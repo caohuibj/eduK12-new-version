@@ -35,7 +35,13 @@ describe('Survey administration canonical origin boundary', () => {
       render(<SurveyAdminOrigin login><div>credentials</div></SurveyAdminOrigin>)
       expect(replace).toHaveBeenCalledExactlyOnceWith('http://localhost:5173/admin/login?returnTo=%2Fusers')
     })
-  it.each(['http://localhost:5173','http://127.0.0.1:5173','https://training.eduk12.top'])(
+  it('takes an old Training management link to the new administrator host', () => {
+    const replace=location('https://training.eduk12.top')
+    render(<SurveyAdminOrigin><div>protected child</div></SurveyAdminOrigin>)
+    expect(screen.queryByText('protected child')).not.toBeInTheDocument()
+    expect(replace).toHaveBeenCalledExactlyOnceWith('https://admin.eduk12.top/admin/survey-researchers')
+  })
+  it.each(['http://localhost:5173','http://127.0.0.1:5173','https://admin.eduk12.top'])(
     'mounts once without a navigation loop at %s', origin => {
       const replace=location(origin)
       render(<SurveyAdminOrigin><div>protected child</div></SurveyAdminOrigin>)

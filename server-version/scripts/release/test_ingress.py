@@ -8,15 +8,15 @@ from ingress import ROOT, bundle, validate, synthetic_config
 class IngressTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(); self.root = Path(self.temp.name)
-        for file in ['nginx.production.conf','eduk12-products.conf','eduk12-school.conf','renew-school.sh']:
+        for file in ['nginx.production.conf','eduk12-products.conf','eduk12-school.conf','eduk12-admin.conf','renew-school.sh']:
             shutil.copyfile(ROOT / file, self.root / file)
     def tearDown(self): self.temp.cleanup()
     def replace(self,file,old,new):
         p=self.root/file;p.write_text(p.read_text().replace(old,new))
     def test_all_current_hosts_and_existing_bindings_preserved(self):
-        self.assertEqual(len(validate(self.root, bundle(ROOT))),7)
+        self.assertEqual(len(validate(self.root, bundle(ROOT))),8)
     def test_missing_include_and_certificate_cannot_pass(self):
-        for name in ['eduk12-school.conf','eduk12-products.conf']:
+        for name in ['eduk12-school.conf','eduk12-products.conf','eduk12-admin.conf']:
             with self.subTest(name=name):
                 text=(self.root/'nginx.production.conf').read_text()
                 self.replace('nginx.production.conf','include /etc/nginx/conf.d/'+name+';','')

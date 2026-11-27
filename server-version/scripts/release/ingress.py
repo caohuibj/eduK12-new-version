@@ -6,11 +6,11 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[2] / 'ops/nginx'
-INCLUDES = {'eduk12-products.conf', 'eduk12-school.conf'}
+INCLUDES = {'eduk12-products.conf', 'eduk12-school.conf', 'eduk12-admin.conf'}
 HOST_CERTS = {'eduk12.top': 'eduk12.top', 'www.eduk12.top': 'eduk12.top',
               'api.eduk12.top': 'api.eduk12.top', 'training.eduk12.top': 'training.eduk12.top',
               'teacher.eduk12.top': 'eduk12-products', 'survey.eduk12.top': 'eduk12-products',
-              'school.eduk12.top': 'school.eduk12.top'}
+              'school.eduk12.top': 'school.eduk12.top', 'admin.eduk12.top': 'admin.eduk12.top'}
 
 
 def server_blocks(text):

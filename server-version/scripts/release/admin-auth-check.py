@@ -9,7 +9,9 @@ const env = process.env
 const key = env.ADMIN_MFA_ENCRYPTION_KEY || ''
 const origin = env.ADMIN_AUTH_ORIGIN || env.ADMIN_WEBAUTHN_ORIGIN
 const rp = env.ADMIN_WEBAUTHN_RP_ID
-if (origin !== 'https://training.eduk12.top' || (rp && rp !== 'training.eduk12.top')) process.exit(2)
+const expected = process.argv[1]
+if (!['https://admin.eduk12.top', 'https://training.eduk12.top'].includes(expected) ||
+    origin !== expected || (rp && rp !== new URL(expected).hostname)) process.exit(2)
 if (!/^[0-9a-f]{64}$/i.test(key) || /^(.)\1{63}$/i.test(key)) process.exit(3)
 for (const name of ['JWT_SECRET', 'CAMPUS_MFA_ENCRYPTION_KEY', 'SURVEY_MFA_ENCRYPTION_KEY', 'LEGACY_DATA_ENCRYPTION_KEY']) {
   if (env[name]?.toLowerCase() === key.toLowerCase()) process.exit(4)
@@ -25,13 +27,13 @@ PROBE_ERRORS = {
 }
 
 
-def check(entry, run=subprocess.run):
+def check(entry, run=subprocess.run, *, origin='https://admin.eduk12.top'):
     if not entry.is_absolute() or not entry.is_file():
         raise ValueError("请指定现行生产 Compose 入口脚本的绝对路径")
     fingerprints = []
     for service in ("backend", "backend-2"):
         try:
-            result = run([str(entry), "exec", "-T", service, "node", "-e", PROBE],
+            result = run([str(entry), "exec", "-T", service, "node", "-e", PROBE, origin],
                          capture_output=True, text=True, timeout=12, check=False)
         except (OSError, subprocess.TimeoutExpired):
             raise ValueError(f"{service} 无法在限定时间内完成管理认证配置检查") from None
@@ -48,9 +50,10 @@ def check(entry, run=subprocess.run):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--compose-entry", required=True, type=Path)
+    parser.add_argument("--origin", choices=["https://admin.eduk12.top", "https://training.eduk12.top"], default="https://admin.eduk12.top")
     args = parser.parse_args()
     try:
-        check(args.compose_entry)
+        check(args.compose_entry, origin=args.origin)
     except ValueError as error:
         parser.exit(1, f"{error}\n")
     print("双 API 管理域、独立 MFA 密钥和 Authenticator 要求通过")

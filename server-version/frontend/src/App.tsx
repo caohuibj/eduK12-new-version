@@ -6,6 +6,7 @@ import AppShell from './components/app-shell/AppShell'
 import { ProductButton, ProductPage, ProductStatus } from './components/product-ui'
 import { RouteAccess, RouteLoading } from './components/app-shell/RouteAccess'
 import { isTrainingHost } from './training/context'
+import { ADMIN_ORIGIN, adminWorkspaceRedirect } from './products/origins'
 import TrainingSjtAuthoringAccess from './training/TrainingSjtAuthoringAccess'
 
 // Portal & Auth Pages
@@ -212,6 +213,12 @@ const CognitiveCapabilityRoute: React.FC<{ children: React.ReactNode }> = ({ chi
 }
 
 function AppRoutes() {
+  const location = useLocation()
+  const canonical = adminWorkspaceRedirect(location.pathname, location.search + location.hash)
+  React.useEffect(() => {
+    if (canonical) window.location.replace(canonical)
+  }, [canonical])
+  if (canonical) return <p role="status">正在转到统一管理后台…</p>
 
   return (
     <React.Suspense fallback={<RouteLoading />}>
@@ -219,11 +226,9 @@ function AppRoutes() {
           {/* Portal - Entry Point */}
           <Route
             path="/"
-            element={
-              <EntryRoute>
-                {isTrainingHost() ? <TrainingPortal /> : <Portal />}
-              </EntryRoute>
-            }
+            element={window.location.origin === ADMIN_ORIGIN
+              ? <Navigate to="/admin/system" replace />
+              : <EntryRoute>{isTrainingHost() ? <TrainingPortal /> : <Portal />}</EntryRoute>}
           />
 
           <Route path="/login" element={isTrainingHost() ? <TrainingLogin /> : <Navigate to="/" replace />} />
@@ -231,6 +236,7 @@ function AppRoutes() {
           <Route path="/features/:feature" element={isTrainingHost() ? <TrainingFeaturePage /> : <Navigate to="/" replace />} />
           <Route path="/contact" element={isTrainingHost() ? <TrainingContactPage /> : <Navigate to="/" replace />} />
 
+          <Route path="/admin" element={<Navigate to="/admin/system" replace/>} />
           {/* Admin Login - no auth check to allow switching accounts */}
           <Route
             path="/admin/login"
