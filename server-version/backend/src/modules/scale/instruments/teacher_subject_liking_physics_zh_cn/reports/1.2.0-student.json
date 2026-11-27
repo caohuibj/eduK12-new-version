@@ -1,0 +1,123 @@
+{
+  "toolKey": "teacher_subject_liking_physics_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "我感受到的物理课堂兴趣｜学生行动版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "artworkKey": "teacher_subject_liking_physics_zh_cn/1.0.0/1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目自编物理学科替换版三题、六点认同选项、无反向计分、至少两题与均分规则；沿用默认 P wave1-20261001-v2 的初高中共同理论五档。报告只解释学生感知，不推断教师真实内心、教学质量或课堂频率；未修改 C、P、阈值与缺失规则。"
+      }
+    },
+    "primaryScoreKeys": [
+      "teacher_subject_liking"
+    ],
+    "scoreOrder": [
+      "teacher_subject_liking"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "teacher_subject_liking",
+        "headline": "我从物理课里感受到多少探索的兴致",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "老师把一张平纸和一团纸举到同样高度，松手前停了一下，让大家先看。小沐注意到老师又换了一次高度，觉得老师很想把现象弄明白；同桌却只记住哪一张先落地。两个人看到同一段课堂，也可能留下不同感受。\n\n这份量表记录的，是你从课堂表现中感受到老师是否喜欢物理、觉得物理有趣。均分越高，表示你平均越认同这些描述；它仍然只是这一次的学生感知。它不是教师自评，也不能替老师说明真实想法或评价教学质量。比起给老师下结论，更有用的是回到一个具体片段，分开写下：你看到了什么，以及你怎样理解。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "先记一个看得见的片段",
+            "summary": "下节课只选一个瞬间，记下老师怎样摆放器材、改变条件或追问现象；再另起一行写你的感受。先不猜老师心里怎么想。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "带一个现象问题去听课",
+            "summary": "课前写下一个具体问题，例如“纸的形状会怎样影响下落”。课堂中留意哪一步给了线索，课后把它补在问题旁边。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "让两个课堂片段互相补充",
+            "summary": "各记一个让你感到投入的片段和一个感觉普通的片段，只写发生了什么。两段经历不必合成一句长期评价。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "把课堂现象讲给自己听",
+            "summary": "挑一个让你印象深的演示，画出条件和观察结果，再写下仍缺的证据。能把现象说清，比只记住热闹更有用。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "把课堂兴致变成一次安全观察",
+            "summary": "在老师允许和指导下，只改变一个安全条件，再观察结果有没有不同。感受到热情之后，也为自己的判断留下一条证据。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "用两行小记录把“老师做了什么”和“我怎样感受”分开，比猜测老师的内心更可靠。"
+          }
+        ],
+        "scoreLabel": "学生感知教师物理兴趣均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "三道题至少答两道，按已答题目计算均分。五档只是把 1—6 分可选范围等距分开，初中和高中共同使用；没有该物理版本的经验样本。",
+      "这些试用分段不是同学中的位置、全国常模或经验证的心理界线，也不提供百分位。",
+      "结果是学生感知，不是教师自评、教师真实兴趣或教学质量，不能用于教师排名与问责；一次均分也不能说明印象怎样形成。"
+    ],
+    "disclaimer": "这份报告供七至十二年级学生回顾物理课堂体验。它不评价教师，也不替任何人作长期判断。"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

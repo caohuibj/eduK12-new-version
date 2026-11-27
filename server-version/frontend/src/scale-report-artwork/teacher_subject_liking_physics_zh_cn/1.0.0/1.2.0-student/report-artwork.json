@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "teacher_subject_liking_physics_zh_cn/1.0.0/1.2.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "教师从同样高度释放平纸和纸团，学生观察两种下落",
+    "width": 512,
+    "height": 512
+  },
+  "bands": [
+    {
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "very_low",
+      "file": "very-low.webp",
+      "alt": "学生把教师改变实验条件的动作和自己的感受分开记录",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "low",
+      "file": "low.webp",
+      "alt": "学生带着一个纸张下落的问题听课，并寻找演示线索",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "middle",
+      "file": "middle.webp",
+      "alt": "学生对照两个不同的物理课堂片段，只记录实际发生的动作",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "high",
+      "file": "high.webp",
+      "alt": "学生把课堂演示画成条件、观察结果和待核对证据",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "very_high",
+      "file": "very-high.webp",
+      "alt": "学生在教师指导下只改变一个安全条件并观察结果",
+      "width": 512,
+      "height": 512
+    }
+  ]
+}
