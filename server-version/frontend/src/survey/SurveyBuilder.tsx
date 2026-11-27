@@ -1,3 +1,4 @@
+import PrivateToolTags from '../components/tool-licensing/PrivateToolTags'
 import {ResearchPackageCatalog} from './ResearchPackageCatalog'
 import {SubmitSurveyToolToLibrary} from './SubmitSurveyToolToLibrary'
 import {toolLibraryApi} from './tool-library-api'
@@ -28,7 +29,7 @@ type BulkBatch={batchId:string;format:'TEXT'|'CSV';content:string;pageKey?:strin
 type BulkResult={revision:number;count:number;ok:boolean;digest:string;issues:{line:number;message:string}[];
   items:{type:string;prompt:string;options:string[];sourceLine?:number;dimensionKey?:string}[]}
 class BuilderApiError extends Error {
-  constructor(message:string,readonly issues:AuthoringIssue[]){super(message)}
+  constructor(message:string,readonly issues:AuthoringIssue[],readonly status?:number){super(message)}
 }
 const getCookie=(name:string)=>document.cookie.split('; ').find(v=>v.startsWith(encodeURIComponent(name)+'='))?.split('=').slice(1).join('=')||''
 async function api<T>(path:string,method='GET',payload?:unknown):Promise<T>{
@@ -49,7 +50,7 @@ async function api<T>(path:string,method='GET',payload?:unknown):Promise<T>{
   const data=await response.json() as Envelope<T|{issues:AuthoringIssue[]}>
   if(!response.ok||data.code!==0){
     const more=data.data as {issues?:AuthoringIssue[]}|null
-    throw new BuilderApiError(data.message||'操作失败',more?.issues??[])
+    throw new BuilderApiError(data.message||'操作失败',more?.issues??[],response.status)
   }
   return data.data as T
 }
@@ -301,6 +302,8 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
             editGeneration.current++
             setActive(d=>d?{...d,title:e.target.value}:d);setDirty(true);setPreview(null);setApiIssues([])
           }}/></label>
+        {measurementWritable&&!licensedReadOnly&&active.status!=='ARCHIVED'&&
+          <PrivateToolTags name={active.title} path={prefix+'/'+encodeURIComponent(active.id)+'/tags'} api={api}/>}
         <div className="flex flex-wrap gap-2">
           {legacyOnly&&!licensedReadOnly&&['FORM','SCALE'].includes(active.kind)&&<button className="btn-secondary" type="button" disabled={busy||dirty} onClick={saveToLibrary}>存入独立工具集</button>}
           {!readOnly&&<button className="btn-primary" type="button" disabled={busy||!dirty||active.status==='ARCHIVED'} onClick={save}>保存草稿</button>}

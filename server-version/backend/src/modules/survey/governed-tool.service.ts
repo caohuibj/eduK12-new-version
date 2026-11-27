@@ -7,7 +7,8 @@ import {freezeSurveyNativeSource,assertSurveyNativeAdmission} from '../bundle-pr
 import type {SurveyNativeSource} from '../bundle-product/survey-native'
 import {catalogDiscoveryRecords,standardDiscoveryMetadataJoin,discoveryPageSql,jsonTagIds,sjtMetadataTagIds,discoveryJoin,governedDiscoveryIdentity} from './catalog-discovery'
 import {catalogTagFacets,type CatalogClassificationTag,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
-import {approveToolEntryPolicies,exactToolEntryProducts} from '../assessment-governance/tool-entry-policy'
+import {approveToolEntryPolicies,assertToolEntryPolicy,exactToolEntryProducts,readApprovedToolEntryProducts} from '../assessment-governance/tool-entry-policy'
+import {inspectTrainingGovernedDefinition} from '../questionnaire-product/training-governed-definition'
 import {ownGovernedMedia,retainGovernedMedia} from './governed-tool.media'
 import {randomUUID} from 'node:crypto'
 import {Prisma,type PrismaClient} from '@prisma/client'
@@ -133,7 +134,7 @@ export async function governedCatalog(actor:string,input:{family?:GovernedFamily
  }
  return {list,page:input.page,hasMore:rows.length>25,tagFacets:catalogTagFacets([catalog.facetTags])}
 }
-export async function governedDetail(actor:string,id:string){await assertStandardSystem(prisma,actor);const row=await governedRow(prisma,id);const trials=await prisma.$queryRaw<Array<{id:string;run_id:string;case_index:number;result_hash:string;created_at:Date;report:unknown}>>`SELECT id,run_id,case_index,result_hash,created_at,result->'report' AS report FROM survey_governed_trials WHERE tool_id=${id} ORDER BY created_at DESC LIMIT 60`;return {...governedView(row),snapshot:row.snapshot,reference:{...row.reference,applications:[...row.reference.applications,{submittedBy:row.submitted_by,submittedAt:row.submitted_at}],approvals:[...row.reference.approvals,...(row.approved_by?[{approvedBy:row.approved_by,approvedAt:row.approved_at,reason:row.approval_reason}]:[])]},trials}}
+export async function governedDetail(actor:string,id:string){await assertStandardSystem(prisma,actor);const row=await governedRow(prisma,id);const trials=await prisma.$queryRaw<Array<{id:string;run_id:string;case_index:number;result_hash:string;created_at:Date;report:unknown}>>`SELECT id,run_id,case_index,result_hash,created_at,result->'report' AS report FROM survey_governed_trials WHERE tool_id=${id} ORDER BY created_at DESC LIMIT 60`;return {...governedView(row),snapshot:row.snapshot,trainingAdapter:inspectTrainingGovernedDefinition(row.snapshot),...(await readApprovedToolEntryProducts(prisma,governedPolicyIdentity(row))),reference:{...row.reference,applications:[...row.reference.applications,{submittedBy:row.submitted_by,submittedAt:row.submitted_at}],approvals:[...row.reference.approvals,...(row.approved_by?[{approvedBy:row.approved_by,approvedAt:row.approved_at,reason:row.approval_reason}]:[])]},trials}}
 export async function governedComponentOptions(actor:string,page=1,query=''){
  await assertStandardSystem(prisma,actor)
  const pattern='%'+query.trim().replace(/[\\%_]/g,'\\$&')+'%'
@@ -161,9 +162,14 @@ export async function approveGovernedTool(actor:string,id:string,input:{expected
   if(r.version!==input.expectedVersion||r.snapshot_hash!==input.hash||r.state!=='SUBMITTED')governedFail(409,'审批内容或状态已变化，请刷新')
   if(input.decision==='APPROVE'){
    const products=exactToolEntryProducts(input.allowedProducts)
-   if(products.some(product=>product!=='SURVEY'))governedFail(409,'此治理版本当前仅有 Survey 执行适配，不能将全局上线视为 Training 准入')
+   if(products.includes('TRAINING')){
+    const adapter=inspectTrainingGovernedDefinition(r.snapshot)
+    if(!adapter.available)governedFail(409,'不能批准 Training 投放：'+adapter.reason)
+   }
    const blockers=artifactBlockers(r.snapshot);if(blockers.length)governedFail(409,blockers.join('；'))
    await assertGovernedDependencies(tx,r.snapshot)
+   if(products.includes('TRAINING'))for(const component of [...r.snapshot.components].sort((a,b)=>a.source.id.localeCompare(b.source.id)))
+    await assertToolEntryPolicy(tx,{resourceKey:'governed-release:'+component.source.id,fingerprint:component.source.hash},'TRAINING')
    await approveToolEntryPolicies(tx,governedPolicyIdentity(r),products,actor,input.reason)
   }
   await tx.$executeRaw`UPDATE survey_governed_tools SET state=${input.decision==='APPROVE'?'APPROVED':'RETURNED'},version=version+1,approved_by=${input.decision==='APPROVE'?actor:null},approved_at=${input.decision==='APPROVE'?new Date():null},approval_reason=${input.decision==='APPROVE'?input.reason:null},reason=${input.reason} WHERE id=${id}`

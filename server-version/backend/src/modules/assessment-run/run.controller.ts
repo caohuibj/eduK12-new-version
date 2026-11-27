@@ -31,6 +31,7 @@ import { listReleasedRegisteredResourcePage } from './registeredResources'
 import { relationalEntryToRunPolicy } from './resourceAuthority'
 import { productionRunResourceAuthorityRegistry } from './resourceAuthority'
 import { decodeRunTaskCursor, encodeRunTaskCursor, listAssignedRunTasks, listAssessmentRunProducts, readAssessmentRunProduct } from './productRead'
+import { educationPublicationResponseCap } from '../tool-licensing/contracts'
 
 const selectorSchema = z.record(z.string(), z.unknown()).default({})
 const policySchema = z.object({
@@ -65,7 +66,12 @@ const addTrackSchema = z.object({
 })
 const educationTrackSchema=addTrackSchema.strict().refine(value=>value.expectedVersion!==undefined&&value.expectedRunId!==undefined,{message:'固定教育测评必须绑定当前任务批次和版本'})
 const publishSchema = z.object({ expectedVersion: z.number().int().min(1) })
-const trackingPublishSchema = publishSchema.extend({tracking: educationTrackingSelectionSchema.optional(),provideParticipantReport:z.boolean().optional()})
+const trackingPublishSchema = publishSchema.extend({
+  tracking: educationTrackingSelectionSchema.optional(),
+  provideParticipantReport: z.boolean().optional(),
+  maxResponses: educationPublicationResponseCap.optional(),
+  intakeDeadline: z.string().datetime().optional(),
+})
 const listRunSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(50),
@@ -272,6 +278,8 @@ export const assessmentRunController = {
         actorUserId: req.user.userId,
         expectedVersion: parsed.data.expectedVersion,tracking:parsed.data.tracking,
         provideParticipantReport:parsed.data.provideParticipantReport,
+        ...(parsed.data.maxResponses === undefined ? {} : { maxResponses: parsed.data.maxResponses }),
+        ...(parsed.data.intakeDeadline === undefined ? {} : { intakeDeadline: new Date(parsed.data.intakeDeadline) }),
       }))
     } catch (err) { return fail(res, err) }
   },

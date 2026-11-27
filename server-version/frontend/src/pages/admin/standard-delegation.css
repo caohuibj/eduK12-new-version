@@ -1,0 +1,23 @@
+.standard-delegation { display:grid; gap:20px; padding:var(--admin-panel-padding,24px); border:1px solid var(--system-line); border-radius:var(--admin-panel-radius,12px); background:var(--system-surface); min-width:0; margin-block:20px; }
+.standard-delegation :is(h3,h4,h5,p) { margin:0; }
+.standard-delegation h3 { font-size:var(--admin-section-size,18px); }
+.standard-delegation h4 { font-size:15px; }
+.standard-delegation h5 { font-size:14px; }
+.standard-delegation-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
+.standard-delegation-grid>section { min-width:0; display:grid; align-content:start; gap:12px; }
+.standard-delegation-grid ul { list-style:none; padding:0!important; margin:0; }
+.standard-delegation-grid li { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding-block:12px; border-bottom:1px solid var(--system-line); overflow-wrap:anywhere; }
+.standard-delegation-grid small { display:block; color:var(--system-muted); }
+.standard-delegation nav { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-block:12px; font-size:12px; }
+.standard-delegation-cover { display:grid; gap:12px; padding:16px; border:1px solid var(--system-line); border-radius:8px; background:var(--system-soft); }
+.standard-delegation-cover li { overflow-wrap:anywhere; padding-block:6px; }
+.standard-delegation-stepup { padding:14px 16px; border:1px solid var(--system-line); border-radius:8px; }
+.standard-delegation-stepup>summary { min-height:44px; cursor:pointer; }
+.standard-delegation-stepup form { display:grid; gap:12px; margin-top:16px; }
+.standard-delegation-stepup label { display:grid; gap:6px; }
+.standard-delegation-stepup input { width:100%; }
+.standard-delegation-choice { padding:12px 16px; border-inline-start:3px solid var(--system-accent); }
+.standard-delegation-records { display:grid; gap:16px; margin-top:8px; }
+.standard-delegation-records .sys-standard-history { margin:0; display:grid; gap:12px; }
+.standard-delegation code { overflow-wrap:anywhere; }
+@media(max-width:760px) { .standard-delegation-grid { grid-template-columns:minmax(0,1fr); } .standard-delegation { padding:16px; } .standard-delegation .sys-search { flex-wrap:wrap; } .standard-delegation .sys-search label { width:100%; min-width:0; } }

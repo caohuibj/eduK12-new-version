@@ -1,4 +1,5 @@
 import {deferredPage} from '../components/page-loading/deferredPage'
+import OwnToolLicense, { type OwnToolLicenseView } from '../components/tool-licensing/OwnToolLicense'
 import {finalDraftStore} from '../services/persistence/finalDraftStore'
 import {isTrainingBusy,runTrainingRetry} from '../services/trainingBusyRetry'
 import {normalizeApiError} from '../utils/normalizeApiError'
@@ -658,6 +659,10 @@ function SchoolApplication(){
           {page==='recovery'&&!professionalRecoveryPage&&(schoolAdmin||psychologyStaff)&&schoolId&&classId&&
             <SchoolRecoveryOfficer key={classPath} api={api} classPath={classPath}/>}
           {(page==='private-tools'||(page==='activities'&&canManageSchoolActivities(access)))&&schoolId&&<EducationAssessmentRegistrationPanel key={'registration:'+user.id+':'+schoolId} api={api} organizationId={schoolId} actorId={user.id} product="SCHOOL"/>}
+          {['private-tools','activities','classes'].includes(page)&&schoolId&&(schoolAdmin||canAuthorPrivateTools)&&
+            <OwnToolLicense key={'school-license:'+user.id+':'+schoolId} title="本校可用工具"
+              load={()=>api<OwnToolLicenseView>('/organizations/'+schoolId+'/tool-licenses')}
+              onOpenSources={canAuthorPrivateTools&&page!=='private-tools'?()=>navigateWorkspace('private-tools'):undefined}/>}
           {page==='private-tools'&&schoolId&&(canAuthorPrivateTools?<EducationPrivateToolStudio key={`SCHOOL:${user.id}:${schoolId}`} api={api} organizationId={schoolId} entry="SCHOOL" actorId={user.id} onDraftStateChange={setPrivateDraftState}/>:<section className="hs-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
           {page==='tasks'&&(user.role==='TEACHER'||user.role==='ADMIN')&&schoolId&&access?.personas.includes('TEACHER')&&<SchoolTeacherTasks compact={ordinaryTeacher} key={'SchoolTeacherTasks:'+user.id+':'+schoolId} api={api} organizationId={schoolId}/>}
           {page==='relationships'&&schoolAdmin&&schoolId&&<><section className="hs-management-related">{managementLinks('relationships')}<a href={workspaceHref('personnel')} onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('personnel')}}>按人员查看有效权限 →</a></section><SchoolRelationships compact={administratorWorkspace} key={'SchoolRelationships:'+schoolId} api={api} organizationId={schoolId} classes={units}/></>}

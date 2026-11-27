@@ -1,3 +1,4 @@
+import {AdminPermissionError} from '../admin-permissions/service'
 import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import {Router,type Request,type Response,type NextFunction} from 'express'
 import {z} from 'zod'
@@ -13,6 +14,7 @@ import {SurveyFinalValidationError} from './final.compute'
 import * as library from './tool-library.service'
 import {publishToolMeasurement} from './tool-publication.service'
 import {ContentReleaseError} from '../measurement-content/release'
+import {ownToolLicenseHandler} from '../tool-licensing/business.routes'
 export const surveyToolLibraryRouter=Router()
 surveyToolLibraryRouter.use(authenticateSurvey)
 const id=z.string().guid(),revision=z.number().int().nonnegative(),title=z.string().trim().min(1).max(200)
@@ -23,15 +25,18 @@ const handle=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respons
     if(cause instanceof z.ZodError)return error(res,'工具字段不合法',-1,400)
     if(cause instanceof SurveyDraftError||cause instanceof BulkImportError)return res.status(400).json({code:'SURVEY_TOOL_INVALID',message:cause.message,data:{issues:cause.issues}})
     if(cause instanceof SurveyFinalValidationError)return error(res,cause.message,-1,400)
-    if(cause instanceof SurveyBuilderError||cause instanceof SurveyMediaError||cause instanceof SurveyGovernanceError||cause instanceof CatalogSourceError)return error(res,cause.message,-1,cause.statusCode)
+    if(cause instanceof AdminPermissionError||cause instanceof SurveyBuilderError||cause instanceof SurveyMediaError||cause instanceof SurveyGovernanceError||cause instanceof CatalogSourceError)return error(res,cause.message,-1,cause.statusCode)
     next(cause)
   }
 }
 const uid=(req:Request)=>req.user!.userId
+surveyToolLibraryRouter.get('/my-license',ownToolLicenseHandler('SURVEY'))
 surveyToolLibraryRouter.get('/catalog',handle(req=>library.catalogTemplates(uid(req),page.parse(req.query.page),z.object(catalogDiscoveryQueryFields).parse(req.query))))
 surveyToolLibraryRouter.get('/',handle(req=>library.listTemplates(uid(req),{page:page.parse(req.query.page),query:z.string().trim().max(200).default('').parse(req.query.query),kind:z.enum(['','FORM','SCALE','COMPOSITION']).default('').parse(req.query.kind),selectableOnly:z.enum(['true','false']).default('false').parse(req.query.selectable)==='true'})))
 surveyToolLibraryRouter.post('/',handle(req=>library.createTemplate(uid(req),z.object({requestId:id,kind:library.toolKind,title}).strict().parse(req.body))))
 surveyToolLibraryRouter.get('/:tid',handle(req=>library.getTemplate(uid(req),id.parse(req.params.tid))))
+surveyToolLibraryRouter.get('/:tid/tags',handle(req=>library.readTemplateTags(uid(req),id.parse(req.params.tid))))
+surveyToolLibraryRouter.put('/:tid/tags',handle(req=>library.updateTemplateTags(uid(req),id.parse(req.params.tid),req.body)))
 surveyToolLibraryRouter.patch('/:tid',handle(req=>library.saveTemplate(uid(req),id.parse(req.params.tid),z.object({revision,title,definition:z.record(z.string(), z.unknown())}).strict().parse(req.body))))
 surveyToolLibraryRouter.post('/:tid/complete',handle(req=>library.completeTemplate(uid(req),id.parse(req.params.tid),z.object({revision}).strict().parse(req.body).revision)))
 surveyToolLibraryRouter.post('/:tid/archive',handle(req=>library.archiveTemplate(uid(req),id.parse(req.params.tid),z.object({revision}).strict().parse(req.body).revision)))

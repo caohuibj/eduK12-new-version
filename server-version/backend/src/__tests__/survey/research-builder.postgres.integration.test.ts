@@ -4,9 +4,11 @@ import { PrismaClient } from '@prisma/client'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 import {
   createDraft, getDraft, listDrafts, updateDraft, copyDraft, archiveDraft,
-  previewSurveyImport, applySurveyImport, simulateSurveyDraft,
+  previewSurveyImport, applySurveyImport, simulateSurveyDraft, readProjectToolTags, updateProjectToolTags,
 } from '../../modules/survey/builder.service'
 import type { FormDraft, ScaleDraft } from '../../modules/survey/builder.definition'
+import { archiveTemplate, createTemplate, getTemplate, readTemplateTags, updateTemplateTags }
+  from '../../modules/survey/tool-library.service'
 
 const DB_URL=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL','PR26_INTEGRATION_DATABASE_URL')
 const suite=DB_URL?describe:describe.skip
@@ -58,7 +60,7 @@ suite('Survey research builder project ACL, revision and batch import — isolat
     expect(other.definition).toMatchObject({schemaVersion:1})
     expect(other.instrumentKey).not.toBe(updated.instrumentKey)
     const valid=await simulateSurveyDraft(aId,projectId,draftId,{})
-    expect(valid.ok).toBe(true)
+    expect(valid).toMatchObject({ok:true})
   })
   it('imports parsed rows atomically under the current revision and preserves item codes',async()=>{
     const source=await getDraft(aId,projectId,draftId)
@@ -96,10 +98,36 @@ suite('Survey research builder project ACL, revision and batch import — isolat
     await expect(updateDraft(bId,projectId,id,{revision:1,title:'冒用',definition}))
       .rejects.toMatchObject({statusCode:404})
     const scores=await simulateSurveyDraft(aId,projectId,id,{itemone:'o5',itemtwo:'o5'})
-    expect(scores.ok).toBe(true)
+    expect(scores).toMatchObject({ok:true})
     const archived=await archiveDraft(aId,projectId,id,1)
     expect(archived.status).toBe('ARCHIVED')
     await expect(updateDraft(aId,projectId,id,{revision:2,title:'归档后修改',definition}))
       .rejects.toMatchObject({statusCode:409})
+  })
+
+  it('keeps private labels scoped to the owned tool without changing authoring revisions',async()=>{
+    const id=randomUUID()
+    const projectTool=await createDraft(aId,projectId,{requestId:id,kind:'FORM',instrumentKey:key('label'),title:'合成项目表单'})
+    const ownTool=await createTemplate(aId,{requestId:id,kind:'COMPOSITION',title:'合成独立组合'})
+    expect(await readProjectToolTags(aId,projectId,id)).toEqual({tags:[],revision:0})
+    expect(await readTemplateTags(aId,id)).toEqual({tags:[],revision:0})
+
+    await expect(updateProjectToolTags(bId,projectId,id,{tags:['越权'],expectedRevision:0})).rejects.toMatchObject({statusCode:404})
+    await expect(updateTemplateTags(bId,id,{tags:['越权'],expectedRevision:0})).rejects.toMatchObject({statusCode:404})
+    await expect(readProjectToolTags(bId,projectId,id)).rejects.toMatchObject({statusCode:404})
+    await expect(readTemplateTags(bId,id)).rejects.toMatchObject({statusCode:404})
+
+    expect(await updateTemplateTags(aId,id,{tags:['独立组合'],expectedRevision:0})).toEqual({tags:['独立组合'],revision:1})
+    expect(await readProjectToolTags(aId,projectId,id)).toEqual({tags:[],revision:0})
+    expect(await updateProjectToolTags(aId,projectId,id,{tags:['项目标签'],expectedRevision:0})).toEqual({tags:['项目标签'],revision:1})
+    expect(await readTemplateTags(aId,id)).toEqual({tags:['独立组合'],revision:1})
+    await expect(updateProjectToolTags(aId,projectId,id,{tags:['旧操作'],expectedRevision:0})).rejects.toMatchObject({statusCode:409})
+    expect(await getDraft(aId,projectId,id)).toMatchObject({definition:projectTool.definition,revision:projectTool.revision})
+    expect(await getTemplate(aId,id)).toMatchObject({definition:ownTool.definition,revision:ownTool.revision})
+
+    await archiveDraft(aId,projectId,id,projectTool.revision)
+    await archiveTemplate(aId,id,ownTool.revision)
+    await expect(updateProjectToolTags(aId,projectId,id,{tags:[],expectedRevision:1})).rejects.toMatchObject({statusCode:409})
+    await expect(updateTemplateTags(aId,id,{tags:[],expectedRevision:1})).rejects.toMatchObject({statusCode:409})
   })
 })

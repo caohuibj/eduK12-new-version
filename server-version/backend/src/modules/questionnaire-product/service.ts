@@ -1,4 +1,7 @@
 import { appendFormContent, readFormSource } from './form-template-content'
+import { assertTrainingGovernedEditable, hasTrainingGovernedSource } from './training-governed-definition'
+import { materializeTrainingGovernedSource, trainingGovernedSourceSchema } from './training-governed-source'
+import { isExpandedToolLicensingEnabled } from '../tool-licensing/runtime'
 import { parseCatalogFilters, sqlLike } from '../training-catalog/filters'
 import {attachTrainingReferenceSelection,listTrainingReferenceChoices,trainingReferenceSelectionSchema} from '../composite/training-reference-selection'
 import { assertCurrentTrainingContentOwner, attachTrainingReportSelection, trainingReportSelectionSchema } from '../composite/training-report-selection'
@@ -60,7 +63,10 @@ const metadata = {
   instruction: z.string().max(10000).nullable().optional(), courseIds: z.array(z.string().min(1)).max(100).default([]),
   publicEnabled: z.boolean().default(false), opensAt: z.string().datetime().nullable().optional(), expiresAt: z.string().datetime().nullable().optional(),
 }
-export const createSchema = z.object({ ...metadata, requestId: z.string().guid(), questionnaireType: z.enum(['COURSE', 'GENERAL']) }).strict()
+export const createSchema = z.object({
+  ...metadata, requestId: z.string().guid(), questionnaireType: z.enum(['COURSE', 'GENERAL']),
+  governedSource: trainingGovernedSourceSchema.optional(),
+}).strict()
 export const editSchema = z.object({ ...metadata, revision: z.number().int().nonnegative() }).strict()
 export const trainingVariantsSchema = z.object({
   revision: z.number().int().nonnegative(), config: weightedVariantConfigSchema.nullable(),
@@ -144,6 +150,7 @@ export async function updateTimingExport(actor:Actor,id:string,raw:unknown){
 export async function updateTrainingVariants(actor: Actor, id: string, raw: unknown) {
   const input = trainingVariantsSchema.parse(raw)
   return mutate(actor, id, input.revision, async (tx, row) => {
+    assertTrainingGovernedEditable(row)
     if (input.config === null) {
       if (input.maxAttempts !== undefined) throw compositeBadRequest('关闭分组时不能同时改变作答次数')
       await tx.compositeAssessment.update({ where: { id }, data: {
@@ -164,6 +171,7 @@ export async function updateTrainingVariants(actor: Actor, id: string, raw: unkn
 export async function updateTrainingFlow(actor: Actor, id: string, raw: unknown) {
   const input = trainingFlowSchema.parse(raw)
   return mutate(actor, id, input.revision, async (tx, row) => {
+    assertTrainingGovernedEditable(row)
     if(input.maxAttempts!==undefined&&input.config?.schemaVersion!==2)throw compositeBadRequest('作答预算仅随明确材料实验设置')
     const candidate={...row,trainingFlowDraft:input.config,maxAttempts:input.maxAttempts??row.maxAttempts}
     if (input.config !== null) {
@@ -195,7 +203,7 @@ export async function detail(actor: Actor, id: string) {
       return {report:current.trainingReportSelectionDraft,reference:current.trainingReferenceSelectionDraft}
     });reportSelection=selections.report;referenceSelection=selections.reference}
   }
-  return { ...await getCompositeForTeacher(actor.userId, actor.role, id), trainingReportSelectionDraft:reportSelection, trainingReferenceSelectionDraft:referenceSelection, supportedChannels: ['WEB'], reportMode: 'COLLECTION_ONLY' }
+  return { ...await getCompositeForTeacher(actor.userId, actor.role, id), governedSourceLocked: hasTrainingGovernedSource(row), trainingReportSelectionDraft:reportSelection, trainingReferenceSelectionDraft:referenceSelection, supportedChannels: ['WEB'], reportMode: 'COLLECTION_ONLY' }
 }
 const formSourceSchema = z.object({ id: z.string().min(1), kind: z.enum(['COMPOSITE', 'LEGACY']), revision: z.number().int().nonnegative().optional() }).strict()
 export async function createFormTemplate(actor: Actor, raw: unknown) {
@@ -227,6 +235,7 @@ export async function importFormTemplate(actor: Actor, id: string, raw: unknown)
   const input = z.object({ revision: z.number().int().nonnegative(), source: formSourceSchema }).strict().parse(raw)
   if (input.source.kind === 'COMPOSITE' && input.source.id === id) throw compositeBadRequest('不能把表单加入自身')
   return mutate(actor, id, input.revision, async (tx, row) => {
+    assertTrainingGovernedEditable(row)
     const source = await readFormSource(tx, actor, input.source)
     await appendFormContent(tx, row, source)
     await ensureCompositeFormSections(id, tx)
@@ -236,6 +245,7 @@ export async function formTemplateSources(actor: Actor) {
   author(actor)
   const owned = await prisma.compositeAssessment.findMany({ where: {
     createdBy: actor.userId, productKind: { in: ['FORM_TEMPLATE', 'QUESTIONNAIRE'] }, status: { not: 'ARCHIVED' },
+    OR: [{ creationKey: null }, { creationKey: { not: { startsWith: 'training-governed:' } } }],
     items: { some: { type: 'FORM' }, none: { type: { not: 'FORM' } } },
     reportPackageKey: null, analysisProtocolKey: null,
   }, select: { id: true, name: true, description: true, revision: true, updatedAt: true }, orderBy: [{ updatedAt: 'desc' }, { id: 'asc' }] })
@@ -250,7 +260,7 @@ export async function create(actor: Actor, raw: unknown) {
   if (process.env.QUESTIONNAIRE_PRODUCTS_ENABLED === 'false') throw compositeConflict('暂未开放新版问卷创建')
   const input = createSchema.parse(raw)
   windowCheck(input)
-  const creationKey = actor.userId + ':' + input.requestId
+  const creationKey = (input.governedSource ? 'training-governed:' : '') + actor.userId + ':' + input.requestId
   const creationHash = canonicalHash(input)
   const run = () => prisma.$transaction(async tx => {
     const existing = await tx.compositeAssessment.findUnique({ where: { creationKey } })
@@ -259,7 +269,7 @@ export async function create(actor: Actor, raw: unknown) {
       return existing.id
     }
     await courses(tx, actor, input.courseIds, input.questionnaireType)
-    return (await tx.compositeAssessment.create({ data: {
+    const created = await tx.compositeAssessment.create({ data: {
       code: 'Q-' + randomUUID(), name: input.name, description: input.description, instruction: input.instruction,
       productKind: 'QUESTIONNAIRE', questionnaireType: input.questionnaireType, createdBy: actor.userId,
       trainingTimingPolicy: await timingPolicy(tx,{productKind:'QUESTIONNAIRE',questionnaireType:input.questionnaireType,questionnaireCourses:input.courseIds.map(courseId=>({courseId})),publicEnabled:input.publicEnabled},input.trainingTimingEnabled===true),
@@ -267,7 +277,9 @@ export async function create(actor: Actor, raw: unknown) {
       ...await validateTrainingFeedbackAuthoring(tx,{createdBy:actor.userId,productKind:'QUESTIONNAIRE',questionnaireType:input.questionnaireType,questionnaireCourses:input.courseIds.map(courseId=>({courseId})),publicEnabled:input.publicEnabled},input.trainingFeedbackPolicy,true),
       creationKey, creationHash, publicEnabled: input.publicEnabled, opensAt: date(input.opensAt), expiresAt: date(input.expiresAt),
       questionnaireCourses: { create: input.courseIds.map(courseId => ({ courseId })) },
-    } })).id
+    } })
+    if (input.governedSource) await materializeTrainingGovernedSource(tx, created.id, actor.userId, input.governedSource)
+    return created.id
   })
   let id: string
   try { id = await run() } catch (e: any) { if (e.code !== 'P2002') throw e; id = await run() }
@@ -320,6 +332,7 @@ export async function update(actor: Actor, id: string, raw: unknown) {
 export async function addItem(actor: Actor, id: string, raw: unknown) {
   const { revision, item, formSectionId } = itemSchema.parse(raw)
   return mutate(actor, id, revision, async (tx, row) => {
+    assertTrainingGovernedEditable(row)
     if (row.productKind === 'FORM_TEMPLATE' && item.type !== 'FORM') throw compositeBadRequest('独立表单只能加入表单题目')
     const itemId = randomUUID()
     const standard=item.standardCombination?await prepareTrainingStandardItemSource(tx,actor.userId,row,{id:itemId,scaleId:item.scaleId!},item.standardCombination):null
@@ -372,6 +385,7 @@ export async function updateFormItem(actor: Actor, id: string, itemId: string, r
 }
 export async function removeItem(actor: Actor, id: string, itemId: string, raw: unknown) {
   return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
+    assertTrainingGovernedEditable(row)
     const item = row.items.find((v: any) => v.id === itemId)
     if (!item) throw compositeNotFound('问卷内容项不存在')
     const removed=trainingReferenceAudit(row,item)
@@ -388,6 +402,7 @@ async function auditSelectedReferences(tx:Tx,actor:Actor,row:{id:string;createdB
 export async function reorder(actor: Actor, id: string, raw: unknown) {
   const { revision, units } = orderSchema.parse(raw)
   return mutate(actor, id, revision, async (tx, row) => {
+    assertTrainingGovernedEditable(row)
     const expected = new Map<string, string>([
       ...row.items.filter((v: any) => v.type !== 'FORM').map((v: any) => [v.id, v.type]),
       ...row.formSections.map((v: any) => [v.id, 'FORM_SECTION']),
@@ -666,6 +681,7 @@ export async function resources(actor: Actor) {
     situational,
     standardCombinations:standardPage.list,
     standardCombinationsNextCursor:standardPage.nextCursor,
+    trainingGovernedSourcesEnabled: actor.role === 'TEACHER' && isExpandedToolLicensingEnabled('TRAINING'),
     courses: courseRows,
   }
 }
@@ -701,6 +717,7 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
     let composite = await tx.compositeAssessment.findUnique({ where: { id }, include: { items: { include: { cognitiveAssignment: true } }, formSections: true, questionnaireCourses: true } })
     if ((!legacy && !composite) || (legacy && composite)) throw compositeNotFound('无法唯一识别来源问卷')
     owner(actor, { createdBy: legacy ? legacy.creatorId : composite!.createdBy })
+    if (composite) assertTrainingGovernedEditable(composite)
     if (composite && (composite.trainingVariantDraft != null || composite.trainingVariantFrozen != null || hasTrainingFlowDefinition(composite))) {
       await tx.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE', id)
       composite = await tx.compositeAssessment.findUnique({ where: { id }, include: { items: { include: { cognitiveAssignment: true } }, formSections: true, questionnaireCourses: true } })

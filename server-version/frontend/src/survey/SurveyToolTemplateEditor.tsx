@@ -1,4 +1,5 @@
 import './survey-form-studio.css'
+import PrivateToolTags from '../components/tool-licensing/PrivateToolTags'
 import {deferredResearcherComponent} from './deferred-researcher-component'
 import {SurveyMaterialPicker} from './SurveyMaterialPicker'
 import {SurveyMaterialDisplay} from './SurveyMaterialDisplay'
@@ -61,6 +62,7 @@ export function SurveyToolTemplateEditor({id,onReturn,onLeaveRiskChange}:{id:str
   }
   const items:ToolRef[]=tool.kind==='COMPOSITION'?tool.definition.items:[]
   const readOnly=tool.status!=='DRAFT'
+  const tagsPath='/tool-library/'+encodeURIComponent(tool.id)+'/tags'
   const importFormat=tool.kind==='SCALE'?'CSV':bulkFormat
   const titleFields=<div className="survey-template-title"><label>工具名称<input ref={nameInput} className="input" disabled={busy||readOnly||formRisk} maxLength={200} value={tool.title} onChange={event=>{editGeneration.current++;setTool({...tool,title:event.target.value});setDirty(true)}}/></label><div className="survey-template-actions"><button type="button" className="btn-primary" disabled={busy||readOnly||!dirty||!tool.title.trim()||formRisk} onClick={save}>{tool.kind==='FORM'?'保存表单信息':tool.kind==='SCALE'?'保存量表信息':'保存组合信息'}</button></div></div>
   const usageHelp=<details className="survey-library-help"><summary>编制与使用说明</summary><p>此工具由你独立管理，不属于具体研究。保存只保留草稿；确认内容并点击“完成编制”，通过结构与素材校验后，才会出现在“发布与采集”的自建工具候选中。后续保存修改会退回草稿，需重新完成；每次选用保留当时的修订，不同步覆盖已有研究。</p><p>{tool.kind==='COMPOSITION'?'普通组合问卷组合已有表单、量表及已授权测评，不生成打包综合报告；研究内仍需配置波次、顺序和反馈策略。':tool.kind==='FORM'?'题目添加、编辑、移除及排序成功后即保存。完成后通过检查与试答核对内容。':'完成题目设置后保存并检查，再通过模拟作答核对内容。量表可设置维度、反向题、总分与原始分区间反馈；研究的报告和发布策略仍单独管理。'}</p></details>
@@ -73,6 +75,7 @@ export function SurveyToolTemplateEditor({id,onReturn,onLeaveRiskChange}:{id:str
       <div id="survey-form-name-fields" className="survey-form-name-fields" hidden={!nameOpen}>{titleFields}</div>
     </header>
     <p className="survey-tool-completion-hint">{tool.readiness==='READY'&&!risk?'此修订已完成编制，可加入研究。后续保存修改后需重新完成。':'保存保留草稿；核对内容、检查与试答后，点击“完成编制”才能在研究中选用。'}</p>
+    {!readOnly&&<PrivateToolTags name={tool.title} path={tagsPath} api={api}/>}
     {error&&<div role="alert" className="survey-library-error">{error}</div>}
     {!!issues.length&&<ul className="survey-library-issues" role="alert">{issues.map((issue,index)=>{const target=formAnswerIssueTarget(tool,issue);return <li key={index}>{target?<button type="button" disabled={busy} onClick={()=>locatePreviewIssue(issue)}>{target.label}：{issue.message}</button>:<>{issue.path||issue.line&&'第 '+issue.line+' 行'}：{issue.message}</>}</li>})}</ul>}
     {tool.kind==='SCALE'&&<>{notice&&<p role="status" className="survey-library-notice">{notice}</p>}<ResearchScaleEditor key={id} value={tool.definition as ScaleDraft} onChange={change} projectId={'tool:'+id} appearance="studio" disabled={busy||readOnly} onDraftRiskChange={setFormRisk} onSave={save} canSave={dirty&&!busy&&!readOnly&&!!tool.title.trim()}/></>}

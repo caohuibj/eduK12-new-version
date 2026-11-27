@@ -1,3 +1,4 @@
+import {readPrivateToolTags,writePrivateToolTags} from '../tool-licensing/private-tags'
 import type {CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {recheckCatalogSjtSourceAuthority} from './catalog.sources'
 import {assertNotTechnicalPackageGrant} from './governed-package.service'
@@ -77,6 +78,28 @@ export async function getDraft(userId:string,projectId:string,id:string){
     return {...publicRow(row),...(row.catalogGrantId?{sourceProvenance:compileCatalogUnit(row,sources.get(row.catalogGrantId)!).sourceProvenance}:{})}
   })
 }
+async function checkProjectToolTags(tx:Tx,userId:string,projectId:string,id:string,write:boolean){
+  await authorizedProject(tx,userId,projectId,write)
+  const [tool]=await tx.$queryRaw<Array<{status:string;catalogGrantId:string|null}>>`
+    SELECT status,catalog_grant_id AS "catalogGrantId" FROM survey_instrument_drafts
+    WHERE id=${id} AND project_id=${projectId} ${write?Prisma.sql`FOR SHARE`:Prisma.empty}
+  `
+  if(!tool||tool.catalogGrantId)fail(404,'自编研究工具不存在')
+  if(write&&tool.status==='ARCHIVED')fail(409,'归档工具不能修改标签')
+}
+export async function readProjectToolTags(userId:string,projectId:string,id:string){
+  return prisma.$transaction(async tx=>{
+    await checkProjectToolTags(tx,userId,projectId,id,false)
+    return readPrivateToolTags(tx,'SURVEY','survey-project:'+id)
+  })
+}
+export async function updateProjectToolTags(userId:string,projectId:string,id:string,input:unknown){
+  return prisma.$transaction(async tx=>{
+    await checkProjectToolTags(tx,userId,projectId,id,true)
+    return writePrivateToolTags(tx,'SURVEY','survey-project:'+id,userId,input)
+  })
+}
+
 export async function createDraft(userId:string,projectId:string,raw:{
   requestId:string;instrumentKey:string;kind:SurveyKind;title:string;
 }){

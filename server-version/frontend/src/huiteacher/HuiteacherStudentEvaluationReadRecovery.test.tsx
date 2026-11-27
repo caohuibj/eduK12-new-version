@@ -112,6 +112,59 @@ describe('Teacher student evaluation read recovery',()=>{
     }finally{confirm.mockRestore()}
   })
 
+  it('confirms the composition Run preview count and forwards the selected publication deadline',async()=>{
+    const deadline='2099-07-31T10:30'
+    const stored='2099-07-31T08:00:00.000Z'
+    const composition={...config,formId:null,definitionDigest:null,
+      privateComposition:{versionId:'composition-a',contentHash:'hash-a'}}
+    const api=vi.fn(async(path:string,method='GET')=>{
+      if(path===configPath)return composition
+      if(path===base+'/run')return draft
+      if(path===configPath+'/eligibility')return {teacherAssigned:true,eligibleStudentCount:14,privacyFloor:10}
+      if(path===configPath+'/run/preview'&&method==='POST')return {runId:draft.runId,version:draft.version,
+        intakeDeadline:stored,tracks:[{executionCount:11}]}
+      if(path===configPath+'/run/publish'&&method==='POST')return {executionCount:11}
+      throw new Error('Unexpected '+method+' '+path)
+    })
+    const confirm=vi.spyOn(window,'confirm').mockReturnValue(true)
+    try{
+      render(<HuiteacherStudentEvaluationManager {...props} eventStatus="OPEN" api={api as Api}/>)
+      const publish=await screen.findByRole('button',{name:'发布评价'})
+      fireEvent.change(screen.getByLabelText('停止接受新作答（本地时间）'),{target:{value:deadline}})
+      fireEvent.click(publish)
+      expect(await screen.findByText('评价已发布，已分配 11 份正式任务。')).toBeInTheDocument()
+      expect(writes(api)).toEqual([
+        [configPath+'/run/preview','POST',{expectedVersion:draft.version}],
+        [configPath+'/run/publish','POST',{expectedVersion:draft.version,maxResponses:11,intakeDeadline:new Date(deadline).toISOString()}],
+      ])
+      expect(confirm).toHaveBeenCalledWith(expect.stringContaining('本次确认作答上限 11 份'))
+      expect(confirm).toHaveBeenCalledWith(expect.stringContaining('已入场的学生仍可继续作答'))
+    }finally{confirm.mockRestore()}
+  })
+
+  it.each([
+    ['different Run',{runId:'other-run',version:draft.version,intakeDeadline:null,tracks:[{executionCount:11}]}],
+    ['missing tracks',{runId:draft.runId,version:draft.version,intakeDeadline:null}],
+  ])('does not open or publish a draft using an invalid preview (%s)',async(_description,planned)=>{
+    const composition={...config,formId:null,definitionDigest:null,
+      privateComposition:{versionId:'composition-a',contentHash:'hash-a'}}
+    const api=vi.fn(async(path:string,method='GET')=>{
+      if(path===configPath)return composition
+      if(path===base+'/run')return draft
+      if(path===configPath+'/eligibility')return {teacherAssigned:true,eligibleStudentCount:14,privacyFloor:10}
+      if(path===configPath+'/run/preview'&&method==='POST')return planned
+      throw new Error('Unexpected '+method+' '+path)
+    })
+    const confirm=vi.spyOn(window,'confirm').mockReturnValue(true)
+    try{
+      render(<HuiteacherStudentEvaluationManager {...props} api={api as Api}/>)
+      fireEvent.click(await screen.findByRole('button',{name:'发布评价'}))
+      expect(await screen.findByText('预览名额或任务版本无效，请重新读取评价任务。')).toBeInTheDocument()
+      expect(writes(api)).toEqual([[configPath+'/run/preview','POST',{expectedVersion:draft.version}]])
+      expect(confirm).not.toHaveBeenCalled()
+    }finally{confirm.mockRestore()}
+  })
+
   it('clears the previous event immediately and ignores its late configuration response',async()=>{
     const old=deferred<typeof config>()
     const otherPath=base.replace(eventId,'event-b')

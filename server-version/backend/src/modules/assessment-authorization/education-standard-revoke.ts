@@ -10,8 +10,8 @@ import {EDUCATION_STANDARD_USE_ACTION,EDUCATION_STANDARD_REVOKE_ACTION,readEduca
 
 const id=z.string().guid()
 export const educationStandardRevokeInput=z.object({requestId:id,expectedVersion:z.number().int().positive(),reason:z.string().trim().min(1).max(500)}).strict()
-/** The original issuer retains cleanup access. A successor needs an exact
- * distribution delegation for this school, product and frozen measurement. */
+/** A successor needs the matching measurement- or combination-level
+ * distribution delegation for this school and product. */
 export async function revokeEducationStandardConfigurationUse(actorId:string,scope:EducationConfigurationScope,combinationId:string,grantId:string,raw:unknown){
  id.parse(combinationId);id.parse(grantId);const input=educationStandardRevokeInput.parse(raw)
  const intentHash=canonicalHash({schemaVersion:1,actorId,scope,combinationId,grantId,...input})
@@ -33,11 +33,13 @@ export async function revokeEducationStandardConfigurationUse(actorId:string,sco
   if((selected.binding.configuration.kind==='STANDARD_COMBINATION'?selected.binding.configuration.combinationId:selected.binding.configuration.configId)!==combinationId)
    throw new AdminPermissionError(409,'原配置来源与撤销目标不一致')
   if(row.issuer_id!==actorId){
-   const measurementId=selected.binding.configuration.measurement.releaseId
-   const [delegation]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`${measurementId}`)} ORDER BY g.id LIMIT 1`)
-   if(!delegation)throw new AdminPermissionError(403,'接任管理员需要原配置所属学校、入口和测量版本的分发授权')
+   const configuration=selected.binding.configuration,measurementId=configuration.measurement.releaseId
+   const exact=configuration.kind==='STANDARD_COMBINATION'?Prisma.sql`${row.resource_keys[0]}`:undefined
+   const [delegation]=await tx.$queryRaw<Array<{id:string;resource_keys:string[]}>>(Prisma.sql`${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`${measurementId}`,exact)} ORDER BY g.id LIMIT 1`)
+   if(!delegation)throw new AdminPermissionError(403,'接任管理员需要该学校和入口的原组合或测量版本分发授权')
+   const distributionKey=delegation.resource_keys.includes(measurementId)?measurementId:row.resource_keys[0]
    await assertContentAuthority(tx,{actorId,grantId:delegation.id,capability:'material.distribute',
-    scope:{product:scope.product,scopeKind:'ORGANIZATION',scopeId:scope.organizationId,resourceKind:'material',resourceKeys:[measurementId]}})
+    scope:{product:scope.product,scopeKind:'ORGANIZATION',scopeId:scope.organizationId,resourceKind:'material',resourceKeys:[distributionKey]}})
   }
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'education-standard-revoke:'+input.requestId}))`
   const previous=await tx.assessmentManagementEvent.findUnique({where:{id:input.requestId}})

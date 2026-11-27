@@ -1,3 +1,4 @@
+import { AdminPermissionError } from '../admin-permissions/service'
 import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import {publishSurveyMeasurementDraft} from './measurement-publication.service'
 import {ContentReleaseError} from '../measurement-content/release'
@@ -42,7 +43,7 @@ const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Res
     if(e instanceof SurveyGovernanceError||e instanceof CatalogSourceError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof ContentReleaseError)return error(res,e.code,-1,409)
     if(e instanceof SurveyMediaError||e instanceof SurveyWaveError)return error(res,e.message,-1,e.statusCode)
-    if(e instanceof service.SurveyBuilderError)return error(res,e.message,-1,e.statusCode)
+    if(e instanceof service.SurveyBuilderError||e instanceof AdminPermissionError)return error(res,e.message,-1,e.statusCode)
     next(e)
   }
 }
@@ -52,6 +53,10 @@ surveyBuilderRouter.post('/:pid/instruments',handle(req=>
   service.createDraft(req.user!.userId,id.parse(req.params.pid),create.parse(req.body))))
 surveyBuilderRouter.get('/:pid/instruments/:iid',handle(req=>
   service.getDraft(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid))))
+surveyBuilderRouter.get('/:pid/instruments/:iid/tags',handle(req=>
+  service.readProjectToolTags(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid))))
+surveyBuilderRouter.put('/:pid/instruments/:iid/tags',handle(req=>
+  service.updateProjectToolTags(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),req.body)))
 surveyBuilderRouter.patch('/:pid/instruments/:iid',handle(req=>
   service.updateDraft(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),update.parse(req.body))))
 surveyBuilderRouter.post('/:pid/instruments/:iid/copy',handle(req=>

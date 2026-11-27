@@ -13,6 +13,7 @@ import { UserRole } from '../../types'
 import { success, error } from '../../utils/response'
 import { z } from 'zod'
 import * as service from './service'
+import { listTrainingGovernedSources } from './training-governed-source'
 import * as workbench from './workbench'
 const router = Router()
 const handle = (fn: (req: Request) => Promise<unknown>) => async (req: Request, res: Response, next: NextFunction) => {
@@ -48,6 +49,7 @@ router.post('/templates/:templateId/archive', handle(req => workbench.archiveTem
 router.get('/management-events', handle(req => workbench.managementEvents(req.user!, req.query)))
 router.get('/workspace/courses/:courseId', handle(req => workbench.courseOverview(req.user!, req.params.courseId, req.query)))
 router.get('/form-templates', handle(req => service.formTemplateSources(req.user!)))
+router.get('/governed-sources', handle(req => listTrainingGovernedSources(req.user!.userId,req.query)))
 router.post('/form-templates', handle(req => service.createFormTemplate(req.user!, req.body)))
 router.post('/:id/import-form', handle(req => service.importFormTemplate(req.user!, req.params.id, req.body)))
 router.get('/resources', handle(req => service.resources(req.user!)))

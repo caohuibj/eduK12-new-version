@@ -4,11 +4,12 @@ import StandardTripletWorkspace from './StandardTripletWorkspace'
 const mock=vi.hoisted(()=>({api:vi.fn()}))
 vi.mock('../../api/surveyStandard',()=>({standardRequest:mock.api}))
 vi.mock('../../admin/AdminStepUp',()=>({default:()=> <p>身份验证</p>}))
+vi.mock("./StandardDelegationPanel",()=>({default:({combination,onClose}:{combination:{id:string;instrumentVersion:string;reportVersion:string};onClose:()=>void})=><section aria-label="delegation-fixture"><span>{combination.id}</span><span>{combination.instrumentVersion}</span><span>{combination.reportVersion}</span><button onClick={onClose}>close-delegation-fixture</button></section>}))
 const hashes={CONTENT:'a'.repeat(64),PARAMETERS:'b'.repeat(64),REPORT:'c'.repeat(64)}
 const row={toolKey:'fixture',instrumentVersion:'1',title:'示例量表',versions:Object.entries(hashes).map(([axis,hash])=>({axis,hash,version:'1'})),combinationHash:'combo',blockers:[],releases:[],tags:[]}
 const detail={selection:{toolKey:'fixture',...hashes},available:[...row.versions.map(v=>({...v,payload:{valid:true},reference:{}})),{axis:'REPORT',hash:'empty-report',version:'none-v1',payload:null}],history:[],trials:[],reference:{authors:['Original']}}
 beforeEach(()=>{vi.clearAllMocks();sessionStorage.clear();mock.api.mockImplementation(async(path:string)=>{if(path.startsWith('/catalog'))return {list:[row],hasMore:false};if(path.startsWith('/candidate'))return detail;if(path==='/management-design')return {rules:[{action:'use.assign',label:'分配使用',training:'仅 Training',survey:'仅 Survey',system:'不代管'}],families:[{family:'COMBINATION',label:'单纯组合',content:'固定组件',parameters:'无额外参数',report:'没有组合报告',implementation:'规则已确认，运行入口尚未接通'},{family:'BUNDLE',label:'组合包',content:'固定组件',parameters:'可留空',report:'组合报告',implementation:'整包禁止拆用'}],boundaries:['不自动产生授权']};return {combinationHash:'combo',blockers:[],parts:Object.fromEntries(detail.available.slice(0,3).map(p=>[p.axis,p]))}})})
-async function open(){render(<StandardTripletWorkspace authored={<p>旧入库页面</p>}/>);const title=await screen.findByText('示例量表');const d=title.closest('details')!;d.open=true;fireEvent(d,new Event('toggle'));await screen.findByText('不反馈（无报告） · empty-re');return d}
+async function open(actorId?:string){render(<StandardTripletWorkspace actorId={actorId} authored={<p>旧入库页面</p>}/>);const title=await screen.findByText('示例量表');const d=title.closest('details')!;d.open=true;fireEvent(d,new Event('toggle'));await screen.findByText('不反馈（无报告） · empty-re');return d}
 describe('standard workflow and unified management design UI',()=>{
  it('opens pending intake import and draft workspaces without a catalog write or synthetic definition',async()=>{
   const read=mock.api.getMockImplementation()!
@@ -48,6 +49,27 @@ describe('standard workflow and unified management design UI',()=>{
   vi.spyOn(window,'confirm').mockReturnValueOnce(true)
   fireEvent.click(screen.getByRole('button',{name:'批准并试运行，通过后上线'}))
   await waitFor(()=>expect(mock.api).toHaveBeenCalledWith('/approve',expect.objectContaining({allowedProducts:['SCHOOL','TEACHER'],reason:'教育入口范围审批',...hashes})))
+  expect(mock.api.mock.calls.some(c=>String(c[0]).includes('grant'))).toBe(false)
+ })
+ it('opens the published education combination directly from the successful approval result',async()=>{
+  const read=mock.api.getMockImplementation()!
+  mock.api.mockImplementation(async(path:string,body:unknown)=>{
+   if(path==='/approve')return {id:'newly-published',state:'ONLINE',combinationHash:'combo'}
+   if(path==='/preview')return {combinationHash:'combo',blockers:[],parts:{
+    CONTENT:{version:'C2',sourceVersion:'2.0'},PARAMETERS:{version:'P1'},REPORT:{version:'R2'},
+   }}
+   return read(path,body)
+  })
+  await open('system')
+  fireEvent.change(screen.getByLabelText('本次操作原因'),{target:{value:'合成教育范围审批'}})
+  fireEvent.click(screen.getByRole('checkbox',{name:'Teacher'}))
+  fireEvent.click(screen.getByRole('button',{name:'核对三份版本'}));await screen.findByText('三份版本对应关系已核对')
+  vi.spyOn(window,'confirm').mockReturnValueOnce(true)
+  fireEvent.click(screen.getByRole('button',{name:'批准并试运行，通过后上线'}))
+  fireEvent.click(await screen.findByRole('button',{name:'去分配'}))
+  const panel=await screen.findByRole('region',{name:'delegation-fixture'})
+  expect(panel).toHaveTextContent('newly-published')
+  expect(panel).toHaveTextContent('R2')
   expect(mock.api.mock.calls.some(c=>String(c[0]).includes('grant'))).toBe(false)
  })
  it('loads only read-only catalog and defers details until expansion',async()=>{render(<StandardTripletWorkspace authored={null}/>);await screen.findByText('示例量表');expect(mock.api).toHaveBeenCalledTimes(1);expect(screen.getByText('示例量表').closest('details')).not.toHaveAttribute('open');expect(mock.api.mock.calls.every(c=>c[1]===undefined)).toBe(true)})
@@ -407,4 +429,37 @@ it('keeps one approval intent after an uncertain result and refuses a changed en
  mock.api.mockImplementation(async(path:string,body?:unknown)=>{if(path==='/approve'){expect(body).toEqual(firstBody);return {state:'ONLINE'}}return original(path,body)})
  fireEvent.click(screen.getByRole('button',{name:'批准并试运行，通过后上线'}));await screen.findByText('已上线；未创建研究者授权。')
  expect(sessionStorage.getItem('survey-triplet-approval:combo')).toBeNull()
+})
+it('opens delegation for the selected default and a different ONLINE history combination with its original content version',async()=>{
+ const read=mock.api.getMockImplementation()!
+ const approved=(id:string,hash:string,report:string)=>({id,state:'ONLINE',version:1,combinationHash:hash,approvedBy:'system',approvedAt:'2026-11-27T00:00:00Z',blockers:[],versions:{CONTENT:{version:'C1',hash:hashes.CONTENT},PARAMETERS:{version:'P1',hash:hashes.PARAMETERS},REPORT:{version:report,hash:hashes.REPORT}}})
+ const current=approved('online-current','combo','R1'),old=approved('online-history','other-combo','R2')
+ mock.api.mockImplementation(async(path:string,body:unknown)=>path.startsWith('/catalog')?{list:[{...row,releases:[current,old]}],hasMore:false}:path.startsWith('/candidate')?{...detail,history:[current,old],versionMappings:[{identity:{releaseId:old.id},axes:{CONTENT:{sourceVersion:'original-content-2'}},measurement:{pointer:null,status:'NOT_RECORDED'}}]}:read(path,body))
+ render(<StandardTripletWorkspace actorId="system" authored={null}/>)
+ const record=(await screen.findByText('示例量表',{selector:'strong'})).closest('details')!
+ record.open=true
+ await screen.findByLabelText('文字报告版本')
+ fireEvent.click(within(screen.getByRole('region',{name:'组合状态与下一步'})).getByRole('button',{name:'分配权限'}))
+ expect(screen.getByRole('region',{name:'delegation-fixture'})).toHaveTextContent('online-current')
+ fireEvent.click(screen.getByRole('button',{name:'close-delegation-fixture'}))
+ const history=screen.getByText('申请、批准及试运行记录（2）').closest('details')!
+ history.open=true
+ const oldSection=Array.from(history.querySelectorAll('section.sys-standard-history'))[1] as HTMLElement
+ fireEvent.click(within(oldSection).getByRole('button',{name:'分配权限'}))
+ const panel=screen.getByRole('region',{name:'delegation-fixture'})
+ expect(panel).toHaveTextContent('online-history');expect(panel).toHaveTextContent('original-content-2');expect(panel).toHaveTextContent('R2')
+ expect(panel).not.toHaveTextContent('online-current')
+})
+it('opens historical delegation management for a withdrawn combination',async()=>{
+ const read=mock.api.getMockImplementation()!
+ const historyRow={id:'withdrawn-history',state:'WITHDRAWN',version:4,combinationHash:'old-combo',approvedBy:'system',approvedAt:'2026-11-27T00:00:00Z',blockers:[],versions:Object.fromEntries(row.versions.map(value=>[value.axis,value]))}
+ mock.api.mockImplementation(async(path:string,body:unknown)=>path.startsWith('/catalog')?{list:[{...row,releases:[historyRow]}],hasMore:false}:path.startsWith('/candidate')?{...detail,history:[historyRow]}:read(path,body))
+ render(<StandardTripletWorkspace actorId="system" authored={null}/>)
+ const record=(await screen.findByText('示例量表',{selector:'strong'})).closest('details')!
+ record.open=true
+ await screen.findByLabelText('文字报告版本')
+ const history=screen.getByText('申请、批准及试运行记录（1）').closest('details')!
+ history.open=true
+ fireEvent.click(within(history).getByRole('button',{name:'管理原委托'}))
+ expect(screen.getByRole('region',{name:'delegation-fixture'})).toHaveTextContent('withdrawn-history')
 })

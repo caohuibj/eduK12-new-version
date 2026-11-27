@@ -21,6 +21,10 @@ import { requireRecentAdminKey, requireSystemAdmin } from './guards'
 import { ADMIN_ENTRY_ACTIVATION, createEntryAdmin, issueEntryAdminEnrollment } from './provisioning'
 import { inactiveAccountMessage } from '../../utils/accountStatus'
 import { cognitiveIntakeAdminRouter } from '../cognitive/onboarding/admin.routes'
+import {standardDelegationsRouter} from './standard-delegations.routes'
+import {standardDelegationReviewRouter} from './standard-delegation-review.routes'
+import { toolLicensesRouter } from '../tool-licensing/routes'
+import { tagCatalogRouter } from '../tool-licensing/tags'
 
 const handle = (work: (req: Request, res: Response) => Promise<unknown>) => async (req: Request, res: Response, next: NextFunction) => {
   try { return success(res, await work(req, res)) }
@@ -106,9 +110,15 @@ adminSecurityRouter.post('/totp/step-up/verify', authenticate, adminTotpAttemptL
   return finishAdminTotp(req, res, readTotpCode(req), 'STEP_UP', claims.adminSessionId)
 }))
 
+export const adminToolCatalogRouter = Router()
+adminToolCatalogRouter.use(authenticate, originGuard, limiter, tagCatalogRouter)
+
 export const adminPermissionsRouter = Router()
 adminPermissionsRouter.use(authenticate, originGuard, requireSystemAdmin, limiter)
 adminPermissionsRouter.use('/cognitive-intake', cognitiveIntakeAdminRouter)
+adminPermissionsRouter.use('/standard-delegations', standardDelegationsRouter)
+adminPermissionsRouter.use('/standard-delegation-review', standardDelegationReviewRouter)
+adminPermissionsRouter.use('/tool-licenses', toolLicensesRouter)
 // System administrators act in their existing management entry. This never
 // permits a Training cookie to authenticate School or Teacher product routes.
 adminPermissionsRouter.use('/education/school/organizations/:organizationId/assessment-resource-registrations',requireRecentAdminKey,educationAssessmentResourceRouter('SCHOOL',requireRecentAdminKey))

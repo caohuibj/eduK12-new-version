@@ -16,6 +16,7 @@ import { requireRecentSchoolMfa } from './mfa.middleware'
 import { guardCampusCapabilityGrant } from './capabilityGuard'
 import { requireCampusClassRead } from './classRead.middleware'
 import { CampusAdmissionError } from './admission.service'
+import { ownToolLicenseHandler } from '../tool-licensing/business.routes'
 import { readCampusRelationshipDirectory, appointCampusCounselorClient, endCampusCounselorClient, assignCampusStaffClass, endCampusStaffClass } from './relationships.service'
 
 // Reuse the existing Organization structure and relationship services, never
@@ -30,6 +31,7 @@ router.get('/organizations/:organizationId/tool-authoring-capabilities', authent
   educationToolAuthoringCapabilitiesHandler('SCHOOL'))
 router.get('/organizations',authenticateSchool,organizationController.listAccessible)
 router.get('/organizations/:organizationId/context',authenticateSchool,organizationController.readContext)
+router.get('/organizations/:organizationId/tool-licenses',authenticateSchool,ownToolLicenseHandler('SCHOOL'))
 router.get('/organizations/:organizationId/units',authenticateSchool,requireCampusClassRead,organizationAdminController.listUnits)
 router.post('/organizations/:organizationId/units',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationAdminController.createUnit)
 router.delete('/organizations/:organizationId/units/:unitId',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationAdminController.deleteUnit)

@@ -11,6 +11,7 @@ import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
 import {EDUCATION_STANDARD_USE_ACTION,EDUCATION_STANDARD_REVOKE_ACTION,educationStandardUseMetadata,readEducationStandardUseBinding,type EducationConfigurationScope} from './education-standard-use'
 import {selectedConfigurationPointer} from './standard-configuration-binding'
 import {readSelectedConfigurationBinding} from './selected-configuration'
+import {educationPublicSourceKey} from '../education-tools/public-source.identity'
 import {listEducationAuthoringMemberCandidates} from '../organization/educationProductAccess'
 
 const id=z.string().guid(),query=z.object({page:z.coerce.number().int().min(1).max(10000).default(1),q:z.string().trim().max(120).default('')}).strict()
@@ -22,10 +23,11 @@ export async function assertEducationConfigurationManager(tx:Prisma.TransactionC
  if(actor.systemAdmin||!['TRAINING','LEGACY'].includes(actor.account_domain))throw new AdminPermissionError(403,'需要独立的教育入口管理身份')
  await assertEntryAdmin(tx,actorId,scope.product==='SCHOOL'?'HUISCHOOL':'HUITEACHER')
 }
-export const educationConfigurationDistributionRoots=(actorId:string,scope:EducationConfigurationScope,measurement:Prisma.Sql)=>Prisma.sql`
- SELECT g.id,g.version,g.valid_from,g.expires_at FROM content_capability_grants g
+export const educationConfigurationDistributionRoots=(actorId:string,scope:EducationConfigurationScope,measurement:Prisma.Sql,exactCombination?:Prisma.Sql)=>Prisma.sql`
+ SELECT g.id,g.version,g.valid_from,g.expires_at,g.resource_keys FROM content_capability_grants g
  WHERE g.subject_id=${actorId} AND g.product=${scope.product} AND g.scope_kind='ORGANIZATION' AND g.scope_id=${scope.organizationId}
-  AND g.resource_kind='material' AND g.resource_keys@>ARRAY[${measurement}]::text[] AND g.capabilities=ARRAY['material.distribute']::text[]
+  AND g.resource_kind='material' AND (g.resource_keys@>ARRAY[${measurement}]::text[]
+   ${exactCombination?Prisma.sql`OR g.resource_keys=ARRAY[${exactCombination}]::text[]`:Prisma.empty}) AND g.capabilities=ARRAY['material.distribute']::text[]
   AND g.parent_grant_id IS NULL AND g.ancestry=ARRAY[g.id]::text[] AND g.delegable_capabilities=ARRAY[]::text[] AND g.remaining_delegation_depth=0
   AND g.revoked_at IS NULL AND g.valid_from<=clock_timestamp() AT TIME ZONE 'UTC' AND g.expires_at>clock_timestamp() AT TIME ZONE 'UTC'`
 
@@ -36,6 +38,8 @@ export async function educationStandardManagementCatalog(actorId:string,scope:Ed
  return prisma.$transaction(async tx=>{
   await assertEducationConfigurationManager(tx,actorId,scope)
   const records=catalogDiscoveryRecords()
+  const roots=educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`s.measurement_release->>'releaseId'`,
+   Prisma.sql`'education-source:STANDARD_SCALE:'||s.id||':'||s.combination_hash`)
   const [catalog]=await tx.$queryRaw<Array<{facetTags:CatalogClassificationTag[];list:Array<{id:string;title:string;toolKey:string;instrumentVersion:string;combinationHash:string;state:string;
    contentVersion:string;parametersVersion:string;reportVersion:string;approved:boolean;nativeStatus:string|null;measurementId:string|null;measurementAvailable:boolean;organizationAvailable:boolean;
    authorities:Array<{id:string;version:number;validFrom:string;expiresAt:string}>;classificationTags:CatalogClassificationTag[]}>}>>(discoveryPageSql({source:Prisma.sql`
@@ -46,12 +50,12 @@ export async function educationStandardManagementCatalog(actorId:string,scope:Ed
     EXISTS(SELECT 1 FROM organizations o JOIN education_product_entitlements ent ON ent.organization_id=o.id
      AND ent.product=${scope.product==='SCHOOL'?'HUISCHOOL':'HUITEACHER'} AND ent.status='ACTIVE' WHERE o.id=${scope.organizationId} AND o.product_domain='SCHOOL' AND o.status='ACTIVE') AS "organizationAvailable",
     COALESCE((SELECT jsonb_agg(jsonb_build_object('id',r.id,'version',r.version,'validFrom',r.valid_from AT TIME ZONE 'UTC','expiresAt',r.expires_at AT TIME ZONE 'UTC'))
-     FROM (${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`s.measurement_release->>'releaseId'`)} ORDER BY g.id LIMIT 129) r),'[]'::jsonb) AS authorities
+     FROM (${roots} ORDER BY g.id LIMIT 129) r),'[]'::jsonb) AS authorities
    FROM survey_standard_releases s LEFT JOIN survey_tool_policies p ON p.product=${scope.product} AND p.resource_key='standard-release:'||s.id AND p.fingerprint=s.combination_hash
    LEFT JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId'
    LEFT JOIN scales native ON ${standardNativeScaleJoin('native','s')} AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
    ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`s.tool_key`,version:Prisma.sql`s.snapshot->>'instrumentVersion'`,metadata:Prisma.sql`s.snapshot#>'{parts,CONTENT,reference,metadata}'`,locale:Prisma.sql`s.snapshot#>>'{definition,versionAxes,locale}'`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})}
-   WHERE (EXISTS(${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`s.measurement_release->>'releaseId'`)}) OR EXISTS(
+   WHERE (EXISTS(${roots}) OR EXISTS(
     SELECT 1 FROM content_capability_grants own JOIN assessment_management_events e ON e.id=own.id AND e.action=${EDUCATION_STANDARD_USE_ACTION}
     WHERE own.issuer_id=${actorId} AND own.product=${scope.product} AND own.scope_kind='ORGANIZATION' AND own.scope_id=${scope.organizationId} AND e.resource_id=s.id))
     `,filters:{...input,keyword:[input.q,input.keyword].filter(Boolean).join(' ')},text:[Prisma.sql`v.title`,Prisma.sql`v."toolKey"`],order:Prisma.sql`v."toolKey",v.created_at,v.id`,limit:size+1,offset:(input.page-1)*size}))
@@ -70,7 +74,9 @@ async function assertSelectable(tx:Prisma.TransactionClient,actorId:string,scope
  await assertEducationConfigurationManager(tx,actorId,scope)
  const source=await readCurrentStandardCombination(tx,{releaseId:id.parse(combinationId),combinationHash})
  await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+combinationId,fingerprint:combinationHash},scope.product)
- const found=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`${source.measurement.releaseId}`)} LIMIT 1`)
+ const exact=educationPublicSourceKey({kind:'STANDARD_SCALE',id:combinationId,hash:combinationHash})
+ const found=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`${educationConfigurationDistributionRoots(actorId,scope,
+  Prisma.sql`${source.measurement.releaseId}`,Prisma.sql`${exact}`)} LIMIT 1`)
  if(!found.length)throw new AdminPermissionError(403,'缺少本校、本来源的精确分发委托')
  return source
 }
@@ -93,7 +99,9 @@ export async function educationStandardManagementGrants(actorId:string,scope:Edu
    WHERE g.product=${scope.product} AND g.scope_kind='ORGANIZATION' AND g.scope_id=${scope.organizationId}
     AND e.actor_id=g.issuer_id AND e.resource_id=${combinationId}
     AND (g.issuer_id=${actorId} OR EXISTS(
-      ${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`e.metadata#>>'{selectedBinding,binding,configuration,measurement,releaseId}'`)}
+      ${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`e.metadata#>>'{selectedBinding,binding,configuration,measurement,releaseId}'`,Prisma.sql`
+       CASE WHEN e.metadata#>>'{selectedBinding,binding,configuration,kind}'='STANDARD_COMBINATION'
+        THEN 'education-source:STANDARD_SCALE:'||e.resource_id||':'||(e.metadata#>>'{selectedBinding,binding,configuration,combinationHash}') END`)}
     )) ${input.userId?Prisma.sql`AND g.subject_id=${input.userId}`:Prisma.empty}
     ${input.requestId?Prisma.sql`AND g.id=${input.requestId}`:Prisma.empty}
    ORDER BY g.created_at,g.id LIMIT ${size+1} OFFSET ${(input.page-1)*size}`)

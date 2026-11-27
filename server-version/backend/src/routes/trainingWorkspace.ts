@@ -16,9 +16,12 @@ import { libraryReadableScaleIds } from '../modules/scale-library-governance/rea
 import { listPublishedConfigs } from '../modules/cognitive/assignment.service'
 import { listSituationalResourceSummaries } from '../modules/situational/situational-release.service'
 import { bundleProductService } from '../modules/bundle-product/service'
+import { ownToolLicenseHandler } from '../modules/tool-licensing/business.routes'
+import { readPrivateToolTags, writePrivateToolTags } from '../modules/tool-licensing/private-tags'
 
 const router = Router()
 router.use(authenticate, requireTeacher)
+router.get('/tool-licenses',ownToolLicenseHandler('TRAINING'))
 export const workspaceQuery = z.object({
   keyword: z.string().trim().max(200).default(''),
   usage:z.enum(['library','assessment']).default('library'),
@@ -32,6 +35,24 @@ const handle = (fn: (req: any) => Promise<unknown>, validationMessage = '检索�
     return next(cause)
   }
 }
+
+async function ownedSjtDraftTags(req: any, update: boolean) {
+  const id = z.string().guid().parse(req.params.id)
+  if (!['TRAINING', 'LEGACY'].includes(req.user.accountDomain) || req.user.role !== 'TEACHER')
+    throw Object.assign(new Error('需要培训师业务身份'), { statusCode: 403 })
+  return prisma.$transaction(async tx => {
+    const [draft] = await tx.$queryRaw<{ id: string }[]>`
+      SELECT id FROM sjt_author_drafts WHERE id=${id} AND owner_id=${req.user.userId} FOR SHARE
+    `
+    if (!draft) throw Object.assign(new Error('未找到可管理的情境判断工具'), { statusCode: 404 })
+    const toolId = 'sjt-draft:' + draft.id
+    return update
+      ? writePrivateToolTags(tx, 'TRAINING', toolId, req.user.userId, req.body)
+      : readPrivateToolTags(tx, 'TRAINING', toolId)
+  })
+}
+router.get('/tools/sjt-draft/:id/tags', handle(req => ownedSjtDraftTags(req, false), '工具标识无效'))
+router.put('/tools/sjt-draft/:id/tags', handle(req => ownedSjtDraftTags(req, true), '标签内容无效'))
 
 const mediaRows = Prisma.sql`SELECT a.id, a.id AS "assetId", a.original_name AS "originalName",
   COALESCE(v.title,d.title,a.original_name,'未命名媒体') AS name,
@@ -91,11 +112,11 @@ router.get('/tools', handle(async req => {
     ...situational.map(row=>({id:row.id,kind:'situational',name:row.name || row.instrumentKey,version:row.instrumentVersion,href:'/questionnaire-products/new',classificationTags:records.find(record=>record.kind==='SJT'&&record.key===row.instrumentKey&&record.version===row.instrumentVersion)?.tags??[]})),
     ...bundles.filter(row=>row.canInstantiate).map(row=>({id:row.bundleKey+'@'+row.bundleVersion,kind:'bundle',name:row.name,version:row.bundleVersion,href:'/bundle-products',classificationTags:row.classificationTags})),
   ].map(row=>Prisma.sql`SELECT ${row.id}::text AS id,${row.kind}::text AS kind,${row.name}::text AS name,NULL::text AS description,
-    'PUBLISHED'::text AS status,${row.version}::text AS version,NULL::text AS "ownerId",NULL::timestamptz AS "updatedAt",${row.href}::text AS href,false AS "canUpdateVersion",${JSON.stringify(row.classificationTags.map(tag=>tag.id))}::jsonb AS "tagIds"`)
+    'PUBLISHED'::text AS status,${row.version}::text AS version,NULL::text AS "ownerId",NULL::timestamptz AS "updatedAt",${row.href}::text AS href,false AS "canUpdateVersion",${JSON.stringify(row.classificationTags.map(tag=>tag.id))}::jsonb AS "tagIds",'[]'::jsonb AS "managementTags"`)
   const rows=Prisma.sql`
     SELECT s.id,'scale'::text AS kind,s.name,s.description,s.status::text AS status,s.instrument_version AS version,
       CASE WHEN s.library_entry_id IS NULL THEN s.creator_id ELSE NULL END AS "ownerId",s.updated_at AS "updatedAt",'/scales/'||s.id AS href,
-      (s.library_entry_id IS NULL AND s.creator_id=${actor} AND s.status='PUBLISHED' AND s.instrument_class='CUSTOM_DESCRIPTIVE' AND s.definition #>> '{license,status}'='self_authored' AND s.definition #>> '{license,redistribution}'='allowed') AS "canUpdateVersion",COALESCE(to_jsonb(s.tags),'[]'::jsonb)||COALESCE(discovery.ids,'[]'::jsonb) AS "tagIds"
+      (s.library_entry_id IS NULL AND s.creator_id=${actor} AND s.status='PUBLISHED' AND s.instrument_class='CUSTOM_DESCRIPTIVE' AND s.definition #>> '{license,status}'='self_authored' AND s.definition #>> '{license,redistribution}'='allowed') AS "canUpdateVersion",COALESCE(to_jsonb(s.tags),'[]'::jsonb)||COALESCE(discovery.ids,'[]'::jsonb) AS "tagIds",COALESCE(to_jsonb(s.tags),'[]'::jsonb) AS "managementTags"
       FROM scales s JOIN users u ON u.id=s.creator_id
       ${standardDiscoveryMetadataJoin(Prisma.sql`s.code`,Prisma.sql`s.instrument_version`)} ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`s.code`,version:Prisma.sql`s.instrument_version`,metadata:Prisma.sql`imported_discovery_source.metadata`,locale:Prisma.sql`imported_discovery_source.locale`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})} WHERE
       -- Approved wrappers are exact immutable versions, independent of the author's
@@ -106,16 +127,23 @@ router.get('/tools', handle(async req => {
           SELECT 1 FROM material_grants g WHERE g.teacher_id=${actor} AND g.resource_type::text='SCALE' AND g.resource_id=s.id
           AND (g.legacy_scale_grant OR NOT EXISTS (SELECT 1 FROM scale_library_entries e
             JOIN scale_library_submissions submission ON submission.id=e.submission_id WHERE submission.source_id=s.id))))))
-    UNION ALL SELECT f.id,'form',f.name,f.description,f.status::text,NULL,f.creator_id,f.updated_at,'/general-questionnaires/'||f.id||'/edit',(f.creator_id=${actor} AND f.status='PUBLISHED'),to_jsonb(f.tags)
+    UNION ALL SELECT f.id,'form',f.name,f.description,f.status::text,NULL,f.creator_id,f.updated_at,'/general-questionnaires/'||f.id||'/edit',(f.creator_id=${actor} AND f.status='PUBLISHED'),to_jsonb(f.tags),to_jsonb(f.tags)
       FROM questionnaires f JOIN users u ON u.id=f.creator_id WHERE f.type='GENERAL' AND NOT EXISTS(SELECT 1 FROM questionnaire_scales s WHERE s.questionnaire_id=f.id) AND u.account_domain IN ('LEGACY','TRAINING')
       AND (f.creator_id=${actor} OR (${config.materialGrantsEnabled} AND f.status='PUBLISHED'
         AND NOT EXISTS(SELECT 1 FROM questionnaire_scales s WHERE s.questionnaire_id=f.id)
         AND EXISTS(SELECT 1 FROM material_grants g WHERE g.teacher_id=${actor} AND g.resource_type::text='FORM_TEMPLATE' AND g.resource_id=f.id)))
-    UNION ALL SELECT c.id,CASE WHEN c.product_kind='FORM_TEMPLATE' THEN 'form-template' WHEN EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=c.id AND i.type='FORM') AND NOT EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=c.id AND i.type<>'FORM') THEN 'form-composition' ELSE 'composition' END,c.name,c.description,c.status::text,c.revision::text,c.created_by,c.updated_at,CASE WHEN c.product_kind='FORM_TEMPLATE' THEN '/toolkit/forms/'||c.id ELSE '/toolkit/compositions/'||c.id END,(c.status='PUBLISHED'),to_jsonb(c.tags)
-      FROM composite_assessments c WHERE c.product_kind IN ('QUESTIONNAIRE','FORM_TEMPLATE') AND c.created_by=${actor} AND c.status<>'ARCHIVED'
-    UNION ALL SELECT s.id,'sjt-draft',COALESCE(s.template->>'title','情境判断'),NULL,s.status,s.template->>'instrumentVersion',s.owner_id,s.updated_at,'/sjt-authoring?draftId='||s.id,(s.status='PUBLISHED'),'[]'::jsonb
+    UNION ALL SELECT c.id,CASE
+       WHEN c.product_kind='FORM_TEMPLATE' THEN 'form-template'
+       WHEN c.product_kind='ASSESSMENT_BUNDLE' THEN 'bundle'
+       WHEN EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=c.id AND i.type='FORM')
+         AND NOT EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=c.id AND i.type<>'FORM') THEN 'form-composition'
+       ELSE 'composition' END,c.name,c.description,c.status::text,c.revision::text,c.created_by,c.updated_at,
+       CASE c.product_kind WHEN 'FORM_TEMPLATE' THEN '/toolkit/forms/'||c.id WHEN 'ASSESSMENT_BUNDLE' THEN '/bundle-products/'||c.id ELSE '/toolkit/compositions/'||c.id END,
+       (c.status='PUBLISHED'),to_jsonb(c.tags),to_jsonb(c.tags)
+      FROM composite_assessments c WHERE c.product_kind IN ('QUESTIONNAIRE','FORM_TEMPLATE','ASSESSMENT_BUNDLE') AND c.created_by=${actor} AND c.status<>'ARCHIVED'
+    UNION ALL SELECT s.id,'sjt-draft',COALESCE(s.template->>'title','情境判断'),NULL,s.status,s.template->>'instrumentVersion',s.owner_id,s.updated_at,'/sjt-authoring?draftId='||s.id,(s.status='PUBLISHED'),'[]'::jsonb,'[]'::jsonb
       FROM sjt_author_drafts s WHERE s.owner_id=${actor}
-    UNION ALL SELECT r.id,'situational',COALESCE(r.package #>> '{definition,source,title}',r.instrument_key),NULL,r.status,r.instrument_version,NULL,r.created_at,'/teacher/situational',false,${sjtMetadataTagIds(Prisma.sql`r.package->'definition'`)}
+    UNION ALL SELECT r.id,'situational',COALESCE(r.package #>> '{definition,source,title}',r.instrument_key),NULL,r.status,r.instrument_version,NULL,r.created_at,'/teacher/situational',false,${sjtMetadataTagIds(Prisma.sql`r.package->'definition'`)},'[]'::jsonb
       FROM sjt_author_releases r WHERE r.author_id<>${actor} AND r.status='PUBLISHED'
       AND r.package #>> '{definition,respondentType}'='teacher_self_report'
       AND EXISTS(SELECT 1 FROM sjt_release_grants g JOIN courses c ON c.id=g.course_id
@@ -132,6 +160,7 @@ router.get('/tools', handle(async req => {
     prisma.$queryRaw<any[]>(Prisma.sql`WITH r AS (${classified}) SELECT r.* FROM r CROSS JOIN LATERAL (SELECT r.ids,r.terms) discovery WHERE ${where} ORDER BY "updatedAt" DESC NULLS LAST,kind,id LIMIT ${q.pageSize} OFFSET ${(q.page-1)*q.pageSize}`),
     prisma.$queryRaw<Array<{total:bigint;facetTags:CatalogClassificationTag[]}>>(Prisma.sql`WITH r AS (${classified}) SELECT COUNT(*)::bigint AS total,COALESCE((SELECT jsonb_agg(DISTINCT tag) FROM r CROSS JOIN LATERAL jsonb_array_elements("classificationTags") tag),'[]'::jsonb) AS "facetTags" FROM r CROSS JOIN LATERAL (SELECT r.ids,r.terms) discovery WHERE ${where}`),
   ])
-  return {tagFacets:catalogTagFacets([count[0]?.facetTags??[]]), list:list.map(({tagIds:_tagIds,ids:_ids,terms:_terms,...row})=>({...row,source:row.ownerId===actor?'owned':'granted'})),total:Number(count[0]?.total||0),page:q.page,pageSize:q.pageSize }
+  return {tagFacets:catalogTagFacets([count[0]?.facetTags??[]]), list:list.map(({tagIds:_tagIds,ids:_ids,terms:_terms,managementTags,...row})=>row.ownerId===actor
+    ? {...row,source:'owned',managementTags:managementTags??[]} : {...row,source:'granted'}),total:Number(count[0]?.total||0),page:q.page,pageSize:q.pageSize }
 }))
 export default router

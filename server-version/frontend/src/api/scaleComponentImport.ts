@@ -12,7 +12,7 @@ export type ComponentDocument={toolKey:string;configurationName:string;baseCombi
 export type ComponentDraft=ComponentDocument&{id:string;revision:number;publishedReleaseId:string|null;updatedAt:string}
 export type ImportResult={digest:string;entries:Array<{index:number;toolKey:string|null;configurationName?:string;changedParts?:ComponentAxis[];status?:string;draft?:ComponentDraft;issues:Array<{sheet:string;row:number;path:string;message:string}>}>}
 export type ComponentPreview={draftId:string;revision:number;previewHash:string;configurationName:string;baseCombination:ComponentPointer|null;changedParts:ComponentAxis[];inheritedParts:ComponentAxis[];blockers:string[];reviewNotice:string;
- triplet:{combinationHash:string;definition:ScaleDefinition;template:ReportTemplateDefinition|null}|null;parts:Partial<Record<ComponentAxis,{version:string;hash:string;payload:unknown}>>}
+ triplet:{combinationHash:string;title:string;instrumentVersion:string;definition:ScaleDefinition;template:ReportTemplateDefinition|null}|null;parts:Partial<Record<ComponentAxis,{version:string;hash:string;payload:unknown}>>}
 export const componentRequest=standardRequest
 export async function uploadComponentWorkbook(path:'preview'|'save',file:File,fields:Record<string,string>={}){
  const data=new FormData();data.append('file',file);for(const [key,value] of Object.entries(fields))data.append(key,value)

@@ -8,6 +8,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { freezeResearchWaveDraft, type ResearchFrozenPublication } from './publication.service'
 import { SurveyWaveError,MAX_WAVE_FINISH_GRACE_MS } from './waves.service'
 import { resolveGroupIpOpenWindow,assertGroupIpWindowActive } from './group-ip-policy'
+import { authorizeSurveyToolPublication } from './tool-licensing'
 
 type Tx=Prisma.TransactionClient
 const token=()=>randomBytes(32).toString('base64url')
@@ -77,6 +78,11 @@ export async function openWave(userId:string,projectId:string,waveId:string,revi
     const finishUntil=groupWindow?.finishUntil??wave.finishUntil??new Date(close.getTime()+MAX_WAVE_FINISH_GRACE_MS)
     if(finishUntil<close||finishUntil.getTime()-close.getTime()>MAX_WAVE_FINISH_GRACE_MS)
       fail('在途作答最迟不得超过本轮招募结束后两小时')
+    // Charge only the successful first formal opening, atomically with OPEN.
+    // PAUSED resume and all participant paths intentionally bypass licensing.
+    await authorizeSurveyToolPublication(tx,{
+      subjectId:userId,publicationId:publication.id,units:snapshot.units,governedPackages:snapshot.governedPackages,
+    })
     const publicId=project.publicId||randomUUID()
     const expiresAt=close
     await tx.surveyEntryToken.create({data:{

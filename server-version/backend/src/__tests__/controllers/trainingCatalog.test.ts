@@ -29,4 +29,8 @@ it('updates only owned management tags with compare-and-set, without touching pu
  expect(m.updateMany).toHaveBeenCalledWith({where:{id:'id',createdBy:'teacher',tags:{equals:['旧']},productKind:'QUESTIONNAIRE'},data:{tags:['前测']}})
  m.updateMany.mockResolvedValue({count:0});await expect(updateCatalogTags({userId:'teacher',role:'TEACHER'},'id',{kind:'COLLECTION',expectedTags:[],tags:[]})).rejects.toMatchObject({statusCode:409})
 })
+it.each(['FORM_TEMPLATE', 'ASSESSMENT_BUNDLE'] as const)('requires owner, product kind and unchanged tags to label %s', async kind => {
+ await expect(updateCatalogTags({userId:'teacher',role:'TEACHER'},'tool',{kind,expectedTags:['一期'],tags:['二期']})).resolves.toEqual({tags:['二期']})
+ expect(m.updateMany).toHaveBeenCalledExactlyOnceWith({where:{id:'tool',createdBy:'teacher',productKind:kind,tags:{equals:['一期']}},data:{tags:['二期']}})
+})
 it('rejects invalid tags and page sizes at the common boundary',()=>{expect(()=>parseCatalogFilters({pageSize:100})).toThrow();expect(()=>parseCatalogFilters({tags:'x'.repeat(21)})).toThrow()})

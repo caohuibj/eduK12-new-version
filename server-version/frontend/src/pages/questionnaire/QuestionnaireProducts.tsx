@@ -6,6 +6,7 @@ import './form-template-editor.css'
 import { CatalogFilters, CatalogPagination } from '../../training/TrainingCatalogControls'
 import { useCatalogQuery } from '../../training/useCatalogQuery'
 import { TrainingQuestionnaireList } from './TrainingQuestionnaireList'
+import { TrainingGovernedPicker, type TrainingGovernedChoice } from './TrainingGovernedPicker'
 import { assessmentContextHref } from '../../training/assessmentContextHref'
 import { DeliveryOptionCard } from './DeliveryOptionCard'
 import { FormChoiceEditor } from './FormChoiceEditor'
@@ -227,6 +228,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
   const preselectedScaleId = formTemplate ? null : searchParams.get('scaleId')
   const preselectedCourseId = formTemplate ? null : searchParams.get('courseId')
   const [detail, setDetail] = useState<any>(null)
+  const [governedSource, setGovernedSource] = useState<TrainingGovernedChoice | null>(null)
   const [catalog, setCatalog] = useState<any>({
     scales: [],
     standardCombinations: [],
@@ -595,7 +597,10 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     }
     return action(async () => {
       if (id === 'new') {
-        const row = await request(formTemplate ? '/form-templates' : '', formTemplate ? {name:name.trim(),description,instruction,requestId} : { ...metadata(), questionnaireType: kind, requestId })
+        const row = await request(formTemplate ? '/form-templates' : '', formTemplate ? {name:name.trim(),description,instruction,requestId} : {
+          ...metadata(), questionnaireType: kind, requestId,
+          ...(governedSource ? { governedSource: { id: governedSource.id, hash: governedSource.hash } } : {}),
+        })
         { const next=new URLSearchParams(location.search);if(preselectedScaleId)next.set('scaleId',preselectedScaleId);navigate((formTemplate?'/toolkit/forms':base)+'/'+row.id+(next.size?'?'+next.toString():'')+(trainingDesign?'#questionnaire-content':''),{replace:true}) }
       } else {
         let row = detail
@@ -808,6 +813,8 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     !detail?.anonymousStudy && !detail?.anonymousStudyId && !detail?.assignmentRef &&
     !detail?.deliveryPolicy && !detail?.selectionPolicy && !detail?.routingPolicy && !detail?.randomizationPolicy
   const draft = id === 'new' || detail?.status === 'DRAFT'
+  const governedSourceLocked = Boolean(detail?.governedSourceLocked)
+  const canEditContent = draft && !governedSourceLocked
   const standardCombinationChoices: Array<{id:string;name:string;scaleId:string;instrumentVersion:string;version:string;code:string;profile:string;disabled?:boolean;unavailableReason?:string|null;
     selectedBinding?:{authorizationId:string;authorizationRevision:number;bindingHash:string;configurationHash:string};combination:{releaseId:string;combinationHash:string}}> = trainingDesign&&!formTemplate
     ? (catalog.standardCombinations??[]).map((choice:any)=>{
@@ -1053,7 +1060,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                       </label>
   const formTemplatePicker = trainingDesign && !formTemplate && draft && type === 'FORM' && <Suspense fallback={<p role="status">正在加载工具…</p>}><FormTemplatePicker excludeId={id} disabled={busy || dirty || authoringLocked} onImport={source => void action(async () => { hydrate(await request('/' + id + '/import-form', { revision: detail.revision, source })); setPreflight(null) })}/></Suspense>
   const addContentControls = <>
-              {draft && (
+              {canEditContent && (
                 <fieldset
                   disabled={busy || dirty || authoringLocked}
                   className="space-y-3 border rounded p-4"
@@ -1211,7 +1218,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                   <li id={'questionnaire-unit-'+v.id} key={v.id} className="border rounded p-3">
                     <ProductButton className="questionnaire-unit-trigger" aria-label={`配置第 ${index+1} 项：${index+1}. ${v.label}`} aria-pressed={(units.some(unit=>unit.id===editingUnit)?editingUnit:units[0]?.id)===v.id} onClick={()=>setEditingUnit(v.id)}>{index+1}. {v.label}</ProductButton>
                     <span>{labels[v.type] || '表单区段'}</span>
-                    {draft && (
+                    {canEditContent && (
                       <div className="flex gap-3">
                         <ProductButton
                           disabled={busy || dirty || index === 0 || Boolean(units[index - 1]?.contextSection)}
@@ -1253,7 +1260,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                         <div key={item.id}>
                           <span>{item.formLabel || item.label} · {item.required === false ? '选填' : '必填'}</span>
                           {formTemplate && draft && <ProductButton disabled={busy || dirty || authoringLocked} onClick={() => editFormItem({...item,formSectionId:v.id})}>编辑此题</ProductButton>}
-                          {draft && (
+                          {canEditContent && (
                             <ProductButton
                               disabled={busy || dirty || authoringLocked || Boolean(editingFormItem) || hasPendingChoices}
                               className="ml-3"
@@ -1277,10 +1284,15 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                           )}
                         </div>
                       ))}
-                    {draft && v.type === 'FORM_SECTION' && !v.items.length && <ProductButton disabled={busy || dirty || authoringLocked} onClick={() => void action(async () => hydrate(await request('/' + id + '/form-sections/' + v.id + '/remove', { revision: detail.revision })))}>移除空区段</ProductButton>}
+                    {canEditContent && v.type === 'FORM_SECTION' && !v.items.length && <ProductButton disabled={busy || dirty || authoringLocked} onClick={() => void action(async () => hydrate(await request('/' + id + '/form-sections/' + v.id + '/remove', { revision: detail.revision })))}>移除空区段</ProductButton>}
 {v.type !== 'FORM_SECTION' && <p>该测评使用已授权定义。必答与来源由当前版本固定；移动或移除请使用左侧内容列表。</p>}</section>)}
   </>
   const basicSettings = <>
+          {trainingDesign && !formTemplate && id === 'new' && !preselectedScaleId && catalog.trainingGovernedSourcesEnabled &&
+            <TrainingGovernedPicker selected={governedSource} onSelect={choice => {
+              setGovernedSource(choice)
+              if (choice && !name.trim()) setName(choice.name)
+            }} />}
           <fieldset
             id="questionnaire-basic"
             disabled={busy || !draft}
@@ -1334,11 +1346,12 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
 
   const contentSettings = detail && <>
     <h2 id="questionnaire-content" tabIndex={-1} className="font-semibold">内容与顺序 · {labels[detail.status]}</h2>
+    {governedSourceLocked && <p>投放使用平台冻结版本。这里可以查看内容，投放范围和时间可在下一步设置。</p>}
     <div className="questionnaire-editor-grid">{unitList}<div className="min-w-0 space-y-4" aria-label="单元配置">{unitConfiguration}{addContentControls}</div></div>
   </>
 
   const advancedSettings = detail && <>
-              {(draft ? variantsEligible || trainingVariantDraft || detail.trainingVariantDraft || (trainingDesign && trainingEligible) : detail.trainingVariantFrozen) && <TrainingVariantEditor
+              {!governedSourceLocked && (draft ? variantsEligible || trainingVariantDraft || detail.trainingVariantDraft || (trainingDesign && trainingEligible) : detail.trainingVariantFrozen) && <TrainingVariantEditor
                 guided={trainingDesign}
                 config={trainingVariantDraft}
                 frozen={detail.trainingVariantFrozen ?? null}
@@ -1352,7 +1365,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                 onMaxAttemptsChange={setMaxAttempts}
                 onSave={() => void save()}
               />}
-              {(draft ? trainingEligible || trainingFlowText || detail.trainingFlowDraft : detail.trainingFlowFrozen) && <TrainingFlowEditor
+              {!governedSourceLocked && (draft ? trainingEligible || trainingFlowText || detail.trainingFlowDraft : detail.trainingFlowFrozen) && <TrainingFlowEditor
                 guided={trainingDesign}
                 text={trainingFlowText} frozen={detail.trainingFlowFrozen ?? null} units={units}
                 maxAttempts={maxAttempts} onMaxAttemptsChange={setMaxAttempts}
@@ -1377,7 +1390,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
 
   const managementActions = detail && <>
               <div className="flex flex-wrap gap-4 my-5">
-                <ProductButton
+                {!governedSourceLocked && <ProductButton
                   disabled={busy}
                   onClick={() =>
                     void action(async () => {
@@ -1389,7 +1402,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                   }
                 >
                   复制为新草稿
-                </ProductButton>
+                </ProductButton>}
                 <Link to={'/composite-assessments/' + id + '/results'}>
                   查看作答与结果
                 </Link>

@@ -25,6 +25,24 @@ async function openDraft(api:ReturnType<typeof apiWith>){
 afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals()})
 
 describe('EducationPrivateToolStudio bounded private authoring workflow',()=>{
+ it.each(['SCHOOL','TEACHER'] as const)('saves %s labels separately from the draft revision',async entry=>{
+  const path=`${base}/${draft.id}/tags`
+  const api=apiWith((url,method)=>url===path
+   ? method==='PUT'?{tags:['合成标签'],revision:1}:{tags:[],revision:0}
+   : undefined)
+  render(<EducationPrivateToolStudio api={api as PrivateToolApi} organizationId="a" entry={entry}/>)
+  fireEvent.click(await screen.findByRole('button',{name:'编辑 我的量表'}))
+  const labels=await screen.findByText('工具标签',{selector:'summary'})
+  expect(api.mock.calls.some(([url])=>url===path)).toBe(false)
+  fireEvent.click(labels)
+  fireEvent.click(await screen.findByRole('button',{name:'编辑标签'}))
+  fireEvent.change(screen.getByLabelText('新标签'),{target:{value:'合成标签'}})
+  fireEvent.click(screen.getByRole('button',{name:'保存标签'}))
+  await screen.findByText('工具标签已保存。')
+  expect(screen.getByText(/草稿已保存 · 修订 3/)).toBeInTheDocument()
+  expect(api).toHaveBeenCalledWith(path,'PUT',{tags:['合成标签'],expectedRevision:0})
+  expect(api.mock.calls.filter(([,method])=>method==='PUT')).toHaveLength(1)
+ })
  it('does not route an ordinary questionnaire deep link into the Form editor',async()=>{
   const api=apiWith(path=>path===`${base}/${draft.id}`?{...draft,kind:'COMPOSITION',definition:{schemaVersion:1,blocks:[]}}:undefined)
   render(<EducationPrivateToolStudio api={api as PrivateToolApi} organizationId="a" entry="TEACHER"/>)

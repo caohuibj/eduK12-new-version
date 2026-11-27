@@ -17,6 +17,10 @@ type Preview={
   teacherAssigned:boolean;readyForPrivacyProtectedFeedback:boolean;note:string
 }
 type Run={runId:string;status:string;version:number;trackCount?:number}
+type RunPublicationPreview={
+  runId:string;version:number;intakeDeadline:string|null
+  tracks:{executionCount:number}[]
+}
 type Progress={runId:string;total:number;counts:Record<string,number>}
 type Props={
   organizationId:string;eventId:string;eventStatus:string;eventVersion:number;
@@ -60,12 +64,12 @@ function StudentEvaluationSession({organizationId,eventId,eventStatus,
       if(!alive.current)throw new Error('评价页面已切换')
       return result
     }catch(error){
-      if(alive.current&&method!=='GET'){
+      if(alive.current&&method!=='GET'&&path!==base+'/run/preview'){
         setReadState('ERROR');setReadError('操作结果需要重新核对，请重新读取评价配置与任务。')
       }
       throw error
     }
-  },[hostApi])
+  },[base,hostApi])
   const available=forms.filter(f=>f.status==='PUBLISHED')
   const loadRun=useCallback(async()=>{
     try{
@@ -144,12 +148,35 @@ function StudentEvaluationSession({organizationId,eventId,eventStatus,
   const publish=()=>run(async()=>{
     if(!assignedRun||assignedRun.status!=='DRAFT'
       ||!['DRAFT','OPEN'].includes(eventStatus))throw new Error('当前没有待发布的评价草稿')
-    if(!window.confirm('确认向本校核验的班级发布学生评教？发布后会冻结教师、问卷与参与资格。'))return
     const eligibility=await api<Preview>(base+'/eligibility')
     setPreview(eligibility)
     if(!eligibility.teacherAssigned)throw new Error('教师任教关系已变化，请先核实')
     if(eligibility.eligibleStudentCount<eligibility.privacyFloor)
       throw new Error('当前符合资格学生 '+eligibility.eligibleStudentCount+' 人，少于发布要求的 '+eligibility.privacyFloor+' 人。请先补齐学校核验的学生班级关系，再发布。')
+    const payload:{expectedVersion:number;maxResponses?:number;intakeDeadline?:string}={
+      expectedVersion:assignedRun.version,
+    }
+    const confirmation=['确认向本校核验的班级发布学生评教？发布后会冻结教师、问卷与参与资格。']
+    if(configured?.privateComposition){
+      const planned=await api<RunPublicationPreview>(base+'/run/preview','POST',{expectedVersion:assignedRun.version})
+      if(planned.runId!==assignedRun.runId||planned.version!==assignedRun.version
+        ||!Array.isArray(planned.tracks)||!planned.tracks.length
+        ||planned.tracks.some(track=>!Number.isSafeInteger(track.executionCount)||track.executionCount<1))
+        throw new Error('预览名额或任务版本无效，请重新读取评价任务。')
+      const count=planned.tracks.reduce((total,track)=>total+track.executionCount,0)
+      if(!Number.isSafeInteger(count)||count>2_147_483_647)
+        throw new Error('预览名额超过允许上限，请调整评价范围。')
+      if(count<eligibility.privacyFloor)
+        throw new Error('本次任务未达到学校评教的隐私人数要求。')
+      const cutoff=deadline?new Date(deadline):planned.intakeDeadline?new Date(planned.intakeDeadline):null
+      if(cutoff&&(!Number.isFinite(cutoff.getTime())||cutoff.getTime()<=Date.now()))
+        throw new Error('停止接受新作答的时间须晚于当前时间。')
+      payload.maxResponses=count
+      if(cutoff&&deadline)payload.intakeDeadline=cutoff.toISOString()
+      confirmation.push('本次确认作答上限 '+count+' 份，发布时重新核对名单。')
+      if(cutoff)confirmation.push('停止接受新作答：'+cutoff.toLocaleString('zh-CN')+'。已入场的学生仍可继续作答。')
+    }
+    if(!window.confirm(confirmation.join('\n')))return
     // Two existing audited transitions are composed into one user action.
     // After an interrupted OPEN, the same button resumes publishing the Run.
     if(eventStatus==='DRAFT'){
@@ -157,7 +184,7 @@ function StudentEvaluationSession({organizationId,eventId,eventStatus,
       onChanged?.()
     }
     const result=await api<{executionCount:number}>(
-      base+'/run/publish','POST',{expectedVersion:assignedRun.version})
+      base+'/run/publish','POST',payload)
     await loadRun();onChanged?.()
     setNotice('评价已发布，已分配 '+result.executionCount+' 份正式任务。')
   })
@@ -238,8 +265,12 @@ function StudentEvaluationSession({organizationId,eventId,eventStatus,
       {assignedRun&&<div className="ht-event">
         <p>评价任务 · {{DRAFT:'草稿',PUBLISHED:'已发布',CLOSED:'已结束',CANCELLED:'已取消'}[assignedRun.status]??assignedRun.status}</p><details><summary>任务编号</summary><code>{assignedRun.runId}</code></details>
         <div className="ht-inline">
-          {['DRAFT','OPEN'].includes(eventStatus)&&assignedRun.status==='DRAFT'&&
-            <button disabled={blocked} onClick={publish}>发布评价</button>}
+          {['DRAFT','OPEN'].includes(eventStatus)&&assignedRun.status==='DRAFT'&&<>
+            {configured.privateComposition&&<label className="ht-field"><span>停止接受新作答（本地时间）</span>
+              <input type="datetime-local" disabled={blocked} value={deadline}
+                onChange={e=>setDeadline(e.target.value)}/></label>}
+            <button disabled={blocked} onClick={publish}>发布评价</button>
+          </>}
           {assignedRun.status==='PUBLISHED'&&<>
             <button disabled={blocked} onClick={loadProgress}>查看参与进度</button>
             {eventStatus==='OPEN'&&<button disabled={blocked} onClick={close}>
@@ -253,6 +284,8 @@ function StudentEvaluationSession({organizationId,eventId,eventStatus,
             <button disabled={blocked} onClick={readReport}>查看群体反馈</button>
           </>}
         </div>
+        {['DRAFT','OPEN'].includes(eventStatus)&&assignedRun.status==='DRAFT'&&configured.privateComposition&&
+          <p className="ht-muted">留空沿用草稿的时间。使用有许可的公共工具时须设置截止时间。发布确认会列出实际预览名额。</p>}
         {progress&&<p>已完成 {progress.counts.COMPLETED??0} / {progress.total}
           {' · '}进行中 {progress.counts.STARTED??0}</p>}
       </div>}

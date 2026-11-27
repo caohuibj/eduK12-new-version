@@ -16,6 +16,37 @@ beforeEach(()=>{vi.clearAllMocks();sessionStorage.clear();mocks.api.mockImplemen
 afterEach(()=>vi.restoreAllMocks())
 async function draftWorkspace(){fireEvent.click(screen.getByRole('tab',{name:'草稿与版本'}));return screen.findByRole('button',{name:'编辑／查看 仅报告草稿'})}
 describe('minimal system administrator component workspace',()=>{
+ it.each(['ONLINE','TRIAL_FAILED'] as const)('offers assignment only after a matching successful education publication (%s)',async state=>{
+  const api=mocks.api.getMockImplementation()!,hash='3'.repeat(64),source=SCALE_BATCH_TEMPLATE.sources[0]
+  const definition=componentContentPlaceholder(JSON.parse(JSON.stringify(source.executable.definition)))
+  const parts={CONTENT:{version:'C2',hash:'c'.repeat(64),payload:{}},PARAMETERS:{version:'P1',hash:'a'.repeat(64),payload:null},REPORT:{version:'R2',hash:'b'.repeat(64),payload:null}}
+  let result:'published-release'|null=null
+  mocks.api.mockImplementation(async(path:string,body?:unknown)=>{
+   if(path.endsWith('/preview'))return {draftId:draft.id,revision:3,previewHash:'1'.repeat(64),configurationName:draft.configurationName,baseCombination:null,
+    changedParts:['REPORT'],inheritedParts:['CONTENT','PARAMETERS'],blockers:[],parts,reviewNotice:'资料匹配',
+    triplet:{combinationHash:hash,title:'选中的组合',instrumentVersion:'2.0.0',definition,template:null}}
+   if(path.endsWith('/publish')){result='published-release';return {id:result,state,combinationHash:hash,blockers:state==='TRIAL_FAILED'?['试运行测试失败']:[]}}
+   if(path==='/component-drafts/draft1'&&result)return {...draft,publishedReleaseId:result}
+   return api(path,body)
+  })
+  const onAssign=vi.fn()
+  render(<ScaleComponentManager actorId="system" onAssign={onAssign}/>);fireEvent.click(await draftWorkspace())
+  fireEvent.click(await screen.findByRole('button',{name:'预览拟发布组合'}))
+  fireEvent.click(await screen.findByRole('checkbox',{name:'Teacher'}))
+  fireEvent.change(screen.getByLabelText('发布说明'),{target:{value:'合成 Teacher 范围发布'}})
+  fireEvent.click(screen.getByRole('button',{name:'发布并自动试运行'}))
+  await screen.findByText(/配置状态：/)
+  if(state==='ONLINE'){
+   const shortcut=await screen.findByRole('button',{name:'去分配'})
+   await waitFor(()=>expect(shortcut).toBeEnabled())
+   fireEvent.click(shortcut)
+   expect(onAssign).toHaveBeenCalledExactlyOnceWith({product:'TEACHER',combination:{id:'published-release',title:'选中的组合',
+    instrumentVersion:'2.0.0',contentVersion:'C2',parametersVersion:'P1',reportVersion:'R2'}})
+  }else{
+   expect(screen.queryByRole('button',{name:'去分配'})).not.toBeInTheDocument()
+   expect(onAssign).not.toHaveBeenCalled()
+  }
+ })
  it('filters pending intake drafts on the current page without creating a catalog draft',async()=>{
   mocks.api.mockResolvedValue({list:[draft,{...draft,id:'other',toolKey:'unrelated',configurationName:'无关草稿'}],hasMore:false})
   render(<ScaleComponentManager actorId="system" initialIntake={{target:{instrumentKey:'example',instrumentVersion:'1.0.0',name:'待审来源'},workspace:'drafts'}}/>)

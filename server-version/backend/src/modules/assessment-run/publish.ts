@@ -7,7 +7,7 @@ import {assertLockedLibraryUseTime} from '../education-tools/library-source.use'
 import {privateFormDraftResourcePolicy} from '../education-tools/private-tool.form-draft-policy'
 import {readPrivateScaleRunSourceForPreparation,readPrivateFormRunSourceForPreparation,readPrivateCompositionRunSourcesForPreparation} from './educationPrivateScaleContext'
 import {prelockEducationLibraryAdmissions,assertEducationLibraryAdmissionsUnchanged,assertEducationLibraryPopulationSupport,lockEducationLibraryPopulationFacts} from './educationLibraryPopulation'
-import {assertEducationRunLibraryResources} from './educationLibraryContext'
+import {assertEducationRunLibraryResources,readEducationRunLibraryContext} from './educationLibraryContext'
 import { matchesClassTarget } from '../assessment-policy/target'
 import { campusRunParticipantScope } from '../campus/activity.runScope'
 import { resolveOwnSchoolActivityPublisher } from '../campus/activity.publisher'
@@ -49,6 +49,8 @@ import {
 } from './repository'
 import { getOrCreateOrganizationEpisodeAllocationInTransaction } from './episodeAllocation'
 import { assertRegisteredResourceUse } from './registeredResources'
+import {authorizeEducationStandardPublication} from './tool-licensing'
+import {isToolLicensingEnabled,ToolLicenseAccessError} from '../tool-licensing/runtime'
 
 type Tx = Prisma.TransactionClient
 
@@ -1034,6 +1036,8 @@ export const publishAssessmentRun = async (input: {
   resourceRegistry?: RunResourceAuthorityRegistry
   tracking?:unknown
   provideParticipantReport?: boolean
+  maxResponses?:number
+  intakeDeadline?:Date
 }): Promise<PublishedRunResult> => {
   const registry = input.resourceRegistry ?? productionRunResourceAuthorityRegistry
   const preparedTracks = await prepareTracks(input.runId, input.organizationId, registry, input.actorUserId)
@@ -1059,8 +1063,9 @@ export const publishAssessmentRun = async (input: {
     `
     if (!organizations[0]) throw new RunPublishError('ORG_NOT_FOUND', 'Organization not found', 404)
     if (organizations[0].status !== 'ACTIVE') throw new RunPublishError('ORGANIZATION_SUSPENDED', 'Organization is suspended', 409)
-    const runs = await tx.$queryRaw<Array<{ status: string; version: number; createdByUserId: string;trackingBaselineId:string|null }>>`
-      SELECT "status", "version", "created_by_user_id" AS "createdByUserId",personal_tracking_baseline_id AS "trackingBaselineId" FROM "assessment_runs"
+    const runs = await tx.$queryRaw<Array<{ status: string; version: number; createdByUserId: string;trackingBaselineId:string|null;intakeDeadline:Date|null }>>`
+      SELECT "status", "version", "created_by_user_id" AS "createdByUserId",personal_tracking_baseline_id AS "trackingBaselineId",
+        intake_deadline AS "intakeDeadline" FROM "assessment_runs"
       WHERE "organization_id" = ${input.organizationId} AND "id" = ${input.runId} FOR UPDATE
     `
     const run = runs[0]
@@ -1086,6 +1091,10 @@ export const publishAssessmentRun = async (input: {
     }
     if (run.status !== 'DRAFT' || run.version !== input.expectedVersion) {
       throw new RunPublishError('RUN_STATE_CONFLICT', 'Run state/version changed before publish ownership', 409)
+    }
+    if (input.intakeDeadline && (!Number.isFinite(input.intakeDeadline.getTime())
+      || input.intakeDeadline <= new Date())) {
+      throw new RunPublishError('RUN_INTAKE_DEADLINE', '停止接受新作答的时间须晚于当前时间', 409)
     }
 
     const currentTrackRows = await tx.$queryRaw<Array<{
@@ -1138,6 +1147,7 @@ export const publishAssessmentRun = async (input: {
     // this locked publication transaction; never overwrite immutable facts.
     const relationshipCache = new Map<string, { id: string; snapshotHash: string }>()
     let executionCount = 0
+    const trackResponseCounts = new Map<string,number>()
     const receiptOnlyTracks = await receiptOnlyTrackIds(tx, preparedTracks, input.provideParticipantReport)
 
     for (const track of preparedTracks) {
@@ -1170,6 +1180,7 @@ export const publishAssessmentRun = async (input: {
       `
       const pairs = libraryPairs?.get(track.id)??await resolvePairs(tx, input.organizationId, track, campusSelected)
       if (pairs.length === 0) throw new RunPublishError('RUN_EMPTY_POPULATION', `Track ${track.id} resolved no eligible actor pairs`, 409)
+      trackResponseCounts.set(track.id,pairs.length)
       if((studentFormResourceId({family:track.resourceFamily,
         key:track.resourceKey,version:track.resourceVersion})||isStudentCompositionKey(track.resourceKey))&&pairs.length<Math.max(teacherResourceMinimum(),track.requestedPolicy.minimumRespondents??0))
         throw new RunPublishError('STUDENT_FEEDBACK_MINIMUM_POPULATION',
@@ -1340,10 +1351,24 @@ export const publishAssessmentRun = async (input: {
       const {freezeEducationTracking}=await import('../reporting/education-personal-tracking')
       await freezeEducationTracking(tx,{...input,tracks:preparedTracks,selection:input.tracking})
     }
+    try{
+      const context=education??((isToolLicensingEnabled('SCHOOL')||isToolLicensingEnabled('TEACHER'))
+        ?await readEducationRunLibraryContext(tx,input,true):null)
+      await authorizeEducationStandardPublication(tx,{
+        product:context?.product??null,organizationId:input.organizationId,runId:input.runId,
+        tracks:preparedTracks,closesAt:input.intakeDeadline??run.intakeDeadline??null,
+        maxResponses:input.maxResponses,frozenResponses:executionCount,trackResponseCounts,
+      })
+    }catch(error){
+      if(error instanceof ToolLicenseAccessError)throw new RunPublishError(error.code,error.message,error.statusCode)
+      throw error
+    }
     const version = run.version + 1
     await tx.$executeRaw`
       UPDATE "assessment_runs"
-      SET "status" = 'PUBLISHED', "published_at" = transaction_timestamp(), "version" = ${version}, "updated_at" = transaction_timestamp()
+      SET "status" = 'PUBLISHED', "published_at" = transaction_timestamp(), "version" = ${version},
+        "intake_deadline" = COALESCE(${input.intakeDeadline ?? null}::timestamptz, "intake_deadline"),
+        "updated_at" = transaction_timestamp()
       WHERE "id" = ${input.runId} AND "status" = 'DRAFT' AND "version" = ${run.version}
     `
     const auditPayload = JSON.stringify({ runId: input.runId, version, trackCount: preparedTracks.length, executionCount })
