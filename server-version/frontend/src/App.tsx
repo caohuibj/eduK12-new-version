@@ -219,6 +219,8 @@ function AppRoutes() {
     if (canonical) window.location.replace(canonical)
   }, [canonical])
   if (canonical) return <p role="status">正在转到统一管理后台…</p>
+  if (window.location.origin === ADMIN_ORIGIN && ["/", "/admin"].includes(location.pathname))
+    return <Navigate to="/admin/system" replace />
 
   return (
     <React.Suspense fallback={<RouteLoading />}>
@@ -226,9 +228,11 @@ function AppRoutes() {
           {/* Portal - Entry Point */}
           <Route
             path="/"
-            element={window.location.origin === ADMIN_ORIGIN
-              ? <Navigate to="/admin/system" replace />
-              : <EntryRoute>{isTrainingHost() ? <TrainingPortal /> : <Portal />}</EntryRoute>}
+            element={
+              <EntryRoute>
+                {isTrainingHost() ? <TrainingPortal /> : <Portal />}
+              </EntryRoute>
+            }
           />
 
           <Route path="/login" element={isTrainingHost() ? <TrainingLogin /> : <Navigate to="/" replace />} />
@@ -236,7 +240,6 @@ function AppRoutes() {
           <Route path="/features/:feature" element={isTrainingHost() ? <TrainingFeaturePage /> : <Navigate to="/" replace />} />
           <Route path="/contact" element={isTrainingHost() ? <TrainingContactPage /> : <Navigate to="/" replace />} />
 
-          <Route path="/admin" element={<Navigate to="/admin/system" replace/>} />
           {/* Admin Login - no auth check to allow switching accounts */}
           <Route
             path="/admin/login"
