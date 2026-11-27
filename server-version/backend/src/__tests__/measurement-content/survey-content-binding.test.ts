@@ -42,7 +42,7 @@ describe('Survey START exact encrypted content binding',()=>{
   it('refuses a current collection fence before selecting or writing a content binding',async()=>{
     const f=fixture();mocks.collection.mockRejectedValueOnce(new Error('synthetic collection stop'))
     await expect(f.run()).rejects.toThrow('synthetic collection stop')
-    expect(mocks.collection).toHaveBeenCalledWith(f.tx,f.frozen)
+    expect(mocks.collection).toHaveBeenCalledWith(f.tx,f.frozen,scope.publicationId)
     expect(mocks.release).not.toHaveBeenCalled();expect(f.tx.$executeRaw).not.toHaveBeenCalled()
   })
   it('stores only exact selected pointers, empty population and report availability under CAS',async()=>{
