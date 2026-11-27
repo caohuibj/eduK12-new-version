@@ -22,4 +22,9 @@ describe('declarative report rendering',()=>{
   it('rejects duplicate facts instead of silently picking one',()=>{
     expect(()=>renderDeclaredReport(template,[fact,fact],[reference])).toThrow('REPORT_DUPLICATE_METRIC_FACT')
   })
+  it('carries only the frozen declarative artwork identity into the rendered DTO',()=>{
+    const withArtwork=reportTemplateSchema.parse({...template,artworkKey:'example_scale/1.2.0/R1.0.0'})
+    expect(renderDeclaredReport(withArtwork,[fact],[reference])).toMatchObject({artworkKey:'example_scale/1.2.0/R1.0.0'})
+    expect(()=>reportTemplateSchema.parse({...template,artworkKey:'https://example.invalid/image.webp'})).toThrow()
+  })
 })

@@ -3,7 +3,8 @@ import { readFileSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { test } from 'node:test'
-import { checkSelectedHistory, checkSelectedSource, readSelectedSource, checkSelectedBundleDependencies, checkSelectedBuiltinDependencies } from './scale-intake-selected-check'
+import { checkSelectedHistory, checkSelectedSource, readSelectedSource, checkSelectedBundleDependencies, checkSelectedBuiltinDependencies, checkSelectedReportVariants, checkSelectedReportVariantHistory } from './scale-intake-selected-check'
+import cfqVariants from '../src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/report-variants.json'
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const file = 'server-version/backend/src/modules/scale/instruments/academic_self_concept_biology_zh_cn/1.0.0/instrument.ts'
 const source = () => JSON.parse(readFileSync(resolve(repo, file.replace('instrument.ts', 'source.json')), 'utf8'))
@@ -122,4 +123,29 @@ test('catalog axis revision permits source clarification without changing C P or
  assert.doesNotThrow(()=>checkSelectedHistory(old,next))
  assert.deepEqual(next.executable,old.executable)
  assert.deepEqual(next.identity,old.identity)
+})
+
+test('version-local report material keeps C/P compatibility and binds artwork to exact C/R identity', () => {
+ const cfqFile='server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/instrument.ts'
+ const cfq=JSON.parse(readFileSync(resolve(repo,cfqFile.replace('instrument.ts','source.json')),'utf8'))
+ const material=structuredClone(cfqVariants),report=material.variants[0].report
+ report.artworkKey=`${cfq.identity.instrumentKey}/${cfq.identity.instrumentVersion}/${report.reportVersion}`
+ assert.deepEqual(checkSelectedReportVariants(cfq,material),[{key:material.variants[0].key,reportVersion:report.reportVersion,artworkKey:report.artworkKey}])
+ report.artworkKey=`other_scale/${cfq.identity.instrumentVersion}/${report.reportVersion}`
+ assert.throws(()=>checkSelectedReportVariants(cfq,material),/SCALE_REPORT_ARTWORK_IDENTITY_MISMATCH/)
+})
+
+test('later report variants append without rewriting a previously selectable R identity', () => {
+ const previous=structuredClone(cfqVariants),next=structuredClone(cfqVariants)
+ next.variants.push({...structuredClone(next.variants[0]),key:'later',title:'后续报告',report:{...structuredClone(next.variants[0].report),reportVersion:'9.9.9'}})
+ assert.doesNotThrow(()=>checkSelectedReportVariantHistory(previous,next))
+ next.variants[0].title+=' changed'
+ assert.throws(()=>checkSelectedReportVariantHistory(previous,next),/REPORT_VARIANT_REWRITTEN/)
+ assert.throws(()=>checkSelectedReportVariantHistory(previous,{...previous,variants:[]}),/REPORT_VARIANT_REMOVED/)
+})
+
+test('ordinary report artwork identity is checked without adding a participant gate', () => {
+ const value=source(),report=value.executable.definition.report
+ report.artworkKey=`other_scale/${value.identity.instrumentVersion}/${report.reportVersion}`
+ assert.throws(()=>checkSelectedSource(value),/报告配图标识/)
 })
