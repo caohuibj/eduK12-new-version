@@ -6,6 +6,7 @@ import AppShell from './components/app-shell/AppShell'
 import { ProductButton, ProductPage, ProductStatus } from './components/product-ui'
 import { RouteAccess, RouteLoading } from './components/app-shell/RouteAccess'
 import { isTrainingHost } from './training/context'
+import { ADMIN_ORIGIN, adminWorkspaceRedirect } from './products/origins'
 import TrainingSjtAuthoringAccess from './training/TrainingSjtAuthoringAccess'
 
 // Portal & Auth Pages
@@ -212,6 +213,14 @@ const CognitiveCapabilityRoute: React.FC<{ children: React.ReactNode }> = ({ chi
 }
 
 function AppRoutes() {
+  const location = useLocation()
+  const canonical = adminWorkspaceRedirect(location.pathname, location.search + location.hash)
+  React.useEffect(() => {
+    if (canonical) window.location.replace(canonical)
+  }, [canonical])
+  if (canonical) return <p role="status">正在转到统一管理后台…</p>
+  if (window.location.origin === ADMIN_ORIGIN && ["/", "/admin"].includes(location.pathname))
+    return <Navigate to="/admin/system" replace />
 
   return (
     <React.Suspense fallback={<RouteLoading />}>

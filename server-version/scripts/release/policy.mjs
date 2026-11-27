@@ -135,7 +135,7 @@ const releaseToolFiles=new Set([
  '.github/workflows/scale-onboarding-boundary.yml',
  ...selectedScaleControlFiles,
  'docs/development/scale-intake-ci-20261029.md',
- 'server-version/ops/nginx/nginx.production.conf','server-version/ops/nginx/eduk12-products.conf','server-version/ops/nginx/eduk12-school.conf','server-version/ops/nginx/renew-school.sh',
+ 'server-version/ops/nginx/nginx.production.conf','server-version/ops/nginx/eduk12-products.conf','server-version/ops/nginx/eduk12-school.conf','server-version/ops/nginx/eduk12-admin.conf','server-version/ops/nginx/renew-school.sh',
  '.github/PULL_REQUEST_TEMPLATE.md','.github/release-tools/package.json','.github/release-tools/package-lock.json',
  'docs/miniprogram-v2/web-feature-inventory.json',
  '.github/workflows/ci.yml','.github/workflows/ci-frontend.yml','.github/workflows/ci-scoped-release.yml','.github/workflows/ci-release-tools.yml','.github/workflows/ci-maintenance.yml',

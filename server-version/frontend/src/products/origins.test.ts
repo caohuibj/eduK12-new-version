@@ -1,19 +1,28 @@
 import { describe, expect, it } from 'vitest'
-import { productOrigins, surveyAdminLoginUrl, surveyInvitationUrl, surveyRecruitmentUrl } from './origins'
+import { adminWorkspaceRedirect, productOrigins, surveyAdminLoginUrl, surveyInvitationUrl, surveyRecruitmentUrl } from './origins'
 import { surveyGovernanceNavigation } from '../components/app-shell/navigation'
 
 describe('trusted product origin links', () => {
-  it.each(['https://survey.eduk12.top','https://training.eduk12.top','http://TRAINING.EDUK12.TOP.:8080'])(
+  it.each(['https://admin.eduk12.top','https://survey.eduk12.top','https://school.eduk12.top','https://teacher.eduk12.top','https://training.eduk12.top','http://TRAINING.EDUK12.TOP.:8080'])(
     'uses canonical HTTPS production origins for %s', origin => {
-      expect(productOrigins(origin, false)).toEqual({admin:'https://training.eduk12.top',survey:'https://survey.eduk12.top',school:'https://school.eduk12.top'})
-      expect(surveyAdminLoginUrl(origin, false)).toBe('https://training.eduk12.top/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
+      expect(productOrigins(origin, false)).toEqual({admin:'https://admin.eduk12.top',training:'https://training.eduk12.top',survey:'https://survey.eduk12.top',school:'https://school.eduk12.top'})
+      expect(surveyAdminLoginUrl(origin, false)).toBe('https://admin.eduk12.top/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
     })
+  it('moves legacy administrator deep links to the fixed host and leaves participant links on Training', () => {
+    const target = '/admin/login'
+    const suffix = '?returnTo=%2Fadmin%2Fsystem'
+    expect(adminWorkspaceRedirect(target,suffix,'https://training.eduk12.top')).toBe('https://admin.eduk12.top'+target+suffix)
+    expect(adminWorkspaceRedirect('/admin/huischool','?standardTool=licensed_scale','https://eduk12.top')).toBe('https://admin.eduk12.top/admin/huischool?standardTool=licensed_scale')
+    expect(adminWorkspaceRedirect('/login','','https://training.eduk12.top')).toBeNull()
+    expect(adminWorkspaceRedirect(target,suffix,'https://admin.eduk12.top')).toBeNull()
+    expect(adminWorkspaceRedirect(target,suffix,'https://example.test')).toBeNull()
+  })
   it.each(['localhost','127.0.0.1','survey.localhost','training.localhost'])(
     'preserves local protocol and port with an allowed admin cookie host: %s', host => {
       for (const scheme of ['http','https']) {
         const origin=`${scheme}://${host}:5173`
         const admin=`${scheme}://${host==='127.0.0.1'?host:'localhost'}:5173`
-        expect(productOrigins(origin,true)).toEqual({admin,survey:`${scheme}://survey.localhost:5173`,school:`${scheme}://school.localhost:5173`})
+        expect(productOrigins(origin,true)).toEqual({admin,training:`${scheme}://training.localhost:5173`,survey:`${scheme}://survey.localhost:5173`,school:`${scheme}://school.localhost:5173`})
         expect(surveyAdminLoginUrl(origin,true)).toBe(admin+'/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
         expect(productOrigins(origin,false)).toBeNull()
       }

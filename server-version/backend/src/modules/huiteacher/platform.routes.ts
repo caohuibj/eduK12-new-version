@@ -17,6 +17,7 @@ import {educationStandardManagementCatalog,educationStandardManagementPreview,ed
 import {grantEducationStandardConfigurationUse,educationStandardUseInput} from '../assessment-authorization/education-standard-use'
 import {revokeEducationStandardConfigurationUse,educationStandardRevokeInput} from '../assessment-authorization/education-standard-revoke'
 import { requireRecentAdminKey } from '../admin-permissions/guards'
+import { isConfiguredAdminOrigin } from '../admin-permissions/security'
 import type { EducationProduct } from '../organization/educationProductAccess'
 import { changeTeacherScaleLicense,TeacherScaleLicenseError } from './scaleLicense.service'
 import { changeTeacherPersonalGrant,TeacherPersonalGrantError } from './personalScaleGrant.service'
@@ -43,15 +44,14 @@ const grantInput=z.object({membershipId:uuid,currentPassword:password}).strict()
 const revokeInput=z.object({currentPassword:password}).strict()
 const searchInput=z.object({q:z.string().trim().max(120).default(''),page:z.coerce.number().int().min(1).max(10000).default(1)}).strict()
 
-// Platform operator lives in Training realm; neither School nor Teacher
-// authenticated sessions may call these product-granting endpoints.
+// These endpoints require the platform entry grant, with writes from the
+// configured management origin or the existing shared platform entry.
 function platformEducationOrigin(req:Request,res:Response,next:NextFunction){
   const origin=req.get('Origin')
   if(origin){
     try{
       const url=new URL(origin)
-      const allowed=url.origin==='https://eduk12.top'
-        ||url.origin==='https://training.eduk12.top'
+      const allowed=origin==='https://eduk12.top' || isConfiguredAdminOrigin(origin)
       const local=process.env.NODE_ENV!=='production'
         && ['localhost','127.0.0.1'].includes(url.hostname)
         && ['http:','https:'].includes(url.protocol)

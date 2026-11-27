@@ -445,7 +445,7 @@ function SurveyApplication(){
           <button className="btn-primary" disabled={busy}>进入双因素验证</button></form>
         <p className="survey-entry-help">登录后还需输入验证器动态码。需要激活账号或恢复密码，请使用管理员提供的一次性邀请。</p>
         <div className="survey-entry-admin">{surveyAdminLoginUrl()
-          ?<a href={surveyAdminLoginUrl()!}>系统管理员入口：研究者与工具授权</a>
+          ?<a href={surveyAdminLoginUrl()!}>Survey 管理员入口：研究者与工具授权</a>
           :<p>当前地址未配置管理员入口。</p>}</div>
       </SurveyEntryPanel>}
       {!loading&&screen==='mfa'&&recovery.length===0&&<section className="survey-mfa-panel bg-white rounded-xl border p-6 my-4 max-w-xl mx-auto">
