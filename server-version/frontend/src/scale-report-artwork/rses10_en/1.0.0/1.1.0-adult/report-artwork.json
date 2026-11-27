@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "rses10_en/1.0.0/1.1.0-adult",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "Two people look back on a presentation and compare two details they noticed, using blank cards.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

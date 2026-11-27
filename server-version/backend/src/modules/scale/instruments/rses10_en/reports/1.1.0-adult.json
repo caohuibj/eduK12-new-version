@@ -1,0 +1,100 @@
+{
+  "toolKey": "rses10_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-adult",
+  "title": "Rosenberg Self-Esteem Scale | A fairer way to talk to yourself",
+  "report": {
+    "reportVersion": "1.1.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "English PhenX Toolkit 180901 wording and order, 10 items, four agreement options, one 0–30 sum after reversing items 3, 5, 8, 9 and 10. The platform presents the options from Strongly Disagree to Strongly Agree. University of Maryland confirms public-domain status with scholarly attribution. No reference scale or local validation is claimed."
+      }
+    },
+    "primaryScoreKeys": [
+      "rses10_en_total"
+    ],
+    "scoreOrder": [
+      "rses10_en_total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "rses10_en_total",
+        "scoreLabel": "Self-esteem total (0–30; descriptive)",
+        "headline": "Try the voice you would use with a friend",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "After giving a presentation, Alex remembers a stumble and thinks, “I made a mess of everything.” A friend who was there remembers the clear example Alex gave halfway through. Both details belong to the same afternoon. Self-esteem is the wider attitude we take toward ourselves when success and mistakes are both in view. It shows up in whether we can give ourselves a fair hearing on a difficult day.\n\nThis score combines ten answers about that general attitude. A higher total reflects a more positive view of yourself in this set of answers. The number alone cannot tell you what shaped that view. What makes the report useful is asking a question you can answer. What detail did I leave out when I told myself the story of that day?",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Write the first sentence that came to mind after a recent setback. Under it, write two observable details. Recall something that was difficult and then something you did that helped, however small."
+          },
+          {
+            "category": "strategy",
+            "text": "Turn the two details into one sentence you could say to a friend in the same position. Try keeping that sentence for the next time the original judgment returns."
+          },
+          {
+            "category": "support",
+            "text": "If self-critical thoughts keep disrupting everyday life, consider telling someone you trust or a qualified professional what the difficult moments are like. Your score is not a prerequisite for asking for support."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Rosenberg, M. (1989). Society and the Adolescent Self-Image (rev. ed.). Wesleyan University Press. English ordering and the four-point scoring key follow PhenX Toolkit protocol 180901 (https://www.phenxtoolkit.org/protocols/view/180901).",
+      "The University of Maryland Department of Sociology lists the scale as public domain. The platform keeps its existing adult self-report eligibility.",
+      "All 10 answers are needed for the local score. This report uses the total alone, with no percentile, categorical cutoff, or separate strengths and weaknesses inferred from individual answers."
+    ],
+    "disclaimer": "Use this adult self-report for reflection. The score describes a set of answers at one sitting and cannot determine personal worth, make a diagnosis, or support a selection decision.",
+    "artworkKey": "rses10_en/1.0.0/1.1.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
