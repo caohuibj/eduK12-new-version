@@ -1,0 +1,123 @@
+{
+  "toolKey": "academic_self_efficacy_mathematics_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "数学学习自我效能｜学生行动版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "artworkKey": "academic_self_efficacy_mathematics_zh_cn/1.0.0/1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容审定（基于 a5cc1056）",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目自编五题数学学科替换版、五点选项、无反向计分、至少四题与均分规则；保留既有 C 1.0.0 和默认 P。五档来自初高中共同适用的 1—5 分理论等距试用区间，不作为常模、能力、成绩或诊断界线。报告只解释数学任务自我效能，不解释单题，也不扩展为数学自我概念。"
+      }
+    },
+    "primaryScoreKeys": [
+      "academic_self_efficacy"
+    ],
+    "scoreOrder": [
+      "academic_self_efficacy"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "academic_self_efficacy",
+        "headline": "难题不是一堵墙，而是一条可以边走边校准的路线",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "看到一道证明题，阿哲握着笔等了半天。他把题干里的“平行”标到图上，发现两条线之间正好夹着一个熟悉的角。他还没想到完整证明，但已经能把第一步写出来。下次遇到一张没见过的图，他可以先试试同一招：把文字条件放回图里看看。\n\n学习自我效能可以从一个小问题想起：“面对眼前这道题，我有多大把握做下去？”这样的判断会随着题目和经验改变。知道自己能从哪里动手、什么时候该找一个提示，会让下一次的判断多一点依据。你上一次解出数学题，是在哪一步发现有路可走的？",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "先在图里标一个条件",
+            "summary": "挑一道最近的几何题，把一个已知条件标到图上，再写下要找的量或关系。对照题干核对这两个记号，看看能不能找到第一步。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "向例题借一步",
+            "summary": "找一道相近的例题。遮住解答，先写自己能确定的关系。卡住时只看下一小步，合上答案后用自己的话把它写出来。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "试试三种题，从哪儿开始",
+            "summary": "拿一道计算题、一道推理题和一道应用题。每道只写第一步，再看看哪一步你最有把握，哪一题还需要弄清一个条件。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "把关键一步留给下一题",
+            "summary": "选一道条件稍有变化的题，做完圈出最关键的一步。用代入、估算或另一种方法验一遍。看看这一步能不能带到其他题里。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "换个题面，比一比路线",
+            "summary": "找一道外表不同、关系相近的题。动手前猜猜哪里会卡住，做完对照实际。把中途换过的做法记下来，写清为什么新的做法走得通。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "留一张四格纸，分别记下你做前的判断、写出的第一步、卡住的地方和核对的结果。"
+          }
+        ],
+        "scoreLabel": "数学学习自我效能均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "五道题至少答四道，按已答题目算均分。均分帮助你回顾这次对自己完成数学学习任务有多大把握。",
+      "五档按 1—5 分量尺范围估算，用于选择一条适合试试的建议。这个版本还没有同年级学生的数据可以作比较。",
+      "缺少年级时，原均分仍可用来选择一条试用建议。报告省略学段参考。"
+    ],
+    "disclaimer": "这份报告供七至十二年级学生回顾自己的学习，也可以带一条练习记录去和老师聊一聊。"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "ase-mathematics-student-report-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
