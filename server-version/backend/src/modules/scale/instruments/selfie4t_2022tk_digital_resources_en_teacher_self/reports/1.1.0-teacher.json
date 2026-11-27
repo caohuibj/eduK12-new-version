@@ -1,0 +1,168 @@
+{
+  "toolKey": "selfie4t_2022tk_digital_resources_en_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "SELFIEforTEACHERS | Give every resource a teaching job",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "European Commission JRC129699 Toolkit Annex I: 5 English stems and 30 descriptions in Area 2 match the registered C after punctuation/whitespace normalization. The official 2023 JRC131282 guide supplies the six scored levels and zero-point not-aware option. Both documents carry CC BY 4.0 with source and change attribution. C, source options and P are unchanged."
+      }
+    },
+    "primaryScoreKeys": [
+      "competence_2_1",
+      "competence_2_2",
+      "competence_2_3",
+      "competence_2_4",
+      "competence_2_5"
+    ],
+    "scoreOrder": [
+      "competence_2_1",
+      "competence_2_2",
+      "competence_2_3",
+      "competence_2_4",
+      "competence_2_5"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_2_1",
+        "scoreLabel": "Searching and selecting (self-position, 0–6)",
+        "headline": "Search for the lesson, not the longest list",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Two resources may cover the same topic while asking very different things of learners. A diagram that makes the main relationship visible may serve the lesson better than a polished clip that rushes through it. Your selected statement describes how you locate and judge resources for a particular learning purpose.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Write down the question learners should be able to answer after using a resource. Compare two existing options for accuracy, accessibility, age fit and the time they need. Keep the one that earns its place."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_2_2",
+        "scoreLabel": "Creating resources (self-position, 0–6)",
+        "headline": "Make a new resource when a gap is real",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Imagine students can follow a worked example in class but lose the sequence when they try it alone. A two-minute, captioned walkthrough or a one-page annotated example could fill that gap. This response concerns the choices you make when building resources for a defined learning need.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Create one small resource for an observed sticking point. Ask a learner or colleague to identify the first action it asks the learner to take, and remove anything that distracts from that action."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_2_3",
+        "scoreLabel": "Modifying resources (self-position, 0–6)",
+        "headline": "Change what gets in the way",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A useful diagram may still assume background knowledge the class doesn’t have. Replacing an unfamiliar example or opening up the layout can preserve the idea and make it easier to enter. Your response reflects how you adapt resources to the learners and purpose in front of you.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Check that you have permission to adapt the resource. Change one example, language feature, or interaction that is creating friction. Review the result with someone who sees the material differently from you."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_2_4",
+        "scoreLabel": "Managing and protecting (self-position, 0–6)",
+        "headline": "Keep the right version easy to find",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Finding a handout at the start of a lesson, recovering a mistaken edit, and sharing it only with people who need it are practical parts of resource design. This response describes how you organise and protect digital materials.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Use one shared home for the current version. Give it a descriptive name, separate editable originals from learner copies, and check the access link from a learner’s view before class."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_2_5",
+        "scoreLabel": "Sharing resources (self-position, 0–6)",
+        "headline": "Share what another teacher can actually reuse",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A link alone leaves a colleague guessing where a resource came from and how to use it. A clear credit, a permission note, and one sentence about the learning purpose give it a second life. Your selected statement concerns sharing instructional material within those conditions.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Choose one resource to share. Include the author, source, relevant licence and any changes you made. Remove student data and restricted material before sharing."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "© European Union 2022 and 2023. Adapted from Anastasia Economou, SELFIEforTEACHERS Toolkit (2022), doi:10.2760/626409, Annex I, and SELFIEforTEACHERS: Designing and developing a self-reflection tool for teachers’ digital competence (2023), doi:10.2760/561258, p.11 and Annex 1. Both CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). The project separates this area and supplies new instructions and feedback. No EU endorsement is implied.",
+      "Each competence stands alone. The six ordered A1–C2 statements are represented by 1–6. A selected zero records ‘I am not aware of this competence’; an omitted response stays missing. There is no area total, proficiency band, or rank.",
+      "This fixed English project adaptation is for primary and secondary teachers reflecting on their own practice. The separate area has no independent validation or Chinese-language equivalence."
+    ],
+    "disclaimer": "For teachers’ own professional learning and reflection. The selection describes self-reported practice in one area of the fixed English adaptation and supplies no appraisal, school ranking, or EU certification.",
+    "artworkKey": "selfie4t_2022tk_digital_resources_en_teacher_self/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
