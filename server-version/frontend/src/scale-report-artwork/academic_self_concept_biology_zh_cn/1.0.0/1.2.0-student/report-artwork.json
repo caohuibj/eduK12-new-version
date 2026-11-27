@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "academic_self_concept_biology_zh_cn/1.0.0/1.2.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "三段式课堂插图：学生先对显微观察感到没把握，随后调焦看见洋葱表皮细胞，最后指着自己的细胞草图向同伴提出问题。",
+    "width": 1600,
+    "height": 900
+  },
+  "bands": [
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "very_low",
+      "file": "very_low.webp",
+      "alt": "学生从画出一个观察到的细胞轮廓开始。",
+      "width": 768,
+      "height": 768
+    },
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "low",
+      "file": "low.webp",
+      "alt": "学生用观察、想法和疑问三个图示整理显微观察。",
+      "width": 768,
+      "height": 768
+    },
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "middle",
+      "file": "middle.webp",
+      "alt": "学生把已经理解、提示后理解和仍想追问的内容整理在一页。",
+      "width": 768,
+      "height": 768
+    },
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "high",
+      "file": "high.webp",
+      "alt": "学生指着细胞草图向同伴解释自己的观察依据。",
+      "width": 768,
+      "height": 768
+    },
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "very_high",
+      "file": "very_high.webp",
+      "alt": "学生比较新的显微样本，并根据观察修正原来的草图。",
+      "width": 768,
+      "height": 768
+    }
+  ]
+}
