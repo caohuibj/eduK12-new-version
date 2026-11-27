@@ -2,6 +2,7 @@
 import fs from 'node:fs'
 import {execFileSync} from 'node:child_process'
 import {pathToFileURL} from 'node:url'
+import {isDeepStrictEqual} from 'node:util'
 const size = value => {
  if(typeof value === 'number' && Number.isSafeInteger(value) && value>0)return value
  const match=/^(\d+(?:\.\d+)?)(b|k|kb|m|mb|g|gb)?$/i.exec(String(value))
@@ -36,7 +37,7 @@ const optionalAssessmentCaps = new Set([
  'PUBLIC_ASSESSMENT_RECOVERY_GET_LIMIT',
  'PUBLIC_ASSESSMENT_RECOVERY_FINAL_LIMIT',
 ])
-export function inspectResourceContract(compose, {capacity=false}={}) {
+export function inspectResourceContract(compose, {capacity=false, existingEnvelope=null}={}) {
  const services=compose.services || {};const result={capacityCertified:false,services:{}}
  let cpu=0,memory=0,pools=0
  const extraBackends=Object.keys(services).filter(name=>/^backend-\d+$/.test(name)).sort()
@@ -106,7 +107,7 @@ export function inspectResourceContract(compose, {capacity=false}={}) {
  })
  const finalGateConcurrencyTotal=finalGateLimits.reduce((sum,limit)=>sum+limit,0)
  if(finalGateLimits.some(limit=>limit>backendService.prismaPool))throw new Error('FINAL admission limit exceeds Prisma pool')
- if(finalGateConcurrencyTotal>2*backendService.prismaPool)throw new Error('FINAL admission limits exceed twice the Prisma pool')
+ if(finalGateConcurrencyTotal>Math.max(2*backendService.prismaPool,existingEnvelope?.finalGates ?? 0))throw new Error('FINAL admission limits exceed twice the Prisma pool')
  result.finalGateConcurrencyTotal=finalGateConcurrencyTotal
  // Worker stop-grace consistency: Compose sends SIGKILL when the grace
  // expires, so the grace must exceed the worker's internal shutdown budget
@@ -120,7 +121,7 @@ export function inspectResourceContract(compose, {capacity=false}={}) {
  const workerBudgetSeconds=workerEnv.WORKER_SHUTDOWN_TIMEOUT_SECONDS===undefined||workerEnv.WORKER_SHUTDOWN_TIMEOUT_SECONDS===''?30:integer(workerEnv.WORKER_SHUTDOWN_TIMEOUT_SECONDS,'WORKER_SHUTDOWN_TIMEOUT_SECONDS',5,300)
  result.services.worker={...result.services.worker,stopGracePeriodSeconds:workerGraceSeconds,workerShutdownTimeoutSeconds:workerBudgetSeconds}
  if(workerGraceSeconds<workerBudgetSeconds+15)throw new Error('Worker stop_grace_period must exceed WORKER_SHUTDOWN_TIMEOUT_SECONDS by at least 15s')
- if(cpu>4.000001 || memory>3584*1048576)throw new Error('4C4G starting envelope exceeded; reserve at least 512MiB for the host')
+ if(cpu>Math.max(4.000001,existingEnvelope?.cpu ?? 0) || memory>Math.max(3584*1048576,existingEnvelope?.memory ?? 0))throw new Error('4C4G starting envelope exceeded; reserve at least 512MiB for the host')
  const redis=services.redis.command || [];const maxIndex=redis.indexOf('--maxmemory');const policyIndex=redis.indexOf('--maxmemory-policy')
  if(maxIndex<0 || size(redis[maxIndex+1])>size(services.redis.mem_limit)*.65 || redis[policyIndex+1]!=='noeviction')throw new Error('Redis persistence/queue headroom or policy invalid')
  const postgres=services.postgres.command || []
@@ -130,10 +131,75 @@ export function inspectResourceContract(compose, {capacity=false}={}) {
  result.totalCpu=cpu;result.totalMemoryMiB=memory/1048576;result.hostMemoryReserveMiB=4096-result.totalMemoryMiB;result.maximumConfiguredAppConnections=pools
  return result
 }
+// This path only accepts a release that preserves the complete running Compose
+// configuration. Existing limits remain visible and are not capacity-certified.
+export function inspectUnchangedProductionRelease(candidate, baseline, {images, revision, producerRun}) {
+ const names=['backend','backend-2','worker','report-worker-2','frontend']
+ if(!/^[a-f0-9]{40}$/.test(revision || ''))throw new Error('Exact release revision required')
+ if(!/^[1-9][0-9]*$/.test(String(producerRun || '')))throw new Error('Release producer run required')
+ const current=structuredClone(baseline), next=structuredClone(candidate)
+ for(const name of names) {
+  const old=current.services?.[name], updated=next.services?.[name]
+  if(!old || !updated)throw new Error(`Missing ${name}`)
+  const expected=images?.[name==='frontend'?'frontend':'backend']?.runtimeImageId
+  if(!/^sha256:[a-f0-9]{64}$/.test(expected || '') || updated.image!==expected)throw new Error(`Unqualified ${name} image`)
+  const labels=updated.labels || {}
+  if(labels['org.opencontainers.image.revision']!==revision || labels['io.eduk12.release.source']!==revision || labels['io.eduk12.release.producer.run']!==String(producerRun))throw new Error(`Incorrect ${name} release identity`)
+  delete old.image;delete updated.image
+  for(const key of ['org.opencontainers.image.revision','io.eduk12.release.source','io.eduk12.release.producer.run']) {
+   if(old.labels)delete old.labels[key]
+   if(updated.labels)delete updated.labels[key]
+  }
+ }
+ if(!isDeepStrictEqual(current,next))throw new Error('Production configuration changed beyond qualified images and release labels')
+ const normalized=structuredClone(candidate)
+ // The approved baseline and target have the same compiled default of 8.
+ for(const name of ['backend','backend-2'])normalized.services[name].environment.AGGREGATE_FINALIZATION_ADMISSION_LIMIT ??= '8'
+ const backend=normalized.services.backend.environment
+ const finalGates=['UNIT_SUBMIT_ADMISSION_LIMIT','AGGREGATE_FINALIZATION_ADMISSION_LIMIT','QUESTIONNAIRE_COMPLETION_ADMISSION_LIMIT'].reduce((sum,key)=>sum+integer(backend[key],key),0)
+ const resourceNames=['postgres','redis','backend',...Object.keys(normalized.services).filter(name=>/^backend-\d+$/.test(name)).sort(),'worker','frontend']
+ const envelope={finalGates,cpu:0,memory:0}
+ for(const name of resourceNames) {
+  const service=normalized.services[name]
+  envelope.cpu+=Number(service.cpus)
+  envelope.memory+=size(service.mem_limit)
+ }
+ const worker=normalized.services['report-worker-2']
+ if(!Number.isFinite(Number(worker.cpus)) || Number(worker.cpus)<=0 || Number(worker.cpus)>4)throw new Error('Invalid report-worker-2 CPU')
+ size(worker.mem_limit)
+ if((worker.ports || []).length)throw new Error('Forbidden report-worker-2 host exposure')
+ const result=inspectResourceContract(normalized,{capacity:true,existingEnvelope:envelope})
+ result.baselinePreserved=true
+ const workerEnv=worker.environment || {}
+ const workerDb=new URL(workerEnv.DATABASE_URL)
+ const workerUrlPool=workerDb.searchParams.has('connection_limit')?integer(workerDb.searchParams.get('connection_limit'),'report-worker-2 DATABASE_URL connection_limit',1,1000):null
+ const workerEnvPool=workerEnv.PRISMA_CONNECTION_POOL_SIZE===undefined || String(workerEnv.PRISMA_CONNECTION_POOL_SIZE).trim()===''?null:integer(workerEnv.PRISMA_CONNECTION_POOL_SIZE,'report-worker-2 Prisma pool',1,1000)
+ if(workerUrlPool!==null && workerEnvPool!==null && workerUrlPool!==workerEnvPool)throw new Error('report-worker-2 DATABASE_URL connection_limit disagrees with Prisma pool')
+ const workerPool=workerUrlPool ?? workerEnvPool ?? integer(undefined,'report-worker-2 Prisma pool',1,1000)
+ const workerProcesses=1+integer(workerEnv.EXPORT_CONCURRENCY,'report-worker-2 EXPORT_CONCURRENCY',1,4)
+ const workerGrace=worker.stop_grace_period===undefined?10:durationSeconds(worker.stop_grace_period,'report-worker-2 stop_grace_period')
+ const workerBudget=workerEnv.WORKER_SHUTDOWN_TIMEOUT_SECONDS===undefined || workerEnv.WORKER_SHUTDOWN_TIMEOUT_SECONDS==='' ? 30 : integer(workerEnv.WORKER_SHUTDOWN_TIMEOUT_SECONDS,'report-worker-2 WORKER_SHUTDOWN_TIMEOUT_SECONDS',5,300)
+ result.reportWorker2={cpus:Number(worker.cpus),memoryMiB:size(worker.mem_limit)/1048576,prismaPool:workerPool,stopGracePeriodSeconds:workerGrace,workerShutdownTimeoutSeconds:workerBudget,shutdownGraceAdequate:workerGrace>=workerBudget+15}
+ result.maximumConfiguredAppConnections+=workerPool*workerProcesses
+ result.totalCpu+=result.reportWorker2.cpus
+ result.totalMemoryMiB+=result.reportWorker2.memoryMiB
+ result.hostMemoryReserveMiB=4096-result.totalMemoryMiB
+ result.note='Existing resource limits preserved; capacity is not certified by this check.'
+ return result
+}
+
 if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href) {
  try {
   const args=process.argv.slice(2);const fileIndex=args.indexOf('--compose-json')
   const input=fileIndex>=0 ? fs.readFileSync(args[fileIndex+1],'utf8') : execFileSync('docker',['compose',...(args.includes('--capacity')?['--profile','capacity-worker','-f','docker-compose.yml','-f','docker-compose.capacity.yml']:[]),'config','--format','json'],{encoding:'utf8',stdio:['ignore','pipe','ignore'],maxBuffer:2097152})
-  console.log(JSON.stringify(inspectResourceContract(JSON.parse(input),{capacity:args.includes('--capacity')}),null,2))
+  const baselineIndex=args.indexOf('--baseline-json')
+  const proofIndex=args.indexOf('--images-json')
+  const revisionIndex=args.indexOf('--release-revision')
+  const runIndex=args.indexOf('--release-run')
+  const candidate=JSON.parse(input)
+  const result=baselineIndex>=0
+   ? inspectUnchangedProductionRelease(candidate,JSON.parse(fs.readFileSync(args[baselineIndex+1],'utf8')),{images:JSON.parse(fs.readFileSync(args[proofIndex+1],'utf8')),revision:args[revisionIndex+1],producerRun:args[runIndex+1]})
+   : inspectResourceContract(candidate,{capacity:args.includes('--capacity')})
+  console.log(JSON.stringify(result,null,2))
  }catch(error){console.error(error instanceof Error ? error.message : 'Resource contract invalid');process.exitCode=1}
 }
