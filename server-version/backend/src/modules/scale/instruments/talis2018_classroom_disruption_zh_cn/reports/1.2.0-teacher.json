@@ -1,0 +1,93 @@
+{
+  "toolKey": "talis2018_classroom_disruption_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-teacher",
+  "title": "目标班级的课堂扰乱回顾（试用）",
+  "report": {
+    "reportVersion": "1.2.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "primaryScoreKeys": [
+      "classroom_disruption"
+    ],
+    "scoreOrder": [
+      "classroom_disruption"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "classroom_disruption",
+        "scoreLabel": "课堂扰乱相关自述均分",
+        "headline": "回到这个班的一节课，看看哪里最容易被打断",
+        "summary": "请回想按题首规则选定的那个班级。有时开课后等了几分钟才能开始，有时课堂气氛原本不错，却在从讲解切换到练习时被反复打断。这四题一起描述教师看到的开课等待、噪声、教学时间被打断和学生维护学习氛围的情况。统一方向后取 1–4 均分，分数较高表示本次自报的课堂扰乱较多。",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选这个班的一节典型课，只记一个反复发生的片段。写下进入这一步之前班里在做什么、出现了什么打断、课堂后来怎样接回原任务。再找一次相近但衔接顺畅的课对照。"
+          },
+          {
+            "category": "strategy",
+            "text": "下次课可以先试一个小调整，例如在安静练习开始前把材料和第一步写清楚。观察学生能否更快开始，或在被打断后更快接回任务。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "只描述按上周二上午 11 点后及原顺延规则选定的一个初中班级。没有符合选择条件的班级，或目标班教学完全或主要面向有特殊教育需要的学生时，该题组不适用。",
+      "关于学生维护愉快学习氛围的题先按 5 减去原分转换方向，四题答全后计算。一次结果无法评价教师教学能力，也不用于评价学生或其他班级。",
+      "本项目按答全的题目取等权原始均分。结果不能直接与 OECD 因子分、国际调查结果或常模对照。当前试用报告没有独立常模、评分等级或阈值。",
+      "来源：OECD（2018），Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (People's Republic of China), ISCED 2（简体中文），https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip。",
+      "本内容改编自 OECD 原作。改编稿中的观点和论证不代表 OECD 或其成员国的官方观点。"
+    ],
+    "disclaimer": "供成人初中教师回顾本次作答。请勿用于教师绩效、录用、问责或学校排名。",
+    "artworkKey": "talis2018_classroom_disruption_zh_cn/1.0.0/1.2.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
