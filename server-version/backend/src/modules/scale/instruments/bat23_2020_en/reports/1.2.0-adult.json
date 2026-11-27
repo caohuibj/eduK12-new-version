@@ -1,0 +1,164 @@
+{
+  "toolKey": "bat23_2020_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-adult",
+  "title": "A closer look at your workday / 把工作中的消耗看具体（试用）",
+  "report": {
+    "reportVersion": "1.2.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "2020 Appendix B Table A2 English work-related core items with original instruction, 23-item mean and four facet means. Descriptive feedback in English with a Simplified Chinese reading aid. Local norms and diagnostic use are outside scope."
+      }
+    },
+    "primaryScoreKeys": [
+      "burnout_core"
+    ],
+    "scoreOrder": [
+      "burnout_core",
+      "exhaustion",
+      "mental_distance",
+      "cognitive_impairment",
+      "emotional_impairment"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "burnout_core",
+        "scoreLabel": "Overall work experience / 整体工作体验",
+        "headline": "Find one thing that could ease the load / 找一件能减轻负担的事",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This 23-item average summarizes how often you noticed four kinds of difficulty at work. Look at the four sections below to see which experiences are worth a closer look. Start with one situation you can describe clearly, such as a day of back-to-back requests.\n\n这 23 道题的平均分汇总了四类工作困难出现的频率。可以从后面的四方面挑出一项，回想一个具体片段，例如一天里临时任务接连涌进来时，你有什么感觉。",
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Write down one demand that kept coming up and what helped, even briefly. Take that example to a conversation about what can change. / 写下一件反复消耗你的事，再记下什么曾让你缓过来一点。带着这个例子谈一项实际可改的安排。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "exhaustion",
+        "scoreLabel": "Exhaustion / 工作后的疲惫",
+        "headline": "Leave space to recover / 给恢复留一点空隙",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This section looks at feeling drained by work and having trouble recovering afterward. Notice when the first stretch of tiredness tends to show up in your day and whether you get a chance to pause.\n\n这一部分关注工作把精力耗掉的感觉，以及结束后多久能缓过来。想想一天中你通常从什么时候开始觉得吃力，之后有没有机会喘口气。",
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "After a demanding stretch, try protecting a short gap before the next commitment. If the schedule leaves no room, bring up the timing or task load with someone who can help. / 试着在耗神的工作之后留个短空档。如果日程实在排不开，可以和能协调的人谈谈时限或任务量。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "mental_distance",
+        "scoreLabel": "Mental distance / 与工作的心理距离",
+        "headline": "Remember when the work felt worth doing / 回想工作曾经有意思的时候",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This section describes feeling less engaged or wanting to keep work at a distance. Think about where you still feel involved, where you pull back, and what changed around those moments.\n\n这一部分关注你对工作的投入感有没有变淡，有时是不是想和工作保持一点距离。回想自己在哪些任务里还有参与感，在哪些时候开始抽离，当时的安排又有什么不同。",
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Pick one task that still felt worthwhile and one you kept putting off. Compare what was clear, what you could decide, and who was available to help. / 选一件仍觉得值得做的事，再选一件总想往后拖的事。看看两件事在目标、能自主决定的空间和可获得的帮助上有什么差别。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "cognitive_impairment",
+        "scoreLabel": "Attention and thinking / 工作中的注意和思路",
+        "headline": "Give a busy mind fewer tabs to hold / 少让脑子同时记好几件事",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This section asks about losing focus, forgetting details or having trouble keeping a train of thought at work. These experiences can become more noticeable when messages, decisions and interruptions pile up.\n\n这一部分关注工作中走神、忘记细节或思路被打断的体验。消息、决定和临时要求一块儿涌进来时，可以留意这些情况是不是更容易出现。",
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Before a likely interruption, write down just the next step. Try keeping one channel quiet during a task that needs concentration, if your role allows it. / 容易被打断之前，只记下手头事情的下一步。条件允许时，做需要专注的任务可以先关掉一类消息提醒。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional_impairment",
+        "scoreLabel": "Emotional strain / 工作中的情绪压力",
+        "headline": "Make room before the next conversation / 下一次沟通前留一点缓冲",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This section asks about becoming upset more easily at work or finding emotions harder to manage. Look for the situations that leave you carrying tension into whatever comes next.\n\n这一部分关注工作中是不是更容易烦躁，或有时很难把情绪平复下来。可以看看哪些场合过后，那股紧绷感容易跟着你进入下一件事。",
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "support",
+            "text": "If you can, allow a brief reset after a difficult interaction. Repeated strain is worth discussing with a trusted colleague, workplace support or an appropriate professional. / 遇到一场费力的沟通，条件允许的话先给自己一点缓冲。如果反复遇到类似压力，可以找信任的同事、单位支持渠道或合适的专业人员谈谈。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "The overall score averages all 23 answers. Each facet has its own 1–5 average. Higher values indicate more frequent self-reported difficulties. / 整体是 23 题的平均分，每方面各自取均分，范围均为 1–5。越高表示自述困难出现得越频繁。",
+      "This is adult work-related self-report. The four facet scores summarize experiences and can be read independently. This report uses no transferred norms or clinical cutoffs. / 针对在职成人自评。四方面可以各自阅读，没有套用外部常模和临床分界。",
+      "Source: Schaufeli, Desart & De Witte (2020), Burnout Assessment Tool, Appendix B Table A2, https://doi.org/10.3390/ijerph17249495. Original English questionnaire under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Bilingual feedback and artwork are new platform materials. / 题本沿用论文英文附录，图文反馈由平台制作。"
+    ],
+    "disclaimer": "These pilot feedback scores describe your answers and do not establish diagnosis, causes or work performance. / 试用分反映你的填答，不能用来判断诊断、原因或工作表现。",
+    "artworkKey": "bat23_2020_en/1.0.0/1.2.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
