@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "teacher_subject_liking_chemistry_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "teacher_subject_liking-very-low.webp",
+      "alt": "学生在课堂笔记上把观察和感受分成两栏，黑板前的老师正在展示一枚铁钉",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "teacher_subject_liking-low.webp",
+      "alt": "学生带着一张问题卡听课，并把课堂线索连到问题上",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "low"
+    },
+    {
+      "file": "teacher_subject_liking-high.webp",
+      "alt": "学生向同桌复述化学现象，并指向自己画的观察图",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "high"
+    },
+    {
+      "file": "teacher_subject_liking-very-high.webp",
+      "alt": "学生把课堂现象变成自己的猜想，并寻找可以核对的证据",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "老师展示一枚生锈的铁钉，学生们注意到课堂的不同细节。",
+    "width": 506,
+    "height": 506
+  }
+}

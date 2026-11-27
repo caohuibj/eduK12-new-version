@@ -1,0 +1,117 @@
+{
+  "toolKey": "teacher_subject_liking_chemistry_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "我感受到的化学课堂热情｜学生行动版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目自编三题、六点认同选项、无反向计分、至少两题与均分规则；沿用默认 P wave1-20261001-v2 的初高中历史便利样本四档，报告不包含 middle。文字只解释学生感知，不推断教师真实内心、教学质量或学生自己的成长信念；未修改 C、P、阈值和缺失规则。"
+      }
+    },
+    "primaryScoreKeys": [
+      "teacher_subject_liking"
+    ],
+    "scoreOrder": [
+      "teacher_subject_liking"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "teacher_subject_liking",
+        "headline": "我从课堂里感受到多少化学热情",
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "化学课上，老师举起一枚生锈的铁钉，问：“颜色怎么变了？”小晴看到老师一边比画一边追问，觉得老师讲得很投入。同桌说：“我只记得刚才那枚铁钉。”听完同一节课，两个人注意到的地方各有不同。\n\n这几道题记录你从课堂表现里感受到的老师对化学的兴趣。答案说的是你的课堂体验。下次有什么场景让你留下深刻印象，可以在笔记上分两栏：一栏写你看见或听见了什么，一栏写你怎样理解。也许你会发现一个值得带到下一节课的问题。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "先分开“看到”和“想到”",
+            "summary": "下节化学课只记一个具体片段：老师说了什么、做了什么；再另起一行写你的感受。先不猜老师心里怎么想。课后看看，这个片段让你多了哪个问题。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "带一个自己的问题进课堂",
+            "summary": "课前写下一句你真正想知道的话，例如“铁为什么会生锈”。课堂中留意哪句话给了你线索，课后把线索补在问题旁边。有没有被带动，可以从这个具体过程看起。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "把被点亮的地方讲清楚",
+            "summary": "挑一个让你觉得老师很投入的例子，用自己的话讲给同桌听。再补一句：这个例子说明了什么化学现象？感受到热情是一条线索，把内容说清才是你的学习。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "把课堂热情变成自己的探索",
+            "summary": "从最近一节课挑一个最吸引你的现象，先写一个猜想，再找一条证据或向老师问一个可核对的问题。借到课堂的热情之后，再走出属于自己的下一步。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "用两行小记录把“老师做了什么”和“我怎样感受”分开；这比猜测老师的内心更可靠。"
+          }
+        ],
+        "scoreLabel": "学生感知教师化学兴趣均分（历史参考试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "三道题至少答两道，按已答题目计算均分。试用分组沿用本项目同学段历史便利样本：初中 N=366，高中 N=560；两学段分界不同，且都只有 very_low、low、high、very_high 四档。",
+      "历史参考只帮助理解这次回答在项目样本中的相对位置，不是全国常模，也不能跨学段比较。",
+      "结果是学生感知，不是教师自评、教师真实兴趣或教学质量；也不等于学生自己的化学兴趣、学习能力或成长信念，不能用于教师排名与问责。"
+    ],
+    "disclaimer": "这份报告供七至十二年级学生回顾课堂体验。它不评价教师，也不替你判断自己能不能学好化学。",
+    "artworkKey": "teacher_subject_liking_chemistry_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
