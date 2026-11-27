@@ -1,0 +1,149 @@
+{
+  "toolKey": "selfie4t_2022tk_empowering_learners_en_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "SELFIEforTEACHERS | Design more than one way into the lesson",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "European Commission JRC129699 Toolkit Annex I: 4 English stems and 24 descriptions in Area 5 match the registered C after punctuation/whitespace normalization. The official 2023 JRC131282 guide supplies the six scored levels and zero-point not-aware option. Both documents carry CC BY 4.0 with source and change attribution. C, source options and P are unchanged."
+      }
+    },
+    "primaryScoreKeys": [
+      "competence_5_1",
+      "competence_5_2",
+      "competence_5_3",
+      "competence_5_4"
+    ],
+    "scoreOrder": [
+      "competence_5_1",
+      "competence_5_2",
+      "competence_5_3",
+      "competence_5_4"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_5_1",
+        "scoreLabel": "Accessibility and inclusion (self-position, 0–6)",
+        "headline": "Notice who has to work around the activity",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "When instructions exist only in a fast clip, a student’s difficulty may come from the format before the learning even begins. Accessible design is anticipating such barriers early. Your selected statement describes how you make digital activity and materials reachable for more learners.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Check one existing activity with a keyboard, captions, and a basic device or connection. Offer a readable alternative that preserves the goal, then ask a learner whether the alternative really works."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_5_2",
+        "scoreLabel": "Differentiation and personalisation (self-position, 0–6)",
+        "headline": "Keep the destination while varying the support",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Two learners can work towards the same explanation with different amounts of scaffolding. A worked starting point, optional prompts, or extra practice can change the path without silently lowering the goal. This response concerns your use of digital tools to make those paths possible.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Choose one common success criterion. Offer two sensible routes or levels of support, then compare the resulting work using that same criterion."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_5_3",
+        "scoreLabel": "Actively engaging learners (self-position, 0–6)",
+        "headline": "Make the learner do the thinking",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Watching an animation can be interesting, but predicting what happens next gives a learner something to test. Digital activity becomes more meaningful when learners make a choice, build a response, or explain a decision. Your selected statement reflects how you design those opportunities.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Change one passive activity by asking for a prediction and a reason before revealing the result. Give learners time to compare their explanations and revise one idea."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_5_4",
+        "scoreLabel": "Blended learning (self-position, 0–6)",
+        "headline": "Give each setting a clear role",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A short independent preparation can give learners time to notice what confuses them. Class time can then do what a recorded explanation cannot: work through those confusions with people present. This response describes how you connect activities across places and times.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Map one lesson as preparation, shared activity, and follow-up. Check that the work from each part has a visible use in the next, and make an accessible route for learners who cannot connect at home."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "© European Union 2022 and 2023. Adapted from Anastasia Economou, SELFIEforTEACHERS Toolkit (2022), doi:10.2760/626409, Annex I, and SELFIEforTEACHERS: Designing and developing a self-reflection tool for teachers’ digital competence (2023), doi:10.2760/561258, p.11 and Annex 1. Both CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). The project separates this area and supplies new instructions and feedback. No EU endorsement is implied.",
+      "Each competence stands alone. The six ordered A1–C2 statements are represented by 1–6. A selected zero records ‘I am not aware of this competence’; an omitted response stays missing. There is no area total, proficiency band, or rank.",
+      "This fixed English project adaptation is for primary and secondary teachers reflecting on their own practice. The separate area has no independent validation or Chinese-language equivalence."
+    ],
+    "disclaimer": "For teachers’ own professional learning and reflection. The selection describes self-reported practice in one area of the fixed English adaptation and supplies no appraisal, school ranking, or EU certification.",
+    "artworkKey": "selfie4t_2022tk_empowering_learners_en_teacher_self/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
