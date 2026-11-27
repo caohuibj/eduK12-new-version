@@ -1,0 +1,123 @@
+{
+  "toolKey": "academic_self_efficacy_biology_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "生物学习自我效能图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "artworkKey": "academic_self_efficacy_biology_zh_cn/1.0.0/1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容审定",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目自编五题学科替换版、五点选项、无反向计分、四题最低作答与均分规则。生物版没有同版本经验样本，五档仅为量尺范围的理论试用区间，不作为常模、能力或诊断界线。"
+      }
+    },
+    "primaryScoreKeys": [
+      "academic_self_efficacy"
+    ],
+    "scoreOrder": [
+      "academic_self_efficacy"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "academic_self_efficacy",
+        "headline": "把“我能完成吗”变成下一步",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "第一次看到一张陌生的遗传图，小禾不知道从哪里开始。她在图上圈出亲本的信息，照着老师的例子列出一种可能的组合，再用方格检查。整道题还没做完，她已经知道下一步该查什么。\n\n“给我一道这样的题，我有多大把握做下去？”这是理解学习自我效能的一个办法。把握会随着题目、练习和可获得的帮助而改变。能圈出一条信息，能借一个提示开始，能回头核对自己做对了哪一步，都是下次估计自己能做什么的依据。想想你最近遇到的那道生物题：给你五分钟，你能从哪里动手？",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "先圈出一条看得懂的信息",
+            "summary": "挑一张课堂上的生命过程图，圈一个你叫得出名字的结构，再找旁边的一条箭头。顺着箭头说一句“先发生什么”。翻回课本核对这一小步。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "借一个提示，自己接着做",
+            "summary": "找一道遗传图题，请同伴只示范怎么圈出亲本信息。你试着写下一种可能的组合，再用方格检查。哪里还卡着，就把那一格拿去问老师。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "给两种任务各估一步",
+            "summary": "一边选一个生命过程，一边选一组实验结果。动手前写下自己分别能说明哪一步，做完再对照。看哪一类任务最值得下一次先练。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "把会用的方法带到下一题",
+            "summary": "找一道条件稍有变化的生物题，先写下做题顺序。做完给三种步骤各打一个记号：自己做的、查资料做的、有人提示后做的。圈出一条还可以带到下一题的方法。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "用一份陌生材料试试",
+            "summary": "找一道材料陌生、考查内容熟悉的实验题。动手前预测哪一步能独立完成，做完核对。选一个和预测不同的地方，写下下次打算换哪种做法。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "试着把“我能不能学会”拆成三个问题：我看懂了什么？先做哪一步？做完拿什么核对？"
+          }
+        ],
+        "scoreLabel": "生物学习自我效能均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "五道题至少答四道，按已答题目算均分。均分表示你这次对自己完成生物学习任务有多大把握。",
+      "初中和高中沿用原参数。五档按 1—5 分量尺范围估算，帮助选择适合这一阶段的建议。这个版本还没有同年级学生的数据可以作比较。",
+      "缺少年级时，原均分仍可用来选择一条试用建议。报告省略学段参考。"
+    ],
+    "disclaimer": "这份报告供七至十二年级学生回顾自己的学习，也可以带一项练习去和老师商量。"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

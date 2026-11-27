@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "academic_self_efficacy_biology_zh_cn/1.0.0/1.2.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生把陌生遗传图拆成圈出亲本、列出组合和检查方格三个可验证步骤。",
+    "width": 1600,
+    "height": 900
+  },
+  "bands": [
+    {
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "very_low",
+      "file": "very-low.webp",
+      "alt": "学生在生命过程图中圈出一个可以先确认的生物线索。",
+      "width": 768,
+      "height": 768
+    },
+    {
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "low",
+      "file": "low.webp",
+      "alt": "学生把示范提示改写成圈亲本、列组合和查方格的三步路线。",
+      "width": 768,
+      "height": 768
+    },
+    {
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "middle",
+      "file": "middle.webp",
+      "alt": "学生比较解释生命过程与分析实验结果两类任务的预测和实际。",
+      "width": 768,
+      "height": 768
+    },
+    {
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "high",
+      "file": "high.webp",
+      "alt": "学生在生物变式任务上区分独立完成、查阅资料和接受提示的步骤。",
+      "width": 768,
+      "height": 768
+    },
+    {
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "very_high",
+      "file": "very-high.webp",
+      "alt": "学生先预测陌生生物任务，再依据新证据调整原来的行动路线。",
+      "width": 768,
+      "height": 768
+    }
+  ]
+}
