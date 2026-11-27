@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "socs_s20_2023_zh_cn/1.0.1/1.2.0-adult",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "忙完一天，两位同事在窗边短暂停留，其中一位放下工作包，给自己倒了一杯茶。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

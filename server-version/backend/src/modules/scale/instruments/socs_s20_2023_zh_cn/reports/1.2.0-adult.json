@@ -1,0 +1,187 @@
+{
+  "toolKey": "socs_s20_2023_zh_cn",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.2.0-adult",
+  "title": "忙完之后，也给自己一点照顾（试用）",
+  "report": {
+    "reportVersion": "1.2.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容和来源校对",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "依据公开中文题本、该平台精确 C 的计分及适用范围。保持 score-only、原 C 和 P。"
+      }
+    },
+    "primaryScoreKeys": [
+      "recognizing_suffering",
+      "understanding_universality",
+      "feeling_for_self",
+      "tolerating_feelings",
+      "acting_to_alleviate",
+      "total"
+    ],
+    "scoreOrder": [
+      "recognizing_suffering",
+      "understanding_universality",
+      "feeling_for_self",
+      "tolerating_feelings",
+      "acting_to_alleviate",
+      "total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "total",
+        "scoreLabel": "整体均分（1–5）",
+        "headline": "像待一个忙了一天的人那样待自己",
+        "summary": "同事忙到忘了吃午饭，你大概会问一句「要不要先坐一会儿」。轮到自己，话却可能变成「怎么又没撑住」。自我关怀可以从很小的地方开始。发现这阵子有些吃力，听懂这种感受，再做一件能帮自己的事。",
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "从下面挑一个和最近经历有关的方面。本周找一个实际机会试做一件小事就够了。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "recognizing_suffering",
+        "scoreLabel": "识别自己的难受（1–5）",
+        "headline": "早点听见那声提醒",
+        "summary": "压力大时，身体和心情常先给出信号。你可能开始看不进文件，或连平常能做的小事也想绕开。这部分记录你会不会停下来察觉这些变化。",
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想想最近一次累过头前，你最早发现的一个信号是什么。把它记在手边，下次认出它就可以早一点调整。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "understanding_universality",
+        "scoreLabel": "把困难放回共同的经历（1–5）",
+        "headline": "遇到困难的人还有很多",
+        "summary": "有时我们只看到别人交出来的成果，很少看到别人改了多少遍、在哪一段也卡住。这部分关注你能不能把自己的挫折放回真实的生活里看。",
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一位你尊敬的人遇到麻烦时做过什么。看看这件事有没有提醒你，自己也可以需要时间或协助。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "feeling_for_self",
+        "scoreLabel": "关怀受苦的自己（1–5）",
+        "headline": "把口气放软一点",
+        "summary": "对自己说话的口气，会影响你有没有余力面对眼前的小麻烦。体谅具体的处境，有时能让下一步更清楚。",
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "如果一位熟悉的人遇到同样的事，你会先说哪一句？试着把这句话说给自己听。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "tolerating_feelings",
+        "scoreLabel": "容纳不舒服的感受（1–5）",
+        "headline": "让感受先待一会儿",
+        "summary": "难受时很容易马上把自己塞进别的事，也可能反复想着同一个场景。这一部分关心的是你能不能留出一点时间，听清自己现在的感受。",
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找个可行的短暂停顿，分开记下「我现在是什么感觉」和「眼前有什么我可以做」。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "acting_to_alleviate",
+        "scoreLabel": "采取照顾自己的行动（1–5）",
+        "headline": "把关心落到一个安排上",
+        "summary": "关怀有时很具体，可能是休息十分钟，找人帮忙同步信息，把一件任务重新约时间，或者给自己的问题留一个能处理的时段。",
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "如果今晚只能安排一件照顾自己的事，挑一件做得到的，把它放进日程里。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "20 题等权均分，五个方面各包含四题、独立计算均分。取值均为 1–5，较高代表本次更认同相应描述。报告采用现有原分，未使用阈值和常模。",
+      "使用范围以中国成年在职人群来源为准。自我关怀可以和争取实际支持同时发生，本报告用于个人反思。",
+      "Meng、Wang 与 Liu，2023，Supplementary Table 1，doi:10.3389/fpsyg.2023.1110076；Gu 等，2020。两来源采用 CC BY 4.0。仓库中文题第 9 项包含一字编辑勘误，原版其余题文、选项与指导语保留，报告和配图为平台新增。"
+    ],
+    "disclaimer": "这是试用版自评报告，内容供自我反思及研究使用。仅凭一次作答不足以判断个人能力或身心状况。",
+    "artworkKey": "socs_s20_2023_zh_cn/1.0.1/1.2.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
