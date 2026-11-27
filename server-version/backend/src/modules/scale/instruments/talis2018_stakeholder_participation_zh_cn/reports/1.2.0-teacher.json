@@ -1,0 +1,93 @@
+{
+  "toolKey": "talis2018_stakeholder_participation_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-teacher",
+  "title": "学校参与和共同支持回顾（试用）",
+  "report": {
+    "reportVersion": "1.2.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "primaryScoreKeys": [
+      "stakeholder_participation"
+    ],
+    "scoreOrder": [
+      "stakeholder_participation"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "stakeholder_participation",
+        "scoreLabel": "学校相关群体参与自述均分",
+        "headline": "从一次学校决定看谁有机会参与",
+        "summary": "例如学校要调整一项活动安排。有的意见可能在方案成形前就被听到，有的意见是在通知之后才有机会表达。五题询问教职工、家长或监护人、学生的决策参与机会，以及共同担责和相互支持的校园文化。五题取 1–4 均分，分数较高表示你更认同自己所在学校具备这些条件。",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一项近期你亲历的学校决定。按事情经过记下谁收到信息、什么时候能提出意见、后来有没有看到回应。只依据你实际知道的部分。"
+          },
+          {
+            "category": "strategy",
+            "text": "下次类似事项可以尝试在方案确定前给相关群体一个清楚的回应渠道，并约定什么时候说明哪些意见被采纳、哪些需要再讨论。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "五题答全才计算。该分数来自一位教师对本校的看法；了解不同群体的实际参与还需分别听取教职工、家长或监护人、学生的意见。",
+      "这个结果不能用来推断学校治理质量、领导能力或比较学校。",
+      "本项目按答全的题目取等权原始均分。结果不能直接与 OECD 因子分、国际调查结果或常模对照。当前试用报告没有独立常模、评分等级或阈值。",
+      "来源：OECD（2018），Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (People's Republic of China), ISCED 2（简体中文），https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip。",
+      "本内容改编自 OECD 原作。改编稿中的观点和论证不代表 OECD 或其成员国的官方观点。"
+    ],
+    "disclaimer": "供成人初中教师回顾本次作答。请勿用于教师绩效、录用、问责或学校排名。",
+    "artworkKey": "talis2018_stakeholder_participation_zh_cn/1.0.0/1.2.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
