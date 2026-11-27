@@ -4,6 +4,8 @@ import api from '../api/client'
 import {ToolCatalogTagsPanel} from '../components/tool-licensing/ToolCatalogTags'
 import {products,type Product,type ToolLicenseFocus} from './toolLicenseFocus'
 import {BatchConfirmation, isBatchReceipt, matchesBatchPreview, readPendingBatch, type BatchCommit, type BatchIntent, type BatchPreview, type BatchReceipt} from './AdminToolLicenseBatch'
+import {licenseAssignmentPath} from './standardAssignmentTarget'
+import {LicenseHistory} from './LicenseRecordDetails'
 import './tool-licenses.css'
 
 const base='/admin/permissions/tool-licenses'
@@ -11,7 +13,7 @@ const catalog='/admin/tool-catalog-tags'
 type Subject={id:string;label:string;description?:string}
 type Tool={key:string;name:string;family:string;tags?:string[]}
 type LicenseTool=Tool&{limit:number|null;used:number}
-type License={id:string;product:Product;subjectId:string;subjectType:string;subjectLabel:string;startsAt:string;expiresAt:string;revision:number;status:'SCHEDULED'|'ACTIVE'|'EXPIRED'|'TERMINATED';reason:string;tools:LicenseTool[]}
+type License={id:string;product:Product;subjectId:string;nextLicenseId?:string|null;missingTools?:string[];subjectType:string;subjectLabel:string;startsAt:string;expiresAt:string;revision:number;status:'SCHEDULED'|'ACTIVE'|'EXPIRED'|'TERMINATED';reason:string;tools:LicenseTool[]}
 type TerminationImpact=Pick<License,'id'|'revision'|'product'|'status'|'subjectLabel'>&{tools:Array<Pick<Tool,'key'|'name'>>;meteredPublications:number;outstandingReservations:number}
 type Page<T>={list:T[];hasMore:boolean;enforcedProducts?:Product[];pilotToolFamilies?:Partial<Record<Product,string[]>>}
 type SelectedTool=Tool&{limitInput:string;used:number}
@@ -244,8 +246,9 @@ function ProductLicenses({actorId,product,active,initialToolKey,initialSubjectId
   setSelected(row.tools.map(tool=>({...tool,limitInput:tool.limit===null?'':String(tool.limit),used:kind==='edit'?tool.used:0})));setReason('')
   if(kind==='edit'){setEditing(row);setRenewing(null);setStartsAt(localTime(new Date(row.startsAt)));setExpiresAt(localTime(new Date(row.expiresAt)))}
   else{
-   const from=new Date(Math.ceil(Math.max(Date.now(),row.status==='TERMINATED'?0:Date.parse(row.expiresAt))/60000)*60000)
-   const local=localTime(from);setStartsAt(local);setExpiresAt(monthsAfter(local,12));setEditing(null);setRenewing(row)
+   const from=new Date(Math.max(Math.ceil(Date.now()/60000)*60000,row.status==='TERMINATED'?0:Date.parse(row.expiresAt)))
+   const seconds=from.toISOString().slice(16,23)
+   const local=localTime(from)+(seconds===':00.000'?'':seconds);setStartsAt(local);setExpiresAt(monthsAfter(local,12));setEditing(null);setRenewing(row)
    setNotice('已带入原工具清单。将新建独立期次，原记录保留；请核对日期与新一期额度。')
   }
  }
@@ -387,7 +390,7 @@ function ProductLicenses({actorId,product,active,initialToolKey,initialSubjectId
     {!!renewalChanges.changed.length&&<p>调整下一期额度 {renewalChanges.changed.map(tool=>tool.name).join('、')}</p>}
    </section>}
    <ul className="tool-license-selected">{selected.map(tool=><li key={tool.key}><div><strong>{tool.name}</strong><small>{families[tool.family]??tool.family}{editing?' · 已用 '+tool.used+' 次':''}</small></div><label>额度 · {tool.name}<input inputMode="numeric" type="number" step="1" min={editing?Math.max(1,tool.used):1} max={2147483647} placeholder="不限次数" disabled={locked} value={tool.limitInput} onChange={event=>setSelected(old=>old.map(item=>item.key===tool.key?{...item,limitInput:event.target.value}:item))}/></label><button type="button" disabled={locked} onClick={()=>setSelected(old=>old.filter(item=>item.key!==tool.key))}>移除 {tool.name}</button></li>)}</ul>
-   <div className="tool-license-grid"><label className="system-field">生效时间（本地时间）<input type="datetime-local" disabled={locked||Boolean(editing)} value={startsAt} onChange={event=>setStartsAt(event.target.value)}/></label><label className="system-field">到期时间（本地时间）<input type="datetime-local" disabled={locked||Boolean(editing)} value={expiresAt} onChange={event=>setExpiresAt(event.target.value)}/></label></div>
+   <div className="tool-license-grid"><label className="system-field">生效时间（本地时间）<input type="datetime-local" step="any" disabled={locked||Boolean(editing)} value={startsAt} onChange={event=>setStartsAt(event.target.value)}/></label><label className="system-field">到期时间（本地时间）<input type="datetime-local" step="any" disabled={locked||Boolean(editing)} value={expiresAt} onChange={event=>setExpiresAt(event.target.value)}/></label></div>
    <div className="system-actions"><button type="button" disabled={locked||Boolean(editing)||!startsAt} onClick={()=>setExpiresAt(monthsAfter(startsAt,6))}>半年</button><button type="button" disabled={locked||Boolean(editing)||!startsAt} onClick={()=>setExpiresAt(monthsAfter(startsAt,12))}>一年</button><small>快捷期限从生效时间计算，填写后仍可自行修改到期时刻。</small></div>
    <label className="system-field">本次授权原因<textarea rows={3} maxLength={500} value={reason} disabled={locked} onChange={event=>setReason(event.target.value)}/></label>
    <div className="system-actions"><button type="button" disabled={locked} onClick={save}>{editing?'保存工具范围与额度':batchMode?'预览批量签发':'确认签发工具许可'}</button><button type="button" disabled={locked} onClick={()=>{if(window.confirm('放弃当前未提交的工具许可选择？'))clearForm()}}>清空当前选择</button></div>
@@ -409,7 +412,7 @@ function ProductLicenses({actorId,product,active,initialToolKey,initialSubjectId
    <p>{listSubject?'当前仅查看已选对象的许可。':'当前查看此入口全部对象。'}{listSubject&&<button type="button" disabled={locked} onClick={()=>{setListSubject('');setListPage(1)}}>查看全部对象</button>}</p>
    {licenses.loading&&<p role="status">正在读取许可记录…</p>}{licenses.error&&<p role="alert">{licenses.error}</p>}
    {!licenses.loading&&licenses.data&&!licenses.data.list.length&&<p>当前没有匹配的工具许可。</p>}
-   <div className="sys-records">{licenses.data?.list.map(row=><article className="sys-record" key={row.id}><details><summary><span className="sys-record-heading"><strong>{row.subjectLabel}</strong><small>{products[row.product]} · {displayTime(row.startsAt)} 至 {displayTime(row.expiresAt)}</small></span><span className="sys-badge">{states[row.status]}</span></summary><div className="sys-record-body"><p>原因：{row.reason} · 修订 {row.revision}</p><ul>{row.tools.map(tool=><li key={tool.key}>{tool.name} · {families[tool.family]??tool.family} · {tool.limit===null?'不限次数':'总量 '+tool.limit+' 次'} · 已用 {tool.used} 次{tool.limit!==null?' · 剩余 '+Math.max(0,tool.limit-tool.used)+' 次':''}</li>)}</ul><div className="system-actions"><button type="button" disabled={locked||!['SCHEDULED','ACTIVE'].includes(row.status)} onClick={()=>loadForm(row,'edit')}>调整工具与额度</button><button type="button" disabled={locked} onClick={()=>loadForm(row,'renew')}>{row.status==='TERMINATED'?'重新签发':'续期'}</button><button type="button" disabled={locked||!['SCHEDULED','ACTIVE'].includes(row.status)} onClick={()=>terminate(row)}>提前终止</button></div><details><summary>许可标识</summary><code>{row.id}</code></details></div></details></article>)}</div>
+   <div className="sys-records">{licenses.data?.list.map(row=><article className="sys-record" key={row.id}><details><summary><span className="sys-record-heading"><strong>{row.subjectLabel}</strong><small>{products[row.product]} · {displayTime(row.startsAt)} 至 {displayTime(row.expiresAt)}</small></span><span className="sys-badge">{states[row.status]}{row.nextLicenseId!==undefined&&(row.nextLicenseId?' · 已有连续下一期':' · 到期后将中断')}</span></summary><div className="sys-record-body"><p>{!!row.missingTools?.length&&'下一期减少工具：'+row.missingTools.join('、')}</p><p>原因：{row.reason} · 修订 {row.revision}</p><ul>{row.tools.map(tool=><li key={tool.key}>{tool.name} · {families[tool.family]??tool.family} · {tool.limit===null?'不限次数':'总量 '+tool.limit+' 次'} · 已用 {tool.used} 次{tool.limit!==null?' · 剩余 '+Math.max(0,tool.limit-tool.used)+' 次':''}{row.status==='ACTIVE'&&tool.family==='SCALE'&&<a href={licenseAssignmentPath(row.product,row.subjectId,tool.key)}>转交 {products[row.product]} 管理员分配版本</a>}</li>)}</ul><div className="system-actions"><button type="button" disabled={locked||!['SCHEDULED','ACTIVE'].includes(row.status)} onClick={()=>loadForm(row,'edit')}>调整工具与额度</button><button type="button" disabled={locked} onClick={()=>loadForm(row,'renew')}>{row.status==='TERMINATED'?'重新签发':'续期'}</button><button type="button" disabled={locked||!['SCHEDULED','ACTIVE'].includes(row.status)} onClick={()=>terminate(row)}>提前终止</button></div><LicenseHistory key={row.revision} id={row.id}/><details><summary>许可标识</summary><code>{row.id}</code></details></div></details></article>)}</div>
    <nav className="tool-license-paging" aria-label="工具许可分页"><button type="button" disabled={locked||licenses.loading||listPage===1} onClick={()=>setListPage(page=>page-1)}>上一页许可</button><span>第 {listPage} 页</span><button type="button" disabled={locked||licenses.loading||!licenses.data?.hasMore} onClick={()=>setListPage(page=>page+1)}>下一页许可</button></nav>
   </section>
  </>

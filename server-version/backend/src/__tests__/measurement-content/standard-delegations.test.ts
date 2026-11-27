@@ -6,7 +6,7 @@ vi.mock('../../modules/measurement-content/admin-authority.service',()=>({issueA
 vi.mock('../../modules/admin-permissions/service',async original=>({...await original<typeof import('../../modules/admin-permissions/service')>(),assertEntryAdmin:mocks.entry}))
 vi.mock('../../modules/measurement-content/standard-combination-source',()=>({readCurrentStandardCombination:mocks.source}))
 vi.mock('../../modules/assessment-governance/tool-entry-policy',()=>({assertToolEntryPolicy:mocks.policy}))
-vi.mock('../../modules/assessment-governance/operational-hold',()=>({isAssessmentOperationallyPaused:()=>mocks.held}))
+vi.mock('../../modules/assessment-governance/operational-hold',()=>({get ASSESSMENT_OPERATIONAL_HOLDS(){return new Map(mocks.held?[['synthetic',{family:'SCALE',key:'synthetic',version:'1'}]]:[])}}))
 vi.mock('../../modules/scale-library-governance/collection-guard',()=>({assertScaleLibraryCollectionAllowed:mocks.stop}))
 import {AdminPermissionError} from '../../modules/admin-permissions/service'
 import {readStandardDelegations,issueStandardDelegation,revokeStandardDelegation} from '../../modules/measurement-content/standard-delegations.service'
@@ -28,7 +28,13 @@ beforeEach(()=>{
  mocks.transaction.mockImplementation(work=>work(tx))
  mocks.query.mockImplementation(query=>{
   if(query.text.includes('SELECT id,measurement_release'))return [{id:release,measurementReleaseId:measurement,combinationHash:'a'.repeat(64)}]
-  if(query.text.includes('SELECT s.id,COALESCE'))return rows
+  if(query.text.includes('SELECT s.id,COALESCE')){
+   if(query.text.includes('held.key=s.tool_key')){
+    const [keys,versions]=query.values.filter(Array.isArray)
+    return rows.filter(row=>!keys.some((key:string,i:number)=>row.toolKey===key&&row.instrumentVersion===versions[i]))
+   }
+   return rows
+  }
   if(query.text.includes('FROM organizations o'))return [{id:school,label:'合成学校',detail:'School 已开通'}]
   if(query.text.includes('FROM users u JOIN admin_entry_grants'))return [{id:admin,label:'synthetic_admin',detail:'合成管理员'}]
   if(query.text.includes('FROM content_capability_grants g'))return [{id:request,version:1,product:'SCHOOL',schoolName:'合成学校',adminName:'synthetic_admin',status:'ACTIVE',reason:'原原因'}]

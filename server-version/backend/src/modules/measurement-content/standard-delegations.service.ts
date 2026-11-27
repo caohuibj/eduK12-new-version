@@ -4,9 +4,8 @@ import {prisma} from '../../config/database'
 import {AdminPermissionError,assertEntryAdmin} from '../admin-permissions/service'
 import {type AdminSessionProof,validAdminProof,ADMIN_STEP_UP_SECONDS} from '../admin-permissions/proof'
 import {canonicalHash} from '../assessment-runtime/canonical'
-import {isAssessmentOperationallyPaused} from '../assessment-governance/operational-hold'
 import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
-import {standardNativeScaleJoin} from '../scale/component-import/native-source'
+import {eligibleStandards} from './eligible-standard'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {educationPublicSourceKey} from '../education-tools/public-source.identity'
 import {readCurrentStandardCombination} from './standard-combination-source'
@@ -42,22 +41,13 @@ async function anchor(tx:Pick<Tx,'$queryRaw'>,releaseId:string){
  * This digest confirms today's cover; it does not invent a version lock. */
 export async function readStandardDelegationCoverage(tx:Tx,releaseId:string,product:Product){
  const source=await anchor(tx,releaseId)
- const rows=await tx.$queryRaw<Combination[]>(Prisma.sql`SELECT s.id,COALESCE(s.snapshot->>'title',s.tool_key) AS title,s.tool_key AS "toolKey",
+ const available=await tx.$queryRaw<Combination[]>(Prisma.sql`SELECT s.id,COALESCE(s.snapshot->>'title',s.tool_key) AS title,s.tool_key AS "toolKey",
   s.snapshot->>'instrumentVersion' AS "instrumentVersion",s.snapshot#>>'{parts,CONTENT,version}' AS "contentVersion",
   s.snapshot#>>'{parts,PARAMETERS,version}' AS "parametersVersion",s.snapshot#>>'{parts,REPORT,version}' AS "reportVersion",
   s.combination_hash AS "combinationHash",native.id AS "nativeId"
-  FROM survey_standard_releases s
-  JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId' AND m.content_hash=s.measurement_release->>'contentHash'
-   AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED'
-  JOIN survey_tool_policies p ON p.product=${product} AND p.resource_key='standard-release:'||s.id AND p.fingerprint=s.combination_hash
-   AND p.decision='APPROVED' AND NOT p.paused
-  JOIN scales native ON ${standardNativeScaleJoin('native','s')} AND native.status='PUBLISHED' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
-  WHERE s.state='ONLINE' AND s.measurement_release->>'releaseId'=${source.measurementReleaseId}
-   AND NOT EXISTS(SELECT 1 FROM scale_library_emergency_stops stop
-    WHERE stop.target_kind='RELEASE' AND stop.target_id=m.id OR stop.target_kind='TRAINING_SCALE' AND stop.target_id=native.id)
+  ${eligibleStandards(product)} AND s.measurement_release->>'releaseId'=${source.measurementReleaseId}
   ORDER BY s.id LIMIT ${MAX_COVER+1}`)
- if(rows.length>MAX_COVER)conflict('当前测量版本覆盖的组合超过安全展示上限，请先整理版本后操作')
- const available=rows.filter(row=>!isAssessmentOperationallyPaused({family:'SCALE',key:row.toolKey,version:row.instrumentVersion}))
+ if(available.length>MAX_COVER)conflict('当前测量版本覆盖的组合超过安全展示上限，请先整理版本后操作')
  const coverageDigest=canonicalHash({schemaVersion:1,product,releaseId,measurementReleaseId:source.measurementReleaseId,
   combinations:available.map(row=>({id:row.id,hash:row.combinationHash}))})
  const exact=available.find(row=>row.id===releaseId&&row.combinationHash===source.combinationHash)

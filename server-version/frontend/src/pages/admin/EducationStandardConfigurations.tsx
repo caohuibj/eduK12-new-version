@@ -6,7 +6,7 @@ import {useEffect,useRef,useState} from 'react'
 import {educationConfigurationBase,educationConfigurationRequest as request,EducationConfigurationHttpError,isEducationPending,sameEducationOperation,
  type EducationManagerProduct,type EducationConfigurationChoice,type EducationManagedUse,type EducationPendingOperation,type EducationManagerOperation} from '../../api/educationStandardConfigurations'
 
-type Props={actorId:string;organizationId:string;product:EducationManagerProduct}
+type Props={initialTool?:string;initialRelease?:string;actorId:string;organizationId:string;product:EducationManagerProduct}
 type Recipient={userId:string;username:string;membershipId:string}
 type Page<T>={page:number;hasMore:boolean;list:T[];tagFacets?:CatalogTagFacets}
 type ReportPreview={title:string;report:{reportVersion?:string;audienceContract?:{audience?:string};interpretations?:Array<{headline?:string;summary?:string}>}}
@@ -29,8 +29,8 @@ function ConfigurationSession(props:Props){
  const [initial]=useState(()=>restored(storageKey,props)),[pending,setPending]=useState<EducationPendingOperation|null>(initial.pending)
  const [blocked,setBlocked]=useState(Boolean(initial.error)),[storageError,setStorageError]=useState(initial.error),[checkedAbsent,setCheckedAbsent]=useState(false)
  const [page,setPage]=useState(1),[more,setMore]=useState(false),[rows,setRows]=useState<EducationConfigurationChoice[]>([]),[loading,setLoading]=useState(false)
- const [filters,setFilters]=useState({...EMPTY_CATALOG_FILTERS}),[applied,setApplied]=useState({...EMPTY_CATALOG_FILTERS}),[facets,setFacets]=useState(EMPTY_CATALOG_FACETS)
- const [combinationId,setCombinationId]=useState(initial.pending?.combinationId??''),[recipients,setRecipients]=useState<Recipient[]>([]),[recipientId,setRecipientId]=useState('')
+ const [filters,setFilters]=useState({...EMPTY_CATALOG_FILTERS,keyword:props.initialTool??''}),[applied,setApplied]=useState({...EMPTY_CATALOG_FILTERS,keyword:props.initialTool??''}),[facets,setFacets]=useState(EMPTY_CATALOG_FACETS)
+ const [combinationId,setCombinationId]=useState(initial.pending?.combinationId??props.initialRelease??''),[recipients,setRecipients]=useState<Recipient[]>([]),[recipientId,setRecipientId]=useState('')
  const [recipientPage,setRecipientPage]=useState(1),[recipientMore,setRecipientMore]=useState(false),[q,setQ]=useState(''),[search,setSearch]=useState('')
  const [authorityId,setAuthorityId]=useState(''),[name,setName]=useState(''),[from,setFrom]=useState(''),[until,setUntil]=useState(''),[password,setPassword]=useState('')
  const [grants,setGrants]=useState<EducationManagedUse[]>([]),[grantPage,setGrantPage]=useState(1),[grantMore,setGrantMore]=useState(false)
@@ -42,10 +42,11 @@ function ConfigurationSession(props:Props){
  useEffect(()=>{
   let alive=true;setLoading(true)
   void request<Page<EducationConfigurationChoice>>(base+'?'+catalogQuery(page,applied)).then(value=>{
-   if(alive){setRows(old=>page===1?value.list:Array.from(new Map([...old,...value.list].map(row=>[row.id,row])).values()));setMore(value.hasMore);setFacets(value.tagFacets??EMPTY_CATALOG_FACETS)}
+   if(alive){const list=props.initialTool ? value.list.filter(row=>row.toolKey===props.initialTool) : value.list
+    setRows(old=>page===1?list:Array.from(new Map([...old,...list].map(row=>[row.id,row])).values()));setMore(value.hasMore);setFacets(value.tagFacets??EMPTY_CATALOG_FACETS)}
   }).catch(reason=>{if(alive)setError(message(reason))}).finally(()=>{if(alive)setLoading(false)})
   return()=>{alive=false}
- },[base,page,applied])
+ },[base,page,applied,props.initialTool])
  useEffect(()=>{
   let alive=true;setRecipients([]);setRecipientId('');setPreview(null)
   if(!choice)return

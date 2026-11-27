@@ -25,9 +25,9 @@ const reason=z.string().trim().min(1).max(400)
 const digest=z.string().regex(/^[0-9a-f]{64}$/)
 const version=z.number().int().positive()
 const listQuery=z.object({page}).strict()
-const detailQuery=z.object({candidateQuery:z.string().trim().max(100).default(''),candidatePage:page,impactPage:page}).strict()
+const detailQuery=z.object({successorGrantId:uuid.optional(),candidateQuery:z.string().trim().max(100).default(''),candidatePage:page,impactPage:page}).strict()
 const transferInput=z.object({requestId:uuid,successorId:uuid,expectedVersion:version,reason}).strict()
-const withdrawalInput=z.object({expectedVersion:version,reason,impactDigest:digest,successorGrantId:uuid.optional()}).strict()
+const withdrawalInput=z.object({expectedVersion:version,reason,impactDigest:digest,successorGrantId:uuid.optional(),continueIds:z.array(uuid).max(2000).default([])}).strict()
 const size=25
 const txOptions={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:10000}
 const entry=(product:Product)=>product==='SCHOOL'?'HUISCHOOL':'HUITEACHER'
@@ -63,13 +63,30 @@ async function root(tx:Tx,accountId:string,grantId:string,lock=false){
  return grant
 }
 
-type Impact={count:number;digest:string;list:{id:string;label:string;title:string;expiresAt:Date}[]}
-async function impact(tx:Tx,grant:Pick<Root,'id'|'accountId'|'product'|'schoolId'>,page=1){
+type Impact={count:number;digest:string;list:{id:string;label:string;title:string;expiresAt:Date;reissued:boolean}[];covered:number}
+async function impact(tx:Tx,grant:Pick<Root,'id'|'accountId'|'product'|'schoolId'>,page=1,successor?:string,continueIds:string[]=[],lock=false){
  const [impact]=await tx.$queryRaw<Impact[]>(Prisma.sql`
   WITH linked AS MATERIALIZED (
    SELECT u.id,u.version,person.username AS label,
     COALESCE(a.metadata->>'configurationName',s.snapshot->>'title',s.tool_key) AS title,
     u.expires_at AT TIME ZONE 'UTC' AS "expiresAt"
+    ,${successor ? Prisma.sql`EXISTS (
+      SELECT 1 FROM content_capability_grants n JOIN assessment_management_events e ON e.id=n.id
+        AND e.action=a.action AND e.resource_id=a.resource_id AND e.actor_id=n.issuer_id
+      JOIN content_capability_grants parent ON parent.id=${successor} AND parent.subject_id=n.issuer_id
+      JOIN admin_entry_grants entry ON entry.user_id=n.issuer_id AND entry.entry=${entry(grant.product)}
+        AND entry.revoked_at IS NULL AND entry.id=e.metadata#>>'{selectedBinding,binding,authorization,authority,0,id}'
+        AND entry.version::text=e.metadata#>>'{selectedBinding,binding,authorization,authority,0,revision}'
+      WHERE n.subject_id=u.subject_id AND n.product=u.product AND n.scope_id=u.scope_id AND n.scope_kind=u.scope_kind
+        AND n.resource_kind=u.resource_kind AND n.resource_keys=u.resource_keys AND n.capabilities=u.capabilities
+        AND n.revoked_at IS NULL AND n.expires_at>=u.expires_at AND n.valid_from<=GREATEST(u.valid_from,statement_timestamp() AT TIME ZONE 'UTC')
+        AND e.metadata#>>'{selectedBinding,binding,configurationHash}'=a.metadata#>>'{selectedBinding,binding,configurationHash}'
+        AND e.metadata#>>'{selectedBinding,binding,authorization,authority,1,id}'=parent.id
+        AND e.metadata#>>'{selectedBinding,binding,authorization,authority,1,revision}'=parent.version::text
+        AND e.metadata#>>'{selectedBinding,binding,authorization,revision}'=n.version::text
+        AND parent.revoked_at IS NULL AND parent.product=u.product AND parent.scope_id=u.scope_id
+      ORDER BY n.id LIMIT 1 ${lock ? Prisma.sql`FOR SHARE OF n` : Prisma.empty}
+    )` : Prisma.sql`false`} AS reissued
    FROM content_capability_grants u JOIN assessment_management_events a ON a.id=u.id
     AND a.action=${EDUCATION_STANDARD_USE_ACTION} AND a.actor_id=u.issuer_id
    JOIN survey_standard_releases s ON s.id=a.resource_id JOIN users person ON person.id=u.subject_id
@@ -79,10 +96,10 @@ async function impact(tx:Tx,grant:Pick<Root,'id'|'accountId'|'product'|'schoolId
     AND u.expires_at>clock_timestamp() AT TIME ZONE 'UTC'
     AND a.metadata#>>'{selectedBinding,binding,authorization,authority,1,id}'=${grant.id}
   )
-  SELECT count(*)::int AS count,
+  SELECT count(*)::int AS count,count(*) FILTER (WHERE reissued AND id=ANY(${continueIds}::text[]))::int AS covered,
    encode(digest(COALESCE(string_agg(id||':'||version::text,',' ORDER BY id),''),'sha256'),'hex') AS digest,
    COALESCE((SELECT jsonb_agg(row ORDER BY row.id) FROM (
-    SELECT id,label,title,"expiresAt" FROM linked ORDER BY id LIMIT ${size} OFFSET ${(page-1)*size}
+    SELECT id,label,title,"expiresAt",reissued FROM linked ORDER BY id LIMIT ${size} OFFSET ${(page-1)*size}
    ) row),'[]'::jsonb) AS list FROM linked`)
  return {...impact,hasMore:impact.count>page*size}
 }
@@ -101,13 +118,13 @@ export async function listStandardDelegationReview(actorId:string,proof:AdminSes
 type Candidate={id:string;label:string;detail:string;grantId:string|null}
 export async function readStandardDelegationReview(actorId:string,proof:AdminSessionProof,rawAccountId:string,rawGrantId:string,raw:unknown){
  const accountId=uuid.parse(rawAccountId),grantId=uuid.parse(rawGrantId)
- const {candidateQuery,candidatePage,impactPage}=detailQuery.parse(raw)
+ const {candidateQuery,candidatePage,impactPage,successorGrantId}=detailQuery.parse(raw)
  return prisma.$transaction(async tx=>{
   const {users}=await lockCurrentContentSystemActor(tx,actorId,proof)
   const grant=await root(tx,accountId,grantId)
   const cover=await readStandardDelegationCoverage(tx,grant.releaseId,grant.product)
   const combinations=grant.exact?cover.combinations.filter(combination=>combination.id===grant.releaseId):cover.combinations
-  const affected=await impact(tx,grant,impactPage)
+  const affected=await impact(tx,grant,impactPage,successorGrantId)
   const candidates=grant.status==='ACTIVE'?await tx.$queryRaw<Candidate[]>(Prisma.sql`
    SELECT u.id,u.username AS label,COALESCE(NULLIF(u.nickname,''),u.username) AS detail,successor.id AS "grantId"
    FROM users u JOIN admin_entry_grants g ON g.user_id=u.id AND g.entry=${entry(grant.product)} AND g.revoked_at IS NULL
@@ -163,8 +180,6 @@ export async function withdrawStandardDelegationReview(actorId:string,proof:Admi
  return revokeAdminContentGrant(actorId,proof,grantId,{expectedVersion:input.expectedVersion,reason},async(tx,record)=>{
   const grant=await root(tx,accountId,grantId)
   if(record.revoked_at)return
-  const affected=await impact(tx,grant)
-  if(affected.digest!==input.impactDigest)unavailable('下游配置范围已变化，请重新查看影响后撤销')
   if(input.successorGrantId){
    const [candidate]=await tx.$queryRaw<{accountId:string}[]>(Prisma.sql`
     SELECT subject_id AS "accountId" FROM content_capability_grants WHERE id=${input.successorGrantId}`)
@@ -175,5 +190,9 @@ export async function withdrawStandardDelegationReview(actorId:string,proof:Admi
     ||successor.resourceKey!==grant.resourceKey||successor.expiresAt<grant.expiresAt)
     unavailable('接任人的学校、入口、范围或有效期不匹配')
   }
+  const affected=await impact(tx,grant,1,input.successorGrantId,input.continueIds,true)
+  if(affected.digest!==input.impactDigest)unavailable('下游配置范围已变化，请重新查看影响后撤销')
+  if(input.continueIds.length && (!input.successorGrantId || affected.covered!==input.continueIds.length))
+    unavailable('选中延续的配置仍缺少接任人同对象、同版本和期限的重发记录，请重新核对')
  })
 }

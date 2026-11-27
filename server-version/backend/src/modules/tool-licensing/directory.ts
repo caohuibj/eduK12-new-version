@@ -1,7 +1,7 @@
 import {Prisma,type PrismaClient} from '@prisma/client'
 import {z} from 'zod'
 import {AdminPermissionError} from '../admin-permissions/service'
-import {standardNativeScaleJoin} from '../scale/component-import/native-source'
+import {eligibleStandards} from '../measurement-content/eligible-standard'
 import {educationCognitiveProfileHeaderJoins} from '../education-tools/public-source.headers'
 import {trainingGovernedDirectoryFilter} from '../questionnaire-product/training-governed-definition'
 import {toolLicenseKeySchema,toolLicenseProductSchema,type ToolLicenseProduct,type ToolLicenseFamily} from './contracts'
@@ -23,13 +23,13 @@ function parse<T>(schema:z.ZodType<T>,raw:unknown):T{
 
 /** Metadata only. The caller must enforce system administration; a directory
  * row never supplies entry administration, exact use or private-data access. */
-function subjects(product:ToolLicenseProduct,id?:string){
+function subjects(product:ToolLicenseProduct,id?:string|string[],lock=true){
  if(product==='SCHOOL'||product==='TEACHER')return Prisma.sql`
   SELECT o.id,o.name AS label,${product==='SCHOOL'?'School 已开通学校':'Teacher 已开通学校'}::text AS description
   FROM organizations o WHERE o.product_domain='SCHOOL' AND o.status='ACTIVE'
    AND EXISTS(SELECT 1 FROM education_product_entitlements e WHERE e.organization_id=o.id
     AND e.product=${product==='SCHOOL'?'HUISCHOOL':'HUITEACHER'} AND e.status='ACTIVE')
-   ${id?Prisma.sql`AND o.id=${id} FOR SHARE OF o`:Prisma.empty}`
+   ${id?Prisma.sql`AND ${Array.isArray(id)?Prisma.sql`o.id=ANY(${id}::text[])`:Prisma.sql`o.id=${id}`} ORDER BY o.id ${lock?Prisma.sql`FOR SHARE OF o`:Prisma.empty}`:Prisma.empty}`
  const qualification=product==='TRAINING'
   ?Prisma.sql`u.account_domain IN ('TRAINING','LEGACY') AND u.role='TEACHER' AND u.teacher_approved`
   :Prisma.sql`u.account_domain='SURVEY' AND g.status='ACTIVE' AND m.enabled`
@@ -38,7 +38,12 @@ function subjects(product:ToolLicenseProduct,id?:string){
    ${product==='SURVEY'?Prisma.sql`JOIN survey_researcher_grants g ON g.user_id=u.id JOIN survey_mfa_credentials m ON m.user_id=u.id`:Prisma.empty}
   WHERE ${qualification} AND u.platform_role='STANDARD' AND u.is_active AND NOT u.is_frozen AND NOT u.must_change_password
    AND (u.expires_at IS NULL OR u.expires_at>clock_timestamp())
-   ${id?Prisma.sql`AND u.id=${id} ${product==='SURVEY'?Prisma.sql`FOR SHARE OF u,g,m`:Prisma.sql`FOR SHARE OF u`}`:Prisma.empty}`
+   ${id?Prisma.sql`AND ${Array.isArray(id)?Prisma.sql`u.id=ANY(${id}::text[])`:Prisma.sql`u.id=${id}`} ORDER BY u.id ${!lock?Prisma.empty:product==='SURVEY'?Prisma.sql`FOR SHARE OF u,g,m`:Prisma.sql`FOR SHARE OF u`}`:Prisma.empty}`
+}
+
+export async function eligibleBatchSubjects(db:Db,product:ToolLicenseProduct,ids:string[],lock:boolean){
+ const rows=await db.$queryRaw<LicenseSubject[]>(subjects(product,ids,lock))
+ return new Map(rows.map(row=>[row.id,row]))
 }
 
 export async function listLicenseSubjects(db:Db,rawProduct:ToolLicenseProduct,raw:{q?:string;page?:number}={}){
@@ -70,12 +75,7 @@ function tools(product:ToolLicenseProduct){
  const education=product==='SCHOOL'||product==='TEACHER'
  const sources:Prisma.Sql[]=[Prisma.sql`
   SELECT 'SCALE:'||s.tool_key AS key,COALESCE(NULLIF(s.snapshot->>'title',''),s.tool_key) AS name,'SCALE'::text AS family
-  FROM survey_standard_releases s JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId'
-  JOIN scales native ON ${standardNativeScaleJoin('native','s')} AND native.status='PUBLISHED' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
-  WHERE s.state='ONLINE' AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED'
-   AND m.content_hash=s.measurement_release->>'contentHash' AND ${releaseNotStopped(Prisma.sql`m.id`)}
-   AND NOT EXISTS(SELECT 1 FROM scale_library_emergency_stops stop WHERE stop.target_kind='TRAINING_SCALE' AND stop.target_id=native.id)
-   AND ${approved(product,Prisma.sql`'standard-release:'||s.id`,Prisma.sql`s.combination_hash`)}`]
+  ${eligibleStandards(product)}`]
 
  // Exact approved profiles are the common public cognitive source. Survey's
  // metadata readiness mirrors its existing catalog, rather than counting an

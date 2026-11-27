@@ -18,7 +18,7 @@ function Versions({choice}:{choice:StandardConfigurationChoice}){
   <div><dt>参数</dt><dd>{choice.versions.PARAMETERS==='none-v1'?'未配置阈值或常模':choice.versions.PARAMETERS}</dd></div>
   <div><dt>报告</dt><dd>{choice.versions.REPORT==='none-v1'?'不反馈':choice.versions.REPORT}</dd></div></dl>
 }
-function RecipientGrant({choice,onClose,issuer,replacement,reason,onReplace,onReplacementDone}:{choice:StandardConfigurationChoice;onClose:()=>void;issuer:ReturnType<typeof useTrainingStandardConfigurationIssue>;
+function RecipientGrant({initialSubjectId,choice,onClose,issuer,replacement,reason,onReplace,onReplacementDone}:{initialSubjectId?:string;choice:StandardConfigurationChoice;onClose:()=>void;issuer:ReturnType<typeof useTrainingStandardConfigurationIssue>;
  replacement:Replacement|null;reason:string;onReplace:(grant:StandardConfigurationUse,recipient:User)=>void;onReplacementDone:(notice:string)=>void}){
  const [teachers,setTeachers]=useState<User[]>([]),[userId,setUserId]=useState(replacement?.recipient.id??'')
  const [grant,setGrant]=useState<StandardConfigurationUse|null>(null),[loaded,setLoaded]=useState(false)
@@ -45,10 +45,10 @@ function RecipientGrant({choice,onClose,issuer,replacement,reason,onReplace,onRe
    if(replacement){
     if(!current.some(row=>row.id===replacement.recipient.id))throw Error('原接收者不在当前合格培训师名单中，请先核对资格；不能改为另一人。')
     await read(replacement.recipient.id)
-   }
+   }else if(initialSubjectId&&current.some(row=>row.id===initialSubjectId)){setUserId(initialSubjectId);await read(initialSubjectId)}
   }).catch(cause=>{if(active)setError(errorMessage(cause))}).finally(()=>{if(active)setLoading(false)})
   return()=>{active=false;alive.current=false;epoch.current++}
- },[read,replacement])
+ },[read,replacement,initialSubjectId])
  const mutate=async(action:'issue'|'revoke')=>{
   if(inFlight.current||!loaded||!userId||uncertain)return
   inFlight.current=true;setBusy(true);setError('');setNotice('')
@@ -107,7 +107,7 @@ export function TrainingStandardConfigurationWorkspace({actorId,initialStandard}
  const [choice,setChoice]=useState<StandardConfigurationChoice|null>(null)
  const [replacement,setReplacement]=useState<Replacement|null>(null),[replacementReason,setReplacementReason]=useState('')
  const issuer=useTrainingStandardConfigurationIssue(actorId),[operationNotice,setOperationNotice]=useState('')
- const visibleRows=rows.filter(row=>replacement?row.toolKey===replacement.source.toolKey&&row.id!==replacement.source.id:!focus||row.id===focus.releaseId)
+ const visibleRows=rows.filter(row=>replacement?row.toolKey===replacement.source.toolKey&&row.id!==replacement.source.id:!focus||(focus.releaseId?row.id===focus.releaseId:row.toolKey===focus.toolKey))
  function finishReplacement(notice:string){setReplacement(null);setReplacementReason('');setChoice(null);setOperationNotice(notice)}
  useEffect(()=>{let active=true;setLoading(true);setError('');setRows([])
   void api.catalog(page,applied).then(response=>{if(!active)return
@@ -120,7 +120,7 @@ export function TrainingStandardConfigurationWorkspace({actorId,initialStandard}
  return <section className="training-accounts training-resources-panel training-configuration-workspace" aria-label="固定量表配置授权">
   <header className="training-configuration-heading"><h2>固定量表配置授权</h2><button className="training-accounts-secondary" disabled={loading} onClick={()=>setRevision(v=>v+1)}>刷新固定配置</button></header>
   <p>只分配系统已批准用于 Training 的精确内容、参数和报告组合。工具审批与培训师使用权分别管理。</p>
-  {focus&&<p>正在查看从量表详情带入的精确版本。 <button type="button" onClick={()=>setFocus(null)}>查看同一量表的其他版本</button></p>}
+  {focus&&<p>{focus.releaseId?'正在查看从量表详情带入的精确版本。':'请选择该许可工具的获准版本。'} <button type="button" onClick={()=>setFocus(null)}>查看同一量表的其他版本</button></p>}
   <CatalogDiscoveryFilters label="固定量表配置检索" filters={filters} facets={facets} onChange={setFilters} disabled={loading||issuer.busy} onApply={value=>{setChoice(null);setRows([]);setPage(1);setApplied({...value,keyword:value.keyword.trim()})}}/>
   {replacement&&<section aria-label="明确替换 Training 配置"><p>为 {replacement.recipient.nickname||replacement.recipient.username} 替换 {replacement.grant.configurationName??'原固定配置'}。请选择同一工具的另一份已批准组合；保存时撤销原使用权，旧草稿不会自动换版，已开始作答及历史定义保留。</p>
    <label>Training 配置替换原因<input maxLength={500} value={replacementReason} disabled={issuer.busy||Boolean(issuer.pending)} onChange={event=>setReplacementReason(event.target.value)}/></label>
@@ -144,7 +144,7 @@ export function TrainingStandardConfigurationWorkspace({actorId,initialStandard}
   </article>)}</div>
   <nav className="training-configuration-pagination" aria-label="固定量表配置分页"><button className="training-accounts-secondary" disabled={loading||page<=1} onClick={()=>setPage(v=>v-1)}>上一页配置</button><span>第 {page} 页</span>
    <button className="training-accounts-secondary" disabled={loading||!hasMore} onClick={()=>setPage(v=>v+1)}>下一页配置</button></nav>
-  {choice&&<RecipientGrant key={choice.id+':'+(replacement?replacement.grant.id+':'+replacement.grant.version:'normal')} choice={choice} issuer={issuer} replacement={replacement} reason={replacementReason}
+  {choice&&<RecipientGrant initialSubjectId={initialStandard?.subjectId} key={choice.id+':'+(replacement?replacement.grant.id+':'+replacement.grant.version:'normal')} choice={choice} issuer={issuer} replacement={replacement} reason={replacementReason}
    onClose={()=>setChoice(null)} onReplace={(grant,recipient)=>{setReplacement({source:choice,grant,recipient});setReplacementReason('');setChoice(null);setOperationNotice('')}} onReplacementDone={finishReplacement}/>}
  </section>
 }

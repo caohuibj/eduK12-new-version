@@ -7,7 +7,7 @@ type Candidate={id:string;label:string;detail:string;grantId:string|null}
 type Detail={
  grant:Grant
  combinations:{id:string;title:string;contentVersion:string;parametersVersion:string;reportVersion:string}[]
- affected:{count:number;digest:string;hasMore:boolean;list:{id:string;label:string;title:string;expiresAt:string}[]}
+ affected:{count:number;digest:string;hasMore:boolean;list:{id:string;label:string;title:string;expiresAt:string;reissued:boolean}[]}
  candidates:Candidate[]
  moreCandidates:boolean
 }
@@ -26,6 +26,8 @@ function Review({accountId,accountLabel}:{accountId:string;accountLabel:string})
  const [grants,setGrants]=useState<GrantPage|null>(null),[listPage,setListPage]=useState(1)
  const [detail,setDetail]=useState<Detail|null>(null),[impactPage,setImpactPage]=useState(1),[candidatePage,setCandidatePage]=useState(1)
  const [search,setSearch]=useState(''),[candidate,setCandidate]=useState<Candidate|null>(null)
+ const [continueIds,setContinueIds]=useState<string[]>([])
+ const [checkedSuccessor,setCheckedSuccessor]=useState<string|null>(null)
  const [reason,setReason]=useState(''),[pending,setPending]=useState<Issue|null>(null)
  const [busy,setBusy]=useState(false),[notice,setNotice]=useState(''),[error,setError]=useState('')
  const active=useRef(true),running=useRef(false)
@@ -40,17 +42,18 @@ function Review({accountId,accountLabel}:{accountId:string;accountLabel:string})
   const response=await api.get<GrantPage>(base+'?page='+page)
   if(active.current){setGrants(response.data!);setListPage(page)}
  }
- const readGrant=async(id:string,query:string,nextCandidatePage:number,nextImpactPage:number)=>{
+ const readGrant=async(id:string,query:string,nextCandidatePage:number,nextImpactPage:number,successor=candidate?.grantId)=>{
   const parameters=new URLSearchParams({candidateQuery:query,candidatePage:String(nextCandidatePage),impactPage:String(nextImpactPage)})
+  if(successor)parameters.set('successorGrantId',successor)
   const response=await api.get<Detail>(base+'/grants/'+id+'?'+parameters.toString())
   if(active.current){
-   setDetail(response.data!);setCandidatePage(nextCandidatePage);setImpactPage(nextImpactPage)
+   setCheckedSuccessor(successor??null);setDetail(response.data!);setCandidatePage(nextCandidatePage);setImpactPage(nextImpactPage)
   }
   return response.data!
  }
  const openGrant=(id:string)=>action(async()=>{
-  setDetail(null);setCandidate(null);setReason('');setSearch('');setNotice('')
-  await readGrant(id,'',1,1)
+  setDetail(null);setCandidate(null);setContinueIds([]);setCheckedSuccessor(null);setReason('');setSearch('');setNotice('')
+  await readGrant(id,'',1,1,null)
  })
  const copy=()=>action(async()=>{
   if(!detail||!candidate||candidate.grantId||!reason.trim())throw new Error('请选择接任人并填写变更原因')
@@ -60,7 +63,8 @@ function Review({accountId,accountLabel}:{accountId:string;accountLabel:string})
   try{
    const response=await api.post<{grantId:string}>(base+'/grants/'+detail.grant.id+'/successor',issue)
    if(!active.current)return
-   setCandidate({...candidate,grantId:response.data!.grantId});setPending(null)
+   const successorId=response.data!.grantId
+   setCandidate({...candidate,grantId:successorId});setPending(null)
    setNotice('接任委托已签发。请核对下游固定配置，再决定何时撤销原委托。')
   }catch(cause){
    const status=(cause as {status?:number})?.status
@@ -83,10 +87,11 @@ function Review({accountId,accountLabel}:{accountId:string;accountLabel:string})
   if(handoff&&!successorGrantId)throw new Error('请先选择已持有同一范围有效委托的接任人')
   const affected=detail.affected.count
   const target=handoff?'完成交接并撤销原委托':'终止原委托'
-  if(!window.confirm(target+'？当前有 '+affected+' 份固定配置引用该委托。撤销会停止这些配置的新发布，已入场作答仍可完成。仍需使用的固定配置应由接任人重新签发。'))return
+  if(!handoff&&continueIds.length)throw new Error('已选择需要延续的配置，请完成交接或取消勾选后再终止')
+  if(!window.confirm(target+'？'+(handoff?'已选择延续 '+continueIds.length+' 份。':'')+'当前有 '+affected+' 份固定配置引用该委托。撤销会停止这些配置的新发布，已入场作答仍可完成。仍需使用的固定配置应由接任人重新签发。'))return
   await api.post(base+'/grants/'+detail.grant.id+'/revoke',{
    expectedVersion:detail.grant.version,reason:reason.trim(),impactDigest:detail.affected.digest,
-   ...(successorGrantId?{successorGrantId}:{}),
+   ...(successorGrantId?{successorGrantId,...(continueIds.length?{continueIds}:{})}:{}),
   })
   if(!active.current)return
   setDetail(null);setCandidate(null);setReason('');setNotice('原分发委托已撤销。')
@@ -116,7 +121,9 @@ function Review({accountId,accountLabel}:{accountId:string;accountLabel:string})
     {combination.title} · 题本 {combination.contentVersion} · 参数 {combination.parametersVersion} · 报告 {combination.reportVersion}
    </li>)}</ul>}
    <p>有 {detail.affected.count} 份有效期内或待生效的固定配置引用此委托。</p>
-   {!!detail.affected.list.length&&<ul>{detail.affected.list.map(item=><li key={item.id}>{item.label} · {item.title} · 到期 {date(item.expiresAt)}</li>)}</ul>}
+   {!!detail.affected.list.length&&<ul>{detail.affected.list.map(item=><li key={item.id}><label><input type="checkbox" disabled={busy||Boolean(pending)||detail.grant.status!=='ACTIVE'} checked={continueIds.includes(item.id)}
+      onChange={event=>setContinueIds(old=>event.target.checked?[...old,item.id]:old.filter(id=>id!==item.id))}/>延续 {item.label} · {item.title} · 到期 {date(item.expiresAt)}</label>
+      {candidate?.grantId&&candidate.grantId===checkedSuccessor&&(item.reissued?' · 已重发':' · 待重发')}</li>)}</ul>}
    {(impactPage>1||detail.affected.hasMore)&&<div className="system-actions">
     <button type="button" disabled={busy||impactPage===1||Boolean(pending)}
       onClick={()=>action(()=>readGrant(detail.grant.id,search,candidatePage,impactPage-1))}>上一页受影响配置</button>
@@ -129,13 +136,14 @@ function Review({accountId,accountLabel}:{accountId:string;accountLabel:string})
      <button disabled={busy||Boolean(pending)} type="submit">搜索接任人</button>
     </form>
     <ul>{detail.candidates.map(option=><li key={option.id}><button type="button" disabled={busy||Boolean(pending)}
-      aria-pressed={candidate?.id===option.id} onClick={()=>setCandidate(option)}>{option.label} · {option.detail}{option.grantId?' · 已有同范围委托':''}</button></li>)}</ul>
+      aria-pressed={candidate?.id===option.id} onClick={()=>{setCandidate(option);setCheckedSuccessor(null);if(option.grantId)action(()=>readGrant(detail.grant.id,search,candidatePage,impactPage,option.grantId))}}>{option.label} · {option.detail}{option.grantId?' · 已有同范围委托':''}</button></li>)}</ul>
     {(candidatePage>1||detail.moreCandidates)&&<div className="system-actions">
      <button type="button" disabled={busy||candidatePage===1||Boolean(pending)}
        onClick={()=>action(()=>readGrant(detail.grant.id,search,candidatePage-1,impactPage))}>上一页接任人</button>
      <button type="button" disabled={busy||!detail.moreCandidates||Boolean(pending)}
        onClick={()=>action(()=>readGrant(detail.grant.id,search,candidatePage+1,impactPage))}>下一页接任人</button>
     </div>}
+    {candidate?.grantId&&<button type="button" disabled={busy} onClick={()=>action(()=>readGrant(detail.grant.id,search,candidatePage,impactPage))}>核对重发记录（已选延续 {continueIds.length} 份）</button>}
     {candidate&&<p>接任人 {candidate.label} · {candidate.grantId?'同范围委托已就绪':'待签发'}</p>}
    </>}
    {detail.grant.status!=='REVOKED'&&<>

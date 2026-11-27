@@ -3,7 +3,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { createToolLicenseBatch, previewToolLicenseBatch } from '../../modules/tool-licensing/batch'
-import { createToolLicense, editToolLicense, readToolLicense, terminateToolLicense } from '../../modules/tool-licensing/management'
+import { authorizeToolPublication } from '../../modules/tool-licensing/runtime'
+import { listToolLicenses, readOwnToolLicense, createToolLicense, editToolLicense, readToolLicense, terminateToolLicense } from '../../modules/tool-licensing/management'
 
 const db = new URL(process.env.DATABASE_URL ?? 'postgresql://localhost/no_database')
 const isolated = ['localhost', '127.0.0.1'].includes(db.hostname)
@@ -11,7 +12,8 @@ const isolated = ['localhost', '127.0.0.1'].includes(db.hostname)
 const prefix = 'batch-license-fixture-' + randomUUID()
 const toolKey = 'SCALE:' + prefix
 const adminIds = [randomUUID(), randomUUID()]
-const schoolIds = Array.from({ length: 9 }, () => randomUUID())
+const measurements:string[]=[]
+const schoolIds = Array.from({ length: 71 }, () => randomUUID())
 const actor = (index = 0) => ({
   actorUserId: adminIds[index],
   actorSession: { adminSessionId: randomUUID(), adminVerifiedAt: Math.floor(Date.now() / 1000),
@@ -32,6 +34,10 @@ const countIssued = async (subjectIds: string[]) =>
 
 describe.skipIf(!isolated)('bulk tool licensing on isolated PostgreSQL', () => {
   beforeAll(async () => {
+    if (process.env.PERF_SQL_EVENT_COUNT === '1') {
+      const events = prisma as unknown as { $on(type:'query', cb:(event:{query:string})=>void):void }
+      events.$on('query', event => measurements.push(event.query))
+    }
     await prisma.user.createMany({ data: adminIds.map((id, index) => ({
       id, username: prefix + '-admin-' + index, passwordHash: '-', role: 'ADMIN', platformRole: 'SYSTEM_ADMIN',
     })) })
@@ -155,6 +161,54 @@ describe.skipIf(!isolated)('bulk tool licensing on isolated PostgreSQL', () => {
     expect(await countIssued(request.subjectIds)).toBe(0)
     expect(await prisma.toolLicense.findUnique({ where: { id: request.requestId } })).toBeNull()
     expect((await readToolLicense(collisionId)).subjectId).toBe(schoolIds[8])
+  })
+
+  it.each([[2,9],[10,11],[50,21]])('issues %i recipients and measures the reviewed batch', async (size,offset) => {
+    const request = draft(schoolIds.slice(offset,offset+size))
+    measurements.length=0
+    const start=performance.now()
+    const preview=await previewToolLicenseBatch(actor(),request)
+    const confirm=performance.now()
+    const issued=await createToolLicenseBatch(actor(),{...request,previewDigest:preview.previewDigest})
+    const end=performance.now()
+    expect(issued.licenses).toHaveLength(size)
+    if (process.env.PERF_SQL_EVENT_COUNT === '1') {
+      const reads=measurements.filter(sql=>/FROM organizations o WHERE o.product_domain/.test(sql)).length
+      const writes=measurements.filter(sql=>/INSERT INTO tool_license(?:s|_items|_events)\s*\(/i.test(sql)).length
+      console.info('LICENSE_BATCH_MEASURE',JSON.stringify({size,reads,writes,previewMs:confirm-start,issueMs:end-confirm}))
+      expect(reads).toBe(2)
+      expect(writes).toBe(3)
+    }
+  })
+
+  it('shows reservations, identifies quota conflicts, and distinguishes continuous renewals from gaps',async()=>{
+    const ids=schoolIds.slice(9,11)
+    const licenses=await prisma.toolLicense.findMany({where:{subjectId:{in:ids}}})
+    const license=licenses[0]
+    const close=new Date(Date.now()+60_000)
+    const previous=process.env.SCHOOL_TOOL_LICENSING_ENABLED
+    process.env.SCHOOL_TOOL_LICENSING_ENABLED='true'
+    try {
+      const publish=(quantity:number)=>prisma.$transaction(tx=>authorizeToolPublication(tx,{
+        product:'SCHOOL',subjectId:license.subjectId,toolKeys:[toolKey],publicationId:randomUUID(),
+        education:{closesAt:close,maxResponses:quantity,frozenResponses:quantity},
+      }))
+      await publish(4)
+      await expect(publish(3)).rejects.toThrow('本次需要预留 3 份，可用 2 份')
+      const own=await readOwnToolLicense('SCHOOL',license.subjectId,adminIds[0])
+      expect(own.license?.tools[0]).toMatchObject({limit:6,used:4,reserved:4})
+      for(const [index,current] of licenses.entries()){
+        const next={...singleDraft(draft(ids),current.subjectId),
+          startsAt:new Date(current.expiresAt.getTime()+index*86400000).toISOString(),
+          expiresAt:new Date(current.expiresAt.getTime()+7*86400000).toISOString()}
+        const issued=await createToolLicense(actor(),next)
+        const list=await listToolLicenses({product:'SCHOOL',subjectId:current.subjectId,status:'EXPIRING'})
+        expect(list.list[0]).toMatchObject({nextLicenseId:index===0?issued.id:null,missingTools:[]})
+      }
+    } finally {
+      if(previous===undefined)delete process.env.SCHOOL_TOOL_LICENSING_ENABLED
+      else process.env.SCHOOL_TOOL_LICENSING_ENABLED=previous
+    }
   })
 
   it('invalidates an uncommitted batch when its only native scale is stopped after preview', async () => {

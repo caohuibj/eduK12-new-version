@@ -1,5 +1,6 @@
 import {lazy,Suspense,useState} from 'react'
-import {Link} from 'react-router-dom'
+import {readStandardAssignmentTarget} from '../../admin/standardAssignmentTarget'
+import {Link,useLocation} from 'react-router-dom'
 import {useAuth} from '../../contexts/AuthContext'
 import {sessionFetch} from '../../api/client'
 import {entryPaths,hasAdminEntry} from '../../admin/authority'
@@ -35,6 +36,7 @@ async function request<T>(path:string,method='GET',data?:unknown):Promise<T>{
  * independent. Sensitive writes also require the current password and key. */
 export default function EducationProductGovernance({product}:{product?:Product}){
   const {user}=useAuth()
+  const initial=readStandardAssignmentTarget(useLocation().search)
   const selectedProduct=product??(hasAdminEntry(user,'HUISCHOOL')?'HUISCHOOL':'HUITEACHER')
   const title=selectedProduct==='HUISCHOOL'?'校园心理健康产品治理':'教师发展与学校改进治理'
   const [school,setSchool]=useState('')
@@ -111,6 +113,7 @@ export default function EducationProductGovernance({product}:{product?:Product})
     </nav>
     {error&&<p role="alert" className="epg-error">{error}</p>}
     {notice&&<p role="status" className="epg-notice">{notice}</p>}
+    {initial?.subjectId&&user&&<section aria-label="许可对象的固定版本分配"><h2>固定版本分配 · {initial.toolKey}</h2><p>学校编号 {initial.subjectId}</p><Suspense fallback={<p>正在读取许可对象的固定配置…</p>}><EducationStandardConfigurations actorId={user.id} organizationId={initial.subjectId} product={selectedProduct} initialTool={initial.toolKey} initialRelease={initial.releaseId}/></Suspense></section>}
     <ToolCatalogTagsPanel product={selectedProduct === 'HUISCHOOL' ? 'SCHOOL' : 'TEACHER'}/>
     <div className="epg-panel">
       <h2>选择正式学校</h2>

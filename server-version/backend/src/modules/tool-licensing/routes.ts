@@ -1,4 +1,5 @@
 import { Router, type NextFunction, type Request, type Response } from 'express'
+import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { error, success } from '../../utils/response'
@@ -65,6 +66,17 @@ toolLicensesRouter.get('/', handler(async req => {
 toolLicensesRouter.post('/batches/preview', handler(req => previewToolLicenseBatch(operator(req), req.body)))
 toolLicensesRouter.post('/batches', requireRecentAdminKey, handler(req => createToolLicenseBatch(operator(req), req.body)))
 toolLicensesRouter.get('/:id', handler(req => readToolLicense(toolLicenseId.parse(req.params.id))))
+toolLicensesRouter.get('/:id/history', handler(async req => {
+  const id = toolLicenseId.parse(req.params.id)
+  const before = z.coerce.number().int().positive().optional().parse(req.query.before)
+  return prisma.$queryRaw(Prisma.sql`
+    SELECT e.revision,e.action,e.reason,e.created_at AS "createdAt",COALESCE(u.username,e.actor_id) AS actor,
+      e.snapshot->'tools' AS tools,COALESCE(prev.snapshot->'tools','[]'::jsonb) AS previous
+    FROM tool_license_events e LEFT JOIN users u ON u.id=e.actor_id
+    LEFT JOIN tool_license_events prev ON prev.license_id=e.license_id AND prev.revision=e.revision-1
+    WHERE e.license_id=${id} ${before ? Prisma.sql`AND e.revision<${before}` : Prisma.empty}
+    ORDER BY e.revision DESC LIMIT 10`)
+}))
 toolLicensesRouter.get('/:id/termination-impact', handler(req => readToolLicenseTerminationImpact(toolLicenseId.parse(req.params.id))))
 toolLicensesRouter.post('/', requireRecentAdminKey, handler(req => createToolLicense(operator(req), req.body)))
 toolLicensesRouter.put('/:id', requireRecentAdminKey, handler(req => editToolLicense(operator(req), toolLicenseId.parse(req.params.id), req.body)))

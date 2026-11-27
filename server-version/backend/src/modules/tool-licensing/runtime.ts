@@ -33,7 +33,7 @@ export type EducationToolAllocation = { key: string; quantity: number; trackIds:
 async function charge(tx: Prisma.TransactionClient, licenseId: string, publicationId: string,
   allocations: readonly EducationToolAllocation[], closesAt: Date | null) {
   // The durable receipt and quota move with the publisher's transaction.
-  const [result] = await tx.$queryRaw<Array<{ receipts: number; charged: number }>>(Prisma.sql`
+  const [result] = await tx.$queryRaw<Array<{ receipts: number; charged: number; failure?: { name:string; quantity:number; remaining:number } }>>(Prisma.sql`
     WITH registered AS (
       INSERT INTO tool_license_charges (license_id, tool_key, publication_id, quantity, settle_after, track_ids)
       SELECT ${licenseId}, key, ${publicationId}, quantity, ${closesAt}::timestamptz, "trackIds"
@@ -42,7 +42,7 @@ async function charge(tx: Prisma.TransactionClient, licenseId: string, publicati
       ON CONFLICT (license_id,tool_key,publication_id) DO NOTHING
       RETURNING tool_key,quantity
     ), locked AS MATERIALIZED (
-      SELECT item.tool_key,registered.quantity FROM tool_license_items item JOIN registered USING(tool_key)
+      SELECT item.tool_key,item.name,registered.quantity,item.usage_limit-item.used AS remaining FROM tool_license_items item JOIN registered USING(tool_key)
       WHERE item.license_id=${licenseId} ORDER BY item.tool_key FOR NO KEY UPDATE OF item
     ), changed AS (
       UPDATE tool_license_items item SET used=item.used+locked.quantity FROM locked
@@ -50,10 +50,14 @@ async function charge(tx: Prisma.TransactionClient, licenseId: string, publicati
         AND item.usage_limit IS NOT NULL AND item.usage_limit-item.used>=locked.quantity
       RETURNING item.tool_key
     )
-    SELECT (SELECT count(*)::int FROM registered) AS receipts,(SELECT count(*)::int FROM changed) AS charged
+    SELECT (SELECT count(*)::int FROM registered) AS receipts,(SELECT count(*)::int FROM changed) AS charged,
+      (SELECT to_jsonb(shortage) FROM (SELECT name,quantity,remaining FROM locked WHERE remaining<quantity ORDER BY tool_key LIMIT 1) shortage) AS failure
   `)
   if (result.receipts !== result.charged) {
-    throw new ToolLicenseAccessError('工具授权的剩余额度不足，无法发布')
+    const failure = result.failure
+    throw new ToolLicenseAccessError(failure
+      ? `${failure.name}剩余额度不足，本次需要${closesAt ? '预留' : '使用'} ${failure.quantity} 份，可用 ${failure.remaining} 份。请联系系统管理员调整许可`
+      : '工具授权的剩余额度不足，请联系系统管理员核对许可')
   }
 }
 
@@ -77,7 +81,7 @@ export async function authorizeToolPublication(tx: Prisma.TransactionClient, inp
     LIMIT 1 FOR SHARE
   `)
   if (!license) {
-    if (input.requireIssuedLicense) throw new ToolLicenseAccessError('请先开通此工具许可，再发布该投放任务')
+    if (input.requireIssuedLicense) throw new ToolLicenseAccessError('请联系系统管理员开通此工具许可，再发布该投放任务')
     return
   }
   // Both the clock and membership must be read after the lock wait. An
@@ -91,8 +95,8 @@ export async function authorizeToolPublication(tx: Prisma.TransactionClient, inp
     ),'[]'::jsonb) AS items
   `)
   if (license.terminatedAt || evaluatedAt < license.startsAt || evaluatedAt >= license.expiresAt)
-    throw new ToolLicenseAccessError('当前工具许可尚未生效或已结束，无法发布')
-  if (keys.length !== items.length) throw new ToolLicenseAccessError('当前许可不包含所选工具，无法发布')
+    throw new ToolLicenseAccessError('当前工具许可尚未生效或已结束，请联系系统管理员核对许可期限')
+  if (keys.length !== items.length) throw new ToolLicenseAccessError('当前许可不包含所选工具 '+keys.filter(key=>!items.some(item=>item.key===key)).join('、')+'，请联系系统管理员补充许可')
   const education = input.product === 'SCHOOL' || input.product === 'TEACHER' ? input.education : undefined
   if (input.product === 'SCHOOL' || input.product === 'TEACHER') {
     const cap = education?.maxResponses

@@ -11,7 +11,7 @@ import {createRelationalProductRegistry,type RelationalProductEntryV1} from '../
 import {projectRelationalRunPolicy,type RunResourcePolicy} from '../assessment-run/resourceAuthority'
 import {authorizePrivateTool} from './private-tool.access'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
-import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
+import {EducationPrivateToolError,privateToolFail,type PrivateToolContext} from './private-tool.contracts'
 import {readEducationPublicUse} from './public-source.catalog'
 import {parseEducationPublicSourceKey} from './public-source.identity'
 import {readEducationPublicSourceHeaders} from './public-source.headers'
@@ -114,7 +114,12 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
  if(publicKeys.length&&!options.historyGroup){
   const pins=readSelectedSourceBindings(rows.flatMap(row=>(row.publicBindings??[]) as unknown[]),true)
   const headers=await readEducationPublicSourceHeaders(tx,publicKeys.map(key=>parseEducationPublicSourceKey(key)!),options.lockForUse,c.entry),allowed=await readEducationPublicUse(tx,c,publicKeys,options.lockForUse,pins,true)
-  if(allowed.size!==publicKeys.length||headers.size!==publicKeys.length)privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
+  if(allowed.size!==publicKeys.length||headers.size!==publicKeys.length){
+   const missing=publicKeys.find(key=>!allowed.has(key)||!headers.has(key))!
+   throw new EducationPrivateToolError('PUBLIC_SOURCE_USE_REQUIRED',403,[],
+    (headers.get(missing)?.title??'固定工具版本 '+(parseEducationPublicSourceKey(missing)?.id??missing))+
+    ' 缺少可用的固定版本分配，请联系本入口管理员核对版本和使用授权')
+  }
  }
  const sources=new Map<string,PrivateCompositionRunSource>()
  for(const row of rows){

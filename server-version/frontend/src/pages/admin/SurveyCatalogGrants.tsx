@@ -25,7 +25,7 @@ export function SurveyCatalogGrants({api,password,researchers,ensureVerification
   const [sourcePage,setSourcePage]=useState<SourcePage>(emptySourcePage),[grants,setGrants]=useState<CatalogGrant[]>([]),[grantPage,setGrantPage]=useState(1)
   const {list:allSources,page,hasMore,terminalReason}=sourcePage
   const [focus,setFocus]=useState(initialStandard??null)
-  const sources=focus?allSources.filter(source=>source.ref.sourceId==='survey-standard:'+focus.releaseId):allSources
+  const sources=focus?allSources.filter(source=>focus.releaseId?source.ref.sourceId==='survey-standard:'+focus.releaseId:source.configuration?.toolKey===focus.toolKey):allSources
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const [queried,setQueried]=useState(false)
   const [managerActorId,setManagerActorId]=useState<string|null>(null),[configurationName,setConfigurationName]=useState('')
@@ -38,6 +38,20 @@ export function SurveyCatalogGrants({api,password,researchers,ensureVerification
   const inFlight=useRef(false),sourceEpoch=useRef(0),targetRef=useRef(researcherId)
   targetRef.current=researcherId
   useEffect(()=>()=>{sourceEpoch.current++},[])
+  const initialRecipient=initialStandard?.subjectId
+  const apiRef=useRef(api)
+  apiRef.current=api
+  useEffect(()=>{
+    if(!initialRecipient)return
+    let current=true
+    void apiRef.current<{list:typeof researchers}>('/researchers?userId='+encodeURIComponent(initialRecipient)).then(data=>{
+      if(!current)return
+      const match=data.list.find(row=>row.id===initialRecipient)
+      if(match){setMatchedResearchers([match]);setResearcherId(match.id)}
+      else setError('许可对象已不在研究者名单中')
+    }).catch(cause=>{if(current)setError(cause instanceof Error?cause.message:'读取许可对象失败')})
+    return ()=>{current=false}
+  },[initialRecipient])
   const selectedResearcher=recipients.find(r=>r.id===researcherId)
   const canGrant=!!selectedResearcher&&['ACTIVE','PENDING_MFA'].includes(selectedResearcher.status)
   const objectName=selectedResearcher?.username||'未选择研究者'
@@ -120,7 +134,7 @@ export function SurveyCatalogGrants({api,password,researchers,ensureVerification
       </section>}
       {cognitivePreview&&<section aria-label="认知报告预览"><h3>{cognitivePreview.reportStyle.title}</h3><p>{cognitivePreview.profile==='experience'?'体验报告':cognitivePreview.profile==='research'?'科研报告':'正式报告'}</p><p>主要内容：{cognitivePreview.reportStyle.headline.map(m=>m.label).join('、')}</p><p>详细内容：{cognitivePreview.reportStyle.detail.map(m=>m.label).join('、')}</p>{cognitivePreview.reportStyle.caveats.map(text=><p key={text}>{text}</p>)}<p>{cognitivePreview.reportStyle.disclaimer}</p><p>此处显示固定报告结构，实际结果由作答产生。</p><button type="button" onClick={()=>setCognitivePreview(null)}>关闭报告预览</button></section>}
       <CatalogDiscoveryFilters label="可授权版本检索" filters={filters} facets={sourcePage.tagFacets??EMPTY_CATALOG_FACETS} onChange={setFilters} onApply={search} disabled={busy}/>
-      {focus&&<p>从量表详情带入精确版本。 <button type="button" onClick={()=>setFocus(null)}>查看同一量表的其他版本</button></p>}
+      {focus&&<p>{focus.releaseId?'从量表详情带入精确版本。':'请选择该许可工具的获准版本。'} <button type="button" onClick={()=>setFocus(null)}>查看同一量表的其他版本</button></p>}
       <button type="button" className="btn-secondary" disabled={busy} onClick={()=>search(filters)}><Search size={16} aria-hidden="true"/>查询可授权版本</button>
       {!queried&&!busy&&!error&&<div className="survey-admin-empty-state survey-admin-source-empty"><span className="survey-admin-empty-icon"><BookOpen size={28} aria-hidden="true"/></span><p>选择来源类型后查询版本；不会自动加载全部目录。</p><span>核对来源与版本后，再为所选研究者授权。</span></div>}
       {queried&&focus&&!busy&&!sources.length&&<p>本页未找到该精确版本。{hasMore?'请查看下一页。':'请核对该版本的 Survey 准入状态。'}</p>}
