@@ -79,6 +79,13 @@ describe('administrator Authenticator binding and sensitive actions',()=>{
     expect(begin).toHaveBeenCalledExactlyOnceWith('synthetic-autofill','Synthetic1!autofill','synthetic-autofill-ticket')
     expect(screen.getByRole('link',{name:'前往管理员登录'})).toHaveAttribute('href',expect.stringContaining('returnTo=%2Fadmin%2Fsurvey-researchers'))
   })
+  it('submits the browser-filled verification code even without a change event',async()=>{
+    await setup()
+    const input = screen.getByLabelText('Authenticator 六位动态码') as HTMLInputElement
+    input.value = '001234'
+    fireEvent.click(screen.getByRole('button',{name:'确认绑定'}))
+    await waitFor(()=>expect(confirm).toHaveBeenCalledExactlyOnceWith('001234'))
+  })
   it('restarts a consumed binding challenge after a rejected code and clears the QR',async()=>{
     confirm.mockRejectedValueOnce(new Error('动态码错误，请重新开始'))
     await setup()

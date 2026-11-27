@@ -25,6 +25,14 @@ beforeEach(()=>{
 })
 afterEach(()=>{vi.unstubAllGlobals();vi.unstubAllEnvs()})
 describe('administrator login flow',()=>{
+  it('uses the submitted browser values for a system sign-in',async()=>{
+    mount('/admin/login?returnTo=%2Fadmin%2Fsystem')
+    const fields = [['管理员账号','synthetic-admin'],['密码','synthetic-password'],['Authenticator 六位动态码','001234']]
+    for (const [label,value] of fields) (screen.getByLabelText(label) as HTMLInputElement).value=value
+    fireEvent.click(screen.getByRole('button',{name:'管理员登录'}))
+    expect(await screen.findByText('destination:/admin/system')).toBeInTheDocument()
+    expect(login).toHaveBeenCalledExactlyOnceWith({username:'synthetic-admin',password:'synthetic-password'},'admin',{method:'TOTP',code:'001234'})
+  })
   it('retains the licensed school and tool when an entry administrator signs in',async()=>{
     const destination='/admin/huischool?standardTool=licensed_scale&subjectId=11260000-0000-4000-8000-000000000001'
     login.mockResolvedValue({code:0,data:{user:{id:'school-admin',username:'school-admin',role:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'HUISCHOOL',version:1}]}}})

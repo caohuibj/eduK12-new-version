@@ -4,6 +4,7 @@ import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { getCookie } from '../../utils/authCookies'
 import { inactiveAccountMessage } from '../../utils/accountStatus'
+import { logger } from '../../utils/logger'
 import { encodeTotpSecret, matchTotpStep } from '../../utils/totp'
 import { cacheService } from '../../services/cacheService'
 import { loadCurrentPrincipal } from '../organization/principal'
@@ -83,20 +84,23 @@ export async function finishAdminTotp(req: Request, res: Response, code: string,
     // account revocation and controlled recovery. Concurrent codes cannot win twice.
     const principal = await lockedAdmin(tx, peek.userId, peek.tokenVersion)
     const consumed = await tx.adminSecurityChallenge.deleteMany({ where: { idHash, expiresAt: { gt: new Date() } } })
-    if (consumed.count !== 1 || !principal || peek.purpose !== 'TOTP_' + kind
-      || (kind === 'STEP_UP' ? !sessionId || peek.sessionId !== sessionId || principal.userId !== req.user?.userId : Boolean(peek.sessionId))) return null
+    if (consumed.count !== 1) return { failure: 'challenge_expired' } as const
+    if (!principal || peek.purpose !== 'TOTP_' + kind
+      || (kind === 'STEP_UP' ? !sessionId || peek.sessionId !== sessionId || principal.userId !== req.user?.userId : Boolean(peek.sessionId)))
+      return { failure: 'challenge_context_changed' } as const
     const credential = await tx.adminTotpCredential.findUnique({ where: { userId: principal.userId } })
-    if (kind === 'REGISTER' ? Boolean(credential) : !credential) return null
+    if (kind === 'REGISTER' ? Boolean(credential) : !credential) return { failure: 'binding_state_changed' } as const
+    if (!code) return { failure: 'missing_or_malformed_input' } as const
     const [pendingCipher, initialPasswordHash] = kind === 'REGISTER' ? peek.challenge.split('|') : []
     const secretCipher = kind === 'REGISTER' ? pendingCipher : credential!.secretCipher
     const step = matchTotpStep(decryptSecret(principal.userId, secretCipher), code, credential?.lastUsedStep ?? -1n)
-    if (step === null) return null
+    if (step === null) return { failure: 'step_did_not_match' } as const
     if (kind === 'REGISTER') {
-      if (!peek.enrollmentHash || (initialPasswordHash && !principal.mustChangePassword)) return null
+      if (!peek.enrollmentHash || (initialPasswordHash && !principal.mustChangePassword)) return { failure: 'enrollment_state_changed' } as const
       const ticket = await tx.adminSecurityChallenge.deleteMany({ where: { idHash: peek.enrollmentHash, userId: principal.userId,
         purpose: 'ENROLLMENT', challenge: initialPasswordHash ? ADMIN_ENTRY_ACTIVATION : '',
         tokenVersion: principal.tokenVersion, expiresAt: { gt: new Date() } } })
-      if (ticket.count !== 1) return null
+      if (ticket.count !== 1) return { failure: 'enrollment_ticket_unavailable' } as const
       await tx.adminTotpCredential.create({ data: { userId: principal.userId, secretCipher, lastUsedStep: BigInt(step) } })
       if (initialPasswordHash) {
         await tx.user.update({ where: { id: principal.userId }, data: {
@@ -105,7 +109,7 @@ export async function finishAdminTotp(req: Request, res: Response, code: string,
       }
     } else {
       const changed = await tx.adminTotpCredential.updateMany({ where: { userId: principal.userId, lastUsedStep: credential!.lastUsedStep }, data: { lastUsedStep: BigInt(step) } })
-      if (changed.count !== 1) return null
+      if (changed.count !== 1) return { failure: 'step_already_consumed' } as const
     }
     await tx.adminAuthorizationAudit.create({ data: { id: randomUUID(), actorUserId: principal.userId, targetUserId: principal.userId,
       action: 'ADMIN_TOTP_' + (kind === 'REGISTER' ? 'REGISTERED' : kind), reason: 'Authenticator TOTP; encrypted account-bound secret; one-use time step' } })
@@ -113,7 +117,16 @@ export async function finishAdminTotp(req: Request, res: Response, code: string,
   })
   // Returning a failure from the transaction commits challenge consumption.
   // A wrong code must never roll it back and allow unlimited retries.
-  if (!result) throw new AdminPermissionError(403, '动态码错误、已使用或验证已失效，请重新开始并使用新的动态码')
+  if (result.failure) {
+    logger.info('Admin Authenticator verification rejected', { phase: kind, outcome: result.failure, requestId: req.requestId })
+    if (kind === 'REGISTER') {
+      if (result.failure === 'challenge_expired') throw new AdminPermissionError(403, '本次绑定二维码已过期')
+      if (result.failure === 'enrollment_ticket_unavailable') throw new AdminPermissionError(403, '本次登记票据已失效')
+      if (result.failure === 'missing_or_malformed_input') throw new AdminPermissionError(403, '动态码没有完整提交，请输入六位数字')
+      if (result.failure === 'step_did_not_match') throw new AdminPermissionError(403, '动态码与本次绑定二维码不匹配')
+    }
+    throw new AdminPermissionError(403, '动态码错误、已使用或验证已失效，请重新开始并使用新的动态码')
+  }
   if (kind === 'REGISTER') return { registered: true as const }
   return issueAdminSession(req, res, result.userId, result.tokenVersion, 'TOTP', sessionId)
 }

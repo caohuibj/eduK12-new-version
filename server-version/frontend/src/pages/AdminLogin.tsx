@@ -36,9 +36,7 @@ const AdminLogin: React.FC = () => {
   const surveyEntry=Boolean(origins&&entryPath===SURVEY_ADMIN_PATH)
   const systemEntry=isSystemLoginTarget(returnTo)
   const trainingEntry=isTrainingAdminPath(entryPath??'')
-  const homeOrigin=new URL(origins?.admin??window.location.origin)
-  if(import.meta.env.DEV&&['localhost','127.0.0.1'].includes(homeOrigin.hostname))homeOrigin.hostname='training.localhost'
-  const trainingHome=homeOrigin.origin+'/'
+  const trainingHome=origins ? origins.training+'/' : '/'
   const educationProduct=educationEntry(location.search)
   const Shell = systemEntry ? SystemAdminEntryShell : trainingEntry ? TrainingAdminLoginShell : educationProduct ? EducationAdminEntryShell : surveyEntry ? SurveyAdminEntryShell : AuthShell
   const trainingRecovery = trainingEntry && readReauthReturn()?.target === returnTo
@@ -51,13 +49,21 @@ const AdminLogin: React.FC = () => {
     password: '',
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    const submitted = new FormData(e.currentTarget)
+    const username = String(submitted.get('username') ?? '')
+    const password = String(submitted.get('password') ?? '')
+    const submittedCode = String(submitted.get('code') ?? '')
+    if (method === 'TOTP' && !/^[0-9]{6}$/.test(submittedCode)) {
+      setError('请填写 Authenticator 显示的六位动态码。')
+      return
+    }
     setLoading(true)
     setError('')
 
     try {
-      const user = await login(formData.username, formData.password, undefined, 'admin', {method,...(method==='TOTP'?{code}:{})})
+      const user = await login(username, password, undefined, 'admin', {method,...(method==='TOTP'?{code:submittedCode}:{})})
       if(user) navigate(adminReturnTo(user,returnTo),{replace:true})
     } catch (err: any) {
       setError(err.message || '登录失败')
@@ -94,6 +100,7 @@ const AdminLogin: React.FC = () => {
             管理员账号
           </label>
           <input autoComplete="username" aria-describedby={error ? "auth-error" : undefined} id="auth-username"
+            name="username"
             type="text"
             value={formData.username}
             onChange={(e) =>
@@ -110,6 +117,7 @@ const AdminLogin: React.FC = () => {
             密码
           </label>
           <input autoComplete="current-password" aria-describedby={error ? "auth-error" : undefined} id="auth-password"
+            name="password"
             type="password"
             value={formData.password}
             onChange={(e) =>
@@ -127,7 +135,7 @@ const AdminLogin: React.FC = () => {
           </select>
         </label>
         {method==='TOTP'&&<label className="block" htmlFor="admin-totp-code">Authenticator 六位动态码
-          <input aria-describedby={trainingEntry ? "training-login-totp-help" : undefined} id="admin-totp-code" className="input" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6}
+          <input aria-describedby={trainingEntry ? "training-login-totp-help" : undefined} id="admin-totp-code" name="code" className="input" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6}
             value={code} required disabled={loading} onChange={e=>setCode(e.target.value.replace(/\D/g,''))}/>
         </label>}
         {trainingEntry && method==='TOTP' && <p id="training-login-totp-help" className="training-login-field-help">打开已绑定的 Authenticator，输入当前显示的 6 位数字。</p>}

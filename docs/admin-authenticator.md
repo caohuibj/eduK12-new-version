@@ -64,7 +64,11 @@
 
 ## 生产启用与恢复验收
 
+统一管理入口为 `https://admin.eduk12.top/admin/system`。Training、Survey、School 和 Teacher 的平台管理员在同一管理域登录，继续按各自的入口授权进入工作台。旧管理页面会跳转到新域。参与者、校园组织账号和 Survey 研究者继续使用各自的产品入口。
+
+切换前确认 DNS 和独立 TLS 证书，保留旧入口配置及镜像供回退。两台 API 同步切换来源；已绑定的 Authenticator 凭据沿用同一加密密钥，浏览器在新域重新登录。WebAuthn 的 RP 与域名绑定，若有现存硬件密钥，先确保相关操作者具备可用的 Authenticator。
+
 1. 核验历史系统管理员账号的实名归属。先启用一位主操作人，再验证独立的备用系统管理员或已授权的运维恢复通道。首位系统管理员和验证器遗失的受控恢复沿用 `admin-security-bootstrap`。
-2. 双 API 在现有生产 Compose 覆盖中使用同一 `ADMIN_AUTH_ORIGIN=https://training.eduk12.top` 和同一独立 `ADMIN_MFA_ENCRYPTION_KEY`。密钥通过现有私密配置交接，并与对应数据库备份分别受控保存。仅向 API 注入。已有硬件密钥管理员先验证 TOTP 后，再将两个 API 的 `ADMIN_REQUIRE_TOTP` 同步设为 `true`。强制模式仅接受由 Authenticator 签发的管理会话，历史会话可能需要重新登录。兼容模式继续保留原 WebAuthn 能力。
+2. 双 API 在现有生产 Compose 覆盖中使用同一 `ADMIN_AUTH_ORIGIN=https://admin.eduk12.top` 和同一独立 `ADMIN_MFA_ENCRYPTION_KEY`。密钥通过现有私密配置交接，并与对应数据库备份分别受控保存。仅向 API 注入。已有硬件密钥管理员先验证 TOTP 后，再将两个 API 的 `ADMIN_REQUIRE_TOTP` 同步设为 `true`。强制模式仅接受由 Authenticator 签发的管理会话，历史会话可能需要重新登录。兼容模式继续保留原 WebAuthn 能力。
 3. 用实际 Compose 入口执行 `server-version/scripts/release/admin-auth-check.py`，确认两台 API 配置一致。用五类实名账号分别完成正常登录和一项授权范围内的操作，核对入口权限、跨入口拒绝和密码阶段无法访问管理接口。
 4. 用专用验收账号演练遗失验证器。经核验后授权运维执行 `RECOVER`，通过私密渠道交接短期一次性票据。确认旧会话失效，重新绑定后验证新动态码，再复核授权范围。受控恢复保留原授权，禁止借恢复临时放宽登录要求。平台管理员的自助恢复码和网页重绑属于后续功能。

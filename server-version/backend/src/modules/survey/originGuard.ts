@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 import { forbidden } from '../../utils/response'
+import { isConfiguredAdminOrigin } from '../admin-permissions/security'
 
 /** Origin is a browser-write defense, never a replacement for DB realm and project ACL. */
 export function surveyOriginGuard(req: Request, res: Response, next: NextFunction) {
@@ -19,10 +20,8 @@ export function surveyOriginGuard(req: Request, res: Response, next: NextFunctio
   next()
 }
 
-/** Legacy SYSTEM_ADMIN console lives on the Training origin, not on Survey.
- * Keep this distinct from the SURVEY Researcher/public-origin policy.
- * CSRF, legacy cookie authentication and fresh admin password remain required.
- */
+/** Platform administration uses the configured management origin. Survey
+ * researcher and public writes keep the Survey origin policy above. */
 export function platformSurveyOriginGuard(req: Request,res: Response,next: NextFunction){
   const origin=req.get('Origin')
   const unsafe=!['GET','HEAD','OPTIONS'].includes(req.method)
@@ -36,7 +35,7 @@ export function platformSurveyOriginGuard(req: Request,res: Response,next: NextF
     const development=process.env.NODE_ENV!=='production'
       && ['training.localhost','localhost','127.0.0.1'].includes(url.hostname)
       && ['http:','https:'].includes(url.protocol)
-    if(url.origin!=='https://training.eduk12.top'&&!development)
+    if(!development&&!isConfiguredAdminOrigin(origin))
       return forbidden(res,'当前来源不能操作 Survey 管理')
   }catch{return forbidden(res,'当前来源不能操作 Survey 管理')}
   next()

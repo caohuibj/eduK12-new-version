@@ -34,9 +34,7 @@ function AdminKeyEnrollment(){
   const surveyEntry=Boolean(origins&&entryPath===SURVEY_ADMIN_PATH)
   const systemEntry=isSystemLoginTarget(returnTo)
   const trainingEntry=isTrainingAdminPath(entryPath??'')
-  const homeOrigin=new URL(origins?.admin??window.location.origin)
-  if(import.meta.env.DEV&&['localhost','127.0.0.1'].includes(homeOrigin.hostname))homeOrigin.hostname='training.localhost'
-  const trainingHome=homeOrigin.origin+'/'
+  const trainingHome=origins ? origins.training+'/' : '/'
   const educationProduct=educationEntry(location.search)
   const Shell=systemEntry?SystemAdminEntryShell:educationProduct?EducationAdminEntryShell:surveyEntry?SurveyAdminEntryShell:AuthShell
   const loginPath=systemEntry?'/admin/login?returnTo='+encodeURIComponent(SYSTEM_HOME):educationProduct?`/admin/login?returnTo=${encodeURIComponent(assignment??(educationProduct==='School'?'/admin/huischool':'/admin/huiteacher'))}`:surveyEntry?surveyAppearanceHref('/admin/login?returnTo='+encodeURIComponent(assignment??SURVEY_ADMIN_PATH),mode):trainingEntry?'/admin/login?returnTo='+encodeURIComponent(assignment??'/admin/training'):'/admin/login'
@@ -54,9 +52,9 @@ function AdminKeyEnrollment(){
     }catch(error){setMessage(errorMessage(error,'绑定未完成'))}
     finally{setBusy(false)}
   }
-  const confirm=async()=>{
+  const confirm=async(submittedCode:string)=>{
     setBusy(true);setMessage('')
-    try{await confirmTotpEnrollment(code);setUri('');setRegistered(true);setMessage('Authenticator 已绑定。请等待动态码更新，再使用密码与新的动态码登录。')}
+    try{await confirmTotpEnrollment(submittedCode);setUri('');setRegistered(true);setMessage('Authenticator 已绑定。请等待动态码更新，再使用密码与新的动态码登录。')}
     catch(error){setUri('');setMessage(errorMessage(error,'验证未完成')+'；请重新填写登记信息开始绑定。')}
     finally{setCode('');setBusy(false)}
   }
@@ -122,8 +120,12 @@ function AdminKeyEnrollment(){
       <QRCodeSVG value={uri} size={180} aria-label="管理员 Authenticator 绑定二维码"/>
       <details><summary>无法扫码？查看手动绑定密钥</summary><code className="break-all">{new URL(uri).searchParams.get('secret')}</code></details>
       <p>绑定信息仅在本页显示，请勿分享二维码或密钥。二维码最多五分钟内有效。</p>
-      <form className="space-y-4" onSubmit={e=>{e.preventDefault();void confirm()}}>
-        <label>Authenticator 六位动态码<input className="input" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6}
+      <form className="space-y-4" onSubmit={e=>{
+        e.preventDefault()
+        const value = new FormData(e.currentTarget).get('code')
+        if (typeof value==='string' && /^[0-9]{6}$/.test(value)) void confirm(value)
+      }}>
+        <label>Authenticator 六位动态码<input className="input" name="code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6}
           required value={code} disabled={busy} onChange={e=>setCode(e.target.value.replace(/\D/g,''))}/></label>
         <button className="btn-primary" disabled={busy}>{busy?'正在确认…':'确认绑定'}</button>
       </form>

@@ -14,6 +14,8 @@ export { ADMIN_SESSION_SECONDS, ADMIN_STEP_UP_SECONDS, adminRequiresTotp, needsA
 export type { AdminAuthenticationMethod } from './proof'
 
 const challengeCookie = 'eduk12_admin_challenge'
+const legacyAdminOrigin = 'https://training.eduk12.top'
+const productionAdminOrigins = new Set(['https://admin.eduk12.top', legacyAdminOrigin])
 export const adminSecretHash = (value: string) => createHash('sha256').update(value).digest('hex')
 export function adminAuthOrigin() {
   const origin = process.env.ADMIN_AUTH_ORIGIN || process.env.ADMIN_WEBAUTHN_ORIGIN
@@ -21,11 +23,16 @@ export function adminAuthOrigin() {
   let url: URL
   try { url = new URL(origin) } catch { throw new AdminPermissionError(503, '管理员认证来源配置无效') }
   const local = process.env.NODE_ENV !== 'production' && url.hostname === 'localhost'
-  if (url.origin !== origin || (!local && origin !== 'https://training.eduk12.top')
+  if (url.origin !== origin || (!local && !productionAdminOrigins.has(origin))
     || (local && !['http:', 'https:'].includes(url.protocol)))
     throw new AdminPermissionError(503, '管理员认证来源配置无效')
   return origin
 }
+export function isConfiguredAdminOrigin(origin: string) {
+  const configured = process.env.ADMIN_AUTH_ORIGIN || process.env.ADMIN_WEBAUTHN_ORIGIN
+  return origin === (configured ? adminAuthOrigin() : legacyAdminOrigin)
+}
+
 export function adminWebAuthnConfig() {
   const origin = adminAuthOrigin()
   const rpID = process.env.ADMIN_WEBAUTHN_RP_ID
@@ -33,8 +40,7 @@ export function adminWebAuthnConfig() {
   const url = new URL(origin)
   const local = process.env.NODE_ENV !== 'production' && url.hostname === 'localhost'
   // A host header, body field or other product origin can never select the RP.
-  if (url.origin !== origin || (!local && (origin !== 'https://training.eduk12.top' || rpID !== 'training.eduk12.top'))
-    || (local && (rpID !== 'localhost' || !['http:', 'https:'].includes(url.protocol))))
+  if (rpID !== url.hostname || (!local && !productionAdminOrigins.has(origin)))
     throw new AdminPermissionError(503, '管理安全密钥来源配置无效')
   return { origin, rpID }
 }
