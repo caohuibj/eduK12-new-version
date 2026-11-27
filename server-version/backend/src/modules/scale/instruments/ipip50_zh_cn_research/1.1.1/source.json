@@ -127,13 +127,13 @@
   },
   "disclosure": {
     "schemaVersion": 1,
-    "policyVersion": "ipip50-adult-v1",
+    "policyVersion": "ipip50-adult-report-v2",
     "audiences": {
       "respondent": {
         "numericScores": true,
-        "references": false,
+        "references": true,
         "individualInterpretations": true,
-        "scoreDerivedLabels": false,
+        "scoreDerivedLabels": true,
         "resultQualityDetails": true,
         "rawAnswers": false,
         "itemScores": false,
@@ -142,9 +142,9 @@
       },
       "subject": {
         "numericScores": true,
-        "references": false,
+        "references": true,
         "individualInterpretations": true,
-        "scoreDerivedLabels": false,
+        "scoreDerivedLabels": true,
         "resultQualityDetails": true,
         "rawAnswers": false,
         "itemScores": false,
@@ -153,9 +153,9 @@
       },
       "researcher": {
         "numericScores": true,
-        "references": false,
+        "references": true,
         "individualInterpretations": true,
-        "scoreDerivedLabels": false,
+        "scoreDerivedLabels": true,
         "resultQualityDetails": true,
         "rawAnswers": false,
         "itemScores": false,
