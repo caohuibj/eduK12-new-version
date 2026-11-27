@@ -1,0 +1,96 @@
+{
+  "toolKey": "wihic_task_orientation_actual_en_lower_secondary_student",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student",
+  "title": "WIHIC | Make the next step easier to see",
+  "report": {
+    "reportVersion": "1.1.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "Eight English items 33–40 and the five frequency choices match Fraser (2023), Appendix A Table A1. The appendix’s top answer is Almost Always. Source © Fraser 2023, CC BY 4.0. The project retains C and the eight-item complete-response mean (1–5), without thresholds. This version adds original feedback only, for the student who answered."
+      }
+    },
+    "primaryScoreKeys": [
+      "task_orientation"
+    ],
+    "scoreOrder": [
+      "task_orientation"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "task_orientation",
+        "scoreLabel": "Classwork goals and focus (1–5 average)",
+        "headline": "Make the next step easier to see",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Mika sits down to start a project. The finished example looks complicated, but a teacher points out what today’s work is meant to show. Mika sketches the first part, checks it against the goal, and can see what still needs doing. A clearer plan makes the task easier to begin.\n\nYour answers describe the experiences of knowing the goal, understanding what work is expected, being ready to begin, and trying to stay with the task. A class with clear instructions can make those steps easier. Notice whether the part you need is a clearer goal, a smaller first step, or time to ask a question.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Before starting the next assignment, say in your own words what you need to finish today. Choose one small action to start with and one way to check if you are on track."
+          },
+          {
+            "category": "support",
+            "text": "If goals or instructions are unclear, ask for one example or an outline of what is expected today. If interruptions make it hard to pick up the work, mark where you stopped before you switch tasks."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "© Barry J. Fraser, 2023. Adapted from What Is Happening In this Class? (WIHIC), Appendix A, Table A1, in The Evolution of the Field of Learning Environments Research, Education Sciences, 13(3), 257. https://doi.org/10.3390/educsci13030257 (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). The project presents one part separately, with its own instruction, scoring of complete answers, and student feedback.",
+      "The result is the mean of eight answers about one class. The five original answer choices run from Almost Never (1) to Almost Always (5). If an answer is missing, this part has no score.",
+      "Using this separate eight-question form with English-reading students ages 12–15 in grades 7–9 is this project’s scope. This item set has no separate validation or group benchmark. Each part of WIHIC stands alone in the report."
+    ],
+    "disclaimer": "This report describes your experience in one class. It is for reflection and does not grade you, your classmates, or your teacher.",
+    "artworkKey": "wihic_task_orientation_actual_en_lower_secondary_student/1.0.0/1.1.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

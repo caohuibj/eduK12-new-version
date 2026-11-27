@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "wihic_task_orientation_actual_en_lower_secondary_student/1.0.0/1.1.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "A student checks a visual sequence and reaches for the first material needed for a classroom task.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
