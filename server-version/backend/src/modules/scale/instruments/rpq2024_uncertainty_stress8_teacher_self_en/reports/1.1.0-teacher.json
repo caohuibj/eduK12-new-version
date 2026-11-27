@@ -1,0 +1,96 @@
+{
+  "toolKey": "rpq2024_uncertainty_stress8_teacher_self_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "RPQ-E | Separate the question from the weight of carrying it",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "English RPQ-E 2024 Table 6 and original author scoring key: questions 19–26 form this component. The 8 responses ordered 1 (Very rarely) to 6 (Almost always) receive equal weight. Existing project complete-response rule and 1–6 component mean are retained. No norms, separate four-item component scores, or RPQ-E total."
+      }
+    },
+    "primaryScoreKeys": [
+      "uncertainty_stress8"
+    ],
+    "scoreOrder": [
+      "uncertainty_stress8"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "uncertainty_stress8",
+        "scoreLabel": "Uncertainty and stress in working with students (descriptive mean, 1–6)",
+        "headline": "Separate the question from the weight of carrying it",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "After a difficult check-in with a student, a teacher keeps replaying the conversation. Part of the problem is a question: what support does this learner need? Another part is the pressure of trying to decide alone between classes. Writing those parts down makes it easier to ask one person for a second view and to find time for the next step.\n\nThe score describes how often you reported feeling unsure about students’ needs or how to respond, and how often the interactions left you feeling under pressure or drained. Both sets of experiences are in this one average. Time, caseload and the support available in your setting can shape it. The next useful step might be one question you can clarify, or getting someone else involved so you have help with the decision.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Choose one interaction. Write privately what is still uncertain, what is already known, and which part of the responsibility you need help to share."
+          },
+          {
+            "category": "support",
+            "text": "If pressure is recurring, ask for a specific form of support, such as time to plan, advice from a school specialist, or a joint check-in. Follow your school’s established procedures for any concern about a learner."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Rogers, S. L., et al. (2024). Further development of the reflective practice questionnaire. PeerJ, 12, e16879. https://doi.org/10.7717/peerj.16879 (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). This is a project report for one component of the 30-item extended questionnaire (RPQ-E, Table 6).",
+      "In the source instructions, educators read “client” as “student.” This version is for adult educators reflecting on their own work. The source study recruited working university students across several professions, so this score supplies no teacher-specific norms or standalone validation.",
+      "The component mean includes all 8 answers and ranges from 1 to 6. The project retains a missing result if any response is absent. This report uses the component only, without a cutoff or a comparison with other RPQ-E scores."
+    ],
+    "disclaimer": "For your own professional reflection as an educator. The result describes your answers about experiences with teaching work and does not assess teaching quality, employment suitability, or student outcomes.",
+    "artworkKey": "rpq2024_uncertainty_stress8_teacher_self_en/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
