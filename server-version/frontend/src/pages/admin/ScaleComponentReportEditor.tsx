@@ -14,10 +14,13 @@ export type StandardReportGuidance = {
 export type StandardReportInterpretationSource =
   | { type: 'score_only' }
   | { type: 'reference_context' }
+  | { type: 'shared_theoretical_range' }
   | { type: 'reference'; referenceVersion?: string; referenceKind?: string }
 
 export type StandardReportInterpretation = {
   scoreKey: string
+  scoreLabel?: string
+  provisional?: true
   headline: string
   source: StandardReportInterpretationSource
   summary: string
@@ -26,6 +29,8 @@ export type StandardReportInterpretation = {
 }
 
 export type StandardReportDefinition = {
+  artworkKey?: string
+  illustrationKey?: string
   audienceContract?: {
     schemaVersion: 1
     respondent: 'STUDENT_SELF' | 'ADULT_SELF' | 'PARENT_REPORT' | 'TEACHER_REPORT' | 'OBSERVER_REPORT'
@@ -120,9 +125,8 @@ export function ScaleComponentReportEditor({
             <span className="component-badge">
               {entry.source.type === 'score_only'
                 ? '仅分数'
-                : entry.source.type === 'reference_context'
-                  ? '选定参数分档'
-                  : '精确参考分档'}
+                : entry.source.type === 'reference_context' ? '选定参数分档'
+                  : entry.source.type === 'shared_theoretical_range' ? '共同理论区间' : '精确参考分档'}
             </span>
           </div>
           <label className="component-field">

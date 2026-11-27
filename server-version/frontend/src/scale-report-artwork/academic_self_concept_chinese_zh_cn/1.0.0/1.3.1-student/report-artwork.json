@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "academic_self_concept_chinese_zh_cn/1.0.0/1.3.1-student",
+  "bands": [
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "very_low",
+      "file": "very_low.webp",
+      "alt": "给读懂的一句话画条线",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "low",
+      "file": "low.webp",
+      "alt": "在想问的那一页夹一张书签",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "middle",
+      "file": "middle.webp",
+      "alt": "写下已经读懂和还想问的两处",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "high",
+      "file": "high.webp",
+      "alt": "圈出帮你读懂这段的词句",
+      "width": 480,
+      "height": 512
+    },
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "very_high",
+      "file": "very_high.webp",
+      "alt": "合上书讲一讲读懂的那一段",
+      "width": 572,
+      "height": 512
+    }
+  ]
+}

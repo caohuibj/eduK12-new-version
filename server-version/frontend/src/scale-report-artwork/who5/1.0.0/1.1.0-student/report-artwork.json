@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "who5/1.0.0/1.1.0-student",
+  "bands": [
+    {
+      "scoreKey": "raw_total",
+      "bandKey": "who5_under_13",
+      "file": "courtyard.webp",
+      "alt": "坐在校园里的学生和朋友聊近况",
+      "width": 752,
+      "height": 1024
+    },
+    {
+      "scoreKey": "raw_total",
+      "bandKey": "who5_from_13",
+      "file": "sketch.webp",
+      "alt": "学生用画本记下最近喜欢的一个瞬间",
+      "width": 752,
+      "height": 1024
+    }
+  ]
+}

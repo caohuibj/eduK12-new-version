@@ -16,6 +16,10 @@ import {
   type FrozenScaleRuntimeSnapshotV2,
 } from './runtime-snapshot-v2'
 import { z } from 'zod'
+import { bindScaleCombinationPolicy, compileScalePolicy } from '../scale/policy/compile'
+import type { AudienceDisclosurePolicyV1 } from '../scale/policy/types'
+import type { AssessmentReferenceSetDefinition } from '../assessment-reference/reference'
+import { getScaleInstrumentSource } from '../scale/onboarding/instrument-registry'
 
 export interface FrozenScaleRuntimeSnapshotV1 {
   schemaVersion: 1
@@ -359,6 +363,8 @@ export const freezeScaleRuntimeAtAttemptStart = async (
      * definition, compiled runtime, instruction and library presentation come
      * only from it; reference bindings, deployment and policy stay live. */
     publishedArtifact?: PublishedScaleArtifact
+    /** Supplied by the existing exact release adapter after entry authority. */
+    standardReport?: { effectiveDisclosure: AudienceDisclosurePolicyV1; references: readonly AssessmentReferenceSetDefinition[] }
   },
 ): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
   assertAssessmentStartResources()
@@ -458,9 +464,17 @@ export const freezeScaleRuntimeAtAttemptStart = async (
   }else if(input.sealedLibraryPresentation)throw new Error('Frozen education library source required')
 
   const { resolveScaleStartDeployment } = await import('../scale/deployment/service')
-  const resolution = await resolveScaleStartDeployment({ db: db as any, scale, requestedMode: input.requestedMode })
+  const resolution = await resolveScaleStartDeployment({ db: db as any, scale, requestedMode: input.requestedMode,
+    ...(input.standardReport?{exactStandard:{instrumentKey:input.instrumentKey,instrumentVersion:input.instrumentVersion}}:{}) })
   if (!resolution.allowNewStarts) {
     throw new Error(`Scale new start denied: ${resolution.reasons.join(',') || 'UNKNOWN'}`)
+  }
+  if (input.standardReport) {
+    const source = resolution.kind === 'MANAGED_V2' ? null : getScaleInstrumentSource(input.instrumentKey,input.instrumentVersion)
+    const base = resolution.kind === 'MANAGED_V2' ? resolution.runtimePolicy : source ? compileScalePolicy(source) : null
+    if (!base) throw new Error('Exact standard source runtime policy missing')
+    return tagIfPublished(createFrozenScaleRuntimeSnapshotV2FromV1(v1,
+      bindScaleCombinationPolicy(base,input.standardReport.effectiveDisclosure,input.standardReport.references)))
   }
   if (resolution.kind !== 'MANAGED_V2') return tagIfPublished(v1)
   return tagIfPublished(createFrozenScaleRuntimeSnapshotV2FromV1(v1, resolution.runtimePolicy))

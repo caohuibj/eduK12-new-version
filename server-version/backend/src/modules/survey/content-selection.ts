@@ -7,6 +7,8 @@ import {referenceEntryKey} from '../measurement-content/reference-candidate'
 import type {FrozenReferencePolicy} from '../measurement-content/reference-policy'
 import {SurveyWaveError} from './waves.service'
 import type {ResearchFrozenUnit} from './publication.service'
+import {effectiveDisclosurePolicySchema} from '../scale/policy/schema'
+import type {AudienceDisclosurePolicyV1} from '../scale/policy/types'
 const id=z.string().guid()
 export const surveyContentSelectionsSchema=z.array(z.object({
   instrumentId:id,reportReleaseId:id.optional(),
@@ -16,6 +18,7 @@ export type SurveyContentSelection=z.infer<typeof surveyContentSelectionsSchema>
 export interface FrozenSurveyContentSelection {
   referencePolicy:FrozenReferencePolicy
   reportRelease?:{releaseId:string;contentHash:string}
+  reportDisclosure?:AudienceDisclosurePolicyV1
 }
 const fail=():never=>{throw new SurveyWaveError(409,'所选参考或报告版本不可用，或与当前项目测量不兼容')}
 /** Shared picker/freezer eligibility. Discovery never expands the private scope. */
@@ -38,6 +41,7 @@ export const surveyFrozenContentSelectionSchema=z.object({
     choices:z.array(z.object({releaseId:frozenText,contentHash:digest,entryKey:digest,priority:z.number().int().safe(),
       metricKey:frozenText,referenceKind:z.enum(['normative_distribution','criterion_threshold','descriptive_sample','theoretical_range'])}).strict()).max(100)}).strict(),
   reportRelease:z.object({releaseId:frozenText,contentHash:digest}).strict().optional(),
+  reportDisclosure:effectiveDisclosurePolicySchema.optional(),
 }).strict()
 
 /** Inside authenticated Wave freeze transaction. Each exact private release is
@@ -76,6 +80,7 @@ export async function freezeSurveyContentSelections(tx:Prisma.TransactionClient,
       if(report.layer!=='REPORT')return fail()
       if(!surveyContentReleaseMatchesMeasurement(report,unit!))fail()
       binding.reportRelease={releaseId:report.releaseId,contentHash:report.contentHash}
+      if(report.content.effectiveDisclosure)binding.reportDisclosure=report.content.effectiveDisclosure
     }
     unit!.contentSelection=binding
   }

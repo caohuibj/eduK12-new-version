@@ -4,6 +4,7 @@ import {createRequire} from 'node:module';
 import {posix} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {renderManifest} from '../../server-version/backend/scripts/generate-situational-instruments.mjs';
+import {isScaleReleaseAsset,selectScaleReleaseAssets} from './scale-intake-scope.mjs';
 
 const require=createRequire(new URL('../release-tools/package.json',import.meta.url));
 const inspectScaleContent=(...args)=>require(fileURLToPath(new URL('../../server-version/backend/scripts/scale-onboarding-check.mjs',import.meta.url))).inspectScaleContent(...args);
@@ -103,10 +104,18 @@ function pureScaleWrapper(file,read,ts) {
 export function verifiedDeclarativeContent(entries,readers,domainFor) {
  try{
   if(!entries.length||!readers.readHeadFile||new Set(entries.map(e=>e.file)).size!==entries.length)return false;
+  if(selectScaleReleaseAssets(entries)){
+   return entries.every(({file,status})=>{
+    if(status==='D')return true;
+    const value=JSON.parse(readers.readHeadFile(file));
+    return value!==null&&typeof value==='object'&&!Array.isArray(value);
+   });
+  }
   const selected=new Set(),registries=[];
   let headFiles;
   for(const entry of entries){
    const file=entry.file,domain=domainFor(file);
+   if(isScaleReleaseAsset(file))return false;
    if(!['scale','situational','bundle'].includes(domain)||entry.newMode!=='100644'||!(entry.status==='A'&&entry.oldMode==='000000'||entry.status==='M'&&entry.oldMode==='100644'))return false;
    if(file===scaleIndex||file===situationalIndex){registries.push(file);continue;}
    if(wrapper.test(file)){selected.add(file);continue;}

@@ -4,7 +4,7 @@ import {prisma} from '../../../config/database'
 import {canonicalHash} from '../../assessment-runtime/canonical'
 import {composeTriplet,type Part,type Axis,type Triplet} from '../../survey/standard-triplet.model'
 import {toolReference} from '../../survey/tool-reference'
-import {assertStandardSystem,persistStandardTripletApproval,runStandardTrial,standardReleaseRow,type StandardRelease} from '../../survey/standard-triplet.service'
+import {assertStandardSystem,publishScaleRelease,standardReleaseRow,type StandardRelease} from '../../survey/standard-triplet.service'
 import {exactStandardCombinationEntryProducts} from '../../assessment-governance/tool-entry-policy'
 import {getScaleInstrumentSource} from '../onboarding/instrument-registry'
 import {importedNativeDefinition} from './native-source'
@@ -12,8 +12,6 @@ import type {AdminSessionProof} from '../../admin-permissions/proof'
 import {databaseContentSource,importedContentPart,importedPolicySource} from './native-source'
 import {compileScalePolicy} from '../policy/compile'
 import {scaleAssessmentMediaReferences} from '../scale-image-retention'
-import {assertAssessmentAssetReferencesReady,retainAssessmentAssetReferences} from '../../assessment-media/assessment-asset'
-import {authorizedTrainingMaterial} from '../../assessment-media/training-materials'
 import {selectedStandardReport} from '../../measurement-content/standard-combination'
 import {componentFail,draftView,type ComponentDraftRow} from './service'
 import {emptyReport,type ComponentDraft} from './contract'
@@ -97,17 +95,11 @@ export async function publishComponentDraft(actor:string,id:string,input:{reques
   if(candidate.previewHash!==input.expectedPreviewHash)componentFail(409,'发布预览摘要不同，请重新核对')
   if(!candidate.triplet||candidate.blockers.length)componentFail(409,candidate.blockers.join('；'))
   const t=candidate.triplet!
-  const media=[...scaleAssessmentMediaReferences(t.definition),...selectedStandardReport(t.parts.REPORT.payload).assetRefs.map(a=>({assetId:a.assetId,contentHash:a.sha256,mimeType:a.mediaType}))]
-  for(const asset of new Map(media.map(a=>[a.assetId,a])).values())if(!candidate.inheritedAssetKeys.includes(canonicalHash(asset)))await authorizedTrainingMaterial(tx,actor,asset.assetId)
-  await assertAssessmentAssetReferencesReady(media,tx)
-  await retainAssessmentAssetReferences({owner:{entityType:'AssessmentPublishedDefinition',entityId:'STANDARD_COMBINATION:'+t.combinationHash,field:'media'},references:media,db:tx})
-  const release=await persistStandardTripletApproval(tx,actor,{toolKey:t.toolKey,CONTENT:t.parts.CONTENT.hash,PARAMETERS:t.parts.PARAMETERS.hash,REPORT:t.parts.REPORT.hash,requestId:input.requestId,expectedCombinationHash:t.combinationHash,reason:input.reason,allowedProducts:products},t,products)
+  const {id:release}=await publishScaleRelease(tx,{toolKey:t.toolKey,CONTENT:t.parts.CONTENT.hash,PARAMETERS:t.parts.PARAMETERS.hash,REPORT:t.parts.REPORT.hash,requestId:input.requestId,expectedCombinationHash:t.combinationHash,reason:input.reason,allowedProducts:products},t,{actor,source:'ADMIN_UI',proof,inheritedAssetKeys:candidate.inheritedAssetKeys})
   await tx.$executeRaw`UPDATE scale_component_drafts SET published_release_id=${release},revision=revision+1,updated_by=${actor},updated_at=clock_timestamp() WHERE id=${id}`
   await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:actor,action:'SCALE_COMPONENT_DRAFT_APPROVED',metadata:{draftId:id,revision:row.revision,releaseId:release,requestId:input.requestId,intentHash,configurationName:row.configuration_name,previewHash:candidate.previewHash}}})
   return release
  },{timeout:15000})
- const row=await standardReleaseRow(prisma,releaseId)
- if(row.state==='APPROVED')await runStandardTrial(actor,releaseId,row.version,proof)
  const current=await standardReleaseRow(prisma,releaseId)
  return {id:current.id,state:current.state,version:current.version,combinationHash:current.combination_hash,blockers:current.blockers}
 }

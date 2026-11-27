@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 # Small dispatcher over the operator's existing Compose entry. Default: plan only.
 set -euo pipefail
-apply=false; entry=; live=; next=; rollback=; ops=; roles=; grace=60; data_action=preflight
+apply=false; entry=; live=; next=; rollback=; ops=; roles=; grace=60; data_action=preflight; scale_main=
 usage() {
   cat <<'EOF'
 update.sh [--apply] frontend|service|content|full --entry COMPOSE_ENTRY
   [--live-profile JSON --next-profile JSON --rollback-profile UNUSED_PATH]
   [--ops-overlay FILE] [--role-sync EXECUTABLE] [--stop-timeout SECONDS]
   [--data-action reuse|preflight|backfill] # full only; default: preflight
+  [--scale-main-sha COMMIT] # content mode or post-cutover service/full step
   -- [application service names | existing npm script and its arguments]
 Default is a non-mutating command plan. Images must already be qualified/preloaded.
 frontend: frontend only; service: explicit application services, no migration.
-content: existing content CLI only, no service restart or automatic publication.
+content: existing content CLI or committed main Scale release synchronization, no restart.
 full: explicit business services; one migration then the existing role coordinator.
 EOF
 }
@@ -21,11 +22,12 @@ while (($#)); do
   case "$1" in
     frontend|service|content|full) [[ -z "$mode" ]] || die 'One mode required'; mode=$1; shift ;;
     --apply) apply=true; shift ;;
-    --entry|--live-profile|--next-profile|--rollback-profile|--ops-overlay|--role-sync|--stop-timeout|--data-action)
+    --entry|--live-profile|--next-profile|--rollback-profile|--ops-overlay|--role-sync|--stop-timeout|--data-action|--scale-main-sha)
       (($# >= 2)) || die "Missing value for $1"
       case "$1" in
         --entry) entry=$2;; --live-profile) live=$2;; --next-profile) next=$2;;
         --rollback-profile) rollback=$2;; --ops-overlay) ops=$2;; --role-sync) roles=$2;; --stop-timeout) grace=$2;; --data-action) data_action=$2;;
+        --scale-main-sha) scale_main=$2;;
       esac; shift 2 ;;
     --) shift; break;;
     -h|--help) usage; exit 0;;
@@ -36,7 +38,68 @@ done
 [[ "$grace" =~ ^[1-9][0-9]*$ ]] || die 'Positive stop timeout required'
 case "$data_action" in reuse|preflight|backfill) ;; *) die 'Invalid full data action';; esac
 run() { printf '+ '; printf '%q ' "$@"; printf '\n'; if "$apply"; then "$@"; fi; }
+scale_repo=
+prepare_scale_sync() {
+  [[ "$scale_main" =~ ^[0-9a-f]{40}$ && -n "$ops" && "$mode" != frontend ]] ||
+    die 'Scale synchronization requires an exact main SHA and the ops profile'
+  scale_repo="$(git -C "$(dirname -- "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
+  local remote
+  remote="$(git -C "$scale_repo" remote get-url origin)"
+  case "$remote" in
+    https://github.com/caohuibj/eduK12-new-version.git|https://github.com/caohuibj/eduK12-new-version|git@github.com:caohuibj/eduK12-new-version.git) ;;
+    *) die 'Scale synchronization expects the official GitHub repository';;
+  esac
+  [[ "$(git --no-replace-objects -C "$scale_repo" rev-parse --verify refs/remotes/origin/main)" = "$scale_main" ]] ||
+    die 'Scale synchronization expects the approved, fetched origin/main commit'
+}
+sync_scale_releases() (
+  local path image
+  if ! "$apply"; then
+    printf '+ export Scale declarations from Git main %s and run scale:sync-releases in the ops container\n' "$scale_main"
+    return 0
+  fi
+  image="$("$entry" -f "$ops" --profile ops config --format json |
+    python3 -c 'import json,sys; print(json.load(sys.stdin)["services"]["migrate"].get("image",""))')"
+  [[ "$image" =~ ^([^[:space:]@]+@)?sha256:[0-9a-f]{64}$ ]] || die 'Use a qualified immutable ops image in the overlay'
+  docker image inspect --format '{{.Id}}' "$image" >/dev/null
+  path="$(mktemp -d)"
+  trap 'rm -r -- "$path"' EXIT
+  python3 - "$scale_repo" "$scale_main" "$path" <<'PY'
+import pathlib, re, subprocess, sys
+
+repo, commit, output = sys.argv[1:]
+root = 'server-version/backend/src/modules/scale/instruments/'
+pattern = re.compile(r'[a-z][a-z0-9_]*/(?:releases\.json|(?:parameters|reports)/[a-zA-Z0-9][a-zA-Z0-9._-]*\.json)')
+
+def git(*args):
+    return subprocess.check_output(['git', '--no-replace-objects', '-C', repo, *args])
+
+for record in git('ls-tree', '-rz', commit, '--', root).split(b'\0'):
+    if not record:
+        continue
+    metadata, name = record.split(b'\t', 1)
+    source = name.decode('utf-8')
+    relative = source.removeprefix(root)
+    if not pattern.fullmatch(relative):
+        continue
+    mode, kind, oid = metadata.split()
+    if mode != b'100644' or kind != b'blob':
+        raise SystemExit('Expected a regular Scale JSON asset: ' + relative)
+    destination = pathlib.Path(output, relative)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(git('cat-file', 'blob', oid.decode('ascii')))
+PY
+  chmod 0755 "$path"
+  run "$entry" -f "$ops" --profile ops run --rm --no-deps --pull never \
+    -v "$path:/scale-release-input:ro" migrate npm run scale:sync-releases -- /scale-release-input "$scale_main"
+)
+if [[ -n "$scale_main" ]]; then prepare_scale_sync; fi
 if [[ "$mode" = content ]]; then
+  if [[ -n "$scale_main" ]]; then
+    (($# == 0)) || die 'A committed Scale release selects its own content command'
+    sync_scale_releases
+    exit 0
+  fi
   [[ -n "$ops" && $# -gt 0 ]] || die 'Content requires --ops-overlay and an existing npm script after --'
   case "$1" in
     bundle:package:preview|bundle:package:install|bundle:package:publish|bundle:package:hold|bundle:package:retire|scale:instrument:install|scale:instrument:publish|cognitive:configs:publish) ;;
@@ -134,4 +197,5 @@ if "$apply"; then
 fi
 # Explicitly use the same persistent profile as subsequent ordinary restarts.
 run env "EDUK12_RELEASE_OVERLAY=$live" "$entry" up -d --no-build --no-deps "${services[@]}"
+if [[ -n "$scale_main" ]]; then sync_scale_releases; fi
 printf '%s\n' 'Run only readiness and one affected short flow; full/DB rollback is operator-directed.'

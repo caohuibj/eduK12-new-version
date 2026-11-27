@@ -1,6 +1,7 @@
 import {decodeTrainingReferenceBinding} from './training-reference-binding'
 import {validateTrainingReferenceRelease} from './training-reference-selection'
 import {loadTrainingMetricDisclosure,trainingReportDisclosureAllowed} from './training-metric-disclosure'
+import {intersectDisclosureCapabilities,resolveAudienceDisclosure} from '../scale/policy/disclosure'
 import type {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
@@ -109,19 +110,22 @@ export async function readTrainingContentReports(db:Prisma.TransactionClient,inp
   // Re-read the accepted child's frozen disclosure on each staff read; the
   // researcher label alone is not a scientific data authorization.
   const disclosure=await loadTrainingMetricDisclosure(db,{parent,unit:bound,source:row,audience:input.audience,core})
-  if(!trainingReportDisclosureAllowed(disclosure,report.content)){
+  const selected=report.content.effectiveDisclosure
+  const visibility=selected?intersectDisclosureCapabilities(disclosure.capabilities,
+   resolveAudienceDisclosure(selected,input.audience)):undefined
+  if(!visibility&&!trainingReportDisclosureAllowed(disclosure,report.content)){
    renderedByItem.set(bound.itemId,{itemId:bound.itemId,status:'UNAVAILABLE',reportRelease:bound.report!,lifecycleNotices,rendered:null});continue
   }
   const allowed=new Set(report.content.metricKeys)
-  const metrics:ReportMetricFact[]=core.metrics.filter((m:any)=>allowed.has(m.key)&&disclosure.metricKeys.has(m.key)).map((m:any)=>({metricKey:m.key,
+  const metrics:ReportMetricFact[]=core.metrics.filter((m:any)=>allowed.has(m.key)&&(disclosure.metricKeys.has(m.key)||visibility&&disclosure.referenceMetricKeys.has(m.key))).map((m:any)=>({metricKey:m.key,
    value:typeof m.value==='number'&&Number.isFinite(m.value)?m.value:null,unit:measurement.content.metrics.find(v=>v.metricKey===m.key)?.unit??m.unit??'unknown',
    status:core.quality.status==='interpretable'&&(m.quality===undefined||['calculated','OK','interpretable'].includes(m.quality))?'INTERPRETABLE':core.quality.status==='invalid'?'INVALID':'UNAVAILABLE'}))
   renderedByItem.set(bound.itemId,{itemId:bound.itemId,status:'READY',reportRelease:bound.report!,lifecycleNotices,
    rendered:renderDeclaredReport(report.content.template,metrics,interpreted.references.filter(reference=>disclosure.referenceMetricKeys.has(reference.metricKey)).map(reference=>{
     const selected=referenceBinding?.units.find(u=>u.itemId===bound.itemId)?.references.find(r=>r.metricKey===reference.metricKey&&r.referenceKind===reference.referenceKind)
     const revoked=selected?.status==='SELECTED'&&referenceReleases.some(r=>r.releaseId===selected.releaseId&&r.status==='REVOKED')
-    return {metricKey:reference.metricKey,referenceKind:reference.referenceKind,status:reference.status==='AVAILABLE'&&!revoked?'AVAILABLE':'UNAVAILABLE',bandKey:reference.values?.bandKey??null}
-   }))})
+    return {metricKey:reference.metricKey,referenceKind:reference.referenceKind,status:reference.status==='AVAILABLE'&&!revoked?'AVAILABLE':'UNAVAILABLE',bandKey:reference.values?.bandKey??null,reason:revoked?undefined:reference.reason}
+   }),visibility)})
  }
  return receipt.interpretation.units.map(u=>renderedByItem.get(u.instrumentKey)??{itemId:u.instrumentKey,status:u.report.status,
   reportRelease:byItem.get(u.instrumentKey)?.report??null,lifecycleNotices:[],rendered:null})

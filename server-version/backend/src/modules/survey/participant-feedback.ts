@@ -51,26 +51,35 @@ const recordedScores=z.object({
 /** Project saved authoritative scores only. No scorer, reference resolver,
  * template rendering, population inference, or private result spreading. */
 export function surveyRawMetricDisclosure(unit:ResearchFrozenUnit,collectionClosed:boolean){
+  const access=participantFeedbackAccess(unit,collectionClosed)
+  return access?.reportPolicy&&!access.reportPolicy.numericScores?null:access
+}
+
+function participantFeedbackAccess(unit:ResearchFrozenUnit,collectionClosed:boolean){
   if(unit.sourceProvenance?.reportConfigured===false||unit.reportEligibility?.eligible===false)return null
   const nativePolicy=unit.nativeBundleReport?resolveAudienceDisclosure(unit.nativeBundleReport.policy.disclosure,'subject'):null
   if(unit.nativeBundleReport&&(unit.nativeBundleReport.audience!=='student'||unit.nativeBundleReport.policy.disposition==='UNKNOWN'||!nativePolicy?.numericScores))return null
   if(!['SCALE','SJT'].includes(unit.kind)||!unit.participantFeedback)return null
   const policy=surveyRawFeedbackSchema.parse(unit.participantFeedback)
   if(policy.mode!=='DESCRIPTIVE')return null
-  return {policy,nativePolicy,pending:policy.release==='AFTER_COLLECTION'&&!collectionClosed}
+  const reportPolicy=unit.contentSelection?.reportDisclosure?resolveAudienceDisclosure(unit.contentSelection.reportDisclosure,'subject'):null
+  if(reportPolicy&&!reportPolicy.numericScores&&!(reportPolicy.educationalContent||reportPolicy.individualInterpretations||reportPolicy.artwork
+    ||reportPolicy.references&&reportPolicy.scoreDerivedLabels))return null
+  return {policy,nativePolicy,reportPolicy,pending:policy.release==='AFTER_COLLECTION'&&!collectionClosed}
 }
 export function rawParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnitResult,collectionClosed:boolean){
   if(result.notExecuted)return null
-  const access=surveyRawMetricDisclosure(unit,collectionClosed)
+  const access=participantFeedbackAccess(unit,collectionClosed)
   if(!access)return null
   if(access.pending)return {pending:true as const}
-  const {policy,nativePolicy}=access
+  const {policy,nativePolicy,reportPolicy}=access
   if(result.instrumentKey!==unit.instrumentKey||result.kind!==unit.kind||result.sourceDigest!==unit.sourceDigest||
     result.scoringDigest!==unit.scoringDigest||!unit.measurementRelease)
     throw new Error('Stored participant score identity mismatch')
   // Recheck the frozen executable allowlist, rather than trusting arbitrary
   // keys in either the disclosure policy or stored scoring payload.
-  const definition=unit.compiledDefinition as {scoring?:{scores?:Array<{key:string;label?:string}>;publishedMetrics?:Array<{key:string;label?:string}>}}
+  const definition=unit.compiledDefinition as {scoring?:{scores?:Array<{key:string;label?:string}>;publishedMetrics?:Array<{key:string;label?:string}>};
+    report?:{interpretations?:Array<{scoreKey:string;scoreLabel?:string}>}}
   const defined=unit.kind==='SCALE'?definition.scoring?.scores:definition.scoring?.publishedMetrics
   if(!defined||policy.metricKeys.some(key=>!defined.some(metric=>metric.key===key)))
     throw new Error('Frozen participant metric policy mismatch')
@@ -81,7 +90,7 @@ export function rawParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnit
   if(new Set(scores.map(score=>score.key)).size!==scores.length)return null
   const metrics=policy.metricKeys.flatMap(key=>{
     const score=scores.find(s=>s.key===key)
-    const frozenLabel=defined.find(metric=>metric.key===key)?.label
+    const frozenLabel=definition.report?.interpretations?.find(metric=>metric.scoreKey===key)?.scoreLabel??defined.find(metric=>metric.key===key)?.label
     const label=typeof frozenLabel==='string'&&frozenLabel.trim()?frozenLabel:key
     return score?.status==='calculated'&&score.value!==null
       ?[{key,label,value:score.value,unit:null,status:'OK' as const}]:[]
@@ -91,7 +100,12 @@ export function rawParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnit
   // rerender current definitions on read or disclose unselected interval rules.
   const feedback=savedFeedbackSchema.safeParse(saved?.rawScoreFeedback)
   const rawScoreFeedback=unit.kind==='SCALE'&&feedback.success&&(!nativePolicy||nativePolicy.individualInterpretations)
-    ?feedback.data.filter(item=>metrics.some(metric=>metric.key===item.scoreKey)).map(item=>({...item,...(item.materials?{materials:item.materials.map(publicMaterial)}:{})})):[]
+    &&(!reportPolicy||reportPolicy.individualInterpretations&&reportPolicy.scoreDerivedLabels)
+    ?feedback.data.filter(item=>metrics.some(metric=>metric.key===item.scoreKey)).map(item=>{
+       const {materials,images,...text}=item
+       const mayShowArtwork=reportPolicy?.artwork!==false
+       return {...text,...(mayShowArtwork&&materials?{materials:materials.map(publicMaterial)}:{}),...(mayShowArtwork&&images?{images}:{})}
+     }):[]
   return {feedbackKind:'RAW_METRICS' as const,pending:false as const,instrumentKey:unit.instrumentKey,title:unit.title,
-    measurementReleaseId:unit.measurementRelease.releaseId,metrics,...(rawScoreFeedback.length?{rawScoreFeedback}:{}),quality:'interpretable' as const}
+    measurementReleaseId:unit.measurementRelease.releaseId,metrics:reportPolicy&&!reportPolicy.numericScores?[]:metrics,...(rawScoreFeedback.length?{rawScoreFeedback}:{}),quality:'interpretable' as const}
 }

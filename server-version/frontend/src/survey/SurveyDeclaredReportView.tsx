@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { SurveyImageProof } from './SurveyParticipantImage'
+import { ScaleReportArtworkHero, ScaleReportBandArtwork } from '../modules/reporting/ScaleReportArtwork'
 
 export interface SurveyDeclaredReport {
   generatorVersion: 'DECLARATIVE_REPORT_V1'
@@ -7,6 +8,7 @@ export interface SurveyDeclaredReport {
   blocks: unknown[]
   limitations?: string[]
   disclaimer?: string | null
+  artworkKey?: string
 }
 
 const isObj = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === 'object' && !Array.isArray(v)
@@ -101,6 +103,7 @@ export function isSurveyDeclaredReport(value: unknown): value is SurveyDeclaredR
   if (!isObj(value)) return false
   if (value.generatorVersion !== 'DECLARATIVE_REPORT_V1' || !Array.isArray(value.blocks)) return false
   if (value.title !== undefined && value.title !== null && typeof value.title !== 'string') return false
+  if (value.artworkKey !== undefined && typeof value.artworkKey !== 'string') return false
   if (value.disclaimer !== undefined && value.disclaimer !== null && typeof value.disclaimer !== 'string') return false
   if (value.limitations !== undefined && (!Array.isArray(value.limitations) || value.limitations.some((line) => typeof line !== 'string'))) {
     return false
@@ -118,6 +121,7 @@ export function SurveyDeclaredReportView({
   return (
     <section className="border-l-2 border-sky-300 pl-3 space-y-2" aria-label="完整工具报告">
       {typeof report.title === 'string' && report.title && <h5 className="font-semibold text-sm">{report.title}</h5>}
+      <ScaleReportArtworkHero artworkKey={report.artworkKey}/>
       {report.blocks.map((raw, index) => {
         if (!isObj(raw)) return null
         switch (raw.type) {
@@ -131,7 +135,8 @@ export function SurveyDeclaredReportView({
             )
           case 'REFERENCE_BAND':
             return (
-              <div key={index} className="rounded bg-slate-50 p-2.5 space-y-1.5 text-sm">
+              <ScaleReportBandArtwork key={index} artworkKey={report.artworkKey} block={raw}>
+              <div className="rounded bg-slate-50 p-2.5 space-y-1.5 text-sm">
                 <p className="whitespace-pre-wrap">{str(raw.text)}</p>
                 {Array.isArray(raw.guidance) && raw.guidance.length > 0 && (
                   <ul className="list-disc pl-5 space-y-1 text-slate-700">
@@ -141,6 +146,7 @@ export function SurveyDeclaredReportView({
                   </ul>
                 )}
               </div>
+              </ScaleReportBandArtwork>
             )
           case 'ASSET':
             return proof && typeof raw.assetId === 'string' ? (

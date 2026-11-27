@@ -95,6 +95,23 @@ test('deletions renames symlinks executables duplicates and noncanonical paths c
  {...mod(file),status:'R'},{...mod(file),oldMode:'120000'},add(file.replace('/test_scale/','/../')),add(file+'\n')])assert.equal(selectScaleIntake([e]),null);
  assert.equal(selectScaleIntake([add(file),add(file)]),null);
 });
+test('pure C/P/R release assets and their Git revert use the single content job',()=>{
+ const manifest=file.replace('1.0.0/instrument.ts','releases.json');
+ const parameter=file.replace('1.0.0/instrument.ts','parameters/1.1.0.json');
+ const report=file.replace('1.0.0/instrument.ts','reports/1.1.0.json');
+ const remove=file=>({file,status:'D',oldMode:'100644',newMode:'000000'});
+ const files=[manifest,parameter,report];
+ const readers={readHeadFile:()=>'{ "version": "1.1.0" }'};
+ for(const entries of [files.map(add),files.map(remove)]){
+  assert.deepEqual(selectScaleIntake(entries).toolKeys,['test_scale']);
+  assert.equal(classifyChanges(entries).scale_intake_light,true);
+  assert.equal(classifyChanges(entries).frontend,false);
+  assert.equal(contentCodeqlRequired(entries,readers),false);
+  assert.equal(contentCodeqlRequired(entries,{readHeadFile:()=> '[]'}),entries[0].status!=='D');
+  assert.equal(classifyChanges([...entries,mod(file)]).scale_intake_light,false);
+ }
+ assert.equal(selectScaleIntake([{...add(report),newMode:'120000'}]),null);
+});
 test('required merge gate consumes content and actual CodeQL, never standalone focused success',()=>{
  const disabled=Object.fromEntries(['maintenance','presentation','frontend','documentation','media2','media7','situational_video','situational_branching','video_core','app_shell','canonical_visual','perf_smoke','ops'].map(k=>[k,'false']));
  const needs={scope:{result:'success',outputs:{...disabled,application_route:'legacy',scenario:'content',content:'true',scale:'true',scale_intake_light:'true',codeql:'true',runner_profile:'hosted',frontend_test:'false',frontend_build:'false',ui_required:'false',visual_hosted:'false',media_selection:'[]',media_groups:'[]'}},content:{result:'success'},codeql:{result:'success'}};

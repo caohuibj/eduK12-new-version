@@ -50,17 +50,27 @@ export const disclosureCapabilitiesV1Schema = z.object({
   educationalContent: z.boolean(),
 }).strict()
 
-export const audienceDisclosurePolicyV1Schema = z.object({
+const audiencePolicy = <T extends z.ZodType>(capabilities: T) => z.object({
   schemaVersion: z.literal(1),
   policyVersion: z.string().min(1),
   audiences: z.object({
-    respondent: disclosureCapabilitiesV1Schema.optional(),
-    subject: disclosureCapabilitiesV1Schema.optional(),
-    teacher: disclosureCapabilitiesV1Schema.optional(),
-    researcher: disclosureCapabilitiesV1Schema.optional(),
+    respondent: capabilities.optional(),
+    subject: capabilities.optional(),
+    teacher: capabilities.optional(),
+    researcher: capabilities.optional(),
   }).strict(),
   unknownAudience: z.literal('DENY'),
 }).strict()
+
+export const audienceDisclosurePolicyV1Schema = audiencePolicy(disclosureCapabilitiesV1Schema)
+export const effectiveDisclosureCapabilitiesSchema = disclosureCapabilitiesV1Schema.extend({ artwork: z.boolean().optional() })
+export const effectiveDisclosurePolicySchema = audiencePolicy(effectiveDisclosureCapabilitiesSchema)
+export const scaleDataCeilingSchema = audiencePolicy(disclosureCapabilitiesV1Schema.pick({
+  rawAnswers: true, itemScores: true, methods: true, resultQualityDetails: true,
+}))
+export const scaleReportVisibilitySchema = audiencePolicy(disclosureCapabilitiesV1Schema.pick({
+  numericScores: true, references: true, scoreDerivedLabels: true, individualInterpretations: true, educationalContent: true,
+}).extend({ artwork: z.boolean() }))
 
 export const instrumentUsageRequirementsV1Schema = z.object({
   schemaVersion: z.literal(1),

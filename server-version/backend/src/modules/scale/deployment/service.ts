@@ -10,12 +10,21 @@ import {
   type ScaleDeploymentModeV1,
 } from '../policy/deployment'
 import type { CompiledScalePolicyV1 } from '../policy/compile'
+import type { ScaleInstrumentSourceV1 } from '../onboarding/types'
 import {
   readActiveScaleDeployment,
   type StoredScaleDeploymentPolicyV1,
 } from './repository'
 
 type Db = PrismaClient | Prisma.TransactionClient
+const exactSourcePolicies = new WeakMap<ScaleInstrumentSourceV1, CompiledScalePolicyV1>()
+const exactSourcePolicy = (source: ScaleInstrumentSourceV1) => {
+  const cached = exactSourcePolicies.get(source)
+  if (cached) return cached
+  const compiled = compileScalePolicy(source)
+  exactSourcePolicies.set(source, compiled)
+  return compiled
+}
 
 export type ScaleStartDeploymentResolution =
   | {
@@ -60,6 +69,9 @@ export const resolveScaleStartDeployment = async (input: {
    */
   requestedMode?: ScaleDeploymentModeV1
   now?: Date
+  /** Only an internal caller with an authorized exact ONLINE combination may
+   * set this. Repository readiness labels govern the old registry route. */
+  exactStandard?: { instrumentKey: string; instrumentVersion: string }
 }): Promise<ScaleStartDeploymentResolution> => {
   if (input.scale.status !== 'PUBLISHED') {
     return {
@@ -87,7 +99,11 @@ export const resolveScaleStartDeployment = async (input: {
 
   const codeSource=getScaleInstrumentSource(input.scale.code,input.scale.instrumentVersion)
   const source = codeSource??await readImportedPolicySource(input.db,input.scale.id)
-  const runtimePolicy = codeSource?getScaleInstrumentRuntimePolicy(input.scale.code,input.scale.instrumentVersion):source?compileScalePolicy(source):undefined
+  const exact = input.exactStandard
+    && input.exactStandard.instrumentKey===source?.identity.instrumentKey
+    && input.exactStandard.instrumentVersion===source?.identity.instrumentVersion
+  const runtimePolicy = source?.executable && (exact ? exactSourcePolicy(source)
+    : codeSource ? getScaleInstrumentRuntimePolicy(input.scale.code,input.scale.instrumentVersion) : compileScalePolicy(source))
   if (!source?.executable || !runtimePolicy) {
     return {
       kind: 'DENY',
@@ -124,8 +140,9 @@ export const resolveScaleStartDeployment = async (input: {
     }
   }
 
-  const reasons: string[] = codeSource||source.localization?scaleLocalizationReasons(source, deployment.policy):[]
-  if (source.executable.releaseStatus !== 'PUBLISHED') reasons.push('EXECUTABLE_NOT_PUBLISHED')
+  const reasons: string[] = source.localization||codeSource&&!exact||deployment.policy.localizationVersion
+    ?scaleLocalizationReasons(source, deployment.policy):[]
+  if (source.executable.releaseStatus==='RETIRED'||!exact&&source.executable.releaseStatus!=='PUBLISHED') reasons.push('EXECUTABLE_NOT_PUBLISHED')
   if (deployment.policy.locale !== runtimePolicy.contentLocale) reasons.push('DEPLOYMENT_CONTENT_LOCALE_MISMATCH')
   const localizationVersion = source.localization?.localizationVersion
   if (

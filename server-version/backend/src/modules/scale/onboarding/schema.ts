@@ -9,6 +9,7 @@ import {
   educationalFeedbackDefinitionV1Schema,
   instrumentApplicabilityV1Schema,
   instrumentUsageRequirementsV1Schema,
+  scaleDataCeilingSchema,
 } from '../policy/schema'
 import type { ScaleCustomScorer } from '../scale-scoring'
 import type { ScaleInstrumentSourceV1 } from './types'
@@ -65,6 +66,7 @@ export const scaleInstrumentSourceV1Schema = z.object({
   educationApplicability: educationApplicabilitySchema.optional(),
   educationExpertApplicability: expertSourceApplicabilitySchema.optional(),
   disclosure: audienceDisclosurePolicyV1Schema.optional(),
+  dataCeiling: scaleDataCeilingSchema.optional(),
   usageRequirements: instrumentUsageRequirementsV1Schema.optional(),
   educationalFeedback: educationalFeedbackDefinitionV1Schema.optional(),
   instruction: z.object({
@@ -98,8 +100,8 @@ export const scaleInstrumentSourceV1Schema = z.object({
   if (source.executable && !source.applicability) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['applicability'], message: 'executable source 必须显式声明 applicability' })
   }
-  if (source.executable && !source.disclosure) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['disclosure'], message: 'executable source 必须显式声明 disclosure' })
+  if (source.executable && !source.disclosure && !source.dataCeiling) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['dataCeiling'], message: 'executable source 必须显式声明 dataCeiling 或原版 disclosure' })
   }
   if (!source.executable && !source.candidatePreview) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['candidatePreview'], message: 'catalog-only source 必须显式标记 candidatePreview' })

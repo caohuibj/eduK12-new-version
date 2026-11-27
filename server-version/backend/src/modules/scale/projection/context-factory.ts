@@ -20,7 +20,7 @@ export const createScaleProjectionContext = (input: {
   let frozenPolicy = input.frozenPolicy
   if (!frozenPolicy && input.instrumentKey && input.instrumentVersion) {
     const source = getScaleInstrumentSource(input.instrumentKey, input.instrumentVersion)
-    if (source?.executable && source.applicability && source.disclosure) {
+    if (source?.executable && source.applicability && (source.disclosure || source.dataCeiling)) {
       frozenPolicy = scaleProjectionPolicyFromCompiled(compileScalePolicy(source))
     } else {
       const executable = getScalePackage(input.instrumentKey, input.instrumentVersion)

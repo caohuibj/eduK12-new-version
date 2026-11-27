@@ -1,4 +1,5 @@
 import type {DisclosureCapabilitiesV1} from '../scale/policy/types'
+import {intersectDisclosureCapabilities,resolveAudienceDisclosure} from '../scale/policy/disclosure'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import type { CanonicalUnitResultEnvelopeV1 } from '../assessment-runtime/unit-result'
 import type { EducationAssessmentOrigin } from '../education-tools/assessment-resource.contract'
@@ -77,18 +78,28 @@ export function projectEducationDeclaredUnitReports(input:Omit<Parameters<typeof
       const slot=selected.find(candidate=>candidate.metricKey===reference.metricKey&&candidate.referenceKind===reference.referenceKind)
       if(!slot)hidden()
       let available=reference.status==='AVAILABLE'&&slot.status==='SELECTED'
+      let revoked=false
       if(slot.status==='SELECTED'){
         const release=read(slot)
         if(release.layer!=='REFERENCE'||release.family!==unit.family||release.content.measurement.releaseId!==measurement.releaseId
           ||release.content.measurement.contentHash!==measurement.contentHash)hidden()
-        available=available&&release.status!=='REVOKED'
+        revoked=release.status==='REVOKED'
+        available=available&&!revoked
       }
       return {metricKey:reference.metricKey,referenceKind:reference.referenceKind,
-        status:available?'AVAILABLE' as const:'UNAVAILABLE' as const,bandKey:available?reference.values?.bandKey??null:null}
+        status:available?'AVAILABLE' as const:'UNAVAILABLE' as const,bandKey:available?reference.values?.bandKey??null:null,reason:revoked?undefined:reference.reason}
     })
-    const needsReference=report.content.template.blocks.some(block=>block.type==='REFERENCE_BAND'||block.type==='METRIC'&&block.display==='REFERENCE_RESULT')
-    const missingReference=needsReference&&report.content.template.blocks.some(block=>(block.type==='REFERENCE_BAND'||block.type==='METRIC'&&block.display==='REFERENCE_RESULT')&&!references.some(reference=>reference.metricKey===block.metricKey&&reference.status==='AVAILABLE'&&(block.type!=='REFERENCE_BAND'||reference.referenceKind===block.referenceKind)))
-    return {...base,status:'READY',...(missingReference?{message:'当前没有适用且获准的参考或阈值，未作等级与阈值解释。'}:{}),rendered:restrictDeclaredEducationReport(renderDeclaredReport(report.content.template,metrics,references),input.disclosureByItem?.get(unit.itemId))}
+    const priorCeiling=input.disclosureByItem?.get(unit.itemId)
+    const reportPolicy=report.content.effectiveDisclosure
+    const selectedRule=reportPolicy?resolveAudienceDisclosure(reportPolicy,'respondent'):undefined
+    const visibility=selectedRule&&priorCeiling?intersectDisclosureCapabilities(selectedRule,priorCeiling):selectedRule
+    const needsReference=(!visibility||visibility.references&&visibility.scoreDerivedLabels)&&report.content.template.blocks.some(block=>block.type==='REFERENCE_BAND'||block.type==='METRIC'&&block.display==='REFERENCE_RESULT')
+    const missingReference=needsReference&&report.content.template.blocks.some(block=>(block.type==='REFERENCE_BAND'||block.type==='METRIC'&&block.display==='REFERENCE_RESULT')&&!references.some(reference=>reference.metricKey===block.metricKey
+     &&(reference.status==='AVAILABLE'||block.type==='REFERENCE_BAND'&&report.content.template.standardScoreBands?.metricKey===block.metricKey&&reference.reason==='MISSING_CONTEXT')
+     &&(block.type!=='REFERENCE_BAND'||reference.referenceKind===block.referenceKind)))
+    const rendered=renderDeclaredReport(report.content.template,metrics,references,visibility)
+    return {...base,status:'READY',...(missingReference?{message:'当前没有适用且获准的参考或阈值，未作等级与阈值解释。'}:{}),
+     rendered:visibility?rendered:restrictDeclaredEducationReport(rendered,priorCeiling)}
   })
 }
 

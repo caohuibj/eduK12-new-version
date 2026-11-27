@@ -87,8 +87,10 @@ export async function loadTrainingMetricDisclosure(db:Prisma.TransactionClient,i
     instrumentVersion:slot.instrumentVersion,audience:audience==='participant'?'subject':'teacher',purpose:'report',frozenPolicy})
    const capabilities=intersectDisclosureCapabilities(resolveEffectiveScaleDisclosure(context),
     resolveEffectiveScaleDisclosure({...context,audience:audience==='participant'?'subject':audience}))
-   const metricKeys=new Set(capabilities.numericScores?Object.keys(slot.compiledRuntime.metricDefinitions):[])
-   return {metricKeys,referenceMetricKeys:new Set(capabilities.references&&capabilities.individualInterpretations?metricKeys:[]),capabilities}
+   const defined=Object.keys(slot.compiledRuntime.metricDefinitions)
+   const metricKeys=new Set(capabilities.numericScores?defined:[])
+   return {metricKeys,referenceMetricKeys:new Set(capabilities.references&&(capabilities.artwork!==undefined?capabilities.scoreDerivedLabels:capabilities.individualInterpretations)
+    ?capabilities.artwork!==undefined?defined:metricKeys:[]),capabilities}
   }
   if(unit.family!=='SJT'||source.sourceType!=='SITUATIONAL_ATTEMPT'||source.sourceAttemptId!==parent.id
    ||slot?.unitType!=='SITUATIONAL'||slot.itemId!==unit.itemId)invalid()
@@ -172,8 +174,10 @@ export async function loadTrainingMetricDisclosure(db:Prisma.TransactionClient,i
    instrumentVersion:runtime.instrumentVersion,audience:audience==='participant'?'subject':'teacher',purpose:'report',frozenPolicy:policy.policy})
   const capabilities=intersectDisclosureCapabilities(resolveEffectiveScaleDisclosure(context),
    resolveEffectiveScaleDisclosure({...context,audience:audience==='participant'?'subject':audience}))
-  const metricKeys=new Set(capabilities.numericScores?Object.keys(runtime.compiledRuntime.metricDefinitions):[])
-  return {metricKeys,referenceMetricKeys:new Set(capabilities.references&&capabilities.individualInterpretations?metricKeys:[]),capabilities}
+  const defined=Object.keys(runtime.compiledRuntime.metricDefinitions)
+  const metricKeys=new Set(capabilities.numericScores?defined:[])
+  return {metricKeys,referenceMetricKeys:new Set(capabilities.references&&(capabilities.artwork!==undefined?capabilities.scoreDerivedLabels:capabilities.individualInterpretations)
+   ?capabilities.artwork!==undefined?defined:metricKeys:[]),capabilities}
  }
  if(unit.family!=='SJT'||source.sourceType!=='SITUATIONAL_ATTEMPT')invalid()
  // SJT retains its existing numeric visibility; the accepted canonical result

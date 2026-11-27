@@ -1,6 +1,7 @@
 import { z } from 'zod'
-import { reportTemplateSchema, validateReportTemplateBindings } from './report-template'
+import { frozenReportTemplateSchema, validateReportTemplateBindings } from './report-template'
 import { canonicalHash, canonicalJsonString } from '../assessment-runtime/canonical'
+import { effectiveDisclosurePolicySchema } from '../scale/policy/schema'
 
 export const CONTENT_HASH_SCHEME = 'MEASUREMENT_CONTENT_CANONICAL_V1' as const
 export const releaseLayer = z.enum(['MEASUREMENT', 'REFERENCE', 'REPORT'])
@@ -49,8 +50,9 @@ export const reportContent = z.object({
   audience: text,
   language: text,
   generatorVersion: text,
+  effectiveDisclosure: effectiveDisclosurePolicySchema.optional(),
   // Text/layout only. Numeric reference rules belong to reference releases.
-  template: reportTemplateSchema,
+  template: frozenReportTemplateSchema,
 }).strict()
 const common = {
   family: releaseFamily, key: text, version: text, scope: contentScope,

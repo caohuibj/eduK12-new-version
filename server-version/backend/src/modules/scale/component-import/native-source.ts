@@ -30,7 +30,14 @@ export function importedNativeDefinition(part:Part):ScaleDefinitionV2{
  if(canonicalHash(expected)!==canonicalHash(part.reference.metadata))throw new Error('IMPORTED_ADMINISTRATION_SOURCE_MISMATCH')
  return {...d,source:a.provenance,license:a.license,report:emptyReport(d.scoring.scores),referencePolicy:{type:'none'}}
 }
-export const importedMeasurementPayload=(part:Part)=>databaseContentSource(part)?(part.payload as {measurement:unknown}).measurement:part.payload
+export const importedMeasurementPayload=(part:Part)=>{
+ if(databaseContentSource(part))return (part.payload as {measurement:unknown}).measurement
+ if(part.payload&&typeof part.payload==='object'&&'dataCeiling'in part.payload){
+  const {dataCeiling:_,...measurement}=part.payload
+  return measurement
+ }
+ return part.payload
+}
 /** Exact native C addressing shared by new-use consumers; internal code never
  * becomes a business instrument key or a parameter/combination identity. */
 export function matchesStandardNativeScale(scale:{id:string;code:string;instrumentVersion:string;standardSourceKind?:string;standardToolKey?:string|null},triplet:Pick<Triplet,'toolKey'|'instrumentVersion'|'parts'>){

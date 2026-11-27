@@ -44,6 +44,9 @@ import {
 } from '../scale/scale-definition'
 import { scaleRuntimeInstrumentKey } from '../scale/runtime-identity'
 import { resolveScaleStartDeployment } from '../scale/deployment/service'
+import type { ExactStandardScaleRuntimeInput } from './training-standard-combination'
+import { bindScaleCombinationPolicy, compileScalePolicy } from '../scale/policy/compile'
+import { getScaleInstrumentSource } from '../scale/onboarding/instrument-registry'
 import { computeTrainingReferenceBinding, trainingBoundContent } from './training-reference-binding'
 import { prepareTrainingFinalReceipt } from './training-content-final'
 import {
@@ -228,9 +231,11 @@ async function loadCognitiveReferenceSetsForDefinitions(
 async function verifyCachedScaleDeployments(
   plan: CompositePublicationPlanV1,
   db: Db,
+  exactStandardSources: ReadonlyMap<string,ExactStandardScaleRuntimeInput>,
 ): Promise<boolean> {
   for (const slot of plan.slots) {
     if (slot.unitType !== 'SCALE' || slot.instrumentClass !== 'STANDARD') continue
+    const exact=exactStandardSources.get(slot.itemId)
     const deploymentResolution = await resolveScaleStartDeployment({
       db: db as any,
       scale: {
@@ -240,6 +245,7 @@ async function verifyCachedScaleDeployments(
         instrumentClass: 'STANDARD',
         status: 'PUBLISHED',
       },
+      ...(exact?{requestedMode:'COMPOSITE' as const,exactStandard:{instrumentKey:exact.toolKey,instrumentVersion:exact.instrumentVersion}}:{}),
     })
     if (!deploymentResolution.allowNewStarts) {
       throw new InstrumentFinalSubmitError(
@@ -248,14 +254,23 @@ async function verifyCachedScaleDeployments(
         409,
       )
     }
-    const livePolicyHash = deploymentResolution.kind === 'MANAGED_V2'
-      ? deploymentResolution.runtimePolicy.runtimePolicyHash
-      : undefined
+    const livePolicyHash=boundCompositeScalePolicy(deploymentResolution,exact)?.runtimePolicyHash
     if (livePolicyHash !== slot.runtimePolicyHash) {
       return false
     }
   }
   return true
+}
+
+function boundCompositeScalePolicy(
+  resolution: Awaited<ReturnType<typeof resolveScaleStartDeployment>>,
+  exact?: ExactStandardScaleRuntimeInput,
+){
+  const base=resolution.kind==='MANAGED_V2'?resolution.runtimePolicy:undefined
+  if(!exact?.effectiveDisclosure)return base
+  const fallback=base?undefined:getScaleInstrumentSource(exact.toolKey,exact.instrumentVersion)
+  if(!base&&!fallback)throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE','精确量表的运行策略不可用',409)
+  return bindScaleCombinationPolicy(base??compileScalePolicy(fallback!),exact.effectiveDisclosure,exact.references)
 }
 
 /** Materializes and persists (content-addressed in assessment_public_templates)
@@ -264,6 +279,7 @@ export async function materializeCompositePublicationPlan(
   compositeId: string,
   db: Db = prisma,
   knownHeader?: { id: string; publishedAt: Date | null; updatedAt: Date },
+  exactStandardSources: ReadonlyMap<string,ExactStandardScaleRuntimeInput> = new Map(),
 ): Promise<CompositePublicationPlanV1> {
   const knownCacheKey = knownHeader && knownHeader.id === compositeId
     ? `${knownHeader.id}:${knownHeader.publishedAt?.toISOString() ?? knownHeader.updatedAt.toISOString()}`
@@ -271,7 +287,7 @@ export async function materializeCompositePublicationPlan(
   if (knownCacheKey && (db === prisma || knownHeader!.publishedAt != null)) {
     const cached = planByCompositeCache.get(knownCacheKey)
     if (cached) {
-      if (await verifyCachedScaleDeployments(cached, db)) {
+      if (await verifyCachedScaleDeployments(cached, db, exactStandardSources)) {
         return cached
       }
       planByCompositeCache.delete(knownCacheKey)
@@ -377,7 +393,7 @@ export async function materializeCompositePublicationPlan(
   if (canUsePlanCache) {
     const cached = planByCompositeCache.get(cacheKey)
     if (cached) {
-      if (await verifyCachedScaleDeployments(cached, db)) {
+      if (await verifyCachedScaleDeployments(cached, db, exactStandardSources)) {
         return cached
       }
       planByCompositeCache.delete(cacheKey)
@@ -390,9 +406,10 @@ export async function materializeCompositePublicationPlan(
   const parsedScaleDefs = new Map<string, ReturnType<typeof scaleDefinitionSchema.parse>>()
   for (const item of composite.items) {
     if (item.type === 'SCALE' && item.scale?.definition) {
-      const def = scaleDefinitionSchema.parse(item.scale.definition)
+      const exact=exactStandardSources.get(item.id)
+      const def = scaleDefinitionSchema.parse(exact?.definition??item.scale.definition)
       parsedScaleDefs.set(item.id, def)
-      if (def.referencePolicy.type === 'declared') {
+      if (!exact&&def.referencePolicy.type === 'declared') {
         const instrumentKey = scaleRuntimeInstrumentKey(item.scale) ?? item.scale.code
         const versions = [...new Set(def.referencePolicy.selections.map(s => s.referenceVersion))]
         scaleRefRequests.push({ instrumentKey, referenceVersions: versions })
@@ -456,8 +473,9 @@ export async function materializeCompositePublicationPlan(
       if (!def) {
         throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', `量表缺少规范定义：${item.scale.code}`, 409)
       }
-      const instrumentKey = scaleRuntimeInstrumentKey(item.scale) ?? item.scale.code
-      const definitionHash = item.scale.definitionHash ?? hashScaleDefinition(def)
+      const exact=exactStandardSources.get(item.id)
+      const instrumentKey = exact?.toolKey??scaleRuntimeInstrumentKey(item.scale)??item.scale.code
+      const definitionHash = exact?canonicalHash(def):item.scale.definitionHash??hashScaleDefinition(def)
       const compiledRuntime = compileScaleRuntime({
         instrumentKey,
         instrumentVersion: item.scale.instrumentVersion,
@@ -476,6 +494,7 @@ export async function materializeCompositePublicationPlan(
             instrumentClass: item.scale.instrumentClass,
             status: item.scale.status,
           },
+          ...(exact?{requestedMode:'COMPOSITE' as const,exactStandard:{instrumentKey:exact.toolKey,instrumentVersion:exact.instrumentVersion}}:{}),
         })
         if (!deploymentResolution.allowNewStarts) {
           throw new InstrumentFinalSubmitError(
@@ -484,10 +503,8 @@ export async function materializeCompositePublicationPlan(
             409,
           )
         }
-        if (deploymentResolution.kind === 'MANAGED_V2') {
-          compiledPolicy = deploymentResolution.runtimePolicy
-          runtimePolicyHash = deploymentResolution.runtimePolicy.runtimePolicyHash
-        }
+        compiledPolicy = boundCompositeScalePolicy(deploymentResolution,exact)
+        runtimePolicyHash = compiledPolicy?.runtimePolicyHash
       }
       const media = collectMediaFromUnknown(def.items, `SCALE:${compiledRuntime.compiledRuntimeHash}`)
       slots.push({
@@ -504,11 +521,11 @@ export async function materializeCompositePublicationPlan(
         required: item.required,
         position: item.position,
         definitionHash,
-        instruction: item.scale.instruction ?? null,
+        instruction: exact?exact.instruction?.text??null:item.scale.instruction??null,
         definition: def,
         compiledRuntime,
         ...(compiledPolicy ? { compiledPolicy, runtimePolicyHash } : {}),
-        referenceSets: refSetsByInstrument.get(instrumentKey) ?? [],
+        referenceSets: exact?.references??refSetsByInstrument.get(instrumentKey)??[],
         referencePolicy: def.referencePolicy,
         ...media,
       })

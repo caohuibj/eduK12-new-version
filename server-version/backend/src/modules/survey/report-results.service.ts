@@ -9,6 +9,7 @@ import {renderDeclaredReport,DECLARATIVE_REPORT_GENERATOR,type ReportMetricFact,
 import {authorizedProject,SurveyBuilderError} from './builder.service'
 import {loadSurveySource} from './analytics.source'
 import {SurveyAnalyticsError} from './analytics.errors'
+import {resolveAudienceDisclosure} from '../scale/policy/disclosure'
 const fail=(status:number,message:string):never=>{throw new SurveyAnalyticsError(status,message)}
 /** Researcher-only materialization of a selected template against saved FINAL
  * facts/interpretation. No scorer, population selector, or new interpretation.
@@ -70,11 +71,12 @@ export async function readSurveyStoredReport(actorId:string,input:{projectId:str
         unit:measurement.content.metrics.find(m=>m.metricKey===score.measurement.scoreKey)?.unit??score.measurement.unit??'unknown',
         status:score.quality?.status==='interpretable'&&score.status===(measurement.family==='COGNITIVE'?'OK':'calculated')?'INTERPRETABLE':score.quality?.status==='invalid'?'INVALID':'UNAVAILABLE'}))
     const references:ReportReferenceFact[]=interpreted!.references.filter(ref=>allowed.has(ref.metricKey)).map(ref=>({metricKey:ref.metricKey,
-      referenceKind:ref.referenceKind,status:ref.status==='AVAILABLE'?'AVAILABLE':'UNAVAILABLE',bandKey:ref.values?.bandKey??null}))
+      referenceKind:ref.referenceKind,status:ref.status==='AVAILABLE'?'AVAILABLE':'UNAVAILABLE',bandKey:ref.values?.bandKey??null,reason:ref.reason}))
     return {accessAudience:'researcher' as const,intendedAudience:report.content.audience,sourceFinalHash:saved!.sourceFinalHash,
       contentBindingHash:saved!.interpretation!.contentBindingHash,reportRelease:bound!.report,
       interpretationSemantics:'SAVED_AT_FINAL_NO_RECALCULATION' as const,lifecycleNotices,
-      report:renderDeclaredReport(report.content.template,metrics,references)}
+      report:renderDeclaredReport(report.content.template,metrics,references,
+       report.content.effectiveDisclosure?resolveAudienceDisclosure(report.content.effectiveDisclosure,'researcher'):undefined)}
   },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:5000})
 }
 

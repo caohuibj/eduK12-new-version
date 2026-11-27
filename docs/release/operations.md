@@ -101,6 +101,23 @@ bash "$U" content --entry "$ENTRY" --ops-overlay "$OPS" -- \
 量表已有 `scale:instrument:install`（默认 preview，`--apply` 才安装）和
 `scale:instrument:publish --input /input/release.json [--apply]`；install 只接纳代码已登记的
 instrumentKey/version 与运行 policy，不是任意题本热插拔。具体参数见原 CLI `install-scale-instrument.ts`。
+
+独立量表阈值和报告用 `parameters/*.json`、`reports/*.json` 和 `releases.json` 声明。
+审查内容 PR 后，部署使用已获取的官方 `origin/main` 精确提交，并由支持该格式的合格 ops 镜像执行。
+私有 ops overlay 提供已预载并按摘要固定的 `migrate.image`，以及专用的
+`SYSTEM_GIT_RELEASE_ACTOR_ID`。该 ID 指向名为 `SYSTEM_GIT_RELEASE` 的专用系统身份。
+后台发布保留现有管理员身份和近期 MFA。清单中的 `contentHash` 绑定审核过的题本，镜像与该摘要不符时同步停止。
+
+```bash
+bash "$U" content --entry "$ENTRY" --ops-overlay "$OPS" --scale-main-sha "$MAIN_SHA"
+# 确认当次部署授权后加 --apply，内容同步不重启应用服务。
+```
+
+`service` 和 `full` 模式也可携带 `--scale-main-sha`，在应用版本切换后同步该提交的声明。
+发布工具从 Git 对象导出普通 JSON 文件到临时只读挂载，按清单准入指定入口并记录 Git 提交。
+学校、教师或研究者的使用权由原授权流程分配。Google Drive 链接可写入 `reviewNote`。
+回滚用 Git revert 合入后部署新的主干提交，或由管理员撤下组合。已冻结的任务沿用原版本。
+
 已有认知配置发布 `cognitive:configs:publish --input /input/release.json [--apply --actor ADMIN_USER_ID]`。
 认知安装只选择已有 registered seed/configVersion/engineVersion/scoringVersion；新 runner、scorer、
 任意 JS 或未登记种子需要相应代码镜像发布，不能当作数据上传执行。

@@ -1,4 +1,9 @@
 import {scaleSourceClassificationTags,catalogClassificationTags,catalogTagFacets,matchesCatalogDiscovery,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
+import {scaleAssessmentMediaReferences} from '../scale/scale-image-retention'
+import {retainAssessmentAssetReferences} from '../assessment-media/assessment-asset'
+import {authorizedTrainingMaterial} from '../assessment-media/training-materials'
+import {ensureStandardNativeScale} from '../scale/onboarding/standard-release-native'
+import {computeDeclaredStandardTrial} from './standard-triplet.trial'
 import {approveStandardCombinationEntryPolicies,exactStandardCombinationEntryProducts} from '../assessment-governance/tool-entry-policy'
 import {toolReference} from './tool-reference'
 import {copyTripletContent} from './standard-triplet.content'
@@ -114,9 +119,15 @@ export async function readStandardApprovalIntent(tx:Db,row:StandardRelease){
  catch{ return fail(409,'原批准入口范围缺少可核验证据；请核对历史审批并使用正式入口范围调整流程') }
 }
 export type StandardApprovalInput=Selection&{requestId:string;expectedCombinationHash:string;reason:string;allowedProducts?:unknown}
+export type GitScalePublication = {source:'SYSTEM_GIT_RELEASE';gitCommitSha:string;releaseKey:string;replaces?:string;reviewNote?:string}
+export type ScalePublishContext = {actor:string} & (
+ {source:'ADMIN_UI';proof?:AdminSessionProof;inheritedAssetKeys?:readonly string[]}
+ | GitScalePublication
+)
 /** Shared approval transaction for registry selections and imported drafts. */
-export async function persistStandardTripletApproval(tx:Prisma.TransactionClient,actor:string,input:StandardApprovalInput,triplet:Triplet,products:ReturnType<typeof exactStandardCombinationEntryProducts>){
+async function persistStandardTripletApproval(tx:Prisma.TransactionClient,actor:string,input:StandardApprovalInput,triplet:Triplet,products:ReturnType<typeof exactStandardCombinationEntryProducts>,git?:GitScalePublication){
  if(triplet.combinationHash!==input.expectedCombinationHash)fail(409,'组合预览已变化')
+ if(input.toolKey!==triplet.toolKey||input.CONTENT!==triplet.parts.CONTENT.hash||input.PARAMETERS!==triplet.parts.PARAMETERS.hash||input.REPORT!==triplet.parts.REPORT.hash)fail(409,'三份版本与发布清单不一致')
  if(triplet.blockers.length)fail(409,triplet.blockers.join('；'))
  if(products.includes('SURVEY')&&(triplet.definition.items.length>500||triplet.definition.display.randomizeItems||triplet.definition.items.some(i=>i.type!=='single'||i.randomizeOptions)))fail(409,'所选内容超出Survey播放器的题型或题量能力')
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-standard:'+triplet.combinationHash}))`
@@ -129,38 +140,65 @@ export async function persistStandardTripletApproval(tx:Prisma.TransactionClient
    return existing.id
   }
   await materializeImportedContent(tx,triplet,actor)
-  if(databaseContentSource(triplet.parts.CONTENT)||triplet.parts.PARAMETERS.reference.metadata.importedComponent)for(const set of triplet.references){
+  for(const set of [...triplet.references].sort((left,right)=>left.referenceVersion.localeCompare(right.referenceVersion))){
+   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'standard-parameter:'+triplet.toolKey+':'+set.referenceVersion}))`
    const existing=await tx.assessmentReferenceSet.findUnique({where:{instrumentType_instrumentKey_referenceVersion:{instrumentType:'SCALE',instrumentKey:triplet.toolKey,referenceVersion:set.referenceVersion}}})
    if(existing&&canonicalHash(existing.definition)!==canonicalHash(set))fail(409,'参数正式版本已有不同内容：'+set.referenceVersion)
+   if(git&&existing&&existing.status!=='ACTIVE'&&triplet.definition.referencePolicy.type==='declared'
+     &&triplet.definition.referencePolicy.selections.some(selection=>selection.referenceVersion===set.referenceVersion))fail(409,'所选正式参数版本已停用：'+set.referenceVersion)
    if(!existing)await tx.assessmentReferenceSet.create({data:{instrumentType:'SCALE',instrumentKey:triplet.toolKey,referenceVersion:set.referenceVersion,status:set.status,definition:set as unknown as Prisma.InputJsonValue}})
   }
   for(const p of Object.values(triplet.parts).sort((a,b)=>a.axis.localeCompare(b.axis))){
    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-axis:'+triplet.toolKey+':'+p.axis+':'+p.version}))`
-   const rows=await tx.$queryRaw<Array<{content_hash:string}>>`SELECT content_hash FROM survey_standard_versions WHERE tool_key=${triplet.toolKey} AND axis=${p.axis} AND version=${p.version} FOR SHARE`
-   if(rows[0]&&rows[0].content_hash!==p.hash)fail(409,p.axis+' 同一版本号已有不同内容，请使用新版本')
-   await tx.$executeRaw`INSERT INTO survey_standard_versions(id,tool_key,axis,version,content_hash,payload,source_version,reference,created_by) VALUES(${randomUUID()},${triplet.toolKey},${p.axis},${p.version},${p.hash},${JSON.stringify(p.payload)}::jsonb,${p.sourceVersion},${JSON.stringify(p.reference)}::jsonb,${actor}) ON CONFLICT DO NOTHING`
+   const rows=await tx.$queryRaw<Array<{version:string;content_hash:string}>>`SELECT version,content_hash FROM survey_standard_versions
+    WHERE tool_key=${triplet.toolKey} AND axis=${p.axis} AND (version=${p.version} OR content_hash=${p.hash}) FOR SHARE`
+   if(rows.some(row=>row.version===p.version&&row.content_hash!==p.hash))fail(409,p.axis+' 同一版本号已有不同内容，请使用新版本')
+   if(rows.some(row=>row.content_hash===p.hash&&row.version!==p.version))fail(409,p.axis+' 相同内容已有正式版本号，请沿用原版本')
+   if(!rows.length)await tx.$executeRaw`INSERT INTO survey_standard_versions(id,tool_key,axis,version,content_hash,payload,source_version,reference,created_by) VALUES(${randomUUID()},${triplet.toolKey},${p.axis},${p.version},${p.hash},${JSON.stringify(p.payload)}::jsonb,${p.sourceVersion},${JSON.stringify(p.reference)}::jsonb,${actor})`
   }
-  triplet.reference.approvals.push({actorId:actor,decision:'APPROVED',reason:input.reason,requestId:input.requestId,at:new Date().toISOString(),versions:input.expectedCombinationHash,allowedProducts:products})
-  await tx.$executeRaw`INSERT INTO survey_standard_releases(id,tool_key,combination_hash,snapshot,reference,state,approved_by) VALUES(${input.requestId},${triplet.toolKey},${triplet.combinationHash},${JSON.stringify(triplet)}::jsonb,${JSON.stringify(triplet.reference)}::jsonb,'APPROVED',${actor})`
+  const reference={...triplet.reference,approvals:[...triplet.reference.approvals,{actorId:actor,decision:'APPROVED',reason:input.reason,requestId:input.requestId,at:new Date().toISOString(),versions:input.expectedCombinationHash,allowedProducts:products,
+    ...(git?{gitRelease:git}:{})}]}
+  const snapshot={...triplet,reference}
+  await tx.$executeRaw`INSERT INTO survey_standard_releases(id,tool_key,combination_hash,snapshot,reference,state,approved_by) VALUES(${input.requestId},${triplet.toolKey},${triplet.combinationHash},${JSON.stringify(snapshot)}::jsonb,${JSON.stringify(reference)}::jsonb,'APPROVED',${actor})`
   await approveStandardCombinationEntryPolicies(tx,{resourceKey:'standard-release:'+input.requestId,fingerprint:triplet.combinationHash},products,actor,input.reason)
-  await audit(tx,actor,'STANDARD_TRIPLET_APPROVED',{releaseId:input.requestId,combinationHash:triplet.combinationHash,reason:input.reason,allowedProducts:products,scope:'PRODUCT_ENTRIES',researcherGrantsCreated:0})
+  await audit(tx,actor,'STANDARD_TRIPLET_APPROVED',{releaseId:input.requestId,combinationHash:triplet.combinationHash,reason:input.reason,allowedProducts:products,scope:'PRODUCT_ENTRIES',researcherGrantsCreated:0,
+   ...(git?{gitRelease:git}:{})})
   return input.requestId
 }
-export async function approveStandardTriplet(actor:string,input:Selection&{requestId:string;expectedCombinationHash:string;reason:string;allowedProducts?:unknown},proof?:AdminSessionProof){
+export async function assertGitScalePublisher(tx:Db,actor:string){
+ await assertStandardSystem(tx,actor)
+ const [service]=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM users WHERE id=${actor} AND username='SYSTEM_GIT_RELEASE' FOR SHARE`
+ if(!service)fail(403,'Git 量表发布需要 SYSTEM_GIT_RELEASE 部署身份')
+}
+
+/** Shared transaction for exact admin selections, component import, and Git sync.
+ * The HTTP adapter supplies recent MFA. The deployment adapter supplies the
+ * separately configured service identity and authoritative Git revision. */
+export async function publishScaleRelease(tx:Prisma.TransactionClient,input:StandardApprovalInput,triplet:Triplet,context:ScalePublishContext){
+ const git=context.source==='SYSTEM_GIT_RELEASE'
+ if(git)await assertGitScalePublisher(tx,context.actor)
+ else await assertStandardSystem(tx,context.actor,context.proof)
  const products=exactStandardCombinationEntryProducts(input.allowedProducts)
+ const gitOrigin=git?{source:context.source,gitCommitSha:context.gitCommitSha,releaseKey:context.releaseKey,
+  ...(context.replaces?{replaces:context.replaces}:{}),...(context.reviewNote?{reviewNote:context.reviewNote}:{})}:undefined
+ const id=await persistStandardTripletApproval(tx,context.actor,input,triplet,products,gitOrigin)
+ const row=await standardReleaseRow(tx,id,true)
+ if(row.state!=='APPROVED')return stateView(row)
+ const media=[...scaleAssessmentMediaReferences(triplet.definition),...selectedStandardReport(triplet.parts.REPORT.payload).assetRefs.map(asset=>({assetId:asset.assetId,contentHash:asset.sha256,mimeType:asset.mediaType}))]
+ const inherited=new Set(git?[]:context.inheritedAssetKeys)
+ if(git||context.inheritedAssetKeys!==undefined)for(const asset of new Map(media.map(asset=>[asset.assetId,asset])).values()){
+  if(!inherited.has(canonicalHash(asset)))await authorizedTrainingMaterial(tx,context.actor,asset.assetId)
+ }
+ await retainAssessmentAssetReferences({owner:{entityType:'AssessmentPublishedDefinition',entityId:'STANDARD_COMBINATION:'+triplet.combinationHash,field:'media'},references:media,db:tx})
+ await ensureStandardNativeScale(tx,context.actor,triplet,products.some(product=>product!=='SURVEY'))
+ return writeStandardTrial(tx,context.actor,row,!git)
+}
+export async function approveStandardTriplet(actor:string,input:Selection&{requestId:string;expectedCombinationHash:string;reason:string;allowedProducts?:unknown},proof?:AdminSessionProof){
  const triplet=await previewStandardTriplet(prisma,actor,input)
- if(triplet.combinationHash!==input.expectedCombinationHash)fail(409,'审核预览已变化，请重新核对三份版本')
- if(triplet.blockers.length)fail(409,triplet.blockers.join('；'))
- const id=await prisma.$transaction(async tx=>{
-  await assertStandardSystem(tx,actor,proof)
-  return persistStandardTripletApproval(tx,actor,input,triplet,products)
- },{timeout:15000})
- const row=await standardReleaseRow(prisma,id)
- if(row.state==='APPROVED')return runStandardTrial(actor,id,row.version,proof)
- return stateView(row)
+ return prisma.$transaction(tx=>publishScaleRelease(tx,input,triplet,{actor,source:'ADMIN_UI',proof}),{timeout:15000})
 }
 export function computeStandardTrial(triplet:Triplet,releaseId:string){
- if(databaseContentSource(triplet.parts.CONTENT)||selectedStandardReport(triplet.parts.REPORT.payload).template)return computeDeclaredStandardTrial(triplet)
+ if(databaseContentSource(triplet.parts.CONTENT)||triplet.parts.REPORT.reference.metadata.gitAsset||selectedStandardReport(triplet.parts.REPORT.payload).template)return computeDeclaredStandardTrial(triplet)
  const snapshot=tripletSnapshot(triplet,releaseId),display=snapshot.displayDefinition as ReturnType<typeof import('./catalog-scale.presentation')['canonicalScalePresentation']>['display']
  const unit={draftId:releaseId,instrumentKey:'trial-scale',kind:'SCALE' as const,title:triplet.title,draftRevision:1,sourceDigest:snapshot.definitionDigest,scoringDigest:snapshot.scoringDigest,compiledDefinition:snapshot.compiledDefinition,displayDefinition:snapshot.displayDefinition,sourceAnswerMapping:snapshot.answerMapping}
  const publication={schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:'isolated-trial',waveId:'isolated-trial',collectionMode:'SINGLE_UNLINKED',consentVersion:1,linkageNoticeConfirmed:false,consentDigest:canonicalHash('SYNTHETIC_TRIAL'),runtimeStatus:'SURVEY_FINAL_V1',units:[unit]} as ResearchFrozenPublication
@@ -169,64 +207,55 @@ export function computeStandardTrial(triplet:Triplet,releaseId:string){
   const timings=Object.fromEntries(display.items.map(item=>[item.itemKey,{schemaVersion:1,firstResponseMs:1000,activeTimeMs:1500,changeCount:0,visits:1,revisitCount:0,interrupted:false,recoveredWithoutClock:false}]))
   const calculated=computeSurveyFinal(publication,{'trial-scale':answers},null,undefined,'FINAL',{'trial-scale':timings}),score=calculated.units[0].privateScoring as ReturnType<typeof import('../scale/scale-scoring')['scoreScale']>
   if(!score?.scores.length||score.scores.some(s=>s.status!=='calculated'||typeof s.value!=='number'||!Number.isFinite(s.value)))throw new Error('试运行未产生完整有效分数')
-  const references:ReportReferenceFact[]=score.scores.flatMap(s=>resolveScaleReference({policy:triplet.definition.referencePolicy,references:triplet.references,instrumentKey:triplet.toolKey,instrumentVersion:triplet.instrumentVersion,scoringVersion:triplet.definition.scoring.scoringVersion,score:s,measurementHash:hashScaleDefinition(triplet.definition)}).map(r=>({metricKey:s.key,referenceKind:r.referenceKind,status:r.status==='available'?'AVAILABLE' as const:'UNAVAILABLE' as const,bandKey:r.criterionBand?.key??null})))
+  const references:ReportReferenceFact[]=score.scores.flatMap(s=>resolveScaleReference({policy:triplet.definition.referencePolicy,references:triplet.references,instrumentKey:triplet.toolKey,instrumentVersion:triplet.instrumentVersion,scoringVersion:triplet.definition.scoring.scoringVersion,score:s,measurementHash:hashScaleDefinition(triplet.definition)}).map(r=>({metricKey:s.key,referenceKind:r.referenceKind,status:r.status==='available'?'AVAILABLE' as const:'UNAVAILABLE' as const,bandKey:r.criterionBand?.key??null,reason:r.unavailableReason==='missing_context'?'MISSING_CONTEXT':r.unavailableReason})))
   const report=triplet.template?renderDeclaredReport(triplet.template,score.scores.map(s=>({metricKey:s.key,value:s.value,unit:'points',status:'INTERPRETABLE' as const})),references):null
   if(triplet.template&&(!report?.blocks.length||!report.blocks.some(b=>(b as {type:string}).type==='METRIC')))throw new Error('试运行未产生有效报告')
   const value={caseIndex,answers,scores:calculated,report}
   return {...value,recordHash:canonicalHash(value)}
  })
 }
-function computeDeclaredStandardTrial(t:Triplet){
- return [0,.5,1].map((fraction,caseIndex)=>{
-  const answers=t.definition.items.map(item=>{const set=t.definition.responseSets.find(s=>s.key===item.responseSetKey)!;return {itemCode:item.itemCode,responseValue:set.options[Math.floor((set.options.length-1)*fraction)].value}})
-  const scores=scoreScale(t.definition,answers)
-  if(!scores.scores.length||scores.scores.some(s=>s.status!=='calculated'||typeof s.value!=='number'||!Number.isFinite(s.value)))throw new Error('试运行未产生完整有效分数')
-  const references:ReportReferenceFact[]=scores.scores.flatMap(s=>resolveScaleReference({policy:t.definition.referencePolicy,references:t.references,instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,scoringVersion:t.definition.scoring.scoringVersion,score:s,measurementHash:hashScaleDefinition(t.definition)}).map(r=>({metricKey:s.key,referenceKind:r.referenceKind,status:r.status==='available'?'AVAILABLE' as const:'UNAVAILABLE' as const,bandKey:r.criterionBand?.key??null})))
-  const report=t.template?renderDeclaredReport(t.template,scores.scores.map(s=>({metricKey:s.key,value:s.value,unit:'points',status:'INTERPRETABLE' as const})),references):null
-  if(t.template&&(!report||t.template.blocks.length>0&&!report.blocks.length))throw new Error('试运行未产生有效报告')
-  const value={caseIndex,answers,scores,report};return {...value,recordHash:canonicalHash(value)}
- })
-}
-export async function runStandardTrial(actor:string,id:string,expectedVersion:number,proof?:AdminSessionProof){
+async function writeStandardTrial(tx:Prisma.TransactionClient,actor:string,row:StandardRelease,keepFailedApproval:boolean){
  const runId=randomUUID()
- const row=await prisma.$transaction(async tx=>{
-  await assertStandardSystem(tx,actor,proof);const r=await standardReleaseRow(tx,id,true)
-  if(r.version!==expectedVersion)fail(409,'审批或试运行版本已变化，请刷新')
-  if(r.state==='ONLINE'||r.state==='WITHDRAWN')fail(409,'该状态不能重复试运行')
-  if(r.state==='TRIAL_RUNNING'&&r.lease_until&&r.lease_until>new Date())fail(409,'该版本仍在试运行，请稍后刷新')
-  await tx.$executeRaw`UPDATE survey_standard_releases SET state='TRIAL_RUNNING',version=version+1,latest_trial=${runId},lease_until=clock_timestamp()+interval '60 seconds',blockers='[]',updated_at=clock_timestamp() WHERE id=${id}`
-  await audit(tx,actor,'STANDARD_TRIAL_STARTED',{releaseId:id,runId})
-  return r
- })
+ const id=row.id
+ await tx.$executeRaw`UPDATE survey_standard_releases SET state='TRIAL_RUNNING',version=version+1,latest_trial=${runId},lease_until=clock_timestamp()+interval '60 seconds',blockers='[]',updated_at=clock_timestamp() WHERE id=${id}`
+ await audit(tx,actor,'STANDARD_TRIAL_STARTED',{releaseId:id,runId})
+ // Save failure details for the existing admin retry workflow. Git publication
+ // is atomic with its predecessor handoff and rolls back the whole tool on error.
+ if(keepFailedApproval)await tx.$executeRaw`SAVEPOINT standard_scale_trial`
  try{
   const results=computeStandardTrial(row.snapshot,id)
-  await prisma.$transaction(async tx=>{
-   const trialMeasurement=await publishContentRelease(tx,scaleMeasurementRelease({localId:'trial:'+id,version:row.snapshot.parts.CONTENT.hash,instrumentVersion:row.snapshot.instrumentVersion,definition:row.snapshot.definition,instrumentClass:'STANDARD',scope:{kind:'PRIVATE',ownerId:row.approved_by,product:'SURVEY',resourceId:'standard-trial:'+runId},provenance:{syntheticTrial:true,runId}}),actor)
-   if(trialMeasurement.layer!=='MEASUREMENT')throw new Error('试运行测量记录类型错误')
-   await copyTripletContent(tx,row.snapshot,trialMeasurement,actor)
-  },{timeout:15000})
-  await prisma.$transaction(async tx=>{await assertStandardSystem(tx,actor,proof);for(const c of results)await tx.$executeRaw`INSERT INTO survey_standard_trials(id,release_id,run_id,case_index,answers,scores,report,record_hash) VALUES(${randomUUID()},${id},${runId},${c.caseIndex},${JSON.stringify(c.answers)}::jsonb,${JSON.stringify(c.scores)}::jsonb,${JSON.stringify(c.report)}::jsonb,${c.recordHash})`})
-  // Separate committed readback, not merely INSERT success in a transaction later rolled back.
-  const readback=await prisma.$queryRaw<Array<{case_index:number;answers:unknown;scores:unknown;report:unknown;record_hash:string}>>`SELECT * FROM survey_standard_trials WHERE release_id=${id} AND run_id=${runId} ORDER BY case_index`
+  const trialMeasurement=await publishContentRelease(tx,scaleMeasurementRelease({localId:'trial:'+id,version:row.snapshot.parts.CONTENT.hash,instrumentVersion:row.snapshot.instrumentVersion,definition:row.snapshot.definition,instrumentClass:'STANDARD',scope:{kind:'PRIVATE',ownerId:row.approved_by,product:'SURVEY',resourceId:'standard-trial:'+runId},provenance:{syntheticTrial:true,runId}}),actor)
+  if(trialMeasurement.layer!=='MEASUREMENT')throw new Error('试运行测量记录类型错误')
+  await copyTripletContent(tx,row.snapshot,trialMeasurement,actor)
+  for(const c of results)await tx.$executeRaw`INSERT INTO survey_standard_trials(id,release_id,run_id,case_index,answers,scores,report,record_hash) VALUES(${randomUUID()},${id},${runId},${c.caseIndex},${JSON.stringify(c.answers)}::jsonb,${JSON.stringify(c.scores)}::jsonb,${JSON.stringify(c.report)}::jsonb,${c.recordHash})`
+  const readback=await tx.$queryRaw<Array<{case_index:number;answers:unknown;scores:unknown;report:unknown;record_hash:string}>>`SELECT * FROM survey_standard_trials WHERE release_id=${id} AND run_id=${runId} ORDER BY case_index`
   if(readback.length!==results.length||readback.some((c,i)=>c.case_index!==i||c.record_hash!==results[i].recordHash||canonicalHash({caseIndex:c.case_index,answers:c.answers,scores:c.scores,report:c.report})!==c.record_hash))throw new Error('数据库回读与试运行结果不一致')
-  await prisma.$transaction(async tx=>{
-   await assertStandardSystem(tx,actor,proof);const current=await standardReleaseRow(tx,id,true)
-   if(current.state!=='TRIAL_RUNNING'||current.latest_trial!==runId)fail(409,'试运行已被另一轮操作替换')
-   const measurement=await publishContentRelease(tx,standardCombinationMeasurementInput(row),actor)
-   if(measurement.layer!=='MEASUREMENT'||measurement.status!=='PUBLISHED')throw new Error('内容发布版本当前不能用于新增使用')
-   await tx.$executeRaw`UPDATE survey_standard_releases SET state='ONLINE',version=version+1,lease_until=NULL,measurement_release=${JSON.stringify({releaseId:measurement.releaseId,contentHash:measurement.contentHash})}::jsonb,blockers='[]',updated_at=clock_timestamp() WHERE id=${id}`
-   await activateImportedContent(tx,row.snapshot,actor)
-   const intent=await readStandardApprovalIntent(tx,current)
-   await audit(tx,actor,'STANDARD_TRIAL_PASSED_ONLINE',{releaseId:id,runId,caseCount:results.length,databaseReadback:true,allowedProducts:intent.products,scope:'PRODUCT_ENTRIES',researcherGrantsCreated:0})
-  },{timeout:15000})
+  const measurement=await publishContentRelease(tx,standardCombinationMeasurementInput(row),actor)
+  if(measurement.layer!=='MEASUREMENT'||measurement.status!=='PUBLISHED')throw new Error('内容发布版本当前不能用于新增使用')
+  await tx.$executeRaw`UPDATE survey_standard_releases SET state='ONLINE',version=version+1,lease_until=NULL,measurement_release=${JSON.stringify({releaseId:measurement.releaseId,contentHash:measurement.contentHash})}::jsonb,blockers='[]',updated_at=clock_timestamp() WHERE id=${id}`
+  await activateImportedContent(tx,row.snapshot,actor)
+  const intent=await readStandardApprovalIntent(tx,row)
+  await audit(tx,actor,'STANDARD_TRIAL_PASSED_ONLINE',{releaseId:id,runId,caseCount:results.length,databaseReadback:true,allowedProducts:intent.products,scope:'PRODUCT_ENTRIES',researcherGrantsCreated:0})
+  if(keepFailedApproval)await tx.$executeRaw`RELEASE SAVEPOINT standard_scale_trial`
  }catch(e){
+  if(!keepFailedApproval)throw e
+  await tx.$executeRaw`ROLLBACK TO SAVEPOINT standard_scale_trial`
+  await tx.$executeRaw`RELEASE SAVEPOINT standard_scale_trial`
   const message=e instanceof Error?e.message:'试运行失败'
-  await prisma.$transaction(async tx=>{
-   const current=await standardReleaseRow(tx,id,true)
-   if(current.state==='TRIAL_RUNNING'&&current.latest_trial===runId){await tx.$executeRaw`UPDATE survey_standard_releases SET state='TRIAL_FAILED',version=version+1,lease_until=NULL,blockers=${JSON.stringify([message])}::jsonb,updated_at=clock_timestamp() WHERE id=${id}`;await audit(tx,actor,'STANDARD_TRIAL_FAILED',{releaseId:id,runId,message})}
-  })
+  await tx.$executeRaw`UPDATE survey_standard_releases SET state='TRIAL_FAILED',version=version+1,lease_until=NULL,blockers=${JSON.stringify([message])}::jsonb,updated_at=clock_timestamp() WHERE id=${id}`
+  await audit(tx,actor,'STANDARD_TRIAL_FAILED',{releaseId:id,runId,message})
  }
- return stateView(await standardReleaseRow(prisma,id))
+ return stateView(await standardReleaseRow(tx,id))
+}
+export async function runStandardTrial(actor:string,id:string,expectedVersion:number,proof?:AdminSessionProof){
+ return prisma.$transaction(async tx=>{
+  await assertStandardSystem(tx,actor,proof)
+  const row=await standardReleaseRow(tx,id,true)
+  if(row.version!==expectedVersion)fail(409,'审批或试运行版本已变化，请刷新')
+  if(row.state==='ONLINE'||row.state==='WITHDRAWN')fail(409,'该状态不能重复试运行')
+  if(row.state==='TRIAL_RUNNING'&&row.lease_until&&row.lease_until>new Date())fail(409,'该版本仍在试运行，请稍后刷新')
+  return writeStandardTrial(tx,actor,row,true)
+ },{timeout:15000})
 }
 export async function withdrawStandardTriplet(actor:string,id:string,version:number,reason:string,proof?:AdminSessionProof){
  return prisma.$transaction(async tx=>{await assertStandardSystem(tx,actor,proof);const row=await standardReleaseRow(tx,id,true);if(row.version!==version||row.state!=='ONLINE')fail(409,'上线状态已变化');await tx.$executeRaw`UPDATE survey_standard_releases SET state='WITHDRAWN',version=version+1,updated_at=clock_timestamp() WHERE id=${id}`;await audit(tx,actor,'STANDARD_TRIPLET_WITHDRAWN',{releaseId:id,reason,preserveHistory:true});return {withdrawn:true}})

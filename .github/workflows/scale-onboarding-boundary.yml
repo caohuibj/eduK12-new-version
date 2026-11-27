@@ -107,16 +107,26 @@ jobs:
           cache: npm
           cache-dependency-path: server-version/backend/package-lock.json
       - name: recompute exact isolated declaration scope before installing dependencies
-        run: node .github/scripts/scale-intake-scope.mjs
+        run: node .github/scripts/scale-intake-scope.mjs > "$RUNNER_TEMP/scale-intake-scope.json"
       - name: install the unchanged locked content dependencies without hooks
         working-directory: server-version/backend
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: check the generated registry once
+      - name: check only the selected declarations
         working-directory: server-version/backend
-        run: npm run scale:instruments:check
-      - name: selected source scoring parameters reports and affected dependencies
-        working-directory: server-version/backend
-        run: node --import tsx scripts/scale-intake-selected-check.ts
+        run: |
+          node --input-type=module <<'JS'
+          import { readFileSync } from 'node:fs';
+          import { execFileSync } from 'node:child_process';
+          const scope = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/scale-intake-scope.json', 'utf8'));
+          const run = (command, args) => execFileSync(command, args, { stdio: 'inherit' });
+          if (scope.toolKeys) {
+            run(process.execPath, ['node_modules/prisma/build/index.js', 'generate', '--no-engine']);
+            run('npm', ['run', 'scale:check', '--', ...scope.toolKeys]);
+          } else {
+            run('npm', ['run', 'scale:instruments:check']);
+            run(process.execPath, ['--import', 'tsx', 'scripts/scale-intake-selected-check.ts']);
+          }
+          JS
   boundary:
     # Declarations only: schemas, source references, golden scoring cases and
     # report/template compatibility. No app build, database or lifecycle fixture.

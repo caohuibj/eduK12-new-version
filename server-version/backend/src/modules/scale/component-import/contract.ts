@@ -7,12 +7,13 @@ import {reportTemplateSchema} from '../../measurement-content/report-template'
 import {assetReference} from '../../measurement-content/release'
 import {validateReferenceSetDefinition} from '../../assessment-reference/reference'
 import {parseLocalizationManifest} from '../library/localization-manifest'
+import {scaleDataCeilingSchema,scaleReportVisibilitySchema} from '../policy/schema'
 
 const version=z.string().trim().min(1).max(120),hash=z.string().regex(/^[a-f0-9]{64}$/)
 const source=scaleInstrumentSourceV1Schema.shape
 export const componentMetadataSchema=z.object({
   title:z.string().trim().min(1).max(300),
-  instruction:source.instruction,applicability:source.applicability,disclosure:source.disclosure,
+  instruction:source.instruction,applicability:source.applicability,disclosure:source.disclosure,dataCeiling:scaleDataCeilingSchema.optional(),
   catalog:source.catalog.optional(),localization:source.localization,usageRequirements:source.usageRequirements,
   educationApplicability:source.educationApplicability,educationExpertApplicability:source.educationExpertApplicability,
   educationalFeedback:source.educationalFeedback,
@@ -22,7 +23,15 @@ export const parameterPayloadSchema=z.object({referencePolicy:scaleReferencePoli
 })
 // The wrapper preserves all installed report-engine blocks without modifying
 // the legacy R payload/hash contract. Existing unwrapped R remains supported.
-export const reportPayloadSchema=z.union([scaleReportDefinitionSchema,z.object({definition:scaleReportDefinitionSchema,template:reportTemplateSchema,assetRefs:z.array(assetReference).optional()}).strict()])
+export const standardReportPayloadEnvelopeSchema=z.object({
+  definition:scaleReportDefinitionSchema,
+  title:z.string().trim().min(1).max(120).optional(),
+  template:reportTemplateSchema.optional(),
+  assetRefs:z.array(assetReference).optional(),
+  parameterVersion:version.optional(),
+  reportVisibility:scaleReportVisibilitySchema.optional(),
+}).strict()
+export const reportPayloadSchema=z.union([standardReportPayloadEnvelopeSchema,scaleReportDefinitionSchema])
 export const componentDraftSchema=z.object({
   toolKey:z.string().regex(/^[a-z][a-z0-9_]*$/).max(120),
   configurationName:z.string().trim().min(1).max(300),

@@ -4,7 +4,7 @@ import {isAssessmentOperationallyPaused} from '../assessment-governance/operatio
 import {getContentRelease} from './repository'
 import {ContentReleaseError} from './release'
 import {compileStandardCombinationReport,describeStandardCombination,selectedStandardReport,type StandardCombinationRecord} from './standard-combination'
-import type {Triplet} from '../survey/standard-triplet.model'
+import {standardCombinationDisclosure,type Triplet} from '../survey/standard-triplet.model'
 import type {StoredRelease} from './repository'
 import {importedMeasurementPayload,importedNativeDefinition,databaseContentSource} from '../scale/component-import/native-source'
 
@@ -86,7 +86,8 @@ export function assertExactStandardCombinationFacts(row:ExactStandardCombination
     ||canonicalHash(row.snapshot.references)!==canonicalHash(p?.references??[]))fail('PARAMETERS_SNAPSHOT_MISMATCH')
   if(row.snapshot.parts.REPORT.payload===null){if(row.snapshot.template!==null)fail('REPORT_SNAPSHOT_MISMATCH')}
   else if(canonicalHash(report)!==canonicalHash(selectedStandardReport(row.snapshot.parts.REPORT.payload).definition))fail('REPORT_SNAPSHOT_MISMATCH')
-  const compiled=compileStandardCombinationReport(row.snapshot.title,row.snapshot.definition,row.snapshot.parts.REPORT.payload!==null)
+  if(canonicalHash(row.snapshot.effectiveDisclosure??null)!==canonicalHash(standardCombinationDisclosure(row.snapshot.parts)??null))fail('REPORT_DISCLOSURE_MISMATCH')
+  const compiled=compileStandardCombinationReport(row.snapshot.title,row.snapshot.definition,row.snapshot.parts.REPORT.payload!==null,row.snapshot.references)
   const template=selectedStandardReport(row.snapshot.parts.REPORT.payload).template??compiled.template
   if(compiled.blockers.length||canonicalHash(template)!==canonicalHash(row.snapshot.template))fail('REPORT_TEMPLATE_MISMATCH')
   return mapping

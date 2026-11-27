@@ -246,7 +246,7 @@ const interpretationFor = (
   let interpretation = configured.summary
   let guidance = configured.guidance
   let referenceVersion: string | null = null
-  if (configured.source.type === 'reference' || configured.source.type === 'reference_context') {
+  if (configured.source.type !== 'score_only') {
     if (!reference) return {
       scoreKey: score.key,
       headline: configured.headline,
@@ -330,6 +330,7 @@ export const buildScaleResult = (input: {
       .map((score) => interpretationFor(input.definition, score, references))
       .filter((interpretation): interpretation is ScaleInterpretationResult => Boolean(interpretation))
 
+  const displayLabels = new Map(input.definition.report.interpretations.filter(entry=>entry.scoreLabel).map(entry=>[entry.scoreKey,entry.scoreLabel]))
   const referenceVersions = unique(references
     .filter((reference) => reference.status === 'available')
     .map((reference) => reference.referenceVersion))
@@ -356,7 +357,7 @@ export const buildScaleResult = (input: {
     },
     quality: scoring.quality,
     itemScores: scoring.itemScores,
-    scores: scoring.scores,
+    scores: displayLabels.size ? scoring.scores.map(score=>({...score,label:displayLabels.get(score.key)??score.label})) : scoring.scores,
     references,
     ...(input.definition.report.rawScoreFeedback ? { rawScoreFeedback: scoring.scores.flatMap(score => {
       const match = score.status === 'calculated' ? matchRawScoreFeedback(input.definition.report.rawScoreFeedback, score.key, score.value) : null

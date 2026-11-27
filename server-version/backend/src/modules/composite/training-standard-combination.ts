@@ -10,7 +10,7 @@ import {standardAxisHashes,standardCombinationHash} from '../measurement-content
 import {assertTrainingStandardUse,standardCombinationPointerSchema,trainingStandardUseAuthoritySchema} from '../measurement-content/standard-combination-use'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
-import {frozenTripletInstruction} from '../survey/standard-triplet.model'
+import {frozenTripletInstruction,type Triplet} from '../survey/standard-triplet.model'
 import {databaseContentSource,matchesStandardNativeScale} from '../scale/component-import/native-source'
 import {scaleMeasurementRelease} from '../measurement-content/scale'
 import {assertCurrentTrainingContentOwner} from './training-report-selection'
@@ -85,7 +85,8 @@ export async function prepareTrainingStandardItemSource(tx:Prisma.TransactionCli
  const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
  if(!clock||expiry&&expiry<=clock.now)fail('OWNER_EXPIRED')
  if(purpose==='NEW_REFERENCE'){
-  const deployment=await resolveScaleStartDeployment({db:tx,scale,requestedMode:'COMPOSITE',now:clock.now})
+  const deployment=await resolveScaleStartDeployment({db:tx,scale,requestedMode:'COMPOSITE',now:clock.now,
+   ...(t.effectiveDisclosure?{exactStandard:{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion}}:{})})
   if(!deployment.allowNewStarts)fail('DEPLOYMENT_OR_RIGHTS_UNAVAILABLE:'+deployment.reasons.join(','))
  }
  return {reference:retainImmutableCanonicalValue(reference),referenceHash:canonicalHash(reference),resolved}
@@ -165,18 +166,30 @@ export async function freezeExactStandardScaleRuntime(
 ){
  // Standard combinations freeze the versioned source instruction with the
  // exact approved tool version (presentation content, outside the P/R hash).
- return freezeExactStandardScaleDefinition(tx,{...t,instruction:frozenTripletInstruction(t),importedScaleId:databaseContentSource(t.parts.CONTENT)?.scaleId,...(publishedArtifact?{publishedArtifact}:{})})
+ return freezeExactStandardScaleDefinition(tx,exactStandardScaleRuntimeInput(t),publishedArtifact)
+}
+
+export type ExactStandardScaleRuntimeInput=Pick<Triplet,'toolKey'|'instrumentVersion'|'definition'|'references'|'effectiveDisclosure'>&{
+ instruction:import('../assessment-runtime/frozen-scale-instruction').FrozenScaleInstruction|null
+ importedScaleId?:string
+ publishedArtifact?:import('../assessment-runtime/published-scale-artifact').PublishedScaleArtifact
+}
+
+export function exactStandardScaleRuntimeInput(t:Triplet):ExactStandardScaleRuntimeInput{
+ return {toolKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,references:t.references,effectiveDisclosure:t.effectiveDisclosure,
+  instruction:frozenTripletInstruction(t),importedScaleId:databaseContentSource(t.parts.CONTENT)?.scaleId}
 }
 
 /** Pure native seam for an independently authorized immutable source. Instruction
  * provenance is validated by that source's seal, not reconstructed on resume. */
 export async function freezeExactStandardScaleDefinition(
   tx:Prisma.TransactionClient,
-  t:Pick<import('../survey/standard-triplet.model').Triplet,'toolKey'|'instrumentVersion'|'definition'|'references'>&{instruction:import('../assessment-runtime/frozen-scale-instruction').FrozenScaleInstruction|null;importedScaleId?:string;publishedArtifact?:import('../assessment-runtime/published-scale-artifact').PublishedScaleArtifact},
+  t:ExactStandardScaleRuntimeInput,
   publishedArtifact?:import('../assessment-runtime/published-scale-artifact').PublishedScaleArtifact,
 ){
  const artifact = publishedArtifact ?? t.publishedArtifact
- const frozen=await freezeScaleRuntimeAtAttemptStart(tx,{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,requestedMode:'COMPOSITE',instruction:t.instruction,importedScaleId:t.importedScaleId,...(artifact?{publishedArtifact:artifact}:{})})
+ const frozen=await freezeScaleRuntimeAtAttemptStart(tx,{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,requestedMode:'COMPOSITE',instruction:t.instruction,importedScaleId:t.importedScaleId,
+  ...(t.effectiveDisclosure?{standardReport:{effectiveDisclosure:t.effectiveDisclosure,references:t.references}}:{}),...(artifact?{publishedArtifact:artifact}:{})})
  assertNativeParameters(t.references,frozen.referenceBindings)
  return frozen
 }
