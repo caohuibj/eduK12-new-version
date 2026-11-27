@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "academic_self_concept_biology_zh_cn",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "98d83b219dbc609d7317c9bfb08b57a9878c3b971b0b3e3bf8b56f4471ffbe96",
+  "baseParametersHash": "287e3758be717ab1b2b970ac726caced400dc6076c109c885bfa1da8f7a2f893",
+  "variants": [
+    {
+      "key": "student_biology_actions",
+      "title": "生物学习自评图文版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "artworkKey": "academic_self_concept_biology_zh_cn/1.0.0/1.2.0",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "Codex 内容审定",
+            "reviewedAt": "2026-11-27T00:00:00Z",
+            "basis": "逐题核对项目学科替换版四题、五点选项、均分计分和三题最低作答规则。生物版尚无同版本经验样本，五档仅为量尺范围的试用估算，不作为常模、能力或诊断界线。"
+          }
+        },
+        "primaryScoreKeys": ["academic_self_concept"],
+        "scoreOrder": ["academic_self_concept"],
+        "interpretations": [
+          {
+            "scoreKey": "academic_self_concept",
+            "headline": "我怎么看自己的生物学习",
+            "source": {"type": "reference_context"},
+            "summary": "生物课上，小叶把洋葱表皮放到显微镜下。第一眼只看见一团淡紫色，她差点把笔放下。同桌问：\"你确定看见了什么？\"小叶重新调焦，先画出一格，再画出相邻的一格：\"它们像一排小砖块。我还想知道，中间那个深色小点是什么。\"一个原本让人发愁的问题，就这样变成了两件能说清的小事。\n\n心理学把\"我觉得自己这门课学得怎么样\"叫作学科自我概念。它不是天赋证明，也不等同于成绩单；它更像一张会更新的自我地图。过去的成绩、老师和同学的反馈、一次实验有没有做懂，都会在地图上留下痕迹。这样的看法也可能影响下一次遇到难题时，你愿不愿意再观察一遍、问一个问题。读这份报告时，不妨把分数放回最近的一次生物学习经历：你已经看清了什么，接下来真正想弄懂的又是什么？",
+            "bands": [
+              {"key": "very_low", "label": "回到你的生物课", "summary": "这次，你较少认同这些关于生物学习的正向描述。先不急着给整门课下结论：翻到最近一张图或一次观察记录，圈出一个你能准确说出的细节。能把\"我不会\"缩小成\"这一处我看见了\"，就是重新认识自己的起点。", "guidance": []},
+              {"key": "low", "label": "回到你的生物课", "summary": "这次，你对这些正向描述的认同偏少。选一个最近没弄懂的生命现象，把纸分成两栏：左边写或画你确实观察到的，右边留给你的疑问。带着这个具体问题去问，比从\"我生物不行\"开始更容易得到有用的帮助。", "guidance": []},
+              {"key": "middle", "label": "回到你的生物课", "summary": "你的均分落在试用量尺的中间一段。相同均分可能来自不同经历，不必把它读成\"一般\"。挑一章内容，各找一个能独立说明、提示后能说明和仍想追问的例子，你会得到一张比分数更清楚的学习地图。", "guidance": []},
+              {"key": "high", "label": "回到你的生物课", "summary": "从这次回答看，你对自己的生物学习比较有把握。挑一个你最近理解得不错的生命过程，试着只凭一张图讲给同学听；让对方指出哪一步还不清楚。能接受追问，会让这份把握变得更有依据。", "guidance": []},
+              {"key": "very_high", "label": "回到你的生物课", "summary": "你这次对自己的生物学习很有信心。找一个没见过的样本或变式问题，先写下预测，再观察或查证，最后补上一处修正。高自信最有价值的样子，不是每次都答对，而是愿意让新证据更新自己的想法。", "guidance": []}
+            ],
+            "guidance": [
+              {"category": "reflection", "text": "把一句\"我生物学得怎么样\"改成两个今天能回答的问题：\"我已经能观察或解释哪一步？下一步我想验证什么？\""},
+              {"category": "strategy", "text": "本周留下一张\"观察—解释—疑问\"三格卡：每格只写一句。下次复习时，看哪一格有了新答案。"}
+            ],
+            "scoreLabel": "生物学习自评均分（试用版）",
+            "provisional": true
+          }
+        ],
+        "limitations": [
+          "均分来自四道正向题，至少回答三题；相同均分可能由不同回答组合形成。",
+          "生物版五档按 1—5 分可选范围等距划分，是试用估算，不是同年级常模、百分位、能力等级或心理阈值。",
+          "结果描述本次自我看法，不替代成绩、课堂观察，也不能推断智力、天赋或未来表现。"
+        ],
+        "disclaimer": "这份报告供七至十二年级学生回顾本次对生物学习的看法，可与老师一起讨论，不用于排名、分流或诊断。"
+      }
+    }
+  ]
+}
