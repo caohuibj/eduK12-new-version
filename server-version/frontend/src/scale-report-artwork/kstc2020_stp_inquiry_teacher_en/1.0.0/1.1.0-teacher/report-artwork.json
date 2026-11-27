@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "kstc2020_stp_inquiry_teacher_en/1.0.0/1.1.0-teacher",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "Students compare two insulated containers while a science teacher listens to their reasoning.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
