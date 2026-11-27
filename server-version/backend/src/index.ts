@@ -6,8 +6,9 @@ import { educationSchoolScaleReportRouter, educationTeacherScaleReportRouter } f
 import {trainingScaleLibraryGovernanceRouter,surveyScaleLibraryGovernanceRouter} from './modules/scale-library-governance/routes'
 import { cleanupExpiredTrainingCheckpoints } from './modules/composite/training-checkpoint.service'
 import { startCheckinScheduleScheduler } from './services/checkinScheduleService'
+import { startToolLicenseSettlement } from './modules/tool-licensing/settlement'
 import { organizationInvitationsRouter } from './modules/organization/invitations'
-import { adminPermissionsRouter, adminSecurityRouter } from './modules/admin-permissions/routes'
+import { adminPermissionsRouter, adminSecurityRouter, adminToolCatalogRouter } from './modules/admin-permissions/routes'
 import {formalReferenceRouter,surveyFormalReferenceRouter} from './modules/measurement-content/formal-reference.routes'
 import { parentAccountsRouter, platformUsersRouter } from './modules/parent-portal/accounts.routes'
 import { parentToolPolicyRouter } from './modules/parent-portal/tool-policy.routes'
@@ -318,6 +319,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/admin/training', trainingAdminRouter)
 app.use('/api/admin/security', adminSecurityRouter)
 app.use('/api/admin/permissions', adminPermissionsRouter)
+app.use('/api/admin/tool-catalog-tags', adminToolCatalogRouter)
 app.use('/api/training/reference-governance',formalReferenceRouter)
 app.use('/api/training/scale-library-governance',trainingScaleLibraryGovernanceRouter)
 const surveyFeatureGuard: express.RequestHandler = (_req,res,next) => {
@@ -468,6 +470,7 @@ app.use(errorHandler)
 // have initialized. This keeps PM2/Docker from declaring a process ready while
 // classroom broadcasts are silently running without cross-process delivery.
 let stopCheckinSchedules: (() => void) | null = null
+let stopToolQuotaSettlement: (() => void) | null = null
 let stopCheckinUploadCleanup: (() => Promise<void>) | null = null
 let exportCleanupTimer: ReturnType<typeof setInterval> | null = null
 let submissionReceiptCleanupTimer: ReturnType<typeof setInterval> | null = null
@@ -478,6 +481,7 @@ const gracefulShutdown = async (signal: string, exitCode = 0) => {
   if (shutdownStarted) return
   shutdownStarted = true
   stopCheckinSchedules?.()
+  stopToolQuotaSettlement?.()
   const uploadCleanupDrain = stopCheckinUploadCleanup?.()
   if (exportCleanupTimer) clearInterval(exportCleanupTimer)
   if (submissionReceiptCleanupTimer) clearInterval(submissionReceiptCleanupTimer)
@@ -551,6 +555,8 @@ const startServer = async (): Promise<void> => {
   await startBackgroundWorkers(config.backgroundWorkersEnabled)
   // Lightweight durable publication is independent of heavy media/export consumers.
   stopCheckinSchedules = startCheckinScheduleScheduler()
+  stopToolQuotaSettlement = startToolLicenseSettlement(cause =>
+    logger.warn('工具授权额度结算失败', { errorType: cause instanceof Error ? cause.name : 'unknown' }))
   const uploadCleanupConfig = resolveCheckinUploadCleanupConfig()
   stopCheckinUploadCleanup = startCheckinUploadCleanupScheduler(
     () => cleanupStalePublicUploadAssets(uploadCleanupConfig.batchSize),

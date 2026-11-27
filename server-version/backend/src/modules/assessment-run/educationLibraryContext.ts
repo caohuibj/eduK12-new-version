@@ -23,7 +23,7 @@ type Scope={organizationId:string;runId:string;actorUserId:string}
 /** Product is a persisted workflow fact, never a request body hint or the
  * population inferred from an entry name. Non-education runs keep old behavior.
  */
-export async function readEducationRunLibraryContext(tx:Prisma.TransactionClient,input:Pick<Scope,'organizationId'|'runId'>){
+export async function readEducationRunLibraryContext(tx:Prisma.TransactionClient,input:Pick<Scope,'organizationId'|'runId'>,allowUnlinked=false){
  const [row]=await tx.$queryRaw<Array<{domain:string;schoolCourseId:string|null;teacherEventId:string|null}>>(Prisma.sql`
   SELECT o.product_domain AS domain,
    (SELECT a.course_id FROM campus_activity_runs a JOIN campus_activities c ON c.organization_id=a.organization_id AND c.course_id=a.course_id
@@ -34,6 +34,7 @@ export async function readEducationRunLibraryContext(tx:Prisma.TransactionClient
   WHERE r.id=${input.runId} AND r.organization_id=${input.organizationId}`)
  if(!row)fail('EDUCATION_LIBRARY_RUN_NOT_FOUND',404)
  if(row.domain!=='SCHOOL')return null
+ if(allowUnlinked&&!row.schoolCourseId&&!row.teacherEventId)return null
  if(Boolean(row.schoolCourseId)===Boolean(row.teacherEventId))fail('EDUCATION_LIBRARY_EXPLICIT_WORKFLOW_REQUIRED',409)
  return {product:row.teacherEventId?'TEACHER' as const:'SCHOOL' as const,...input,
    schoolCourseId:row.schoolCourseId,teacherEventId:row.teacherEventId}

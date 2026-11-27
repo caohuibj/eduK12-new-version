@@ -1,6 +1,7 @@
 import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import { useCallback,useEffect,useRef,useState } from 'react'
 import { ResearchFormEditor } from '../survey/ResearchFormEditor'
+import PrivateToolTags from '../components/tool-licensing/PrivateToolTags'
 import type { FormDraft } from '../survey/builder.types'
 
 type Api=<T>(path:string,method?:string,data?:unknown)=>Promise<T>
@@ -123,6 +124,7 @@ export function HuiteacherFormStudio({organizationId,api,onDraftStateChange}:{
           onChange={e=>{setTitle(e.target.value);setDirty(true)}}/></label>
         <span className="ht-tag">修订 {active.revision} · {active.status==='DRAFT'?'待发布':'冻结发布'}</span>
       </div>
+      <PrivateToolTags key={active.id} api={api} path={base+'/'+encodeURIComponent(active.id)+'/tags'} name={active.title}/>
       {active.status==='DRAFT'
         ?<fieldset disabled={busy}><legend>表单内容</legend><ResearchFormEditor value={draft} onChange={value=>{setDraft(value);setDirty(true)}}/></fieldset>
         :<p>已发布的题目定义不可再修改。如需更新，请另建表单草稿。</p>}

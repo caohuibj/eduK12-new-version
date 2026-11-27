@@ -1,3 +1,4 @@
+import {readPrivateToolTags,writePrivateToolTags} from '../tool-licensing/private-tags'
 import type {CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
@@ -59,6 +60,17 @@ export async function listTemplates(userId:string,input:{page:number;query:strin
   })
 }
 export async function getTemplate(userId:string,id:string){return prisma.$transaction(async tx=>{await authorizeToolOwner(tx,userId);return view(await ownedTemplate(tx,userId,id))})}
+export async function readTemplateTags(userId:string,id:string){return prisma.$transaction(async tx=>{
+  await authorizeToolOwner(tx,userId)
+  await ownedTemplate(tx,userId,id)
+  return readPrivateToolTags(tx,'SURVEY','survey-template:'+id)
+})}
+export async function updateTemplateTags(userId:string,id:string,input:unknown){return prisma.$transaction(async tx=>{
+  await authorizeToolOwner(tx,userId)
+  const template=await ownedTemplate(tx,userId,id,true)
+  if(template.status!=='DRAFT')fail(409,'归档工具不能修改标签')
+  return writePrivateToolTags(tx,'SURVEY','survey-template:'+id,userId,input)
+})}
 export async function createTemplate(userId:string,input:{requestId:string;kind:Template['kind'];title:string}){
   return prisma.$transaction(async tx=>{
     await authorizeToolOwner(tx,userId)

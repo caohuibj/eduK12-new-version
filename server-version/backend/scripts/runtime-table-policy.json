@@ -273,6 +273,11 @@
     "survey_package_members": "RUNTIME_RW",
     "survey_package_report_artifacts": "RUNTIME_RW",
     "education_roster_import_jobs": "RUNTIME_RW",
-    "education_roster_import_parts": "RUNTIME_RW"
+    "education_roster_import_parts": "RUNTIME_RW",
+    "tool_licenses": "RUNTIME_RW",
+    "tool_license_items": "RUNTIME_RW",
+    "tool_license_events": "RUNTIME_RW",
+    "tool_license_charges": "RUNTIME_RW",
+    "tool_catalog_tag_sets": "RUNTIME_RW"
   }
 }

@@ -14,10 +14,11 @@ import {parseEducationPackageKey} from '../education-tools/package-reference.con
 import {readEducationPackageHeaders} from '../education-tools/package-reference.headers'
 import {lockEducationNativeSourceIds} from '../education-tools/native-source.locks'
 const uuid=z.string().guid(),reason=z.string().trim().min(1).max(500)
-const wireGrant=z.object({ ...contentGrantInputSchema.shape,
+const wireContentGrant=z.object({ ...contentGrantInputSchema.shape,
   validFrom:z.string().datetime().transform(value=>new Date(value)),
   expiresAt:z.string().datetime().transform(value=>new Date(value)),
-}).strict().pipe(contentGrantInputSchema).superRefine((grant,ctx)=>{
+}).strict().pipe(contentGrantInputSchema)
+const wireGrant=wireContentGrant.superRefine((grant,ctx)=>{
   if(!supported(grant)||!uuid.safeParse(grant.subjectId).success||(!platformSjt(grant)&&!platformReference(grant)&&!platformScaleLibrary(grant)&&!platformScalePublic(grant)&&!platformSjtDistribution(grant)&&!uuid.safeParse(grant.scope.scopeId).success)||
     grant.scope.resourceKeys.some(key=>educationMaterialUse(grant)?!parseEducationPublicSourceKey(key)&&!parseEducationPackageKey(key):!uuid.safeParse(key).success))
     ctx.addIssue({code:'custom',message:'Only supported exact project, course, governance, entry-distribution or education public-source use grants are allowed'})
@@ -28,6 +29,11 @@ const wireGrant=z.object({ ...contentGrantInputSchema.shape,
     ctx.addIssue({code:'custom',message:'Education exact public-source use does not support delegation'})
 })
 export const adminContentRootRequestSchema=z.object({requestId:uuid,expectedVersion:z.literal(0),reason,grant:wireGrant}).strict()
+const standardCombinationRootRequest=adminContentRootRequestSchema.extend({grant:wireContentGrant.refine(grant=>
+ educationDistribution(grant)&&uuid.safeParse(grant.subjectId).success&&uuid.safeParse(grant.scope.scopeId).success
+ &&grant.scope.resourceKeys.length===1&&parseEducationPublicSourceKey(grant.scope.resourceKeys[0])?.kind==='STANDARD_SCALE'
+ &&grant.remainingDelegationDepth===0&&!grant.delegableCapabilities.length,
+ 'Only one exact standard combination may be distributed by this authority')})
 export const adminContentRevokeRequestSchema=z.object({expectedVersion:z.number().int().positive(),reason}).strict()
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:5000}
 function deny(message = '内容授权范围或当前身份无效'): never {
@@ -99,8 +105,21 @@ function storedInput(row:GrantRow):ContentGrantInput{return contentGrantInputSch
  validFrom:row.valid_from,expiresAt:row.expires_at})}
 const comparable=(grant:ContentGrantInput)=>({...grant,validFrom:grant.validFrom.toISOString(),expiresAt:grant.expiresAt.toISOString()})
 /** Root issuance only. No administrator/owner identity implicitly acquires rights. */
-export async function issueAdminContentRoot(actorId:string,proof:AdminSessionProof,raw:unknown){
-  const input=adminContentRootRequestSchema.parse(raw),grant=input.grant,scope=grant.scope,isPlatformSjt=platformSjt(grant),isPlatformReference=platformReference(grant),isLibrary=platformScaleLibrary(grant),isScalePublic=platformScalePublic(grant),isSjtDistribution=platformSjtDistribution(grant),isEducationDistribution=educationDistribution(grant),isEducationUse=educationMaterialUse(grant)
+export async function issueAdminContentRoot(actorId:string,proof:AdminSessionProof,raw:unknown,confirmNewGrant?:(tx:Prisma.TransactionClient)=>Promise<void>){
+  return issueContentRoot(actorId,proof,adminContentRootRequestSchema.parse(raw),confirmNewGrant)
+}
+
+/** Only the named standard detail workflow supplies the exact combination and
+ * its mandatory in-transaction approval/coverage check. Generic issuance
+ * continues to reject non-UUID distribution keys. */
+export async function issueAdminStandardCombinationRoot(actorId:string,proof:AdminSessionProof,raw:unknown,confirmNewGrant:(tx:Prisma.TransactionClient)=>Promise<void>){
+  if(typeof confirmNewGrant!=='function')deny('精确组合分发必须在签发事务中核对当前组合')
+  return issueContentRoot(actorId,proof,standardCombinationRootRequest.parse(raw),confirmNewGrant,true)
+}
+
+async function issueContentRoot(actorId:string,proof:AdminSessionProof,input:z.output<typeof adminContentRootRequestSchema>,
+  confirmNewGrant?: (tx:Prisma.TransactionClient)=>Promise<void>,exactStandard=false){
+  const grant=input.grant,scope=grant.scope,isPlatformSjt=platformSjt(grant),isPlatformReference=platformReference(grant),isLibrary=platformScaleLibrary(grant),isScalePublic=platformScalePublic(grant),isSjtDistribution=platformSjtDistribution(grant),isEducationDistribution=educationDistribution(grant),isEducationUse=educationMaterialUse(grant)
   if(isEducationDistribution&&(grant.remainingDelegationDepth!==0||grant.delegableCapabilities.length))deny('教育资源分发授权不允许转委托')
   assertProof(proof)
   return prisma.$transaction(async tx=>{
@@ -210,7 +229,7 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
       }
     }
     let educationResources:Array<{id:string}>=[]
-    if(isEducationDistribution){
+    if(isEducationDistribution&&!exactStandard){
       // Exact source assembly, C/P/R releases and declared stimulus assets all
       // require separate resource identities. No wildcard or fake Scale wrapper.
       const composites=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM composite_assessments
@@ -225,7 +244,7 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
     }
     const publicHeaders=isEducationUse?await readEducationPublicSourceHeaders(tx,scope.resourceKeys.flatMap(key=>{const source=parseEducationPublicSourceKey(key);return source?[source]:[]}),true):null
     const packageHeaders=isEducationUse?await readEducationPackageHeaders(tx,scope.resourceKeys.flatMap(key=>{const source=parseEducationPackageKey(key);return source?[source]:[]}),true):null
-    const resources=isEducationUse?[...publicHeaders!.keys(),...packageHeaders!.keys()].map(id=>({id})):isEducationDistribution?educationResources:isSjtDistribution?distributionResources:isScalePublic?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM scales WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND instrument_class='CUSTOM_DESCRIPTIVE' ORDER BY id FOR SHARE`)
+    const resources=exactStandard?null:isEducationUse?[...publicHeaders!.keys(),...packageHeaders!.keys()].map(id=>({id})):isEducationDistribution?educationResources:isSjtDistribution?distributionResources:isScalePublic?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM scales WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND instrument_class='CUSTOM_DESCRIPTIVE' ORDER BY id FOR SHARE`)
       :isLibrary?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM measurement_content_releases WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND family='SCALE' AND layer='MEASUREMENT' AND status='PUBLISHED' ORDER BY id FOR SHARE`)
       :isPlatformSjt?registryResources:isPlatformReference
       ?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM measurement_content_releases
@@ -238,7 +257,7 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
           AND scope->>'resourceId'=${scope.scopeId} AND scope->>'ownerId'=${grant.subjectId} ORDER BY id FOR SHARE`)
       :await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM survey_wave_finals
         WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND project_id=${scope.scopeId} ORDER BY id FOR SHARE`)
-    if(resources.length!==scope.resourceKeys.length||resources.some(row=>!scope.resourceKeys.includes(row.id)))deny()
+    if(resources&&(resources.length!==scope.resourceKeys.length||resources.some(row=>!scope.resourceKeys.includes(row.id))))deny()
     // Check after all waits, not a pre-lock statement timestamp.
     const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
     assertProof(proof)
@@ -259,6 +278,9 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
         audit.reason!==input.reason||audit.action!=='CONTENT_ROOT_GRANTED')throw new AdminPermissionError(409,'授权请求编号已用于其他内容或已撤销')
       return {grantId:input.requestId,version:1,changed:false}
     }
+    // Optional management-only confirmation shares this exact write transaction.
+    // Existing receipts above retain their original idempotency contract.
+    if(confirmNewGrant)await confirmNewGrant(tx)
     await recheckAfterWait(tx,proof,users)
     await tx.adminAuthorizationAudit.create({data:{id:input.requestId,actorUserId:actorId,targetUserId:grant.subjectId,
       // entry is the legacy browser-entry enum (TRAINING/SURVEY). Education's
@@ -269,13 +291,14 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
 }
 /** Emergency system withdrawal works even for an expired/disabled recipient.
  * No descendant rewrite: existing consumer ancestry SHARE locks serialize it. */
-export async function revokeAdminContentGrant(actorId:string,proof:AdminSessionProof,grantId:string,raw:unknown){
+export async function revokeAdminContentGrant(actorId:string,proof:AdminSessionProof,grantId:string,raw:unknown,confirmScope?:(tx:Prisma.TransactionClient,grant:Readonly<GrantRow>)=>Promise<void>){
   uuid.parse(grantId);const input=adminContentRevokeRequestSchema.parse(raw);assertProof(proof)
   return prisma.$transaction(async tx=>{
     const {users}=await lockActor(tx,actorId,proof)
     const [grant]=await tx.$queryRaw<GrantRow[]>(Prisma.sql`SELECT * FROM content_capability_grants WHERE id=${grantId} FOR UPDATE`)
     await recheckAfterWait(tx,proof,users)
     if(!grant||!supported(storedInput(grant)))deny()
+    if(confirmScope)await confirmScope(tx,grant)
     if(grant.revoked_at){
       if(grant.version===input.expectedVersion+1&&grant.revoked_by===actorId&&grant.revoke_reason===input.reason)
         return {grantId,version:grant.version,changed:false}

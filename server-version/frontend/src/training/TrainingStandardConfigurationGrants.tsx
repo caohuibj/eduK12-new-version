@@ -9,6 +9,7 @@ import {standardConfigurationGrantsApi as api,validStandardConfigurationChoice,v
 import type {User} from '../types'
 import {useAuth} from '../contexts/AuthContext'
 import {useTrainingStandardConfigurationIssue,trainingIssueOutcome} from './useTrainingStandardConfigurationIssue'
+import type {StandardAssignmentTarget} from '../admin/standardAssignmentTarget'
 
 const errorMessage=(cause:unknown)=>cause instanceof Error?cause.message:'请求未完成，请重新读取实际状态。'
 type Replacement={source:StandardConfigurationChoice;grant:StandardConfigurationUse;recipient:User}
@@ -94,18 +95,19 @@ function RecipientGrant({choice,onClose,issuer,replacement,reason,onReplace,onRe
  </ManagementDialog>
 }
 
-export default function TrainingStandardConfigurationGrants(){
+export default function TrainingStandardConfigurationGrants({initialStandard}:{initialStandard?:StandardAssignmentTarget|null}={}){
  const {user}=useAuth()
- return user?<TrainingStandardConfigurationWorkspace key={user.id} actorId={user.id}/>:null
+ return user?<TrainingStandardConfigurationWorkspace key={user.id} actorId={user.id} initialStandard={initialStandard}/>:null
 }
-export function TrainingStandardConfigurationWorkspace({actorId}:{actorId?:string}={}){
+export function TrainingStandardConfigurationWorkspace({actorId,initialStandard}:{actorId?:string;initialStandard?:StandardAssignmentTarget|null}={}){
  const [rows,setRows]=useState<StandardConfigurationChoice[]>([]),[page,setPage]=useState(1),[hasMore,setMore]=useState(false)
- const [filters,setFilters]=useState({...EMPTY_CATALOG_FILTERS}),[applied,setApplied]=useState({...EMPTY_CATALOG_FILTERS}),[facets,setFacets]=useState(EMPTY_CATALOG_FACETS)
+ const [focus,setFocus]=useState(initialStandard??null)
+ const [filters,setFilters]=useState({...EMPTY_CATALOG_FILTERS,keyword:initialStandard?.toolKey??''}),[applied,setApplied]=useState(filters),[facets,setFacets]=useState(EMPTY_CATALOG_FACETS)
  const [loading,setLoading]=useState(false),[error,setError]=useState(''),[revision,setRevision]=useState(0)
  const [choice,setChoice]=useState<StandardConfigurationChoice|null>(null)
  const [replacement,setReplacement]=useState<Replacement|null>(null),[replacementReason,setReplacementReason]=useState('')
  const issuer=useTrainingStandardConfigurationIssue(actorId),[operationNotice,setOperationNotice]=useState('')
- const visibleRows=rows.filter(row=>!replacement||row.toolKey===replacement.source.toolKey&&row.id!==replacement.source.id)
+ const visibleRows=rows.filter(row=>replacement?row.toolKey===replacement.source.toolKey&&row.id!==replacement.source.id:!focus||row.id===focus.releaseId)
  function finishReplacement(notice:string){setReplacement(null);setReplacementReason('');setChoice(null);setOperationNotice(notice)}
  useEffect(()=>{let active=true;setLoading(true);setError('');setRows([])
   void api.catalog(page,applied).then(response=>{if(!active)return
@@ -118,6 +120,7 @@ export function TrainingStandardConfigurationWorkspace({actorId}:{actorId?:strin
  return <section className="training-accounts training-resources-panel training-configuration-workspace" aria-label="固定量表配置授权">
   <header className="training-configuration-heading"><h2>固定量表配置授权</h2><button className="training-accounts-secondary" disabled={loading} onClick={()=>setRevision(v=>v+1)}>刷新固定配置</button></header>
   <p>只分配系统已批准用于 Training 的精确内容、参数和报告组合。工具审批与培训师使用权分别管理。</p>
+  {focus&&<p>正在查看从量表详情带入的精确版本。 <button type="button" onClick={()=>setFocus(null)}>查看同一量表的其他版本</button></p>}
   <CatalogDiscoveryFilters label="固定量表配置检索" filters={filters} facets={facets} onChange={setFilters} disabled={loading||issuer.busy} onApply={value=>{setChoice(null);setRows([]);setPage(1);setApplied({...value,keyword:value.keyword.trim()})}}/>
   {replacement&&<section aria-label="明确替换 Training 配置"><p>为 {replacement.recipient.nickname||replacement.recipient.username} 替换 {replacement.grant.configurationName??'原固定配置'}。请选择同一工具的另一份已批准组合；保存时撤销原使用权，旧草稿不会自动换版，已开始作答及历史定义保留。</p>
    <label>Training 配置替换原因<input maxLength={500} value={replacementReason} disabled={issuer.busy||Boolean(issuer.pending)} onChange={event=>setReplacementReason(event.target.value)}/></label>
@@ -132,6 +135,7 @@ export function TrainingStandardConfigurationWorkspace({actorId}:{actorId?:strin
   </section>}
   {loading&&<p role="status">正在读取已批准配置…</p>}{error&&<p role="alert">{error}</p>}
   {!loading&&!error&&!rows.length&&<p>{catalogQuery(1,applied)!=='page=1'?'没有匹配的固定量表配置，可调整条件或清除筛选。':'尚无已批准用于 Training 的固定量表配置。未装载、未审批或其他入口的内容不会自动成为可分配配置。'}</p>}
+  {focus&&!loading&&!error&&!!rows.length&&!visibleRows.length&&<p>本页未找到该精确版本。{hasMore?'请查看下一页。':'请核对该版本的 Training 准入状态。'}</p>}
   {replacement&&!loading&&!visibleRows.length&&<p>本页没有同一工具的其他配置，可查看其他页或取消替换。</p>}
   <ApprovedScaleAxes choices={visibleRows.filter(row=>row.assignable)} disabled={loading||issuer.busy} scopeLabel="当前页已读取配置，可用分页查看其他版本" onSelect={id=>{const row=visibleRows.find(value=>value.id===id&&value.assignable);if(row)setChoice(row)}}/>
   <div className="training-configurations-grid">{visibleRows.map(row=><article key={row.id} className="training-configuration-card"><h3>{row.title}</h3><p>量表 · 题本版本 {row.instrumentVersion}</p><CatalogClassificationTags tags={row.classificationTags}/><Versions choice={row}/>

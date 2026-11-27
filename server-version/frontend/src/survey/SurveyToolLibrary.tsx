@@ -9,6 +9,7 @@ import './survey-tool-library.css'
 import './survey-tool-library-polish.css'
 import CatalogDiscoveryFilters from '../components/scale-governance/CatalogDiscoveryFilters'
 import CatalogClassificationTags from '../components/scale-governance/CatalogClassificationTags'
+import OwnToolLicense, { type OwnToolLicenseView } from '../components/tool-licensing/OwnToolLicense'
 import {catalogQuery,EMPTY_CATALOG_FILTERS,EMPTY_CATALOG_FACETS,type CatalogClassificationTag,type CatalogTagFacets} from '../api/catalogDiscovery'
 
 
@@ -103,6 +104,8 @@ export function SurveyToolLibrary({visible=true,projectId,onSelected,onBeforeSel
       {([{kind:'SCALE',title:'量表',text:'设置维度、计分与反馈',Icon:SlidersHorizontal},{kind:'FORM',title:'表单',text:'编写题目、分页与显示条件',Icon:FileText},{kind:'COMPOSITION',title:'普通组合问卷',text:'按顺序组合已有工具',Icon:Layers}] as const).map(({kind,title,text,Icon})=><button type="button" key={kind} disabled={busy||!!renaming||!!pendingKind&&pendingKind!==kind} onClick={()=>void create(kind)}><Icon size={21}/><span><strong>{pendingKind===kind?'重试进入'+title:title}</strong><small>{text}</small></span><ArrowRight size={16}/></button>)}
       {pendingKind&&<p role="status">{busy?'正在打开编制页…':'进入结果尚未确认，请重试同一入口；不会重复创建。'}</p>}
     </div>}
+    {!projectId&&visible&&<OwnToolLicense title="我的工具授权" load={()=>api<OwnToolLicenseView>('/tool-library/my-license')}
+      onOpenSources={()=>{if(!renaming){setSource('granted');setPage(1)}}}/>}
     <div className="survey-library-toolbar"><div className="survey-library-sources" role="group" aria-label="工具来源"><button type="button" aria-pressed={source==='owned'} disabled={!!renaming} onClick={()=>{setSource('owned');setPage(1)}}><Pencil size={15} aria-hidden="true"/>我编制的</button><button type="button" aria-pressed={source==='granted'} disabled={!!renaming} onClick={()=>{setSource('granted');setPage(1)}}><ShieldCheck size={16} aria-hidden="true"/>已获授权</button></div>
       {!loading&&!error&&<span className="survey-library-result-count">{source==='owned'?(projectId?'本页可选 '+list.length+' 项':'共 '+total+' 项工具'):'本页 '+grants.length+' 项授权工具'}</span>}
     </div>

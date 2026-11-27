@@ -31,7 +31,8 @@ async function administrator(req:Request) {
 surveyPlatformRouter.use(authenticate, requireSurveyManager)
 surveyPlatformRouter.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 surveyPlatformRouter.use((req,res,next)=>['GET','HEAD','OPTIONS'].includes(req.method)?next():requireRecentAdminKey(req,res,next))
-surveyPlatformRouter.get('/researchers',handler(req=>governance.researcherList(req.user!.userId,Math.min(1000,Math.max(1,Number(req.query.page)||1)))))
+surveyPlatformRouter.get('/researchers',handler(req=>governance.researcherList(req.user!.userId,Math.min(1000,Math.max(1,Number(req.query.page)||1)),
+  z.string().trim().max(120).default('').parse(req.query.q))))
 surveyPlatformRouter.get('/researcher-invitations',handler(req=>
   governance.unclaimedResearcherInvitations(req.user!.userId,
     Math.min(1000,Math.max(1,Number(req.query.page)||1)))))

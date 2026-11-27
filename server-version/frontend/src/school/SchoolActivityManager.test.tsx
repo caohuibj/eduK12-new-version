@@ -192,7 +192,7 @@ describe('School psychologist backend operation capabilities',()=>{
 })
 
 
-it('publishes own psychologist batch using server run capabilities without isAdmin',async()=>{
+it.each([false,true])('publishes own psychologist batch with a confirmed cap and optional deadline=%s without isAdmin',async(withDeadline)=>{
   const detail={...activity,capabilities:{canSubmit:false,canOpen:false,canPause:true,canResume:false,canClose:true,canPublishRun:true,ownPsychologyPublisher:true},
     runs:[{runId:'run-own',name:'本人测评',status:'DRAFT',capabilities:{canPublish:true,canClose:false,canCancel:false}}]}
   const base=`/organizations/${org}/activities/${course}`
@@ -201,7 +201,7 @@ it('publishes own psychologist batch using server run capabilities without isAdm
     if(path.endsWith('/tasks'))return {list:[],truncated:false}
     if(path===base+'/runs/run-own')return {run:{id:'run-own',name:'本人测评',status:'DRAFT',version:2}}
     if(path.endsWith('/tracking'))return {baselineId:null,ordinal:null,choices:[]}
-    if(path.endsWith('/preview'))return {tracks:[{executionCount:1,subjectCount:1,respondentCount:1}]}
+    if(path.endsWith('/preview'))return {tracks:[{executionCount:4,subjectCount:4,respondentCount:4},{executionCount:4,subjectCount:4,respondentCount:4}]}
     return detail
   })
   const original=window.confirm;window.confirm=vi.fn(()=>true)
@@ -211,8 +211,15 @@ it('publishes own psychologist batch using server run capabilities without isAdm
     fireEvent.click(await screen.findByRole('button',{name:'本人测评 · 准备中'}))
     fireEvent.click(await screen.findByRole('button',{name:'预览合法参与者数量'}))
     await waitFor(()=>expect(screen.getByRole('button',{name:'正式发布本人测评'})).toBeEnabled())
+    expect(screen.getByText(/本次冻结总作答上限：8 份/)).toBeVisible()
+    if(withDeadline)fireEvent.change(screen.getByLabelText('停止接受新作答（本地时间）'),{target:{value:'2029-11-30T12:30'}})
+    vi.mocked(window.confirm).mockReturnValueOnce(false)
     fireEvent.click(screen.getByRole('button',{name:'正式发布本人测评'}))
-    await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/runs/run-own/publish','POST',{expectedVersion:2,tracking:{mode:'SINGLE',metrics:[],visibleMetrics:[]},provideParticipantReport:false}))
+    await waitFor(()=>expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining('冻结总作答上限为 8 份，不缩减原参与范围')))
+    expect(api.mock.calls.some(([path])=>path.endsWith('/publish'))).toBe(false)
+    await waitFor(()=>expect(screen.getByRole('button',{name:'正式发布本人测评'})).toBeEnabled())
+    fireEvent.click(screen.getByRole('button',{name:'正式发布本人测评'}))
+    await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/runs/run-own/publish','POST',{expectedVersion:2,tracking:{mode:'SINGLE',metrics:[],visibleMetrics:[]},provideParticipantReport:false,maxResponses:8,...(withDeadline?{intakeDeadline:new Date('2029-11-30T12:30').toISOString()}:{})}))
   }finally{window.confirm=original}
 })
 

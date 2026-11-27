@@ -1,0 +1,48 @@
+.own-tool-license {
+  color: inherit;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 12px;
+  margin-block: 14px;
+}
+
+.own-tool-license > summary {
+  padding: 12px 15px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.own-tool-license-body {
+  display: grid;
+  gap: 12px;
+  padding: 0 15px 14px;
+}
+
+.own-tool-license-body p { margin: 0; }
+
+.own-tool-license-period,
+.own-tool-license-list li,
+.own-tool-license-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: baseline;
+}
+
+.own-tool-license-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.own-tool-license-list li { justify-content: space-between; }
+.own-tool-license-list small { display: block; }
+
+.own-tool-license-actions button {
+  color: inherit;
+  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: transparent;
+}

@@ -58,13 +58,16 @@ export async function grantEducationStandardConfigurationUse(actorId:string,scop
   const manager=await assertEntryAdmin(tx,actorId,entry(scope.product))
   const source=await readCurrentStandardCombination(tx,{releaseId:combinationId,combinationHash:input.combinationHash})
   await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+combinationId,fingerprint:input.combinationHash},scope.product)
-  const authority=await assertContentAuthority(tx,{actorId,grantId:input.authorityGrantId,capability:'material.distribute',
-   scope:{product:scope.product,scopeKind:'ORGANIZATION',scopeId:scope.organizationId,resourceKind:'material',resourceKeys:[source.measurement.releaseId]}})
-  if(authority.version!==input.expectedAuthorityVersion)conflict('精确分发委托已变化')
-  const [root]=await tx.$queryRaw<Array<{id:string;parent_grant_id:string|null;valid_from:Date;expires_at:Date;capabilities:string[];delegable_capabilities:string[];remaining_delegation_depth:number}>>(Prisma.sql`
-   SELECT id,parent_grant_id,valid_from,expires_at,capabilities,delegable_capabilities,remaining_delegation_depth FROM content_capability_grants WHERE id=${authority.grantId} FOR SHARE`)
+  const resourceKey=educationPublicSourceKey({kind:'STANDARD_SCALE',id:combinationId,hash:input.combinationHash})
+  const [root]=await tx.$queryRaw<Array<{id:string;parent_grant_id:string|null;valid_from:Date;expires_at:Date;resource_keys:string[];capabilities:string[];delegable_capabilities:string[];remaining_delegation_depth:number}>>(Prisma.sql`
+   SELECT id,parent_grant_id,valid_from,expires_at,resource_keys,capabilities,delegable_capabilities,remaining_delegation_depth
+   FROM content_capability_grants WHERE id=${input.authorityGrantId}`)
   if(!root||root.parent_grant_id||root.capabilities.length!==1||root.capabilities[0]!=='material.distribute'||root.delegable_capabilities.length||root.remaining_delegation_depth!==0)
    deny('需要系统明确给出的不可转委托精确分发依据')
+  const distributionKey=root.resource_keys.includes(source.measurement.releaseId)?source.measurement.releaseId:resourceKey
+  const authority=await assertContentAuthority(tx,{actorId,grantId:input.authorityGrantId,capability:'material.distribute',
+   scope:{product:scope.product,scopeKind:'ORGANIZATION',scopeId:scope.organizationId,resourceKind:'material',resourceKeys:[distributionKey]}})
+  if(authority.version!==input.expectedAuthorityVersion)conflict('精确分发委托已变化')
   if(validFrom<root.valid_from||expiresAt>root.expires_at)conflict('使用授权有效期不能超过精确分发委托')
   await tx.$queryRaw(Prisma.sql`SELECT id FROM organizations WHERE id=${scope.organizationId} FOR SHARE`)
   const recipient=await resolveEducationToolAuthoringContext({principal:{userId:input.userId,accountDomain:'SCHOOL'},entry:scope.product,organizationId:scope.organizationId},tx)
@@ -81,7 +84,6 @@ export async function grantEducationStandardConfigurationUse(actorId:string,scop
    kind:'EDUCATION_SOURCE_USE',id:input.requestId,revision:1,issuerId:actorId,recipientId:input.userId,organizationId:scope.organizationId,
    authority:[{kind:'ENTRY_ADMIN',id:manager.grantId,revision:manager.grantVersion},{kind:'CONTENT_DELEGATION',id:authority.grantId,revision:authority.version}],
   }})
-  const resourceKey=educationPublicSourceKey({kind:'STANDARD_SCALE',id:combinationId,hash:input.combinationHash})
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'education-standard-use:'+input.requestId}))`
   const previous=await tx.contentCapabilityGrant.findUnique({where:{id:input.requestId}})
   const audit=await tx.assessmentManagementEvent.findUnique({where:{id:input.requestId}})

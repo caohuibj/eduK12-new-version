@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { prisma } from '../../config/database'
 
-const input = z.object({ kind: z.enum(['LEGACY','LEGACY_QUESTIONNAIRE','COLLECTION','QUESTIONNAIRE','LEGACY_COMPOSITE','SCALE','COGNITIVE']), tags: z.array(z.string().trim().min(1).max(20)).max(10), expectedTags: z.array(z.string()).max(10) }).strict()
+const input = z.object({ kind: z.enum(['LEGACY','LEGACY_QUESTIONNAIRE','COLLECTION','QUESTIONNAIRE','LEGACY_COMPOSITE','SCALE','COGNITIVE','FORM_TEMPLATE','ASSESSMENT_BUNDLE']), tags: z.array(z.string().trim().min(1).max(20)).max(10), expectedTags: z.array(z.string()).max(10) }).strict()
 /** Tags affect discovery only. No publication revision, config or frozen scoring writes. */
 export async function updateCatalogTags(actor: {userId:string;role:string}, id: string, raw: unknown) {
   if (!['TEACHER','ADMIN'].includes(actor.role)) throw Object.assign(new Error('无权管理测评标签'),{statusCode:403})

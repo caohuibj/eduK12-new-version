@@ -1,11 +1,12 @@
 import {randomUUID} from 'node:crypto'
+import {setTimeout as sleep} from 'node:timers/promises'
 import express from 'express'
 import type {Server} from 'node:http'
 import {afterAll,beforeAll,describe,expect,it,vi} from 'vitest'
 import {prisma as db} from '../../config/database'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from './integration-env'
 import {createHuiteacherTarget,createHuiteacherEvent,transitionHuiteacherEvent} from '../../modules/huiteacher/evaluation.service'
-import {configureHuiteacherStudentEvaluation,createHuiteacherStudentEvaluationRun,publishHuiteacherStudentEvaluationRun} from '../../modules/huiteacher/studentEvaluation.service'
+import {configureHuiteacherStudentEvaluation,createHuiteacherStudentEvaluationRun,previewHuiteacherStudentEvaluationRun,publishHuiteacherStudentEvaluationRun} from '../../modules/huiteacher/studentEvaluation.service'
 import {readHuiteacherStudentFeedbackReport} from '../../modules/huiteacher/studentReport.service'
 import {closeAssessmentRun} from '../../modules/assessment-run/lifecycle'
 import {createTeacherAssessmentRuntimeRouter} from '../../modules/huiteacher/assessmentRuntime.routes'
@@ -23,6 +24,9 @@ import {installStudentStandardFixtures} from './studentStandardSource.fixture'
 import {issueAdminContentRoot} from '../../modules/measurement-content/admin-authority.service'
 import {educationPublicSourceKey} from '../../modules/education-tools/public-source.identity'
 import {listEducationPublicSources} from '../../modules/education-tools/public-source.catalog'
+import {approveStandardCombinationEntryPolicies} from '../../modules/assessment-governance/tool-entry-policy'
+import {createToolLicense} from '../../modules/tool-licensing/management'
+import {captureToolLicenseSettlementFence,settleOneToolPublication} from '../../modules/tool-licensing/settlement'
 
 // Runs only on an explicitly selected migrated, disposable real PostgreSQL DB.
 // Only identities/verified roster are seeded; source freeze, configuration,
@@ -116,14 +120,42 @@ suite('Teacher student ordinary Scale/Form questionnaire (isolated PostgreSQL)',
   await transitionHuiteacherEvent({...campaign,action:'OPEN',expectedVersion:event.version})
   await expect(publishHuiteacherStudentEvaluationRun({...campaign,expectedVersion:run.version})).rejects.toMatchObject({code:'STUDENT_FEEDBACK_MINIMUM_POPULATION'})
   await addStudent()
-  await publishHuiteacherStudentEvaluationRun({...campaign,expectedVersion:run.version})
+  let meter:{id:string;toolKey:string;cutoff:Date}|undefined
+  if(standard){
+   vi.stubEnv('TEACHER_TOOL_LICENSING_ENABLED','true')
+   // Keep both the respondent and non-respondent complement large enough
+   // for the existing protected cohort report after proving quota recovery.
+   for(let n=0;n<10;n++)await addStudent()
+   const approved={resourceKey:'standard-release:'+standard.declared.versionId,fingerprint:standard.declared.contentHash}
+   await db.$transaction(tx=>approveStandardCombinationEntryPolicies(tx,approved,['SURVEY','TEACHER'],standard.system,'Synthetic Teacher authorization test'))
+   const [source]=await db.$queryRaw<{toolKey:string}[]>`SELECT tool_key AS "toolKey" FROM survey_standard_releases WHERE id=${standard.declared.versionId}`
+   const toolKey='SCALE:'+source.toolKey
+   const id=randomUUID(),expiresAt=new Date(Date.now()+3_600_000)
+   await createToolLicense({actorUserId:standard.system,actorSession:{
+    tokenVersion:0,adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:'synthetic-student-standard-strong-session',
+   }},{requestId:id,product:'TEACHER',subjectId:org.id,reason:'Synthetic evaluation quota',
+    startsAt:new Date(Date.now()-60_000).toISOString(),expiresAt:expiresAt.toISOString(),tools:[{key:toolKey,limit:20}]})
+   const preview=await previewHuiteacherStudentEvaluationRun({...campaign,expectedVersion:run.version})
+   expect(preview).toMatchObject({runId:run.runId,version:run.version,intakeDeadline:null,tracks:[{executionCount:20}]})
+   await expect(publishHuiteacherStudentEvaluationRun({...campaign,expectedVersion:run.version,maxResponses:19,
+    intakeDeadline:new Date(Date.now()+60_000)})).rejects.toMatchObject({code:'TOOL_PUBLICATION_LICENSE'})
+   await expect(publishHuiteacherStudentEvaluationRun({...campaign,expectedVersion:run.version,maxResponses:20,
+    intakeDeadline:new Date(expiresAt.getTime()+60_000)})).rejects.toMatchObject({code:'TOOL_PUBLICATION_LICENSE'})
+   expect(await db.$queryRaw`SELECT 1 FROM tool_license_charges WHERE license_id=${id}`).toEqual([])
+   const cutoff=new Date(Date.now()+18_000)
+   await publishHuiteacherStudentEvaluationRun({...campaign,expectedVersion:run.version,maxResponses:20,intakeDeadline:cutoff})
+   expect(await db.$queryRaw`SELECT quantity,settle_after AS "settleAfter" FROM tool_license_charges WHERE license_id=${id} AND tool_key=${toolKey} AND publication_id=${run.runId}`).toEqual([{quantity:20,settleAfter:cutoff}])
+   meter={id,toolKey,cutoff}
+  }else await publishHuiteacherStudentEvaluationRun({...campaign,expectedVersion:run.version})
   const executions=await db.$queryRaw<Array<{id:string}>>`SELECT id FROM assessment_run_executions WHERE organization_id=${org.id} AND run_id=${run.runId}`
-  expect(executions).toHaveLength(10)
+  expect(executions).toHaveLength(meter?20:10)
   const own=(await request(students[0],'/student-assessments/my-assessment-tasks')).data.list
   expect(own).toHaveLength(1);expect(own[0]).toMatchObject({teacherName:'Verified evaluated teacher',mode:'COMPOSITION'})
   expect((await request(teacher.id,'/student-assessments/my-assessment-tasks')).status).toBe(404)
   expect((await request(outsider.id,'/student-assessments/my-assessment-tasks')).data.list).toEqual([])
-  for(const studentId of students){
+  const unadmitted=meter?{studentId:students[10],
+   executionId:(await request(students[10],'/student-assessments/my-assessment-tasks')).data.list[0].executionId}:undefined
+  for(const studentId of students.slice(0,10)){
    const inbox=await request(studentId,'/student-assessments/my-assessment-tasks'),task=inbox.data.list[0]
    const prefix='/student-assessments/run-executions/'+task.executionId
    if(task.consentRequired)expect((await request(studentId,prefix+'/assessment-consent/accept',{})).status).toBe(200)
@@ -133,6 +165,7 @@ suite('Teacher student ordinary Scale/Form questionnaire (isolated PostgreSQL)',
    expect(await db.compositeAssessmentAttempt.findUnique({where:{id:parent},select:{userId:true,subjectUserId:true,respondentUserId:true}})).toEqual({userId:studentId,subjectUserId:teacher.id,respondentUserId:studentId})
    expect((await request(teacher.id,path)).status).toBe(404)
    expect((await request(teacher.id,'/assessment-composite-attempts/'+parent)).status).toBe(404)
+   if(meter&&studentId===students[9])await sleep(Math.max(0,meter.cutoff.getTime()-Date.now()+20))
    for(let block=0;block<2;block++){
     const current=await request(studentId,path+'?view=current-unit');expect(current.status,JSON.stringify(current.value)).toBe(200)
     const item=current.data.currentItem,payload={submissionId:randomUUID(),attemptEpoch:current.data.attemptEpoch,definitionHash:item.definitionHash,contextSnapshotHash:current.data.contextSnapshotHash,
@@ -146,6 +179,14 @@ suite('Teacher student ordinary Scale/Form questionnaire (isolated PostgreSQL)',
    const feedback=await request(studentId,prefix+'/feedback');expect(feedback.status,JSON.stringify(feedback.value)).toBe(200)
    expect(feedback.data.state).toBe('COMPLETION_ONLY');expect(JSON.stringify(feedback.data)).not.toMatch(/PRIVATE student text|scores|metrics|rawScore|manifestHash/)
    expect((await request(teacher.id,prefix+'/feedback')).status).toBe(404)
+  }
+  if(meter&&unadmitted){
+   const late=await request(unadmitted.studentId,'/student-assessments/run-executions/'+unadmitted.executionId+'/start-assessment',{})
+   expect(late.status).toBe(403)
+   expect(await db.$queryRaw`SELECT publication_id AS "publicationId" FROM tool_license_charges
+    WHERE settled_at IS NULL AND settle_after<=statement_timestamp()`).toEqual([{publicationId:run.runId}])
+   expect(await settleOneToolPublication(await captureToolLicenseSettlementFence())).toBe(10)
+   expect(await db.$queryRaw`SELECT used FROM tool_license_items WHERE license_id=${meter.id} AND tool_key=${meter.toolKey}`).toEqual([{used:10}])
   }
   await expect(readHuiteacherStudentFeedbackReport(campaign)).rejects.toThrow()
   await closeAssessmentRun({organizationId:org.id,runId:run.runId})

@@ -8,6 +8,7 @@ import { authenticateHuiteacher } from '../../middleware/auth'
 import { success } from '../../utils/response'
 import { requireRecentTeacherMfa,requireTeacherProductAdmin } from './authority'
 import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
+import { educationPublicationResponseCap } from '../tool-licensing/contracts'
 import {
   configureHuiteacherStudentEvaluation,readHuiteacherStudentEvaluation,
   previewHuiteacherStudentEvaluation,listHuiteacherStudentEvaluationCandidates,
@@ -53,11 +54,12 @@ const wrap=(fn:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
         message:'学校评教配置未获授权，或教师任教关系与班级不匹配',
         data:null,
       })
-    const known=e as {statusCode?:number;code?:string}
+    const known=e as {statusCode?:number;code?:string;message?:string}
     if(typeof known?.statusCode==='number'&&known.statusCode>=400&&known.statusCode<500)
       return res.status(known.statusCode).json({
         code:known.code??'HUITEACHER_STUDENT_EVAL_DENIED',
-        message:'请求未获授权或任务状态已改变',data:null,
+        message:known.code==='TOOL_PUBLICATION_LICENSE'||known.code==='RUN_INTAKE_DEADLINE'
+          ?known.message:'请求未获授权或任务状态已改变',data:null,
       })
     throw e
   }
@@ -90,6 +92,10 @@ router.get(path+'/eligibility',studentFeedbackGuard,authenticateHuiteacher,requi
 
 const runVersion=z.object({expectedVersion:z.number().int().positive()}).strict()
 const runDraft=z.object({intakeDeadline:z.string().datetime().nullable().optional()}).strict()
+const runPublication=runVersion.extend({
+  maxResponses:educationPublicationResponseCap.optional(),
+  intakeDeadline:z.string().datetime().transform(value=>new Date(value)).optional(),
+})
 router.post(path+'/run',studentFeedbackGuard,authenticateHuiteacher,requireTeacherProductAdmin,limiter,
   wrap(req=>{
     const body=runDraft.parse(req.body)
@@ -106,7 +112,7 @@ router.post(path+'/run/preview',studentFeedbackGuard,authenticateHuiteacher,requ
 router.post(path+'/run/publish',studentFeedbackGuard,authenticateHuiteacher,requireTeacherProductAdmin,limiter,
   wrap(req=>publishHuiteacherStudentEvaluationRun({
     ...params.parse(req.params),actorUserId:req.user!.userId,
-    ...runVersion.parse(req.body),
+    ...runPublication.parse(req.body),
   })))
 
 router.post(path+'/report/release',studentFeedbackGuard,authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,

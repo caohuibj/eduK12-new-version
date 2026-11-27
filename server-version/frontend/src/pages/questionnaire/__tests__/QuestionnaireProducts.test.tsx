@@ -172,6 +172,26 @@ describe('questionnaire draft feedback', () => {
     expect(courseCheck).not.toBeChecked()
   })
 
+  it('pins the publicly governed version selected by the teacher when creating a draft', async () => {
+    trainingPresentation.enabled = true
+    const pointer = { id: 'fixture-form-release', hash: 'a'.repeat(64) }
+    api.get.mockImplementation(async (path: string) => path.includes('/governed-sources?')
+      ? {code: 0, data: {list: [{...pointer, name: '冻结培训表单', version: '2.0.0', family: 'FORM'}], hasMore: false }}
+      : {code: 0, data: {scales: [], cognitive: [], situational: [], courses: [], trainingGovernedSourcesEnabled: true }})
+    api.post.mockRejectedValue({ message: '测试只检查草稿提交' })
+    const user = userEvent.setup()
+    mount()
+    await user.click(await screen.findByText('选用已批准的公共表单或组合'))
+    await user.type(screen.getByLabelText('搜索平台工具'), '培训')
+    await user.click(screen.getByRole('button', {name: '查找工具'}))
+    await user.click(await screen.findByRole('button', {name: '冻结培训表单 · 表单 · 2.0.0'}))
+    expect(api.post).not.toHaveBeenCalled()
+    await user.click(screen.getAllByRole('button', { name: /创建草稿/ })[0])
+    expect(api.post).toHaveBeenCalledWith('/questionnaire-products', expect.objectContaining({
+      name: '冻结培训表单', governedSource: pointer,
+    }))
+  })
+
   it('discards a previous questionnaire response after switching pages', async () => {
     let resolveOld!: (value: unknown) => void
     const oldRequest = new Promise(resolve => { resolveOld = resolve })

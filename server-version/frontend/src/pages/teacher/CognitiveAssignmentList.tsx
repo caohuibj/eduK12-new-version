@@ -1,5 +1,6 @@
 import type {StandardConfigurationPointer} from '../../api/standardConfigurationGrants'
 import { isTrainingHost } from '../../training/context'
+import TrainingCatalogTags from '../../training/TrainingCatalogTags'
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
@@ -36,6 +37,7 @@ type AssignmentRow = {
   courseId: string | null
   maxAttempts: number
   listedStandalone?: boolean
+  tags?: string[]
   config?: { testType: string; name: string; configVersion: string }
 }
 
@@ -289,7 +291,7 @@ const CognitiveAssignmentList: React.FC = () => {
 
       {list.length === 0 ? <ProductStatus kind="info" title="暂无认知任务">先创建并发布后，才能加入综合测评或发给学生。</ProductStatus> : (
         <div className={`staff-table-container ${isTrainingHost() ? "staff-record-table" : ""}`}><table className="staff-table"><thead><tr><th>任务</th><th>状态</th><th>任务类型</th><th>最大次数</th><th className="text-right">操作</th></tr></thead><tbody>
-          {list.map(item => <tr key={item.id}><td><Link className="staff-record-title" to={`/cognitive-assignments/${item.id}`}>{item.title}</Link>{item.listedStandalone === false && <div className="staff-muted">综合测评内部任务</div>}</td><td data-label="状态"><span className={`staff-badge ${item.status === 'PUBLISHED' ? 'staff-badge--success' : ''}`}>{statusLabel[item.status] || item.status}</span></td><td data-label="任务类型">{item.config?.name || '—'}</td><td data-label="最大次数">{item.maxAttempts}</td><td><div className="staff-table-actions"><Link className="staff-secondary-link" to={`/cognitive-assignments/${item.id}`}><Settings className="w-4 h-4" aria-hidden="true" />配置任务</Link></div></td></tr>)}
+          {list.map(item => <tr key={item.id}><td><Link className="staff-record-title" to={`/cognitive-assignments/${item.id}`}>{item.title}</Link>{item.listedStandalone === false && <div className="staff-muted">综合测评内部任务</div>}</td><td data-label="状态"><span className={`staff-badge ${item.status === 'PUBLISHED' ? 'staff-badge--success' : ''}`}>{statusLabel[item.status] || item.status}</span></td><td data-label="任务类型">{item.config?.name || '—'}</td><td data-label="最大次数">{item.maxAttempts}</td><td><div className="staff-table-actions"><Link className="staff-secondary-link" to={`/cognitive-assignments/${item.id}`}><Settings className="w-4 h-4" aria-hidden="true" />配置任务</Link></div>{isTrainingHost()&&item.listedStandalone!==false&&<TrainingCatalogTags id={item.id} kind="COGNITIVE" tags={item.tags} onSaved={tags=>setList(current=>current.map(row=>row.id===item.id?{...row,tags}:row))}/>}</td></tr>)}
         </tbody></table></div>
       )}
       {grantConfig && (

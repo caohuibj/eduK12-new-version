@@ -13,6 +13,7 @@ import { success } from '../../utils/response'
 import { organizationAdminController } from '../organization/organization.admin.controller'
 import { listEducationProductMemberships } from '../organization/educationProductAccess'
 import { requireTeacherAdminSession, requireTeacherProductAdmin, requireRecentTeacherMfa, requireTeacherProductMember } from './authority'
+import { ownToolLicenseHandler } from '../tool-licensing/business.routes'
 
 const router=Router()
 router.use(educationRosterJobRouter('TEACHER'))
@@ -33,6 +34,8 @@ const wrap=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)
 })
 router.get('/organizations/:organizationId/tool-authoring-capabilities', authenticateHuiteacher,
   requireTeacherAdminSession,educationToolAuthoringCapabilitiesHandler('TEACHER'))
+router.get('/organizations/:organizationId/tool-licenses',authenticateHuiteacher,
+  requireTeacherAdminSession,ownToolLicenseHandler('TEACHER'))
 router.get('/organizations',authenticateHuiteacher,wrap(async(req,res)=>{
   return success(res,{
     list:await listEducationProductMemberships(req.user!.userId,'HUITEACHER'),

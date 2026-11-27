@@ -1,5 +1,5 @@
 export class ToolLibraryError extends Error{
-  constructor(message:string,readonly issues:{path?:string;line?:number;message:string}[]=[]){super(message)}
+  constructor(message:string,readonly issues:{path?:string;line?:number;message:string}[]=[],readonly status?:number){super(message)}
 }
 export async function toolLibraryApi<T>(path:string,method='GET',body?:unknown):Promise<T>{
   const headers:Record<string,string>={'Content-Type':'application/json'}
@@ -11,7 +11,7 @@ export async function toolLibraryApi<T>(path:string,method='GET',body?:unknown):
   }
   const response=await fetch('/api/survey'+path,{method,credentials:'same-origin',headers,...(body===undefined?{}:{body:JSON.stringify(body)})})
   const result=await response.json()
-  if(!response.ok||result.code!==0)throw new ToolLibraryError(result.message||'操作失败',result.data?.issues??[])
+  if(!response.ok||result.code!==0)throw new ToolLibraryError(result.message||'操作失败',result.data?.issues??[],response.status)
   return result.data as T
 }
 export type ToolSource='owned'|'granted'

@@ -14,9 +14,9 @@ import {previewStandardTriplet,approveStandardTriplet} from '../../modules/surve
 /** New synthetic sources, never modified declarations on real instruments.
  * Registry delegation adds fixtures only; all native validation, publication,
  * C/P/R approval, U, SQL sealing, admission and scoring remain actual services. */
-export async function installStudentStandardFixtures(){
+export async function installStudentStandardFixtures(keySuffix=''){
  const sources=[true,false].map(declared=>{
-  const key=declared?'synthetic_student_teacher_observer':'synthetic_generic_observer'
+  const key=(declared?'synthetic_student_teacher_observer':'synthetic_generic_observer')+keySuffix
   const definition=compileResearchScale('Synthetic student observation',{schemaVersion:1,respondentType:'teacher_self_report',aggregation:'mean',
    responseOptions:[{optionKey:'zero',label:'Zero',score:0},{optionKey:'one',label:'One',score:1}],dimensions:[{dimensionKey:'support',label:'Observed support',direction:'descriptive'}],
    items:[{itemKey:'q',prompt:'Synthetic observed classroom support',required:true,reverse:false,dimensionKeys:['support']}]})

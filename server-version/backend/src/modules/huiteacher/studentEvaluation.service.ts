@@ -404,12 +404,14 @@ export async function previewHuiteacherStudentEvaluationRun(input:{
   if(link.eventStatus!=='DRAFT'&&link.eventStatus!=='OPEN')
     deny('HUITEACHER_STUDENT_EVAL_EVENT_UNAVAILABLE')
   if(link.runStatus!=='DRAFT')deny('HUITEACHER_STUDENT_EVAL_RUN_NOT_DRAFT')
-  return previewAssessmentRun({organizationId:input.organizationId,
+  const preview=await previewAssessmentRun({organizationId:input.organizationId,
     runId:link.runId,actorUserId:input.actorUserId,
     expectedVersion:input.expectedVersion})
+  return {...preview,intakeDeadline:link.intakeDeadline}
 }
 export async function publishHuiteacherStudentEvaluationRun(input:{
   actorUserId:string;organizationId:string;eventId:string;expectedVersion:number
+  maxResponses?:number;intakeDeadline?:Date
 }){
   const link=await checkedStudentRun(input)
   if(link.eventStatus!=='OPEN'||link.runStatus!=='DRAFT')
@@ -418,7 +420,8 @@ export async function publishHuiteacherStudentEvaluationRun(input:{
     organizationId:input.organizationId,runId:link.runId})
   return publishAssessmentRun({organizationId:input.organizationId,
     runId:link.runId,actorUserId:input.actorUserId,
-    expectedVersion:input.expectedVersion})
+    expectedVersion:input.expectedVersion,
+    maxResponses:input.maxResponses,intakeDeadline:input.intakeDeadline})
 }
 async function checkedStudentRun(input:{
   actorUserId:string;organizationId:string;eventId:string
@@ -429,10 +432,10 @@ async function checkedStudentRun(input:{
   })
   if(!scope?.productAdmin)deny('HUITEACHER_STUDENT_EVAL_ADMIN_REQUIRED',403)
   const rows=await prisma.$queryRaw<Array<{
-    runId:string;eventStatus:string;runStatus:string
+    runId:string;eventStatus:string;runStatus:string;intakeDeadline:Date|null
   }>>`
     SELECT link."run_id" AS "runId",event."status" AS "eventStatus",
-      run."status" AS "runStatus"
+      run."status" AS "runStatus",run."intake_deadline" AS "intakeDeadline"
     FROM "huiteacher_evaluation_run_links" link
     JOIN "huiteacher_student_eval_configs" config
       ON config."organization_id"=link."organization_id"

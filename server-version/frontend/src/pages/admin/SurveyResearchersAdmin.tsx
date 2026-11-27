@@ -4,6 +4,8 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { SurveyCatalogGrants } from './SurveyCatalogGrants'
 import { ProductPage } from '../../components/product-ui'
 import AdminStepUp from '../../admin/AdminStepUp'
+import ToolCatalogTags from '../../components/tool-licensing/ToolCatalogTags'
+import {readStandardAssignmentTarget,type StandardAssignmentTarget} from '../../admin/standardAssignmentTarget'
 import './survey-admin.css'
 import {useAuth} from '../../contexts/AuthContext'
 type Envelope<T>={code:number|string;message:string;data:T}
@@ -50,11 +52,12 @@ async function platformApi<T>(path:string,method='GET',body?:unknown):Promise<T>
 }
 export default function SurveyResearchersAdmin(){
   const {user}=useAuth()
-  return user?<SurveyResearchersWorkspace key={user.id} actorId={user.id}/>:null
+  const search=window.location.search
+  return user?<SurveyResearchersWorkspace key={user.id+search} actorId={user.id} initialStandard={readStandardAssignmentTarget(search)}/>:null
 }
 /** The production wrapper keys all retained UI/password/request state to the
  * live authenticated account. Tests may exercise this workspace separately. */
-export function SurveyResearchersWorkspace({actorId}:{actorId?:string}={}){
+export function SurveyResearchersWorkspace({actorId,initialStandard}:{actorId?:string;initialStandard?:StandardAssignmentTarget|null}={}){
   const [list,setList]=useState<Researcher[]>([]),[pending,setPending]=useState<Invitation[]>([])
   const [researcherPage,setResearcherPage]=useState(1),[invitationPage,setInvitationPage]=useState(1)
   const [researcherQuery,setResearcherQuery]=useState(''),[researcherStatus,setResearcherStatus]=useState('')
@@ -95,13 +98,13 @@ export function SurveyResearchersWorkspace({actorId}:{actorId?:string}={}){
   }
   const [link,setLink]=useState(''),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const [busy,setBusy]=useState(false)
-  const [loading,setLoading]=useState(true),[section,setSection]=useState<'researchers'|'invitations'|'tools'>('researchers')
+  const [loading,setLoading]=useState(true),[section,setSection]=useState<'researchers'|'invitations'|'tools'|'tags'>(initialStandard?'tools':'researchers')
   const [linkContext,setLinkContext]=useState('')
   const [linkExpiry,setLinkExpiry]=useState('')
   const [rebindFor,setRebindFor]=useState<string|null>(null)
   const [identityVerification,setIdentityVerification]=useState('')
   const [unconfirmed,setUnconfirmed]=useState<string|null>(null)
-  const sections=[['researchers','研究者','资格、认证与恢复'],['invitations','邀请','签发与未领取状态'],['tools','工具授权','对象与精确版本']] as const
+  const sections=[['researchers','研究者','资格、认证与恢复'],['invitations','邀请','签发与未领取状态'],['tags','工具标签','公共工具归类'],['tools','工具授权','对象与精确版本']] as const
   const statusLabel=(status:string)=>(({ACTIVE:'已激活',PENDING_MFA:'待绑定双因素认证',SUSPENDED:'已暂停',REVOKED:'已永久撤销',UNAVAILABLE:'资格不可用'} as Record<string,string>)[status]||'状态待核对')
   const refresh=async(researcher=researcherPage,invitation=invitationPage,only?:'researchers'|'invitations')=>{
     setLoading(true)
@@ -225,7 +228,10 @@ export function SurveyResearchersWorkspace({actorId}:{actorId?:string}={}){
       <p className="text-sm text-gray-500">{linkExpiry&&<>有效至 {linkExpiry}。 </>}请通过已经核验的私密渠道交给本人。</p>
     </div>}
     <section role="tabpanel" id="survey-admin-panel-tools" aria-labelledby="survey-admin-tab-tools" hidden={section!=='tools'}>
-      <SurveyCatalogGrants api={catalogApi} password={password} researchers={list} ensureVerification={ensureVerification} actorId={actorId}/>
+      <SurveyCatalogGrants api={catalogApi} password={password} researchers={list} ensureVerification={ensureVerification} actorId={actorId} initialStandard={initialStandard}/>
+    </section>
+    <section role="tabpanel" id="survey-admin-panel-tags" aria-labelledby="survey-admin-tab-tags" hidden={section!=='tags'} className="survey-admin-panel">
+      {section==='tags'&&<ToolCatalogTags product="SURVEY"/>}
     </section>
     <section role="tabpanel" id="survey-admin-panel-invitations" aria-labelledby="survey-admin-tab-invitations" hidden={section!=='invitations'} className="survey-admin-panel survey-admin-invitations">
     <div className="survey-admin-section-heading"><div className="survey-admin-panel-heading"><span className="survey-admin-avatar"><MailPlus size={22} aria-hidden="true"/></span><div><h2>研究者邀请</h2><p>签发开户邀请，查看或撤销待领取的开户及恢复邀请。</p></div></div>

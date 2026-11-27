@@ -1,8 +1,8 @@
 import {beforeEach,afterEach,it,expect,vi} from 'vitest'
 import {act,render,screen,fireEvent,waitFor,within} from '@testing-library/react'
 import {Link,MemoryRouter,Routes,Route} from 'react-router-dom'
-const mocks=vi.hoisted(()=>({get:vi.fn(),post:vi.fn(),patch:vi.fn(),governance:vi.fn()}))
-vi.mock('../api/client',()=>({default:{get:mocks.get,post:mocks.post,patch:mocks.patch}}))
+const mocks=vi.hoisted(()=>({get:vi.fn(),post:vi.fn(),put:vi.fn(),patch:vi.fn(),governance:vi.fn()}))
+vi.mock('../api/client',()=>({default:{get:mocks.get,post:mocks.post,put:mocks.put,patch:mocks.patch}}))
 vi.mock('../contexts/AuthContext',()=>({useAuth:()=>({user:{id:'teacher',role:'TEACHER'}})}))
 vi.mock('./FormalReferenceStudio',()=>({default:()=>{mocks.governance();return <div>参考治理已打开</div>}}))
 vi.mock('../components/MediaSelector',()=>({default:()=>null}))
@@ -29,6 +29,42 @@ it('keeps SJT and cognitive descriptors without authoring or version actions',as
  await screen.findByRole('article',{name:'已授权认知'})
  for(const row of rows){const card=within(screen.getByRole('article',{name:row.name}));fireEvent.click(card.getByRole('button',{name:'展开详情：'+row.name}));expect(card.queryByRole('link')).not.toBeInTheDocument();expect(card.queryByRole('button',{name:'更新版本'})).not.toBeInTheDocument()}
  expect(mocks.post).not.toHaveBeenCalled()
+})
+it('shows private tag editors only on owned tool templates, drafts and fixed-package deployments',async()=>{
+ const template={...own,id:'form-template',name:'自编表单模板',kind:'form-template',status:'DRAFT',href:'/toolkit/forms/form-template',managementTags:['旧标签']}
+ const draft={...own,id:'sjt-draft',name:'自有情境判断',kind:'sjt-draft',status:'DRAFT'}
+ const bundle={...own,id:'placement',name:'自有固定包投放',kind:'bundle',href:'/bundle-products/placement'}
+ const rows=[template,draft,bundle,grant]
+ mocks.get.mockImplementation(async(path:string)=>path.endsWith('/tags')
+  ? {code:0,data:{tags:[],revision:0}} : {code:0,data:{list:rows,total:rows.length}})
+ show()
+ const card=within(await screen.findByRole('article',{name:template.name}))
+ fireEvent.click(card.getByRole('button',{name:'展开详情：'+template.name}))
+ fireEvent.click(card.getByText('管理标签 · 旧标签',{selector:'summary'}))
+ fireEvent.change(card.getByRole('textbox',{name:'测评标签'}),{target:{value:'模板标签'}})
+ mocks.post.mockResolvedValueOnce({code:0,data:{tags:['模板标签']}})
+ fireEvent.click(card.getByRole('button',{name:'保存标签'}))
+ expect(await card.findByText('标签已保存。')).toBeVisible()
+ expect(card.getByText('管理标签 · 模板标签')).toBeVisible()
+ expect(mocks.post).toHaveBeenCalledWith('/questionnaire-products/form-template/catalog-tags',{kind:'FORM_TEMPLATE',expectedTags:['旧标签'],tags:['模板标签']})
+
+ const sjt=within(screen.getByRole('article',{name:draft.name}))
+ fireEvent.click(sjt.getByRole('button',{name:'展开详情：'+draft.name}))
+ fireEvent.click(sjt.getByText('工具标签',{selector:'summary'}))
+ fireEvent.click(await sjt.findByRole('button',{name:'编辑标签'}))
+ fireEvent.change(sjt.getByRole('textbox',{name:'新标签'}),{target:{value:'情境标签'}})
+ mocks.put.mockResolvedValueOnce({code:0,data:{tags:['情境标签'],revision:1}})
+ fireEvent.click(sjt.getByRole('button',{name:'保存标签'}))
+ expect(await sjt.findByText('工具标签已保存。')).toBeVisible()
+ expect(mocks.put).toHaveBeenCalledWith('/training-workspace/tools/sjt-draft/sjt-draft/tags',{tags:['情境标签'],expectedRevision:0})
+
+ const fixed=within(screen.getByRole('article',{name:bundle.name}))
+ fireEvent.click(fixed.getByRole('button',{name:'展开详情：'+bundle.name}))
+ expect(fixed.getByRole('link',{name:'管理投放'})).toHaveAttribute('href','/bundle-products/placement')
+ expect(fixed.getByText('管理标签',{selector:'summary'})).toBeVisible()
+ const granted=within(screen.getByRole('article',{name:grant.name}))
+ fireEvent.click(granted.getByRole('button',{name:'展开详情：'+grant.name}))
+ expect(granted.queryByText('管理标签',{selector:'summary'})).not.toBeInTheDocument()
 })
 it('opens existing composition content for editing and retains its report configuration',async()=>{
  mocks.get.mockResolvedValue({code:0,data:{list:[{...own,id:'composition',name:'组合问卷',kind:'composition',status:'DRAFT',href:'/toolkit/compositions/composition'}],total:1}});show()

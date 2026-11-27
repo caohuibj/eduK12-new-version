@@ -2,12 +2,13 @@ import { Router } from 'express'
 import { z,ZodError } from 'zod'
 import { asyncHandler } from '../../middleware/asyncHandler'
 import { authenticateHuiteacher } from '../../middleware/auth'
-import { success } from '../../utils/response'
+import { error,success } from '../../utils/response'
+import { AdminPermissionError } from '../admin-permissions/service'
 import { requireRecentTeacherMfa,requireTeacherProductAdmin } from './authority'
 import {
   createHuiteacherForm,listHuiteacherForms,readHuiteacherForm,
   updateHuiteacherForm,publishHuiteacherForm,previewHuiteacherForm,
-  HuiteacherFormError,
+  HuiteacherFormError,huiteacherFormTags,
 } from './forms.service'
 import { SurveyFinalValidationError } from '../survey/final.compute'
 
@@ -26,6 +27,7 @@ const wrap=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)
   try{return await fn(req,res)}
   catch(e){
     if(e instanceof ZodError)return res.status(400).json({code:'HUITEACHER_FORM_INPUT_INVALID',message:'Form 参数格式不合法',data:null})
+    if(e instanceof AdminPermissionError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof HuiteacherFormError)return res.status(e.statusCode).json({
       code:e.code,message:'Form 定义或状态不允许此操作',data:e.issues.length?{issues:e.issues}:null,
     })
@@ -63,6 +65,14 @@ router.put('/organizations/:organizationId/forms/:formId',
     actorUserId:req.user!.userId,formId:id.parse(req.params.formId),
     ...update.parse(req.body),
   }))))
+const formTags=(write:boolean)=>wrap(async(req,res)=>success(res,await huiteacherFormTags({
+  organizationId:id.parse(req.params.organizationId),
+  actorUserId:req.user!.userId,formId:id.parse(req.params.formId),
+},write?{body:req.body}:undefined)))
+router.get('/organizations/:organizationId/forms/:formId/tags',
+  authenticateHuiteacher,requireTeacherProductAdmin,formTags(false))
+router.put('/organizations/:organizationId/forms/:formId/tags',
+  authenticateHuiteacher,requireTeacherProductAdmin,formTags(true))
 router.post('/organizations/:organizationId/forms/:formId/publish',
   authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
   wrap(async(req,res)=>success(res,await publishHuiteacherForm({

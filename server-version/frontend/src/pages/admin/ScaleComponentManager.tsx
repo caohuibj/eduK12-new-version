@@ -9,6 +9,8 @@ import {EntryAdmissionChoices,type StandardCombinationEntryAdmissionProduct} fro
 import AdminStepUp from '../../admin/AdminStepUp'
 import ScaleComponentPreview from './ScaleComponentPreview'
 import { ScaleComponentReportEditor, type StandardReportDefinition } from './ScaleComponentReportEditor'
+import type {StandardDelegationTarget} from './StandardDelegationPanel'
+import StandardEntryAssignmentLinks from './StandardEntryAssignmentLinks'
 import './scale-component-manager.css'
 
 type Header=Pick<ComponentDraft,'id'|'toolKey'|'configurationName'|'revision'|'publishedReleaseId'>
@@ -42,7 +44,8 @@ const hasConfiguredReportPayload=(payload:unknown):boolean=>{
  })
 }
 const simpleDefinition=(d:ScaleDefinition)=>{try{return typeof d.respondentType==='string'&&!!d.source&&!!d.license&&!!d.display&&Array.isArray(d.items)&&Array.isArray(d.responseSets)&&d.responseSets.length>0&&d.responseSets.every(set=>typeof set.key==='string'&&Array.isArray(set.options)&&set.options.length>=2)&&Array.isArray(d.report?.interpretations)&&Array.isArray(d.report.scoreOrder)&&Array.isArray(d.report.primaryScoreKeys)&&d.items.length<=200&&!('scorerKey'in d.scoring)&&d.scoring.defaultMissingPolicy.type==='complete_required'&&d.scoring.itemRules.every(i=>['identity','reverse'].includes(i.transform.type))&&d.scoring.scores.every(s=>s.source.type==='items'&&['sum','mean'].includes(s.source.aggregation))}catch{return false}}
-export default function ScaleComponentManager({actorId,initialCombination,initialIntake}:{actorId:string;initialCombination?:ComponentPointer|null;initialIntake?:{target:StandardOnboardingTarget;workspace:'import'|'drafts'}|null}){
+export default function ScaleComponentManager({actorId,initialCombination,initialIntake,onAssign}:{actorId:string;initialCombination?:ComponentPointer|null;
+ initialIntake?:{target:StandardOnboardingTarget;workspace:'import'|'drafts'}|null;onAssign?:(target:StandardDelegationTarget)=>void}){
  const uid=useId(),editorHeading=useRef<HTMLHeadingElement>(null),importTab=useRef<HTMLButtonElement>(null),draftTab=useRef<HTMLButtonElement>(null)
  const [workspace,setWorkspace]=useState<'import'|'drafts'>(initialCombination?'drafts':initialIntake?.workspace??'import')
  const [onlyIssues,setOnlyIssues]=useState(false),[filterText,setFilterText]=useState(initialIntake?.target.instrumentKey??''),[filterStatus,setFilterStatus]=useState<'all'|'draft'|'frozen'>('all')
@@ -54,13 +57,14 @@ export default function ScaleComponentManager({actorId,initialCombination,initia
  const [selected,setSelected]=useState<ComponentDraft|null>(null),[text,setText]=useState(''),[savedText,setSavedText]=useState(''),[isNew,setIsNew]=useState(false)
  const [preview,setPreview]=useState<ComponentPreview|null>(null),[products,setProducts]=useState<StandardCombinationEntryAdmissionProduct[]>([]),[reason,setReason]=useState('')
  const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[tab,setTab]=useState<'basic'|'responses'|'items'|'scores'>('items')
+ const [published,setPublished]=useState<{releaseId:string;toolKey:string;target:StandardDelegationTarget|null}|null>(null)
  const componentPool=useRef<ComponentDocument['changedParts']>({})
  const inFlight=useRef(false),live=useRef(true),pageEpoch=useRef(0)
  const pendingPublish=useRef<{id:string;requestId:string;input:unknown}|null>(null),pendingCreate=useRef<{requestId:string;draft:ComponentDocument}|null>(null)
  useEffect(()=>{live.current=true;return()=>{live.current=false;pageEpoch.current++}},[])
  const refresh=async()=>{const epoch=++pageEpoch.current;setListLoading(true);setListError('');try{const r=await api<{list:Header[];hasMore:boolean}>('/component-drafts?page='+page);if(live.current&&epoch===pageEpoch.current){setRows(r.list);setMore(r.hasMore);setLoadedPage(page)}}catch(e){if(live.current&&epoch===pageEpoch.current)setListError(message(e))}finally{if(live.current&&epoch===pageEpoch.current)setListLoading(false)}}
  useEffect(()=>{void refresh();return()=>{pageEpoch.current++}},[page])
- const run=async(work:()=>Promise<void>,label='正在处理，请稍候…')=>{if(inFlight.current)return;inFlight.current=true;setBusy(true);setBusyLabel(label);setError('');setNotice('');try{await work()}catch(e){if(live.current)setError(message(e))}finally{inFlight.current=false;if(live.current){setBusy(false);setBusyLabel('')}}}
+ const run=async(work:()=>Promise<void>,label='正在处理，请稍候…')=>{if(inFlight.current)return;inFlight.current=true;setBusy(true);setBusyLabel(label);setError('');setNotice('');setPublished(null);try{await work()}catch(e){if(live.current)setError(message(e))}finally{inFlight.current=false;if(live.current){setBusy(false);setBusyLabel('')}}}
  const doc=useMemo(()=>{try{const d=JSON.parse(text);if(!d||typeof d.toolKey!=='string'||typeof d.configurationName!=='string'||!d.changedParts||typeof d.changedParts!=='object'||Array.isArray(d.changedParts))return null;for(const part of Object.values(d.changedParts))if(!part||typeof part!=='object'||typeof (part as {version?:unknown}).version!=='string')return null;return d as ComponentDocument}catch{return null}},[text])
  const dirty=text!==savedText,readOnly=!!selected?.publishedReleaseId
  const choose=(d:ComponentDraft)=>{if(!live.current)return;componentPool.current=structuredClone(d.changedParts);const raw=JSON.stringify(componentDocument(d),null,2);setSelected(d);setText(raw);setSavedText(raw);setPreview(null);setIsNew(false);setWorkspace('drafts');setAdvancedOpen(false);setAdvancedEdited(false);pendingPublish.current=null;pendingCreate.current=null}
@@ -99,9 +103,18 @@ export default function ScaleComponentManager({actorId,initialCombination,initia
   const old=pendingPublish.current
   if(old&&(old.id!==selected.id||JSON.stringify({...old.input as object,requestId:''})!==JSON.stringify(body)))throw new Error('原发布请求尚待核对，不能更换内容、原因或入口')
   const request=old??{id:selected.id,requestId:crypto.randomUUID(),input:body};const input={...body,requestId:request.requestId};pendingPublish.current={...request,input}
-  const r=await api<{id:string;state:string;blockers:string[]}>('/component-drafts/'+selected.id+'/publish',input)
+  const r=await api<{id:string;state:string;combinationHash:string;blockers:string[]}>('/component-drafts/'+selected.id+'/publish',input)
   pendingPublish.current=null;if(!live.current)return
   setNotice('配置状态：'+(publicationLabels[r.state]??r.state)+(r.blockers.length?'；'+r.blockers.join('；'):'；未自动分配任何使用权。'))
+  const triplet=preview.triplet
+  const product=products.includes('SCHOOL')?'SCHOOL':products.includes('TEACHER')?'TEACHER':null
+  const content=preview.parts.CONTENT,parameters=preview.parts.PARAMETERS,report=preview.parts.REPORT
+  if(r.state==='ONLINE'&&triplet&&r.combinationHash===triplet.combinationHash){
+   setPublished({releaseId:r.id,toolKey:selected.toolKey,target:product&&content&&parameters&&report?{product,combination:{
+    id:r.id,title:triplet.title,instrumentVersion:triplet.instrumentVersion,
+    contentVersion:content.version,parametersVersion:parameters.version,reportVersion:report.version,
+   }}:null})
+  }
   choose(await api<ComponentDraft>('/component-drafts/'+selected.id));await refresh()
  },'正在批准并试运行；评分、报告和数据库回读通过后才会上线…')
  const c=advancedEdited?undefined:doc?.changedParts.CONTENT,rawReport=advancedEdited?null:doc?.changedParts.REPORT?.payload,r=rawReport&&typeof rawReport==='object'?rawReport:null,report=r?('definition'in r?r.definition:r):null,template=r&&'template'in r?r.template:null
@@ -132,6 +145,10 @@ export default function ScaleComponentManager({actorId,initialCombination,initia
    <button ref={draftTab} id={uid+'-drafts-tab'} role="tab" aria-selected={workspace==='drafts'} aria-controls={uid+'-drafts'} tabIndex={workspace==='drafts'?0:-1} disabled={busy} onKeyDown={moveTab} onClick={()=>setWorkspace('drafts')}><FolderOpen size={16} aria-hidden="true"/>草稿与版本{dirty&&<span className="component-dot" aria-label="有未保存修改"/>}</button>
   </div>
   {error&&<p role="alert" className="component-message component-error">{error}</p>}{notice&&<p role="status" className="component-message component-success">{notice}</p>}
+  {published&&<div className="component-actions" aria-label="上线后的分配操作">
+   {published.target&&onAssign&&<button type="button" disabled={busy} onClick={()=>onAssign(published.target!)}>去分配</button>}
+   <StandardEntryAssignmentLinks toolKey={published.toolKey} releaseId={published.releaseId}/>
+  </div>}
   {busy&&<p role="status" className="component-message"><RefreshCw className="component-spin" size={16} aria-hidden="true"/>{busyLabel}</p>}
   <section id={uid+'-import'} role="tabpanel" aria-labelledby={uid+'-import-tab'} hidden={workspace!=='import'}>
    <ol className="component-steps" aria-label="导入步骤"><li data-done={!!file}><span>1</span>下载并填写</li><li data-done={filePreviewed||!!savedCount}><span>2</span>预览并修正</li><li data-done={!!savedCount}><span>3</span>保存有效草稿</li></ol>

@@ -3,9 +3,11 @@ import {createRetryableLazy} from '../../components/shared-ui/RetryableLazy'
 const UserList=createRetryableLazy(()=>import('../UserList'),'账号列表')
 const TeacherCodeList=createRetryableLazy(()=>import('../TeacherCodeList'),'注册码管理')
 const TrainingAdminCourses=createRetryableLazy<NonNullable<ComponentProps<typeof import('../../training/TrainingAdminCourses').default>>>(()=>import('../../training/TrainingAdminCourses'),'课程监管')
-const TrainingAdminResources=createRetryableLazy(()=>import('../../training/TrainingAdminResources'),'资源与授权')
+const TrainingAdminResources=createRetryableLazy<NonNullable<ComponentProps<typeof import("../../training/TrainingAdminResources").default>>>(()=>import('../../training/TrainingAdminResources'),'资源与授权')
 import {Navigate,useLocation} from 'react-router-dom'
+import {readStandardAssignmentTarget} from '../../admin/standardAssignmentTarget'
 import {trainingAdminPage} from '../../admin/trainingPages'
+import {ToolCatalogTagsPanel} from '../../components/tool-licensing/ToolCatalogTags'
 import {ShieldCheck} from 'lucide-react'
 import '../../training/training-admin-workspace.css'
 
@@ -30,12 +32,12 @@ const pageCopy={
 const legacySections:Record<string,string>={'#training-admin-accounts':'accounts','#training-admin-courses':'courses','#training-admin-resources':'resources'}
 
 export default function AdminTrainingWorkspace(){
-  const {pathname,hash}=useLocation(),page=trainingAdminPage(pathname)?.key??'accounts'
+  const {pathname,hash,search}=useLocation(),page=trainingAdminPage(pathname)?.key??'accounts'
   const legacy=pathname.replace(/\/$/,'')==='/admin/training'?legacySections[hash]:undefined
   if(pathname.replace(/\/$/,'')==='/admin/training')return <Navigate replace to={'/admin/training/'+(legacy??'accounts')}/>
   const copy=pageCopy[page]
   return <div className="training-management-home training-management-section-page">
-    {page==='accounts'?<AccountsPage/>:page==='courses'?<TrainingAdminCourses pageTitle="课程监管"/>:<TrainingAdminResources/>}
+    {page==='accounts'?<AccountsPage/>:page==='courses'?<TrainingAdminCourses pageTitle="课程监管"/>:<><ToolCatalogTagsPanel product="TRAINING"/><TrainingAdminResources key={search} initialStandard={readStandardAssignmentTarget(search)}/></>}
     <p className="training-management-page-note"><ShieldCheck size={18} aria-hidden="true"/>{copy.note}</p>
     <ManagementScope/>
   </div>

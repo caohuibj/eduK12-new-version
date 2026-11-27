@@ -10,7 +10,7 @@ describe('exact component preview presentation',()=>{
   definition.referencePolicy={type:'declared',selections:[{scoreKey:'total',referenceKind:'criterion_threshold',referenceVersion:'P1'}]}
   const ref=(version:string,label:string)=>({referenceVersion:version,entries:[{scoreKey:'total',referenceKind:'criterion_threshold',statistics:{thresholds:[{key:'band',label,minInclusive:0,maxInclusive:1}]}}]})
   const preview:ComponentPreview={draftId:'synthetic',revision:1,previewHash:'a'.repeat(64),configurationName:'合成配置',baseCombination:null,changedParts:['REPORT'],inheritedParts:['CONTENT','PARAMETERS'],blockers:[],reviewNotice:'合成核对',
-   triplet:{combinationHash:'b'.repeat(64),definition,template:null},parts:{PARAMETERS:{version:'P1',hash:'c'.repeat(64),payload:{references:[ref('P1','已选分档'),ref('P2','未选分档')]}},REPORT:{version:'1.0.0',hash:'d'.repeat(64),payload:definition.report}}}
+   triplet:{combinationHash:'b'.repeat(64),title:'合成配置',instrumentVersion:'1.0.0',definition,template:null},parts:{PARAMETERS:{version:'P1',hash:'c'.repeat(64),payload:{references:[ref('P1','已选分档'),ref('P2','未选分档')]}},REPORT:{version:'1.0.0',hash:'d'.repeat(64),payload:definition.report}}}
   const {rerender}=render(<ScaleComponentPreview preview={preview}/>)
   expect(screen.getByText('已选分档')).toBeVisible();expect(screen.queryByText('未选分档')).not.toBeInTheDocument()
   expect(screen.getByText(definition.report.interpretations[0].summary)).toBeVisible()

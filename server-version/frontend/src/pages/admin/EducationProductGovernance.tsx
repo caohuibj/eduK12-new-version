@@ -4,6 +4,7 @@ import {useAuth} from '../../contexts/AuthContext'
 import {sessionFetch} from '../../api/client'
 import {entryPaths,hasAdminEntry} from '../../admin/authority'
 import AdminStepUp from '../../admin/AdminStepUp'
+import {ToolCatalogTagsPanel} from '../../components/tool-licensing/ToolCatalogTags'
 import './education-products.css'
 const EducationCognitiveConfigurations=lazy(()=>import('./EducationCognitiveConfigurations'))
 const EducationStandardConfigurations=lazy(()=>import('./EducationStandardConfigurations'))
@@ -110,6 +111,7 @@ export default function EducationProductGovernance({product}:{product?:Product})
     </nav>
     {error&&<p role="alert" className="epg-error">{error}</p>}
     {notice&&<p role="status" className="epg-notice">{notice}</p>}
+    <ToolCatalogTagsPanel product={selectedProduct === 'HUISCHOOL' ? 'SCHOOL' : 'TEACHER'}/>
     <div className="epg-panel">
       <h2>选择正式学校</h2>
       <form onSubmit={event=>{event.preventDefault();void searchSchools()}}>

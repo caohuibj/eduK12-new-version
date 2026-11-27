@@ -4,6 +4,7 @@ import {catalogDiscoveryQueryFields,catalogTagFacets,type CatalogClassificationT
 import {Prisma} from '@prisma/client'
 import {canReadLibraryScale} from '../modules/scale-library-governance/readers'
 import { setScalePublicDelivery } from '../modules/scale/scale-public-delivery'
+import { publishScaleCourseLinks } from '../modules/scale/scale-course-publication'
 import { assertTrainingScaleCollectionAllowed } from '../modules/scale/scale-collection-guard'
 import { randomUUID } from 'node:crypto'
 import { assertScaleReportImagesOwned } from '../modules/scale/scale-image-retention'
@@ -1466,7 +1467,7 @@ export const scaleController = {
         if ((scale.libraryEntryId || userRole !== UserRole.ADMIN) && courses.some(course => course.creatorId !== userId)) {
           throw new ScaleLibraryError(403, '只能关联自己创建的课程')
         }
-        return tx.courseScale.createMany({ data: courseIds.map(courseId => ({ scaleId, courseId })), skipDuplicates: true })
+        return publishScaleCourseLinks(tx, scale, courses)
       }, { isolationLevel: 'Serializable' })
       return success(res, { added: created.count }, '课程关联成功')
     } catch (err) {

@@ -7,6 +7,7 @@ import {
   validateSurveyDraft, type FormDraft, type Issue,
 } from '../survey/builder.definition'
 import { dryRunSurveyForm } from '../survey/final.compute'
+import { readPrivateToolTags,writePrivateToolTags } from '../tool-licensing/private-tags'
 
 export class HuiteacherFormError extends Error {
   constructor(public readonly code:string,public readonly statusCode=409,public readonly issues:Issue[]=[]){
@@ -64,6 +65,21 @@ export async function readHuiteacherForm(input:{
     })
     if(!row)fail('HUITEACHER_FORM_NOT_FOUND',404)
     return row
+  })
+}
+export async function huiteacherFormTags(input:{
+  organizationId:string;actorUserId:string;formId:string
+},change?:{body:unknown}){
+  return prisma.$transaction(async tx=>{
+    await authorized(tx,input.organizationId,input.actorUserId)
+    const row=await tx.huiteacherFormInstrument.findFirst({
+      where:{id:input.formId,organizationId:input.organizationId},select:{id:true},
+    })
+    if(!row)fail('HUITEACHER_FORM_NOT_FOUND',404)
+    const key='organization-form:'+row.id
+    return change
+      ?writePrivateToolTags(tx,'TEACHER',key,input.actorUserId,change.body)
+      :readPrivateToolTags(tx,'TEACHER',key)
   })
 }
 export async function listHuiteacherForms(input:{

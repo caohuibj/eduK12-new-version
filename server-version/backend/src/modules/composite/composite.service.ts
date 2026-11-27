@@ -66,6 +66,7 @@ import {assertCurrentTrainingContentOwner,attachTrainingReportSelection} from '.
 import {prepareTrainingContentSnapshot,attachPublishedScaleArtifacts,prepareTrainingContentAttemptBinding,resolveTrainingScaleArtifacts,resolveTrainingContentBindingParent,saveCompactTrainingContentBinding,trainingContentAttemptBindingSchema} from './training-content-binding'
 import {inheritTrainingTrackingSources,freezeTrainingTracking,readTrainingTracking} from './personal-tracking'
 import {verifyStoredTrainingStandardItem,freezeTrainingStandardScaleRuntime,trainingStandardCombinationSummary} from './training-standard-combination'
+import {authorizeTrainingStandardPublication} from './training-tool-licensing'
 import { evaluateTrainingFeedbackForAttempt, prepareTrainingFeedbackBinding, freezeTrainingFeedbackSnapshot, compactTrainingFeedbackSnapshot, trainingFeedbackAttemptSelect, trainingFeedbackParentSelect, type TrainingFeedbackBinding } from './training-feedback-binding'
 import { isLoadedCompositeParticipantFeedbackDeferred, trainingFeedbackReportReady } from '../assessment-policy/participant-feedback'
 import { freezeTrainingPersistenceSnapshot, readTrainingPersistencePolicy, trainingPersistenceMetadata } from './training-persistence.policy'
@@ -75,6 +76,7 @@ import { canonicalHash, hasImmutableCanonicalValue, retainImmutableCanonicalValu
 import { assertStandardItemsVerifiedByContentBinding } from './training-start-child-admission'
 import { resolveTrainingFlowScopeForMaterialization, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers, TRAINING_FLOW_DEFINITION_SELECT, type VerifiedTrainingFlowMaterialization } from './training-flow-scope'
 import { buildTrainingFlowUnits } from './training-flow-definition'
+import { assertTrainingGovernedEditable, hasTrainingGovernedSource } from '../questionnaire-product/training-governed-definition'
 import { freezeTrainingFlowAssignment } from './training-flow-assignment-snapshot'
 import { compileTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey } from '../assessment-core/flow/training'
 import { assertTrainingFlowAuthoringScope } from '../questionnaire-product/training-flow-authoring'
@@ -622,9 +624,11 @@ const assertDraft = (composite: { status: string }) => {
 
 const assertCollectionOnlyEditing = (composite: {
   productKind?: string
+  creationKey?: string | null
   analysisProtocolKey?: string | null
   reportPackageKey?: string | null
 }) => {
+  assertTrainingGovernedEditable(composite)
   if (composite.productKind === 'ASSESSMENT_BUNDLE' || composite.analysisProtocolKey || composite.reportPackageKey) {
     throw compositeConflict('固定分析协议的模块不能单独添加、移除或排序')
   }
@@ -1474,6 +1478,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
     },
   })
   if (!source) throw compositeNotFound()
+  assertTrainingGovernedEditable(source)
   assertNotOrganizationResourceGenericEntry(source)
   if(source.trainingFlowDraft!=null||source.trainingFlowFrozen!=null)throw compositeBadRequest('条件流程请使用问卷专用复制入口')
   if(source.trainingVariantDraft!=null||source.trainingVariantFrozen!=null)throw compositeBadRequest('概率分卷请使用问卷专用复制入口')
@@ -2530,6 +2535,11 @@ const publishCompositeInTransaction = async (userId: string, role: UserRole, id:
       ? false
       : supportsReceiptOnlyPublication(publicationSource)
         || Boolean(hasScoredItems && reportEligibility && !reportEligibility.hasEligibleUnits)
+  await authorizeTrainingStandardPublication(db as Prisma.TransactionClient,publicationSource,prepared.trainingContentSnapshot)
+  if (hasTrainingGovernedSource(publicationSource)) {
+    const { authorizeTrainingGovernedPublication } = await import('../questionnaire-product/training-governed-source')
+    await authorizeTrainingGovernedPublication(db as Prisma.TransactionClient,publicationSource)
+  }
   const published = await db.compositeAssessment.update({
     where: { id },
     data: {

@@ -7,7 +7,11 @@ import {educationPrivateToolMediaRouter} from './private-tool.media.routes'
 import {Router,type Request} from 'express'
 import {z} from 'zod'
 import {asyncHandler} from '../../middleware/asyncHandler'
-import {success} from '../../utils/response'
+import {error as respondError,success} from '../../utils/response'
+import {prisma} from '../../config/database'
+import {AdminPermissionError} from '../admin-permissions/service'
+import {readPrivateToolTags,writePrivateToolTags} from '../tool-licensing/private-tags'
+import {authorizePrivateTool,privateToolScope} from './private-tool.access'
 import {FormAnswerValidationError} from '../assessment-core/form/answers'
 import {ScaleAnswerValidationError} from '../scale/scale-scoring'
 import type {EducationToolEntry} from './access'
@@ -38,11 +42,21 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
   try{return success(res,await fn(req))}
   catch(error){
    if(error instanceof z.ZodError)return res.status(400).json({code:'PRIVATE_TOOL_INPUT_INVALID',message:'私有工具参数无效',data:null})
+   if(error instanceof AdminPermissionError)return respondError(res,error.message,-1,error.statusCode)
    if(error instanceof EducationPrivateToolError)return res.status(error.statusCode).json({code:error.code,message:error.code,data:{issues:error.issues}})
    if(error instanceof ScaleAnswerValidationError)return res.status(400).json({code:'PRIVATE_TOOL_PREVIEW_INPUT_INVALID',message:'预览回答无效',data:{issues:error.issues}})
    if(error instanceof FormAnswerValidationError)return res.status(400).json({code:'PRIVATE_TOOL_PREVIEW_INPUT_INVALID',message:'预览回答无效',data:{path:error.path}})
    throw error
   }
+ })
+ const tagRequest=(write:boolean)=>handle(async req=>{
+  const c=context(req),id=toolId(req)
+  return prisma.$transaction(async tx=>{
+   await authorizePrivateTool(tx,c,write?{toolId:id}:false)
+   const owned=await tx.educationPrivateTool.findFirst({where:{id,...privateToolScope(c)},select:{id:true}})
+   if(!owned)throw new EducationPrivateToolError('PRIVATE_TOOL_NOT_FOUND',404)
+   return write?writePrivateToolTags(tx,c.entry,id,c.principal.userId,req.body):readPrivateToolTags(tx,c.entry,id)
+  })
  })
  router.use(educationPrivateToolMediaRouter(context))
  router.use(privateToolSharingRouter(context))
@@ -75,6 +89,8 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
   const query=z.object({cursor:privateToolId.optional(),kind:z.enum(['SCALE','FORM']).default('SCALE')}).strict().parse(req.query)
   return (query.kind==='FORM'?service.listPrivateFormRuntimeCandidates:service.listPrivateScaleRuntimeCandidates)(context(req),query.cursor)
  }))
+ router.get('/:toolId/tags',tagRequest(false))
+ router.put('/:toolId/tags',tagRequest(true))
  router.get('/:toolId',handle(req=>service.readPrivateTool(context(req),toolId(req))))
  router.put('/:toolId',handle(req=>service.updatePrivateTool(context(req),toolId(req),req.body)))
  router.post('/:toolId/import/preview',handle(req=>importPrivateToolCsv(context(req),toolId(req),req.body)))

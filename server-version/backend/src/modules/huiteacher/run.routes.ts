@@ -8,6 +8,7 @@ import { asyncHandler } from '../../middleware/asyncHandler'
 import { authenticateHuiteacher } from '../../middleware/auth'
 import { success } from '../../utils/response'
 import { requireTeacherProductAdmin,requireRecentTeacherMfa } from './authority'
+import { educationPublicationResponseCap } from '../tool-licensing/contracts'
 import {
   HuiteacherRunError,addTeacherRunTrack,addTeacherPrivateRunTrack,addTeacherPrivateFormRunTrack,addTeacherPrivateCompositionRunTrack,previewTeacherRun,publishTeacherRun,
   progressTeacherRun,closeTeacherRun,cancelTeacherRun,listTeacherAvailableScales,teacherTrackingOptions,createNextTeacherTrackingEvent,removeTeacherTrackingDraftSource,
@@ -64,7 +65,7 @@ const wrap=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)
       return res.status(known.statusCode).json({code:known.code??'RUN_INVALID',
         message:known.code==='RUN_PARTICIPANT_REPORT_NOT_CONFIGURED'
           ?'所选工具仅用于数据采集，不能提供个人报告。请取消勾选“向作答者提供报告”，再发布仅回执任务。'
-          :'测评资源、版本或任务授权不满足发布条件',data:null})
+          :['TOOL_PUBLICATION_LICENSE','RUN_INTAKE_DEADLINE'].includes(known.code ?? '') ? known.message : '测评资源、版本或任务授权不满足发布条件',data:null})
     throw e
   }
 })
@@ -93,9 +94,18 @@ router.post(base+'/preview',authenticateHuiteacher,requireTeacherProductAdmin,
     ...keys.parse(req.params),actorUserId:req.user!.userId,...version.parse(req.body),
   }))))
 router.post(base+'/publish',authenticateHuiteacher,requireTeacherProductAdmin,
-  wrap(async(req,res)=>success(res,await publishTeacherRun({
-    ...keys.parse(req.params),actorUserId:req.user!.userId,...version.extend({tracking:z.unknown().optional(),provideParticipantReport:z.boolean().optional()}).parse(req.body),
-  }))))
+  wrap(async(req,res)=>{
+    const {intakeDeadline,...options}=version.extend({
+      tracking:z.unknown().optional(),
+      provideParticipantReport:z.boolean().optional(),
+      maxResponses:educationPublicationResponseCap.optional(),
+      intakeDeadline:z.string().datetime().optional(),
+    }).parse(req.body)
+    return success(res,await publishTeacherRun({
+      ...keys.parse(req.params),actorUserId:req.user!.userId,...options,
+      ...(intakeDeadline===undefined?{}:{intakeDeadline:new Date(intakeDeadline)}),
+    }))
+  }))
 router.get(base+'/tracking',authenticateHuiteacher,requireTeacherProductAdmin,wrap(async(req,res)=>success(res,await teacherTrackingOptions({...keys.parse(req.params),actorUserId:req.user!.userId}))))
 router.delete(base+'/tracks/:trackId',authenticateHuiteacher,requireTeacherProductAdmin,wrap(async(req,res)=>success(res,await removeTeacherTrackingDraftSource({...keys.extend({trackId:uuid}).parse(req.params),actorUserId:req.user!.userId,...z.object({expectedVersion:z.number().int().positive()}).strict().parse(req.body)}))))
 router.post(base+'/next-wave',authenticateHuiteacher,requireTeacherProductAdmin,wrap(async(req,res)=>success(res,await createNextTeacherTrackingEvent({...keys.parse(req.params),actorUserId:req.user!.userId,...z.object({requestId:uuid}).strict().parse(req.body)}))))

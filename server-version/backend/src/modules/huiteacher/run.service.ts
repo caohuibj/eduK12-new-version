@@ -148,7 +148,7 @@ export async function previewTeacherRun(input:Key&{expectedVersion:number}){
     actorUserId:input.actorUserId,expectedVersion:input.expectedVersion,
   })
 }
-export async function publishTeacherRun(input:Key&{expectedVersion:number;tracking?:unknown;provideParticipantReport?:boolean}){
+export async function publishTeacherRun(input:Key&{expectedVersion:number;tracking?:unknown;provideParticipantReport?:boolean;maxResponses?:number;intakeDeadline?:Date}){
   const link=await activeLink(input)
   if(link.eventStatus!=='OPEN'||link.runStatus!=='DRAFT')
     fail('HUITEACHER_RUN_EVENT_MUST_BE_OPEN')
@@ -158,6 +158,8 @@ export async function publishTeacherRun(input:Key&{expectedVersion:number;tracki
   return publishAssessmentRun({
     organizationId:input.organizationId,runId:link.runId,
     actorUserId:input.actorUserId,expectedVersion:input.expectedVersion,tracking:input.tracking,provideParticipantReport:input.provideParticipantReport,
+    ...(input.maxResponses===undefined?{}:{maxResponses:input.maxResponses}),
+    ...(input.intakeDeadline===undefined?{}:{intakeDeadline:input.intakeDeadline}),
   })
 }
 export async function progressTeacherRun(input:Key){

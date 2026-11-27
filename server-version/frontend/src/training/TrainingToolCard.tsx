@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, Brain, ChevronDown, ClipboardList, FileText, Layers, MessageSquareText, Wrench } from 'lucide-react'
 import './training-toolkit-compact.css'
 import CatalogClassificationTags from '../components/scale-governance/CatalogClassificationTags'
+import PrivateToolTags from '../components/tool-licensing/PrivateToolTags'
+import TrainingCatalogTags from './TrainingCatalogTags'
 import type {CatalogClassificationTag} from '../api/catalogDiscovery'
 
 export type TrainingToolRow = {
@@ -10,6 +12,7 @@ export type TrainingToolRow = {
   source: 'owned' | 'granted'; status?: string; version?: string; updatedAt?: string; href?: string
   canUpdateVersion?: boolean
   classificationTags?:CatalogClassificationTag[]
+  managementTags?: string[]
 }
 const labels: Record<string, string> = {
   scale: '量表', form: '表单', 'form-composition': '表单内容', 'form-template': '表单',
@@ -18,14 +21,21 @@ const labels: Record<string, string> = {
 }
 const statuses: Record<string, string> = { DRAFT: '草稿', PUBLISHED: '已发布', IN_REVIEW: '审核中', REJECTED: '待修订', DEPRECATED: '已停用', RETIRED: '已停用' }
 
+const ownedTagKinds: Record<string, string> = {
+  scale: 'SCALE', form: 'LEGACY', 'form-composition': 'QUESTIONNAIRE', 'form-template': 'FORM_TEMPLATE',
+  composition: 'QUESTIONNAIRE', bundle: 'ASSESSMENT_BUNDLE',
+}
+
 /** Compact catalog presentation. Actions retain the original server-provided eligibility. */
-export default function TrainingToolCard({ row, busy, onUpdateVersion }: { row: TrainingToolRow; busy: boolean; onUpdateVersion: () => void }) {
+export default function TrainingToolCard({ row, busy, onUpdateVersion, onTagsSaved }: { row: TrainingToolRow; busy: boolean; onUpdateVersion: () => void; onTagsSaved: (tags: string[]) => void }) {
   const [expanded, setExpanded] = useState(false)
   const key = row.kind + '-' + row.id
   const titleId = 'resource-' + key, detailId = 'resource-details-' + key
   const versionable = row.canUpdateVersion === true && row.source === 'owned' && row.status === 'PUBLISHED'
     && ['scale', 'form', 'composition', 'form-composition'].includes(row.kind)
   const unavailable = ['situational', 'sjt-draft', 'cognitive'].includes(row.kind)
+  const bundlePlacement = row.kind === 'bundle' && row.source === 'owned' && row.href?.startsWith('/bundle-products/')
+  const tagKind = row.source === 'owned' && (row.kind !== 'bundle' || bundlePlacement) ? ownedTagKinds[row.kind] : undefined
   const isFormContent = ['form', 'form-composition'].includes(row.kind)
   const Icon = row.kind === 'scale' ? ClipboardList : row.kind === 'cognitive' ? Brain
     : ['situational', 'sjt-draft'].includes(row.kind) ? MessageSquareText
@@ -47,7 +57,7 @@ export default function TrainingToolCard({ row, busy, onUpdateVersion }: { row: 
       </div>
       <div className="training-tool-actions">
         {row.kind === 'bundle'
-          ? <Link className="training-tool-primary" to={row.href?.startsWith('/bundle-products/') ? row.href : '/bundle-products'}>查看与使用<ArrowRight size={15} aria-hidden="true" /></Link>
+          ? <Link className="training-tool-primary" to={row.href?.startsWith('/bundle-products/') ? row.href : '/bundle-products'}>{bundlePlacement ? '管理投放' : '查看与使用'}<ArrowRight size={15} aria-hidden="true" /></Link>
           : !unavailable && (isFormContent
             ? <button type="button" className="training-tool-primary" disabled={busy} onClick={onUpdateVersion}>存为独立表单<ArrowRight size={15} aria-hidden="true" /></button>
             : <Link className="training-tool-primary" to={row.kind === 'composition' ? '/questionnaire-products/' + row.id : row.href || '/toolkit'}>
@@ -68,6 +78,8 @@ export default function TrainingToolCard({ row, busy, onUpdateVersion }: { row: 
         {row.version && <div><dt>{['composition', 'form-composition', 'form-template'].includes(row.kind) ? '修订' : '版本'}</dt><dd>{row.version}</dd></div>}
         {hasDate && <div><dt>更新于</dt><dd><time dateTime={row.updatedAt}>{date.toLocaleDateString('zh-CN')}</time></dd></div>}
       </dl>}
+      {tagKind && <TrainingCatalogTags id={row.id} kind={tagKind} tags={row.managementTags} onSaved={onTagsSaved}/>}
+      {row.source === 'owned' && row.kind === 'sjt-draft' && <PrivateToolTags name={row.name} path={'/training-workspace/tools/sjt-draft/' + encodeURIComponent(row.id) + '/tags'}/>}
       {((row.kind === 'composition' && row.href) || (versionable && !isFormContent)) && <div className="training-tool-secondary-actions">
         {row.kind === 'composition' && row.href && <Link to={row.href}>配置与报告<ArrowRight size={14} aria-hidden="true" /></Link>}
         {versionable && !isFormContent && <button type="button" disabled={busy} onClick={onUpdateVersion}>更新版本</button>}

@@ -25,6 +25,8 @@ import {resolveTrainingCognitiveProfileForNewTask,readTrainingCognitiveTaskBindi
 import {cognitiveProfileAssignmentFreeze,assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import type {CognitiveProfileArtifact} from '../assessment-authorization/cognitive-profile-artifact'
 import {publishAssignmentMeasurementRelease} from './assignment-measurement-release'
+import {toolLicenseKey} from '../tool-licensing/contracts'
+import {authorizeToolPublication,isExpandedToolLicensingEnabled} from '../tool-licensing/runtime'
 
 export { CognitiveServiceError }
 
@@ -285,6 +287,7 @@ export const listTeacherAssignments = async (
     maxAttempts: a.maxAttempts,
     required: a.required,
     listedStandalone: a.listedStandalone,
+    tags: a.tags,
     publishedAt: a.publishedAt,
     createdAt: a.createdAt,
     updatedAt: a.updatedAt,
@@ -539,6 +542,9 @@ export const publishAssignment = async (userId: string, role: UserRole, id: stri
          selectedCognitiveConfigurationName:fixed.configurationName}}})
       if(updated.count!==1)throw CONFLICT('Assignment changed while publishing; reload and retry')
       await publishAssignmentMeasurementRelease(tx,userId,id,fixed.artifact)
+      if(isExpandedToolLicensingEnabled('TRAINING'))await authorizeToolPublication(tx,{
+        product:'TRAINING',subjectId:userId,publicationId:id,toolKeys:[toolLicenseKey('COGNITIVE',fixed.artifact.identity.testType)],
+      })
       const actual=await tx.cognitiveAssignment.findUniqueOrThrow({where:{id}})
       const {resolvedConfigSnapshotEncrypted:_,resolvedReportSnapshotEncrypted:__,...safe}=actual
       return {...safe,configurationName:fixed.configurationName,selectedBinding:selectedPin.selectedBinding,profileLocked:true}

@@ -5,6 +5,7 @@ import apiClient from '../api/client'
 import { ProductButton } from '../components/product-ui'
 import ManagementDialog from '../components/staff-ui/ManagementDialog'
 import { useAuth } from '../contexts/AuthContext'
+import OwnToolLicense, { type OwnToolLicenseView } from '../components/tool-licensing/OwnToolLicense'
 import TrainingCardDescription from './TrainingCardDescription'
 import TrainingToolCard, { type TrainingToolRow } from './TrainingToolCard'
 import CatalogDiscoveryFilters from '../components/scale-governance/CatalogDiscoveryFilters'
@@ -82,11 +83,14 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
       {media&&<form className="training-workspace-search" role="search" onSubmit={event=>{event.preventDefault();update('keyword',search.trim())}}><Search size={18} aria-hidden="true"/><input aria-label="检索媒体" placeholder="搜索媒体名称" value={search} onChange={event=>setSearch(event.target.value)}/>{search&&<button type="button" aria-label="清除检索" onClick={()=>{setSearch('');update('keyword','')}}><X size={16}/></button>}<button type="submit">检索</button></form>}
       <details className="training-library-create"><summary><Plus size={18}/>{media?'上传媒体':'编制工具'}</summary><div>{media?(['video','image','document'] as const).map(type=><button key={type} onClick={()=>{setUpload(type);document.querySelector<HTMLDetailsElement>('.training-library-create')?.removeAttribute('open')}}><Upload size={16}/>上传{labels[type]}</button>):<><Link to="/scales/new">编制量表</Link><Link to="/toolkit/forms/new">编制表单</Link><Link to="/questionnaire-products/new">创建普通组合问卷</Link></>}</div></details>
     </header>
+    {!media&&user?.id&&<OwnToolLicense key={user.id} title="我的工具授权"
+      load={async()=>{const result=await apiClient.get<OwnToolLicenseView>('/training-workspace/tool-licenses');return result.data}}
+      onOpenSources={()=>update('source','granted')}/>}
     <div className="training-library-filter training-workspace-filter-bar"><div className="training-workspace-filters" role="group" aria-label="资源类型">{(media?mediaKinds:toolKinds).map(([value,label])=><button key={value} aria-pressed={kind===value} onClick={()=>update('kind',value)}>{label}</button>)}</div><div className="training-library-filter-meta"><label>来源<select aria-label="资源来源" value={source} onChange={event=>update('source',event.target.value)}><option value="all">全部来源</option><option value="owned">{media?'我上传的':'我编制的'}</option><option value="granted">已获授权</option></select></label><span>{loading?'正在读取…':`共 ${total} 项`}</span></div></div>
     {!media&&<CatalogDiscoveryFilters label="工具分类筛选" filters={filters} facets={facets} onChange={setFilters} onApply={applyClassification} disabled={busy||loading}/>}
     {error&&!rename&&<div role="alert" className="training-library-error">{error}<button onClick={()=>setRevision(value=>value+1)}>重新读取</button></div>}{notice&&<div role="status" className="training-library-notice"><span>{notice}</span><button type="button" aria-label="关闭提示" onClick={()=>setNotice('')}><X size={16}/></button></div>}
     {loading?<p role="status" className="training-library-empty">正在读取{media?'媒体':'工具'}…</p>:!error&&!rows.length?<div className="training-library-empty"><Wrench size={28}/><h2>暂无符合条件的{media?'媒体':'工具'}</h2><p>调整检索和筛选条件，或{media?'上传新的素材':'编制你的第一个工具'}。</p></div>:<div className="training-library-grid training-workspace-grid">{rows.map(row=>{
-      if(!media)return <TrainingToolCard key={row.kind+':'+row.id} row={row} busy={busy} onUpdateVersion={()=>void updateVersion(row)}/>
+      if(!media)return <TrainingToolCard key={row.kind+':'+row.id} row={row} busy={busy} onUpdateVersion={()=>void updateVersion(row)} onTagsSaved={managementTags=>setRows(current=>current.map(item=>item.kind===row.kind&&item.id===row.id?{...item,managementTags}:item))}/>
       const Icon=row.kind==='image'?Image:row.kind==='video'?Video:FileText
       return <article key={row.kind+':'+row.id} className="training-library-card training-workspace-card" aria-labelledby={`resource-${row.kind}-${row.id}`}>
         <div className="training-workspace-card-top">

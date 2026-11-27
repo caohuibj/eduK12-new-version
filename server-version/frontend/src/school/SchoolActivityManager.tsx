@@ -30,7 +30,7 @@ type Activity={
 }
 type ActivityPage={list:Activity[];hasMore?:boolean;page?:number}
 type RunTrackSummary={id:string;resourceFamily:string;resourceKey:string;resourceVersion:string;title?:string;sourceRevision?:number}
-type Run={id:string;name:string;status:string;version:number;tracks?:RunTrackSummary[]}
+type Run={id:string;name:string;status:string;version:number;intakeDeadline?:string|null;tracks?:RunTrackSummary[]}
 type RunDetail={run:Run;tracks?:RunTrackSummary[]}
 type ActivityCapabilities={canSubmit:boolean;canOpen:boolean;canPause:boolean;canResume:boolean;canClose:boolean;canPublishRun:boolean;ownPsychologyPublisher:boolean}
 type RunCapabilities={canPublish:boolean;canClose:boolean;canCancel:boolean}
@@ -116,7 +116,8 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   const [relation,setRelation]=useState('SELF')
   const [perspective,setPerspective]=useState('SELF_REPORT')
   const [targetMode,setTargetMode]=useState('')
-  const [preview,setPreview]=useState<null|{tracks:Array<{executionCount:number;subjectCount:number;respondentCount:number}>}>(null)
+  const [preview,setPreview]=useState<null|{scope:string;api:SchoolApi;tracks:Array<{executionCount:number;subjectCount:number;respondentCount:number}>}>(null)
+  const [publishDeadlines,setPublishDeadlines]=useState<Record<string,string>>({})
   const [busy,setBusy]=useState(false)
   const [notice,setNotice]=useState('')
   const [error,setError]=useState('')
@@ -128,6 +129,9 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   const resourceScope=JSON.stringify([actorKey,path,activeRun?.id??'',activeRun?.version??null])
   const resourceContext=useRef({scope:resourceScope,api})
   resourceContext.current={scope:resourceScope,api}
+  const matchingPreview=preview?.scope===resourceScope&&preview.api===api?preview:null
+  const maxResponses=matchingPreview?.tracks.reduce((total,track)=>total+track.executionCount,0)
+  const publishDeadline=publishDeadlines[resourceScope]??''
   const nextStep=selected?schoolActivityNextStep(selected.status,selected.runs.map(run=>run.status),selected.capabilities?.ownPsychologyPublisher===true):null
   const canInspectRuns=!!selected&&['DRAFT','SUBMITTED','OPEN'].includes(selected.status)
   const resource=resources.find(r=>r.family+':'+r.key+':'+r.version===resourceId)
@@ -306,15 +310,20 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   })
   const previewRun=()=>void execute(async()=>{
     if(!selected||!activeRun)return
+    setPreview(null)
     const r=await api<{tracks:Array<{executionCount:number;subjectCount:number;respondentCount:number}>}>(
       path+'/runs/'+activeRun.id+'/preview','POST',{expectedVersion:activeRun.version})
-    setPreview(r)
+    if(!Array.isArray(r.tracks)||r.tracks.some(track=>[track.executionCount,track.subjectCount,track.respondentCount].some(count=>!Number.isSafeInteger(count)||count<0))||!Number.isSafeInteger(r.tracks.reduce((total,track)=>total+track.executionCount,0)))throw new Error('预览人数响应无效，请重新预览合法参与者数量。')
+    setPreview({...r,scope:resourceScope,api})
     setNotice('仅展示人数预览，不展示任何个体心理报告或原始作答。')
   })
   const publishRun=(tracking?:unknown,provideParticipantReport?:boolean)=>void execute(async()=>{
-    if(!selected||!activeRun)return
-    if(!window.confirm('确认测评资源、参与名单、许可与科学成熟度已经审核，正式向获批人员发布？'))return
-    await api(path+'/runs/'+activeRun.id+'/publish','POST',{expectedVersion:activeRun.version,tracking,provideParticipantReport})
+    if(!selected||!activeRun||maxResponses===undefined)return
+    if(maxResponses<=0)throw new Error('当前预览没有可发布的作答任务，请核对原参与范围后重新预览。')
+    const deadline=publishDeadline?new Date(publishDeadline):null
+    if(deadline&&(!Number.isFinite(deadline.getTime())||deadline.getTime()<=Date.now()))throw new Error('停止接受新作答时间必须晚于当前时间。')
+    if(!window.confirm(`确认测评资源、参与名单、许可与科学成熟度已经审核，正式向获批人员发布？本次确认冻结总作答上限为 ${maxResponses} 份，不缩减原参与范围。${deadline?'停止接受新作答：'+deadline.toLocaleString('zh-CN')+'。':''}已有作答仍按原任务规则继续。`))return
+    await api(path+'/runs/'+activeRun.id+'/publish','POST',{expectedVersion:activeRun.version,tracking,provideParticipantReport,maxResponses,...(deadline?{intakeDeadline:deadline.toISOString()}:{})})
     await fetchDetail(selected.courseId)
     setActiveRun(null);setNotice('正式测评已发布。学生仍需以本人身份完成原有作答流程。')
   })
@@ -550,11 +559,13 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
         </>}
         {activeRun.status==='DRAFT'&&<button disabled={busy}
           onClick={previewRun}>预览合法参与者数量</button>}
-        {preview&&<p role="status">预览：
-          {preview.tracks.map((t,i)=><span key={i}> 项目 {i+1}（作答 {t.executionCount}，
-            受评对象 {t.subjectCount}）</span>)}</p>}
-        {selected.runs.find(r=>r.runId===activeRun.id)?.capabilities?.canPublish===true&&
-          <EducationTrackingPublish key={actorKey+':'+activeRun.id+':'+activeRun.version} entry="SCHOOL" api={api} path={path+'/runs/'+activeRun.id} disabled={busy||!preview} publish={publishRun} publishLabel={selected.capabilities?.ownPsychologyPublisher?'正式发布本人测评':'学校管理员正式发布测评'}/>}
+        {matchingPreview&&<><p role="status">预览：
+          {matchingPreview.tracks.map((t,i)=><span key={i}> 项目 {i+1}（作答 {t.executionCount}，
+            受评对象 {t.subjectCount}）</span>)}</p><p>本次冻结总作答上限：{maxResponses} 份。按作答任务计数，不代表独立人数；发布时保留原参与范围。</p></>}
+        {selected.runs.find(r=>r.runId===activeRun.id)?.capabilities?.canPublish===true&&<>
+          <label className="hs-field"><span>停止接受新作答（本地时间）</span><input type="datetime-local" disabled={busy} value={publishDeadline} onChange={event=>setPublishDeadlines(old=>({...old,[resourceScope]:event.target.value}))}/></label>
+          <p>留空沿用原草稿期限。此时间只停止接受新作答，已有作答仍按原任务规则继续。{activeRun.intakeDeadline?'原草稿期限：'+new Date(activeRun.intakeDeadline).toLocaleString('zh-CN')+'。':''}</p>
+          <EducationTrackingPublish key={actorKey+':'+activeRun.id+':'+activeRun.version} entry="SCHOOL" api={api} path={path+'/runs/'+activeRun.id} disabled={busy||!matchingPreview} publish={publishRun} publishLabel={selected.capabilities?.ownPsychologyPublisher?'正式发布本人测评':'学校管理员正式发布测评'}/></>}
       </div>}
       </section>
       <section className="hs-activity-config-panel" id="hs-activity-panel-results" aria-label="活动进度与结果" hidden={compact&&panel!=='results'}>

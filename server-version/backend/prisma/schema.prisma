@@ -4698,3 +4698,81 @@ model SurveyStandardTrial {
  @@unique([releaseId,runId,caseIndex])
  @@map("survey_standard_trials")
 }
+
+model ToolLicense {
+  id            String    @id
+  product       String
+  subjectType   String    @map("subject_type")
+  subjectId     String    @map("subject_id")
+  subjectLabel  String    @map("subject_label")
+  startsAt      DateTime  @map("starts_at") @db.Timestamptz(6)
+  expiresAt     DateTime  @map("expires_at") @db.Timestamptz(6)
+  terminatedAt  DateTime? @map("terminated_at") @db.Timestamptz(6)
+  revision      Int       @default(1)
+  requestDigest String    @map("request_digest")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  items         ToolLicenseItem[]
+  events        ToolLicenseEvent[]
+
+  @@index([product, subjectId, startsAt(sort: Desc)], map: "tool_licenses_subject_period_idx")
+  @@index([product, createdAt(sort: Desc), id], map: "tool_licenses_product_created_idx")
+  @@map("tool_licenses")
+}
+
+model ToolLicenseItem {
+  licenseId  String    @map("license_id")
+  toolKey    String    @map("tool_key")
+  name       String
+  family     String
+  usageLimit Int?      @map("usage_limit")
+  used       Int       @default(0)
+  removedAt  DateTime? @map("removed_at") @db.Timestamptz(6)
+  license    ToolLicense @relation(fields: [licenseId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  charges    ToolLicenseCharge[]
+
+  @@id([licenseId, toolKey])
+  @@map("tool_license_items")
+}
+
+model ToolLicenseEvent {
+  licenseId String   @map("license_id")
+  revision  Int
+  actorId   String   @map("actor_id")
+  action    String
+  reason    String
+  snapshot  Json
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  license   ToolLicense @relation(fields: [licenseId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@id([licenseId, revision])
+  @@map("tool_license_events")
+}
+
+model ToolLicenseCharge {
+  licenseId     String    @map("license_id")
+  toolKey       String    @map("tool_key")
+  publicationId String    @map("publication_id")
+  quantity      Int
+  trackIds      String[]  @default([]) @map("track_ids")
+  settleAfter   DateTime? @map("settle_after") @db.Timestamptz(6)
+  settledAt     DateTime? @map("settled_at") @db.Timestamptz(6)
+  released      Int       @default(0)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  item          ToolLicenseItem @relation(fields: [licenseId, toolKey], references: [licenseId, toolKey], onDelete: Restrict, onUpdate: NoAction)
+
+  @@id([licenseId, toolKey, publicationId])
+  @@index([publicationId, settleAfter], map: "tool_license_charges_settlement_idx")
+  @@map("tool_license_charges")
+}
+
+model ToolCatalogTagSet {
+  product   String
+  toolKey   String   @map("tool_key")
+  labels    Json     @default("[]")
+  revision  Int      @default(1)
+  updatedBy String   @map("updated_by")
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@id([product, toolKey])
+  @@map("tool_catalog_tag_sets")
+}

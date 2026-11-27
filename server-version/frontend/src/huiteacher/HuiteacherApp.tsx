@@ -1,4 +1,5 @@
 import {deferredPage,KeepMountedOnVisit} from '../components/page-loading/deferredPage'
+import OwnToolLicense, { type OwnToolLicenseView } from '../components/tool-licensing/OwnToolLicense'
 
 import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import {TeacherAssessmentProvider} from './TeacherAssessmentPage'
@@ -609,6 +610,9 @@ function HuiteacherApplication(){
       </details>}
       {org&&<section id="ht-school-settings" hidden={schoolSection!=='ht-school-settings'} className="ht-panel ht-workspace-section" tabIndex={-1} aria-label="学校设置与成员">
         <h2>{org.organizationName}</h2>{directoryPending&&<p role="status">正在读取学校名单…</p>}{directory.error&&<p role="alert">{directory.error}</p>}<p>{org.productAdmin?'已获得本校 Teacher 管理权限':'已获得本校 Teacher 参与权限'}</p>
+        {schoolSection==='ht-school-settings'&&<OwnToolLicense key={'teacher-license:'+me.id+':'+org.organizationId} title="本校可用工具"
+          load={()=>teacherApi<OwnToolLicenseView>('/organizations/'+org.organizationId+'/tool-licenses')}
+          onOpenSources={()=>setSchoolSection('ht-school-evaluations')}/>}
         {me.role!=='STUDENT'&&<><h3>年级与班级 <span className="ht-count">{units.length}</span></h3>{!directoryPending&&!directory.error&&!units.length&&<p className="ht-muted">暂无年级和班级，可通过批量导入或手动创建添加。</p>}<div className="ht-units">{units.map(u=><span key={u.id} className="ht-tag">{u.unitKind==='GRADE'?'年级':'班级'} · {u.name}</span>)}</div></>}
         {me.role!=='STUDENT'&&org.productAdmin&&<div className="ht-admin">
           <details className="ht-admin-action"><summary>敏感操作验证</summary><div className="ht-inline ht-admin-mfa"><Field label="近期 MFA 验证码" value={mfaCode} set={setMfaCode}/>

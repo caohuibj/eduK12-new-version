@@ -1,6 +1,7 @@
 import {deferredPage} from '../page-loading/deferredPage'
 import {RefreshCw,Info} from 'lucide-react'
 import {SchoolPrivateToolCollection,type SchoolPrivateToolControls} from '../../school/SchoolPrivateToolCollection'
+import PrivateToolTags from '../tool-licensing/PrivateToolTags'
 import {EducationFormBulkImport} from './EducationFormBulkImport'
 import {EducationScaleCsvImport} from './EducationScaleCsvImport'
 import {EducationMaterialPicker,EducationMaterialPreview} from './EducationMaterialPicker'
@@ -187,6 +188,7 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
    <SchoolLayout entry={entry} className="education-private-editor-controls"><label className="education-private-title-field">工具名称<input value={tool.title} maxLength={200} disabled={busy||importBusy||mediaCount>0||sharingState.writing} onChange={event=>{if(!locked.current)setTool({...tool,title:event.target.value})}}/></label>
    <div className="education-private-toolbar education-private-actions" role="group" aria-label="草稿与版本操作"><button type="button" className={checked?undefined:'education-private-primary'} disabled={busy||importBusy||mediaCount>0||sharingState.writing||bulkPending||csvPending||!tool.title.trim()} onClick={()=>void save()}>保存草稿</button><button type="button" disabled={busy||importBusy||mediaCount>0||sharingState.writing||bulkPending||csvPending||dirty} onClick={check}>检查定义</button><button type="button" disabled={busy||importBusy||mediaCount>0||sharingState.writing||!checked} onClick={()=>{setPreviewing(value=>!value);setPreviewResult(null)}}>{previewing?'返回编辑':'试填预览'}</button><button type="button" disabled={busy||importBusy||mediaCount>0||sharingState.writing||!checked} className={checked?'education-private-primary':undefined} onClick={freeze}>固定私有版本</button></div></SchoolLayout>
    <p className="education-private-step-help">{dirty?'请先保存修改，再检查定义。':checked?'定义检查已通过。建议试填核对后固定版本；活动发布仍在活动工作区单独完成。':'保存后检查定义，检查通过后可试填和固定版本。'}</p></SchoolLayout>
+   <PrivateToolTags key={tool.id} api={api} path={base+'/'+encodeURIComponent(tool.id)+'/tags'} name={tool.title}/>
    {entry==='TEACHER'&&tool.kind==='SCALE'&&!previewing&&<label>量表原版施测声明<select disabled={busy||importBusy||csvPending||mediaCount>0||sharingState.writing} value={(tool.definition as ScaleDefinition).respondentType} onChange={event=>{
     const definition=tool.definition as ScaleDefinition;if(event.target.value===definition.respondentType)return
     if(!window.confirm('改变施测声明会清除本草稿的旧受众声明，请核对题目适用性后保存并固定新版本。原固定版本保持不变。'))return

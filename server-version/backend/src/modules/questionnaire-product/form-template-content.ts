@@ -5,6 +5,7 @@ import { compositeBadRequest, compositeConflict, compositeForbidden, compositeNo
 import { remapTrainingFormDefinition } from '../assessment-runtime/form-policy'
 import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
 import { mediaGrantFilter, mediaLibraryFilter } from '../../services/workspaceMedia'
+import { assertTrainingGovernedEditable } from './training-governed-definition'
 
 export type FormSource = { id: string; kind: 'COMPOSITE' | 'LEGACY'; revision?: number }
 type Actor = { userId: string; role: UserRole }
@@ -50,6 +51,7 @@ export async function readFormSource(tx: Tx, actor: Actor, source: FormSource) {
   const row = await tx.compositeAssessment.findUnique({ where: { id: source.id }, include: { items: true, formSections: true } })
   if (!row || !['FORM_TEMPLATE', 'QUESTIONNAIRE'].includes(row.productKind) || row.status === 'ARCHIVED') throw compositeNotFound('可复用表单不存在')
   if (row.createdBy !== actor.userId && actor.role !== 'ADMIN') throw compositeForbidden('只能复用本人编制的表单')
+  assertTrainingGovernedEditable(row)
   if (source.revision !== undefined && source.revision !== row.revision) throw compositeConflict('来源表单已更新，请重新选择')
   if (row.items.some(item => item.type !== 'FORM') || row.reportPackageKey || row.analysisProtocolKey || row.trainingVariantDraft || row.trainingVariantFrozen || row.trainingFlowDraft || row.trainingFlowFrozen) throw compositeBadRequest('只能整份复用纯表单内容，请在组合测评中分别选择其他工具')
   return { name: row.name, description: row.description, instruction: row.instruction, sections: row.formSections, items: row.items }

@@ -20,6 +20,9 @@ import { compositeBadRequest, compositeConflict, compositeForbidden, compositeNo
 import { freezeDataForWrite, freezeAssignmentProfile } from '../cognitive/profile-freeze'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { publishAssignmentMeasurementRelease } from '../cognitive/assignment-measurement-release'
+import { authorizeTrainingPublishKeys } from '../composite/training-tool-licensing'
+import { toolLicenseKey } from '../tool-licensing/contracts'
+import { isExpandedToolLicensingEnabled } from '../tool-licensing/runtime'
 import { BundleDefinitionProvider, freezeBundleProductionDefinition } from './definition-provider'
 import { createCodeBundleDefinitionProvider } from './code-catalog'
 import {catalogClassificationTags,catalogTagFacets,matchesCatalogDiscovery,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
@@ -206,6 +209,8 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
         }
       }
       await publishComposite(actor.userId, actor.role, id, tx,undefined,tracking)
+      if (entry.declarativePackage && isExpandedToolLicensingEnabled('TRAINING'))
+        await authorizeTrainingPublishKeys(tx, actor.userId, id, [toolLicenseKey('BUNDLE', entry.definition.bundleKey)])
       await tx.compositeAssessment.update({ where: { id }, data: { revision: { increment: 1 } } })
     }, { timeout: 30000 })
     return detail(actor, id)

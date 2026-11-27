@@ -4,6 +4,7 @@ import {EducationPrivateVersionChooser} from './EducationPrivateVersionChooser'
 import {SchoolPrivateGroupDisclosure} from './SchoolPrivateGroupDisclosure'
 import {CompositionOutline} from '../../modules/assessment-core/composition/CompositionOutline'
 import {SchoolPrivateToolCollection,type SchoolPrivateToolControls} from '../../school/SchoolPrivateToolCollection'
+import PrivateToolTags from '../tool-licensing/PrivateToolTags'
 import {PrivateToolPreview,type PrivateToolPreviewValue} from './PrivateToolPreview'
 import {EducationPublicFormChooser} from './EducationPublicFormChooser'
 import {educationPublicFormPreviewMedia,publicNativePreviewPath,publicFormPreviewPath,publicStandardPreviewPath,libraryScalePreviewPath} from './educationPublicFormClient'
@@ -158,6 +159,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
     <button type="button" disabled={busy||dirty||!tool.definition.blocks.length} onClick={freeze}>固定问卷版本</button></div>
    {dirty&&<p role="status">当前有未保存修改，请先保存后再预览或固定版本。</p>}
    <label>问卷名称<input value={tool.title} maxLength={200} disabled={busy} onChange={event=>change({title:event.target.value})}/></label>
+   <PrivateToolTags key={tool.id} api={api} path={base+'/'+encodeURIComponent(tool.id)+'/tags'} name={tool.title}/>
    <label>问卷作答方式<select value={responseMode} disabled={busy} onChange={event=>changeResponseMode(event.target.value as CompositionResponseMode)}>
     {entry==='SCHOOL'?<><option value="SELF">学生自评</option><option value="PARENT_REPORT">家长观察学生</option><option value="TEACHER_REPORT">教师观察学生</option></>:
      <><option value="SELF">教师自评</option><option value="STUDENT_REPORT">学生评价教师</option><option value="EXPERT_REPORT">受邀专家观察</option></>}

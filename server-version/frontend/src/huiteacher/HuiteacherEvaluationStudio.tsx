@@ -19,7 +19,7 @@ const mergeRows=<T extends {id:string}>(old:T[],next:T[])=>Array.from(new Map([.
 type Target={id:string;name:string;kind:string;status:string;subjectUserId:string|null}
 type Event={id:string;targetId:string;kind:string;title:string;status:string;version:number}
 type RunTrackSummary={id:string;resourceFamily:string;resourceKey:string;resourceVersion:string;title?:string|null;sourceRevision?:number|null}
-type Run={tracks?:RunTrackSummary[];eventId:string;runId:string;status:string;version:number;name?:string;trackCount?:number}
+type Run={tracks?:RunTrackSummary[];eventId:string;runId:string;status:string;version:number;name?:string;trackCount?:number;intakeDeadline?:string|null}
 type RunPreview={runId:string;version:number;tracks:Array<{trackId:string;executionCount:number;subjectCount:number;respondentCount:number;resourcePolicy:unknown}>}
 type PreviewSnapshot={data:RunPreview;base:string;api:Api;actorKey:string;eventVersion:number;eventStatus:string}
 type Form={id:string;title:string;definitionDigest:string;status:'PUBLISHED'|'DRAFT'}
@@ -65,6 +65,8 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
   const [expandedEvents,setExpandedEvents]=useState<Record<string,boolean>>({})
   const [runMap,setRunMap]=useState<Record<string,Run>>({})
   const [previews,setPreviews]=useState<Record<string,PreviewSnapshot>>({})
+  const [publishDeadlines,setPublishDeadlines]=useState<Record<string,string>>({})
+  const publicationKey=(event:Event,run:Run)=>JSON.stringify([actorKey,base,event.id,run.runId,run.version])
   const previewEpoch=useRef(0)
   const previewContext=useRef({base,api,actorKey,events,runMap})
   previewContext.current={base,api,actorKey,events,runMap}
@@ -270,17 +272,28 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     const latest=previewContext.current.runMap[event.id]
     if(latest?.runId!==run.runId||latest.version!==run.version||latest.status!=='DRAFT')return
     if(data.runId!==run.runId||data.version!==run.version||!Array.isArray(data.tracks)||data.tracks.some(track=>
-      !track.trackId||[track.executionCount,track.subjectCount,track.respondentCount].some(count=>!Number.isSafeInteger(count)||count<0)))throw new Error('预览版本或人数响应无效，请重新预览任务配置。')
+      !track.trackId||[track.executionCount,track.subjectCount,track.respondentCount].some(count=>!Number.isSafeInteger(count)||count<0))||!Number.isSafeInteger(data.tracks.reduce((total,track)=>total+track.executionCount,0)))throw new Error('预览版本或人数响应无效，请重新预览任务配置。')
     setPreviews(old=>({...old,[event.id]:{data,base,api,actorKey,eventVersion:event.version,eventStatus:event.status}}))
     setNotice('预览已生成，人数以对应工具为单位；发布时仍会重新校验当前资格。')
   })
+  const matchingPreview=(event:Event,run:Run)=>{
+    const snapshot=previews[event.id]
+    if(!snapshot||snapshot.base!==base||snapshot.api!==api||snapshot.actorKey!==actorKey||snapshot.eventVersion!==event.version||snapshot.eventStatus!==event.status||snapshot.data.runId!==run.runId||snapshot.data.version!==run.version||run.status!=='DRAFT')return null
+    return snapshot.data
+  }
   const publishRun=(event:Event,tracking?:unknown,provideParticipantReport?:boolean)=>perform(async()=>{
+    const requestedDeadline=publishDeadlines[publicationKey(event,runMap[event.id])]??''
     const run=await fetchRun(event)
+    const context=previewContext.current
+    if(context.base!==base||context.api!==api||context.actorKey!==actorKey)return
     if(event.status!=='OPEN')throw new Error('请先开放评价活动')
-    if(!window.confirm('确认按当前固定版本配置，向本校符合资格的教师分配测评任务吗？发布时将重新校验参与资格。'))return
+    const preview=matchingPreview(event,run),maxResponses=preview?.tracks.reduce((total,track)=>total+track.executionCount,0)
+    const deadline=requestedDeadline?new Date(requestedDeadline):null
+    if(deadline&&(!Number.isFinite(deadline.getTime())||deadline.getTime()<=Date.now()))throw new Error('停止接受新作答时间必须晚于当前时间。')
+    if(!window.confirm('确认按当前固定版本配置，向本校符合资格的教师分配测评任务吗？发布时将重新校验参与资格。'+(maxResponses===undefined?'':`本次确认冻结总作答上限为 ${maxResponses} 份，不缩减原参与范围。`)+(deadline?'停止接受新作答：'+deadline.toLocaleString('zh-CN')+'。':'')+'已有作答仍按原任务规则继续。'))return
     const publication=await api<{executionCount:number;version:number}>(
       base+'/evaluation-events/'+event.id+'/run/publish','POST',
-      {expectedVersion:run.version,...(tracking===undefined?{}:{tracking}),provideParticipantReport})
+      {expectedVersion:run.version,...(tracking===undefined?{}:{tracking}),provideParticipantReport,...(maxResponses===undefined?{}:{maxResponses}),...(deadline?{intakeDeadline:deadline.toISOString()}:{})})
     await fetchRun(event)
     setNotice('评价任务已发布；共冻结 '+publication.executionCount+' 个作答任务。')
   })
@@ -410,12 +423,12 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
           kind:track.resourceKey.startsWith('education-composition:')?'普通问卷':({SCALE:'量表',FORM:'表单',BUNDLE:'正式整包',COGNITIVE:'认知测验',SITUATIONAL:'情境判断'} as Record<string,string>)[track.resourceFamily]??'测评工具',
           version:track.sourceRevision?'修订 '+track.sourceRevision:track.resourceVersion,
         }))}/>
-        {(()=>{const snapshot=previews[event.id],run=runMap[event.id]
-          if(!snapshot||snapshot.base!==base||snapshot.api!==api||snapshot.actorKey!==actorKey||snapshot.eventVersion!==event.version||snapshot.eventStatus!==event.status||snapshot.data.runId!==run.runId||snapshot.data.version!==run.version||run.status!=='DRAFT')return null
-          return <section className="ht-panel" aria-label="任务配置预览"><h4>任务配置预览 · 版本 {snapshot.data.version}</h4>
-            <p>预计作答任务：{snapshot.data.tracks.reduce((total,track)=>total+track.executionCount,0)} 个</p>
+        {(()=>{const data=matchingPreview(event,runMap[event.id])
+          if(!data)return null
+          return <section className="ht-panel" aria-label="任务配置预览"><h4>任务配置预览 · 版本 {data.version}</h4>
+            <p>预计作答任务：{data.tracks.reduce((total,track)=>total+track.executionCount,0)} 个</p><p>本次冻结总作答上限：{data.tracks.reduce((total,track)=>total+track.executionCount,0)} 份。发布时保留原参与范围。</p>
             <p className="ht-muted">人数仅在各工具内去重，同一教师可能参与多个工具；不将各工具人数相加视为独立人数。发布时仍会重新校验资格。</p>
-            <ul>{snapshot.data.tracks.map((track,index)=><li key={track.trackId}>工具 {index+1}：被测者 {track.subjectCount} 人 · 作答者 {track.respondentCount} 人 · 作答任务 {track.executionCount} 个</li>)}</ul>
+            <ul>{data.tracks.map((track,index)=><li key={track.trackId}>工具 {index+1}：被测者 {track.subjectCount} 人 · 作答者 {track.respondentCount} 人 · 作答任务 {track.executionCount} 个</li>)}</ul>
           </section>
         })()}
         <details><summary>任务技术详情</summary><p>Assessment Run：<code>{runMap[event.id].runId}</code> · {runMap[event.id].status} · Track 数量：{runMap[event.id].trackCount??0}</p></details>
@@ -488,6 +501,9 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
               加入表单
             </button>
             <button onClick={()=>previewRun(event)} disabled={working}>预览任务配置</button>
+            <p className="ht-muted">可先预览，核对本次冻结总作答上限后再发布。</p>
+            <label>停止接受新作答 · {event.title}（本地时间）<input type="datetime-local" disabled={working} value={publishDeadlines[publicationKey(event,runMap[event.id])]??''} onChange={change=>setPublishDeadlines(old=>({...old,[publicationKey(event,runMap[event.id])]:change.target.value}))}/></label>
+            <p className="ht-muted">留空沿用原草稿期限。此时间只停止接受新作答，已有作答仍按原任务规则继续。{runMap[event.id].intakeDeadline?'原草稿期限：'+new Date(runMap[event.id].intakeDeadline!).toLocaleString('zh-CN')+'。':''}</p>
             <TeacherTrackingPublish key={event.id+':'+runMap[event.id].version+':'+actorKey} api={api} path={base+'/evaluation-events/'+event.id+'/run'} disabled={working||event.status!=='OPEN'} publish={(tracking,provideParticipantReport)=>publishRun(event,tracking,provideParticipantReport)}/>
           </div>
         </>}
