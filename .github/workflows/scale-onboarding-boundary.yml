@@ -129,7 +129,7 @@ jobs:
           const run = (command, args) => execFileSync(command, args, { stdio: 'inherit' });
           if (scope.toolKeys) {
             run(process.execPath, ['node_modules/prisma/build/index.js', 'generate']);
-            run('npm', ['run', 'scale:check', '--', ...scope.toolKeys]);
+            run('npm', ['run', 'content:check', '--', ...scope.toolKeys.map(key => 'scale:' + key)]);
           } else {
             run('npm', ['run', 'scale:instruments:check']);
             run(process.execPath, ['--import', 'tsx', 'scripts/scale-intake-selected-check.ts']);
@@ -197,13 +197,17 @@ jobs:
           import fs from 'node:fs';
           import {execFileSync} from 'node:child_process';
           import {verifyHistory} from './scripts/bundle-content-check.ts';
+          import {bundleReleaseSelector} from '../../.github/scripts/git-content-release-scope.mjs';
           const base=process.env.BUNDLE_CONTENT_BASE_SHA;
           const files=execFileSync('git',['diff','--name-only','-z',base,'HEAD'],{encoding:'utf8'}).split('\0').filter(Boolean);
           const root='src/modules/assessment-bundle/packages';
           const units=files.map(f=>f.match(/src\/modules\/(?:scale|situational)\/instruments\/([^/]+)\/([^/]+)\//)).filter(Boolean).map(m=>m[1]+'/'+m[2]);
           const cognitive=files.some(f=>f.includes('/modules/cognitive/tasks/'));
+          const releaseSelectors=[...new Set(files.map(bundleReleaseSelector).filter(Boolean))];
+          const releasedKeys=new Set(releaseSelectors.map(selector=>selector.slice('bundle:'.length)));
           const selected=[];
           for(const key of fs.readdirSync(root))for(const version of fs.readdirSync(root+'/'+key)) {
+            if(version==='releases.json' || releasedKeys.has(key))continue;
             const dir=root+'/'+key+'/'+version, manifest=JSON.parse(fs.readFileSync(dir+'/manifest.json','utf8'));
             if(files.some(f=>f.includes('/'+dir+'/')) || manifest.definition.slots.some(slot=>units.includes(slot.instrumentKey+'/'+slot.instrumentVersion)||cognitive&&slot.unitType==='COGNITIVE'))selected.push(dir);
           }
@@ -213,7 +217,11 @@ jobs:
             run(['manifest-check']);
           }
           for(const dir of selected)run(['check',dir]);
-          fs.writeFileSync(process.env.BUNDLE_CONTENT_EVIDENCE,JSON.stringify({base,selected,status:'success',validation:'existing affected package check; no database or lifecycle'}));
+          if(releaseSelectors.length) {
+            execFileSync(process.execPath,['node_modules/prisma/build/index.js','generate'],{stdio:'inherit'});
+            execFileSync('npm',['run','content:check','--',...releaseSelectors],{stdio:'inherit'});
+          }
+          fs.writeFileSync(process.env.BUNDLE_CONTENT_EVIDENCE,JSON.stringify({base,selected,releaseSelectors,status:'success',validation:'existing affected package check; no database or lifecycle'}));
           JS
       - name: Save actual declaration validation results
         if: always()

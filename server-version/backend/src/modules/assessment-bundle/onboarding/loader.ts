@@ -34,6 +34,7 @@ export function discoverPackages(root: string): DeclarativePackage[] {
   for (const key of children(root)) {
     if (!key.isDirectory() || key.isSymbolicLink()) throw new Error('PACKAGE_DIRECTORY_REQUIRED:'+key.name)
     for (const version of children(path.join(root,key.name))) {
+      if (version.name === 'releases.json' && version.isFile()) continue
       if (!version.isDirectory() || version.isSymbolicLink()) throw new Error('PACKAGE_DIRECTORY_REQUIRED:'+version.name)
       const pack = loadPackage(path.join(root,key.name,version.name))
       const def=pack.manifest.definition

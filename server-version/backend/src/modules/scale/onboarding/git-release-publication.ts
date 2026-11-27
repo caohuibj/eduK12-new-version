@@ -129,7 +129,13 @@ async function syncTool(tx:Prisma.TransactionClient,input:{actorId:string;gitCom
 
 /** The deployment adapter submits the complete manifest snapshot of its
  * verified main revision. Omission withdraws only releases owned by Git. */
-export async function syncGitScaleReleases(db:PrismaClient,input:{actorId:string;gitCommitSha:string;releases:readonly GitScaleRelease[]}){
+type GitScaleSyncInput = {actorId:string;gitCommitSha:string;releases:readonly GitScaleRelease[]}
+
+export function syncGitScaleReleases(db:PrismaClient,input:GitScaleSyncInput){
+  return db.$transaction(tx=>syncGitScaleReleasesInTransaction(tx,input),{timeout:120000})
+}
+
+export async function syncGitScaleReleasesInTransaction(tx:Prisma.TransactionClient,input:GitScaleSyncInput){
   if(!/^[a-f0-9]{40}$/.test(input.gitCommitSha))conflict('INVALID_COMMIT')
   const byTool=new Map<string,GitScaleRelease[]>()
   for(const release of input.releases){
@@ -143,16 +149,14 @@ export async function syncGitScaleReleases(db:PrismaClient,input:{actorId:string
     if(new Set(releases.map(item=>item.triplet.combinationHash)).size!==releases.length)conflict('DUPLICATE_COMBINATION:'+key)
     return [key,activeScaleDeclarations(releases)]
   }))
-  return db.$transaction(async tx=>{
-    await assertGitScalePublisher(tx,input.actorId)
-    // A release commit represents a single desired state. Keep discovery under
-    // the same lock so two simultaneous syncs cannot merge unrelated commits.
-    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('standard-git-release-sync'))`
-    const previous=await tx.$queryRaw<Array<{tool_key:string}>>`SELECT DISTINCT tool_key FROM survey_standard_releases
-      WHERE state='ONLINE' AND (reference->'approvals') @> ${gitMarker}::jsonb`
-    const results:SyncResult[]=[]
-    const toolKeys=[...new Set([...byTool.keys(),...previous.map(row=>row.tool_key)])].sort()
-    for(const toolKey of toolKeys)results.push(...await syncTool(tx,input,toolKey,byTool.get(toolKey)??[],desired.get(toolKey)??[]))
-    return results
-  },{timeout:120000})
+  await assertGitScalePublisher(tx,input.actorId)
+  // A release commit represents a single desired state. Keep discovery under
+  // the same lock so two simultaneous syncs cannot merge unrelated commits.
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('standard-git-release-sync'))`
+  const previous=await tx.$queryRaw<Array<{tool_key:string}>>`SELECT DISTINCT tool_key FROM survey_standard_releases
+    WHERE state='ONLINE' AND (reference->'approvals') @> ${gitMarker}::jsonb`
+  const results:SyncResult[]=[]
+  const toolKeys=[...new Set([...byTool.keys(),...previous.map(row=>row.tool_key)])].sort()
+  for(const toolKey of toolKeys)results.push(...await syncTool(tx,input,toolKey,byTool.get(toolKey)??[],desired.get(toolKey)??[]))
+  return results
 }

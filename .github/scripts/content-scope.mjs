@@ -1,3 +1,4 @@
+import {bundleReleaseSelector,verifyGitContentHistory} from './git-content-release-scope.mjs';
 import {unitOnly} from './ci-qualification.mjs';
 import {studentDiscoveryScope} from './student-discovery-scope.mjs';
 import {readEdgeScope,edgeConfigOutputs} from './edge-config-scope.mjs';
@@ -25,7 +26,7 @@ const frontendSrc = 'server-version/frontend/src/';
 export function domainFor(file) {
   if (typeof file !== 'string' || file.split('/').some(part => !part || part === '..' || part === '.')
       || /[\\\x00-\x1f\x7f]/.test(file)) return null;
-  if (new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/(manifest|evidence-map|rules|report|profile|scientific|publication|context)\\.json$`).test(file)
+  if (bundleReleaseSelector(file) || new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/(manifest|evidence-map|rules|report|profile|scientific|publication|context)\\.json$`).test(file)
       || new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/fixtures/(valid|missing|invalid|not-applicable)\\.json$`).test(file)
       || new RegExp(`^${modules}assessment-bundle/ci-fixtures/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+\\.json$`).test(file)
       || file === `${modules}assessment-bundle/generated/packages.json`) return 'bundle';
@@ -330,6 +331,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE !== 'true')
     throw new Error('Choose a step_probe for component CI, or explicitly set full_acceptance=true for whole-platform CI');
   const entries = event === 'workflow_dispatch' ? [] : changedEntries(base);
+  verifyGitContentHistory(entries);
   const files = entries.map(entry => entry.file);
   const result = event === 'workflow_dispatch'
     ? { maintenance:false, content:false, presentation:false, frontend:false, documentation:false, domains:[] }

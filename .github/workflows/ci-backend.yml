@@ -179,6 +179,19 @@ jobs:
             ? execFileSync('git',['merge-base','HEAD','origin/main'],{encoding:'utf8'}).trim() : '');
           verifyHistory(base);
           JS
+      - name: validate changed Git content declarations in mixed application changes
+        if: github.event_name == 'pull_request' && inputs.focus != 'form-intake'
+        env:
+          CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          node --input-type=module <<'JS'
+          import {bundleReleaseSelector} from '../../.github/scripts/git-content-release-scope.mjs';
+          import {execFileSync} from 'node:child_process';
+          const base = process.env.CONTENT_BASE_SHA;
+          const files=execFileSync('git',['diff','--name-only','-z',base,'HEAD'],{encoding:'utf8'}).split('\0');
+          const selectors=[...new Set(files.map(bundleReleaseSelector).filter(Boolean))];
+          if(selectors.length)execFileSync('npm',['run','content:check','--',...selectors],{stdio:'inherit'});
+          JS
       - name: native Form strict input, real HTTP authority and PostgreSQL save/readback
         if: inputs.focus == 'form-intake'
         env:
