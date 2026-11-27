@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "kstc2020_slp_cognition_teacher_en/1.0.0/1.1.0-teacher",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "A teacher reviews two seedling drawings while preparing a lesson on early plant growth.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
