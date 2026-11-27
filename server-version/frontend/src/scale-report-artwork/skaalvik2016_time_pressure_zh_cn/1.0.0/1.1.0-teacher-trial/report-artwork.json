@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "skaalvik2016_time_pressure_zh_cn/1.0.0/1.1.0-teacher-trial",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位教师整理日程中的零碎事项，为需要专注的备课留出一段完整时间。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

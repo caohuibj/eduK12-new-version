@@ -1,0 +1,92 @@
+{
+  "toolKey": "skaalvik2016_time_pressure_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher-trial",
+  "title": "时间压力｜教师自评（试用版）",
+  "report": {
+    "reportVersion": "1.1.0-teacher-trial",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题对照 Skaalvik 与 Skaalvik（2016）已公开英文题文、六级作答端点及已登记简体中文工作译稿。按 2026-10-30 项目已批准的独立使用形式保留 5 题、数字中间选项和完整作答 1–6 均分。新 R 仅调整试用反馈，中文本地效度证据仍待补充。"
+      }
+    },
+    "primaryScoreKeys": [
+      "time_pressure"
+    ],
+    "scoreOrder": [
+      "time_pressure"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "time_pressure",
+        "scoreLabel": "时间压力（1–6 均分，试用）",
+        "headline": "给备课留一段完整时间",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "下午开了会，又补了几份材料，一直等到下班后才开始备课。把这一天摊开看，最费时间的也许是任务挤在了同一个时段。\n\n这部分回顾你在学校工作中感受到的时间紧张，包括备课被挤占、工作量和能否休息。均分越高，表示你越认同这些时间压力。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一项最近挤占备课或休息的任务。写下它占了多长时间，分清哪些必须当天处理、哪些可以合并或改期。和合适的负责人讨论能否固定一段完整备课时间，或协调其中一项安排。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Skaalvik, E. M., & Skaalvik, S. (2016). Teacher Stress and Teacher Self-Efficacy as Predictors of Engagement, Emotional Exhaustion, and Motivation to Leave the Teaching Profession. Creative Education, 7, 1785–1799，§3.3.3，https://doi.org/10.4236/ce.2016.713182，CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)。项目对该组公开英文题文作简体中文翻译并新增教师反馈。",
+      "本组 5 题取 1–6 分均值，按项目规则须全部作答，中间选项 2–5 只用数字。参考参数暂无适用的常模和分档。",
+      "适用于理解中文的成年教师回顾当前学校工作条件。原研究在挪威进行，对象为高中教师。当前中文为项目工作译稿，适用于个人反思和研究试用。"
+    ],
+    "disclaimer": "用于成年教师本人回顾感受到的工作条件和所需支持，适用范围为个人反思与研究试用。",
+    "artworkKey": "skaalvik2016_time_pressure_zh_cn/1.0.0/1.1.0-teacher-trial"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher-trial",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
