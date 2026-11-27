@@ -38,7 +38,7 @@ export function compileStandardCombinationReport(title:string,definition:ScaleDe
   const selected=definition.referencePolicy.type==='declared'?definition.referencePolicy.selections.filter(s=>s.scoreKey===key):[]
   for(const band of text.bands)for(const selection of selected)blocks.push({type:'REFERENCE_BAND',metricKey:key,referenceKind:selection.referenceKind,bandKey:band.key,text:band.label+'\n'+band.summary,guidance:band.guidance.map(g=>g.text)})
  }
- return {template:configured?reportTemplateSchema.parse({title,blocks,limitations:definition.report.limitations,disclaimer:definition.report.disclaimer}):null,blockers}
+ return {template:configured?reportTemplateSchema.parse({title,...(definition.report.artworkKey?{artworkKey:definition.report.artworkKey}:{}),blocks,limitations:definition.report.limitations,disclaimer:definition.report.disclaimer}):null,blockers}
 }
 
 /** Preserve the existing approved-combination hash scheme byte for byte.

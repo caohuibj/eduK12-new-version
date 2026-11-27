@@ -445,7 +445,7 @@ export interface TrainingContentReport {
   status:'READY'|'REVOKED'|'NOT_SELECTED'|'UNAVAILABLE'
   reportRelease:{releaseId:string;contentHash:string}|null
   lifecycleNotices:Array<{layer:string;releaseId:string;status:string}>
-  rendered:{generatorVersion:string;title:string|null;blocks:unknown[];limitations:string[];disclaimer:string|null}|null
+  rendered:{generatorVersion:string;title:string|null;artworkKey?:string;blocks:unknown[];limitations:string[];disclaimer:string|null}|null
 }
 
 export interface CompositeReport {

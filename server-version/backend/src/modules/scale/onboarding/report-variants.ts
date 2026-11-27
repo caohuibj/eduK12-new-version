@@ -3,6 +3,8 @@ import {canonicalHash} from '../../assessment-runtime/canonical'
 import {scaleReportDefinitionSchema} from '../scale-definition'
 import type {ScaleInstrumentSourceV1} from './types'
 import {scaleSourceAxisPayloads} from './source-snapshot'
+import {reportArtworkKeyFor} from '../../measurement-content/report-artwork'
+import {GENERATED_SCALE_REPORT_VARIANT_MATERIALS} from './report-variants.generated'
 import cfq from '../instruments/cfq7_zh_cn_research/1.0.1/report-variants.json'
 import efficacy from '../instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/report-variants.json'
 import procrastination from '../instruments/bps9_zh_cn_research/1.0.0/report-variants.json'
@@ -135,13 +137,28 @@ export function readScaleReportVariantMaterial(source:ScaleInstrumentSourceV1,ra
   ||material.baseContentHash!==canonicalHash(parts.content)||material.baseParametersHash!==canonicalHash(parts.parameters))throw new Error('SCALE_REPORT_VARIANT_SOURCE_MISMATCH')
  const versions=[parts.report.reportVersion,...material.variants.map(v=>v.report.reportVersion)]
  if(new Set(versions).size!==versions.length||new Set(material.variants.map(v=>v.key)).size!==material.variants.length)throw new Error('SCALE_REPORT_VARIANT_VERSION_CONFLICT')
- for(const variant of material.variants)if(!variant.report.interpretations.length)throw new Error('SCALE_REPORT_VARIANT_EMPTY')
+ for(const variant of material.variants){
+  if(!variant.report.interpretations.length)throw new Error('SCALE_REPORT_VARIANT_EMPTY')
+  if(variant.report.artworkKey&&variant.report.artworkKey!==reportArtworkKeyFor(source.identity.instrumentKey,source.identity.instrumentVersion,variant.report.reportVersion))throw new Error('SCALE_REPORT_ARTWORK_IDENTITY_MISMATCH')
+ }
  return material
 }
+type ReportVariantMaterial=z.infer<typeof schema>
+export const scaleReportVariantMaterialHash=(material:ReportVariantMaterial,variant:ReportVariantMaterial['variants'][number])=>canonicalHash({
+ schemaVersion:material.schemaVersion,instrumentKey:material.instrumentKey,instrumentVersion:material.instrumentVersion,
+ baseContentHash:material.baseContentHash,baseParametersHash:material.baseParametersHash,variant,
+})
 export function listScaleReportVariants(source:ScaleInstrumentSourceV1){
- const selected=materials.find(({material})=>material.instrumentKey===source.identity.instrumentKey&&material.instrumentVersion===source.identity.instrumentVersion)
+ const legacy=materials.find(({material})=>material.instrumentKey===source.identity.instrumentKey&&material.instrumentVersion===source.identity.instrumentVersion)
+ const generated=GENERATED_SCALE_REPORT_VARIANT_MATERIALS.find(({material})=>{
+  const value=material as {instrumentKey?:unknown;instrumentVersion?:unknown}
+  return value.instrumentKey===source.identity.instrumentKey&&value.instrumentVersion===source.identity.instrumentVersion
+ })
+ const selected=legacy??(generated?{material:generated.material,origin:{kind:'VERSION_DIRECTORY',path:generated.path}}:undefined)
  if(!selected)return []
  const material=readScaleReportVariantMaterial(source,selected.material)
  return material.variants.map(variant=>({...variant,baseContentHash:material.baseContentHash,baseParametersHash:material.baseParametersHash,
-  materialHash:canonicalHash(material),origin:selected.origin}))
+  // Hash one immutable variant envelope, so appending a later R does not mutate
+  // the provenance identity of already selectable reports or frozen results.
+  materialHash:scaleReportVariantMaterialHash(material,variant),origin:selected.origin}))
 }
