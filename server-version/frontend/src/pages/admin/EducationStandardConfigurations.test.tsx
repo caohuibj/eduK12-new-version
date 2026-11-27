@@ -222,7 +222,7 @@ it.each(['HUISCHOOL','HUITEACHER'] as const)('selects the exact existing %s sour
  api.mockImplementation(async path=>reads(path.replace(currentBase,base)) as never)
  render(<EducationStandardConfigurations {...props} product={product}/>);await screen.findByRole('option',{name:/已批准固定量表 · C/})
  fireEvent.click(screen.getByText('按题本、参数和报告查找已批准配置'));fireEvent.change(screen.getByLabelText('量表工具'),{target:{value:choice.toolKey}})
- for(const [name,value] of [['题本 C',choice.versions.CONTENT],['解释参数 P',choice.versions.PARAMETERS],['报告 R',choice.versions.REPORT]])fireEvent.change(screen.getByLabelText(name),{target:{value}})
+ for(const [name,value] of [['题本 C',choice.versions.CONTENT],['解释参数 P',choice.versions.PARAMETERS],['报告版本',choice.versions.REPORT]])fireEvent.change(screen.getByLabelText(name),{target:{value}})
  fireEvent.change(screen.getByLabelText('核对精确配置'),{target:{value:choice.id}});fireEvent.click(screen.getByRole('button',{name:'使用所选已批准组合'}))
  expect(screen.getByLabelText('已批准量表配置')).toHaveValue(choice.id);await screen.findByRole('option',{name:recipient.username});fireEvent.click(screen.getByRole('button',{name:'保存固定配置并授权'}));await screen.findByText('请选择合法接收者和分发委托，填写配置名称、委托期限内的使用期限及本次密码。');expect(api.mock.calls.some(([,method])=>method==='POST')).toBe(false)
 })

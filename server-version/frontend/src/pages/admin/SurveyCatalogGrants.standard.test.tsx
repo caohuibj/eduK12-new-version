@@ -114,7 +114,7 @@ it('keeps Survey axis discovery in the authenticated approved page and submits t
   return {list:[]}
  })
  await prepare(api);fireEvent.click(screen.getByText('按题本、参数和报告查找已批准配置'));fireEvent.change(screen.getByLabelText('量表工具'),{target:{value:'original-tool'}})
- for(const [name,value] of [['题本 C','内容一'],['解释参数 P','none-v1'],['报告 R','报告二']])fireEvent.change(screen.getByLabelText(name),{target:{value}})
+ for(const [name,value] of [['题本 C','内容一'],['解释参数 P','none-v1'],['报告版本','报告二']])fireEvent.change(screen.getByLabelText(name),{target:{value}})
  const exact=screen.getByLabelText('核对精确配置'),option=within(exact).getAllByRole('option')[1] as HTMLOptionElement;fireEvent.change(exact,{target:{value:option.value}});fireEvent.click(screen.getByRole('button',{name:'使用所选已批准组合'}))
  const selected=screen.getByRole('region',{name:'已选精确版本'});expect(selected).toHaveTextContent('已选 1 个精确版本');expect(writes(api)).toHaveLength(0)
  fireEvent.click(within(selected).getByRole('button',{name:/授权已选版本/}));await waitFor(()=>expect(writes(api)).toHaveLength(1));expect(writes(api)[0][2]).toMatchObject({source,exact:{configurationName:'固定体验报告'}});expect(writes(api)[0][2]).not.toHaveProperty('axisVersions')

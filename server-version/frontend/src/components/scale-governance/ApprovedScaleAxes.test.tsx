@@ -4,13 +4,14 @@ import ApprovedScaleAxes,{type ApprovedScaleChoice} from './ApprovedScaleAxes'
 const first:ApprovedScaleChoice={id:'exact-one',toolKey:'same-tool',title:'注意力',versions:{CONTENT:'c1',PARAMETERS:'p1',REPORT:'r1'}}
 const second:ApprovedScaleChoice={...first,id:'exact-two',versions:{CONTENT:'c2',PARAMETERS:'p2',REPORT:'r2'}}
 function open(){fireEvent.click(screen.getByText('按题本、参数和报告查找已批准配置'));fireEvent.change(screen.getByLabelText('量表工具'),{target:{value:'same-tool'}})}
-function axes(c='c1',p='p1',r='r1'){for(const [name,value] of [['题本 C',c],['解释参数 P',p],['报告 R',r]])fireEvent.change(screen.getByLabelText(name),{target:{value}})}
+function axes(c='c1',p='p1',r='r1'){for(const [name,value] of [['题本 C',c],['解释参数 P',p],['报告版本',r]])fireEvent.change(screen.getByLabelText(name),{target:{value}})}
 describe('shared administrator approved scale axis discovery',()=>{
  it('requires all explicit axes and the exact combination before selecting, without issuing or constructing content',()=>{
-  const select=vi.fn();render(<ApprovedScaleAxes choices={[first,second]} onSelect={select}/>);open();axes()
+  const select=vi.fn();render(<ApprovedScaleAxes choices={[first,second]} onSelect={select}/>);open()
+  expect(screen.getByLabelText('报告版本')).toHaveValue('');axes()
   expect(select).not.toHaveBeenCalled();expect(screen.getByRole('button',{name:'使用所选已批准组合'})).toBeDisabled()
   fireEvent.change(screen.getByLabelText('核对精确配置'),{target:{value:first.id}});fireEvent.click(screen.getByRole('button',{name:'使用所选已批准组合'}));expect(select).toHaveBeenCalledExactlyOnceWith(first.id)
-  expect(screen.getByText(/专业搭配由管理员决定/)).toBeVisible()
+  expect(screen.getByText(/管理员在签发授权时选定报告版本/)).toBeVisible()
  })
  it('refuses to imply a new approval when individually existing axes have no approved combination',()=>{
   const select=vi.fn();render(<ApprovedScaleAxes choices={[first,second]} onSelect={select}/>);open();axes('c1','p2','r2')
