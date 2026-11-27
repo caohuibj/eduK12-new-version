@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "value_cost_english_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "value-very-low.webp",
+      "alt": "学生在短提示上指出一个自己看懂的地方。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "value-low.webp",
+      "alt": "两名同学用课堂上学过的表达练习借书。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "low"
+    },
+    {
+      "file": "value-middle.webp",
+      "alt": "学生把听、说和读的例子记进一本笔记。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "middle"
+    },
+    {
+      "file": "value-high.webp",
+      "alt": "学生先读一段自己喜欢的材料，再写一句想用的表达。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "high"
+    },
+    {
+      "file": "value-very-high.webp",
+      "alt": "同学用借书场景核对一句表达还能怎样使用。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "very_high"
+    },
+    {
+      "file": "cost-very-low.webp",
+      "alt": "学生结束一段英语练习后把耳机放在桌上。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "cost-low.webp",
+      "alt": "学生标记真正需要重听的一小段音频。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "low"
+    },
+    {
+      "file": "cost-middle.webp",
+      "alt": "英语练习、运动和休息在同一张时间表上。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "middle"
+    },
+    {
+      "file": "cost-high.webp",
+      "alt": "学生用便签记住需要回放的位置。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "high"
+    },
+    {
+      "file": "cost-very-high.webp",
+      "alt": "学生和家长对照笔记，商量先调整哪一段安排。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生留意图书馆里提示借阅方向的英文说明。",
+    "width": 506,
+    "height": 506
+  }
+}

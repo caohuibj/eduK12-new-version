@@ -1,0 +1,162 @@
+{
+  "toolKey": "value_cost_english_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "英语学习价值与时间取舍图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对项目原七题、两个独立均分及最少答题规则。两学段按原 1–6 分量尺估算，各保留五档。"
+      }
+    },
+    "primaryScoreKeys": [
+      "value",
+      "cost"
+    ],
+    "scoreOrder": [
+      "value",
+      "cost"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "value",
+        "headline": "学到的英语会在哪儿派上用场",
+        "summary": "在图书馆的英文说明牌旁，小沐读懂了一个熟悉的动作词。她又看看下一行，找到一条知道怎么做的信息。回到课堂，她想起自己曾在对话练习里读过类似的话。原来一句练过的表达，能在课本以外解决一个眼前的小问题。\n\n这三道题记录你觉得学英语有多重要、多有用。想起一件真正发生过的事，再回头看哪个课堂概念在那里给了你帮助。",
+        "scoreLabel": "英语学习价值均分（试用版）",
+        "source": {
+          "type": "reference_context"
+        },
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "找一句生活里见过的英语",
+            "summary": "从学校的一份简短英文提示中找一句你认得一半的话。看一看熟悉的词怎样帮你理解要做的事。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "带一个具体场景再听",
+            "summary": "挑一句课上练过的话，想一处真的会用上它的情景。听一遍，再换成你想说的内容。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "分别说说听、读、表达有什么用",
+            "summary": "回想一项听懂的指令、一处读懂的意思或一次成功的表达。把其中两个写成实际例子。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "把想学的东西变成一个小任务",
+            "summary": "如果你想读懂一段喜欢的材料，先完成一件很小的事，比如抓住大意。再写下一句你真的会用的话。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "向同伴展示一次用法",
+            "summary": "拿一段课堂英语给同桌听，说明它能帮你完成什么。请对方换一个场景，再试着用同样的表达回答。",
+            "guidance": []
+          }
+        ],
+        "guidance": [],
+        "provisional": true
+      },
+      {
+        "scoreKey": "cost",
+        "headline": "看看什么占去了英语学习时间",
+        "summary": "小沐想听完一段录音，也想按时参加队里的练习。她把耳机摘下来才发现，刚才大半时间花在了来回找同一句。下一次她在纸上记了大概位置，只返回核对那一句，给整个练习留了一个明白的收尾。\n\n这四道题记录你感到学英语占用时间和需要取舍的程度。把它和你觉得这门课有多有价值分别理解。一次具体的时间记录能帮你找到可调整的小地方。",
+        "scoreLabel": "英语学习时间与取舍均分（试用版）",
+        "source": {
+          "type": "reference_context"
+        },
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "给练习画一个结束点",
+            "summary": "选一次英语练习，开始前说清这次要完成哪一小段。做到了就收起来，看看能不能按原安排结束。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "看看重复听的时间用在哪里",
+            "summary": "听录音时把真正要重听的位置记下来。结束后回看，哪一次重听让你理解了新的内容？",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "把练习和其他任务放在一张纸上",
+            "summary": "把阅读、词语复习、其他作业和活动列在一起。给英语留下一个具体时段，把练习缩成当时能完成的一小段。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "减少来回翻找",
+            "summary": "找出最费时间的一步，比如反复查同一个词、来回找录音或重写一整段。换一种记录方法，下次只检查这一处的耗时。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "一起商量下周只调整一件事",
+            "summary": "带着三次练习记录和老师或家长谈一下。先指出最常被打断的步骤，再约定一个下周可以验证的安排。",
+            "guidance": []
+          }
+        ],
+        "guidance": [],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "学习价值按前三题的均分记录，至少答两题。时间与取舍按后四题的均分记录，至少答三题。两个结果分别阅读。",
+      "五档沿用原参数的试用区间。缺少匹配的学段时，可读两个通用故事。"
+    ],
+    "disclaimer": "可以挑一次真实的学习经历来理解这两个得分，也可带着一个具体问题跟同伴、老师或家长讨论。",
+    "artworkKey": "value_cost_english_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
