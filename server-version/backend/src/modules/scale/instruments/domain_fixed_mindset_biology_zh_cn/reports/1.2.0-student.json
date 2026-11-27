@@ -1,0 +1,117 @@
+{
+  "toolKey": "domain_fixed_mindset_biology_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "生物学习信念图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对项目自编三题、六个正向选项、至少答两道后取均分及两学段已有理论分档。"
+      }
+    },
+    "primaryScoreKeys": [
+      "domain_fixed_mindset"
+    ],
+    "scoreOrder": [
+      "domain_fixed_mindset"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "domain_fixed_mindset",
+        "headline": "看不清时，可以换一种观察办法",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "观察叶片时，阿禾总把叶脉的分叉看成一团。他原本想把笔记合上，后来把纸上的轮廓分成左、中、右三块，一次只对照一小块。他补出了两条原来漏掉的线，也把一处仍不确定的地方圈了起来。\n\n这几道题记录你怎样看待生物学习天赋能否改变。分数越高，表示这次越认同它比较固定。回想一次真实的学习，分开记下原先的判断、换过的办法，以及后来能看清的一步。下一次要试的事，往往就藏在那一步里。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "给同类图换一个观察顺序",
+            "summary": "挑两张相似的生物图。第一张先看整体，第二张先找一个熟悉的结构，再对照自己能辨认出什么。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "留下先前和现在的记录",
+            "summary": "把两次观察画在纸的两边。圈出后来自己补上的一个细节，再给还拿不准的地方做一个小标记。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "把困难写到图上",
+            "summary": "回到一张让你觉得自己不擅长的生物图。指着它写一句实际遇到的问题，例如“我分不清这两条线的走向”。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "借一个示范，再画一处",
+            "summary": "请同学示范如何辨认一个结构。合上示范，在另一张相近的图上找同一个结构，看自己能否说出依据。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "带着两张图问一个问题",
+            "summary": "把能看懂和没看懂的两份图放在一起，请老师或同学指出其中一处区别。下一次先练辨认这一处。",
+            "guidance": []
+          }
+        ],
+        "guidance": [],
+        "scoreLabel": "生物学习信念均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "三道题至少答两道，按已答题目计算均分。分数用来回顾你当时的看法。",
+      "初中与高中沿用相同的理论五档。报告根据当前均分提供一条试用建议。"
+    ],
+    "disclaimer": "可从一个真实课堂片段读这份报告，挑其中一个做法试一试。",
+    "artworkKey": "domain_fixed_mindset_biology_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
