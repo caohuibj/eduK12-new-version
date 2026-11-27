@@ -1,0 +1,128 @@
+{
+  "toolKey": "academic_self_efficacy_physics_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "物理学习自我效能图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "artworkKey": "academic_self_efficacy_physics_zh_cn/1.0.0/1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容审定",
+        "reviewedAt": "2026-11-27T00:00:00Z",
+        "basis": "逐题核对项目自编五题学科替换版、五点选项、无反向计分、四题最低作答与均分规则。物理版没有同版本经验样本，五档仅为量尺范围的理论试用区间，不作为常模、能力或诊断界线。"
+      }
+    },
+    "primaryScoreKeys": [
+      "academic_self_efficacy"
+    ],
+    "scoreOrder": [
+      "academic_self_efficacy"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "academic_self_efficacy",
+        "headline": "灯泡没亮时，先做一个能验证的判断",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "小川接好课堂实验用的小电路，灯泡却没亮。他在老师指导下先断开电源，画出导线连接的顺序，再按图检查开关、接线和灯泡。他发现一处接线松了。这次他记住了，下一次碰到类似情况，先从哪里查。\n\n这份问卷关心的是，你有多大把握学会新的物理内容、遇到困难时继续尝试，并完成手上的任务。做计算题、画图或动手实验，需要的帮助可能不同。回想一次最近的物理学习，选出你能独立完成的一步，以及还需要提示的一步。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "先核对一个连接点",
+            "summary": "看一张课堂电路图，沿导线找一个连接点，再确认旁边的开关是断开还是闭合。指出你核对的位置，再决定下一步查哪里。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "把示范写成三步",
+            "summary": "看完课堂示范，把过程写成三步：沿图查路径、核对开关状态、确认灯泡的连接。合上示范，先独立完成其中一步，把还需要的提示写下来。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "对比两种物理任务",
+            "summary": "从读电路图、判断受力方向和解释电路实验中，选两项短任务。做之前分别写下你预计能完成哪一步，做完对照实际，找出下一次最想练习的一步。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "用变式题检验方法",
+            "summary": "挑一道改变开关位置的电路变式题，先画图并预测灯泡会怎样。做完标出哪些步骤自己推出来，哪些要查图或听提示，再留下一条能用到下一题的检查方法。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "根据新证据修正预测",
+            "summary": "换一张没见过的实验电路图，先预测哪只灯会亮并写一句理由。用课堂实验记录或在老师指导下的实验核对。若观察不同，指出是哪条证据改变了你对连接路线的判断。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "遇到物理难题时，把“不会”拆成：情境没读懂、图没画出、关系式没选对、计算卡住，还是不会核对？"
+          },
+          {
+            "category": "strategy",
+            "text": "本周选一道略有难度的物理题，记下预测、检查步骤、找到的证据和需要调整的地方。还没解完时，先写下最值得检查的下一步。"
+          }
+        ],
+        "scoreLabel": "物理学习自我效能均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "结果是五道正向题的平均分，至少回答四题才能计算。只回答四题时，按这四题的平均分解释。",
+      "初中和高中分别匹配现有参考。两组都按 1—5 分量尺范围设置五个试用区间。当前没有这一版本的经验样本，分段仅用于选择报告文字。",
+      "分数反映学生这次判断自己能否完成物理学习任务。成绩、实际表现和对整门课的自我评价需要分别了解。",
+      "缺少年级时，原均分仍可用来选择一条试用建议。报告省略学段参考。"
+    ],
+    "disclaimer": "本报告供七至十二年级学生回顾自己完成物理学习任务的把握，可与老师讨论下一步练习。请勿用于排名、分流或诊断。"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
