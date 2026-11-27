@@ -20,5 +20,5 @@ export function renderDeclaredReport(template:ReportTemplate,metrics:readonly Re
     if(block.type==='CHART')return [{...block,metrics:block.metricKeys.map(display)}]
     return [block]
   })
-  return {generatorVersion:DECLARATIVE_REPORT_GENERATOR,title:template.title??null,blocks,limitations:template.limitations,disclaimer:template.disclaimer??null}
+  return {generatorVersion:DECLARATIVE_REPORT_GENERATOR,...(template.artworkKey?{artworkKey:template.artworkKey}:{}),title:template.title??null,blocks,limitations:template.limitations,disclaimer:template.disclaimer??null}
 }
