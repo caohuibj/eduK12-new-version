@@ -21,6 +21,25 @@ export function isExpandedToolLicensingEnabled(product: ToolLicenseProduct) {
   return process.env[`${product}_TOOL_LICENSING_ENABLED`] === 'true'
 }
 
+export type CommercialRolloutMode = 'OFF' | 'LEGACY' | 'SCHEDULED' | 'REQUIRED'
+
+// The first term that can take effect establishes commercial enrollment for
+// this entrance and subject. A later lapse in coverage never resets it.
+export function commercialEnrollmentAtSql(product: string | Prisma.Sql, subjectId: string | Prisma.Sql) {
+  return Prisma.sql`(
+    SELECT term.starts_at FROM tool_licenses term
+    WHERE term.product=${product} AND term.subject_id=${subjectId}
+      AND (term.terminated_at IS NULL OR term.terminated_at>term.starts_at)
+    ORDER BY term.starts_at LIMIT 1
+  )`
+}
+
+export function commercialRolloutMode(enabled: boolean, effectiveAt: Date | null, evaluatedAt: Date): CommercialRolloutMode {
+  if (!enabled) return 'OFF'
+  if (effectiveAt === null) return 'LEGACY'
+  return effectiveAt > evaluatedAt ? 'SCHEDULED' : 'REQUIRED'
+}
+
 type RuntimeLicense = {
   id: string
   startsAt: Date
@@ -76,8 +95,9 @@ export async function authorizeToolPublication(tx: Prisma.TransactionClient, inp
   const [license] = await tx.$queryRaw<RuntimeLicense[]>(Prisma.sql`
     SELECT id,starts_at AS "startsAt",expires_at AS "expiresAt",terminated_at AS "terminatedAt" FROM tool_licenses
     WHERE product=${input.product} AND subject_id=${input.subjectId}
+      AND (terminated_at IS NULL OR terminated_at>starts_at)
     ORDER BY (terminated_at IS NULL AND starts_at<=statement_timestamp() AND expires_at>statement_timestamp()) DESC,
-      starts_at DESC,id
+      CASE WHEN starts_at>statement_timestamp() THEN starts_at END ASC NULLS LAST, starts_at DESC,id
     LIMIT 1 FOR SHARE
   `)
   if (!license) {
@@ -86,16 +106,23 @@ export async function authorizeToolPublication(tx: Prisma.TransactionClient, inp
   }
   // Both the clock and membership must be read after the lock wait. An
   // administrator may have changed the items or the period may have elapsed.
-  const [{ evaluatedAt, items }] = await tx.$queryRaw<Array<{
-    evaluatedAt: Date; items: Array<{ key: string; limit: number | null }>
+  const [{ evaluatedAt, enrolled, items }] = await tx.$queryRaw<Array<{
+    evaluatedAt: Date; enrolled: boolean; items: Array<{ key: string; limit: number | null }>
   }>>(Prisma.sql`
-    SELECT clock_timestamp() AS "evaluatedAt",COALESCE((
-      SELECT jsonb_agg(jsonb_build_object('key',tool_key,'limit',usage_limit)) FROM tool_license_items
-      WHERE license_id=${license.id} AND removed_at IS NULL AND tool_key IN (${Prisma.join(keys)})
-    ),'[]'::jsonb) AS items
+    WITH evaluation AS MATERIALIZED (SELECT clock_timestamp() AS now)
+    SELECT now AS "evaluatedAt",CASE WHEN ${license.startsAt}<=now THEN TRUE
+      ELSE COALESCE(${commercialEnrollmentAtSql(input.product, input.subjectId)}<=now,FALSE) END AS enrolled,
+      COALESCE((
+        SELECT jsonb_agg(jsonb_build_object('key',tool_key,'limit',usage_limit)) FROM tool_license_items
+        WHERE license_id=${license.id} AND removed_at IS NULL AND tool_key IN (${Prisma.join(keys)})
+      ),'[]'::jsonb) AS items
+    FROM evaluation
   `)
-  if (license.terminatedAt || evaluatedAt < license.startsAt || evaluatedAt >= license.expiresAt)
-    throw new ToolLicenseAccessError('当前工具许可尚未生效或已结束，请联系系统管理员核对许可期限')
+  if (license.terminatedAt || evaluatedAt < license.startsAt || evaluatedAt >= license.expiresAt) {
+    if (input.requireIssuedLicense || enrolled)
+      throw new ToolLicenseAccessError('当前工具许可尚未生效或已结束，请联系系统管理员核对许可期限')
+    return
+  }
   if (keys.length !== items.length) throw new ToolLicenseAccessError('当前许可不包含所选工具 '+keys.filter(key=>!items.some(item=>item.key===key)).join('、')+'，请联系系统管理员补充许可')
   const education = input.product === 'SCHOOL' || input.product === 'TEACHER' ? input.education : undefined
   if (input.product === 'SCHOOL' || input.product === 'TEACHER') {

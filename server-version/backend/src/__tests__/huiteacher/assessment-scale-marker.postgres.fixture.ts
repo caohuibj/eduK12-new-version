@@ -1,3 +1,4 @@
+import {trainingAdminProof} from '../helpers/training-admin-proof'
 import {randomUUID} from 'node:crypto'
 import {expect} from 'vitest'
 import type {PrismaClient} from '@prisma/client'
@@ -29,8 +30,8 @@ export async function standardMarkerSource(db:PrismaClient){
   const combination={releaseId:approved.id,combinationHash:approved.combinationHash}
   const distributor=await db.user.create({data:{username:'std-marker-distributor-'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'TRAINING',role:'ADMIN'}})
   await db.adminEntryGrant.create({data:{id:randomUUID(),userId:distributor.id,entry:'TRAINING',grantedBy:system.id}})
-  await expect(grantTrainingStandardCombinationUse(system.id,approved.id,{requestId:randomUUID(),userId:teacher.id,combinationHash:approved.combinationHash})).rejects.toThrow('系统管理员不能代替入口管理员')
-  await grantTrainingStandardCombinationUse(distributor.id,approved.id,{requestId:randomUUID(),userId:teacher.id,combinationHash:approved.combinationHash})
+  await expect(grantTrainingStandardCombinationUse(system.id,approved.id,{requestId:randomUUID(),userId:teacher.id,combinationHash:approved.combinationHash},trainingAdminProof())).rejects.toThrow('系统管理员不能代替入口管理员')
+  await grantTrainingStandardCombinationUse(distributor.id,approved.id,{requestId:randomUUID(),userId:teacher.id,combinationHash:approved.combinationHash},trainingAdminProof())
   const course=await db.course.create({data:{creatorId:teacher.id,title:'Synthetic standard source',courseCode:randomUUID(),courseType:'TRAINING_COURSE',status:'PUBLISHED'}})
   const original=await db.compositeAssessment.create({data:{code:randomUUID(),name:'Original standard source',createdBy:teacher.id,productKind:'QUESTIONNAIRE',questionnaireType:'COURSE',questionnaireCourses:{create:{courseId:course.id}},items:{create:{type:'SCALE',scaleId:installed.scaleId,required:true,position:0}}},include:{questionnaireCourses:true,items:{include:{scale:true}}}})
   // The actual installed standard source requires gradeLevel before its Scale.

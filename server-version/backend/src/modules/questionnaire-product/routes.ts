@@ -2,7 +2,7 @@ import { updateCatalogTags } from '../training-catalog/tags'
 import {trainingReinterpretationsRouter} from './reinterpretation.routes'
 import {trainingReferencesRouter} from '../training-analysis/reference.routes'
 import {trainingContentReportsRouter} from './content-report.routes'
-import {grantTrainingStandardCombinationUse,revokeTrainingStandardCombinationUse} from '../measurement-content/standard-combination-use'
+import {grantTrainingStandardCombinationUse,revokeTrainingStandardCombinationUse,TrainingConfigurationStepUpError} from '../measurement-content/standard-combination-use'
 import {trainingStandardManagementCatalog,trainingStandardManagementGrants,trainingStandardManagementRequest} from '../measurement-content/standard-combination-management'
 import {platformSurveyOriginGuard} from '../survey/originGuard'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
@@ -20,6 +20,7 @@ const handle = (fn: (req: Request) => Promise<unknown>) => async (req: Request, 
   try { return success(res, await fn(req)) } catch (e: any) {
     if (e instanceof z.ZodError) return error(res, e.issues.map(v => v.message).join('; '), -1, 400)
     if (e instanceof ContentAuthorityError) return error(res,e.code,-1,403)
+    if (e instanceof TrainingConfigurationStepUpError) return res.status(403).json({code:e.code,message:e.message})
     if (e instanceof ContentReleaseError) return error(res,e.code,-1,409)
     if (e.statusCode >= 400 && e.statusCode < 500) return error(res, e.message, -1, e.statusCode)
     return next(e)
@@ -35,9 +36,9 @@ router.get('/standard-combinations/:combinationId/use-grants',authenticate,platf
 router.get('/standard-combinations/:combinationId/use-requests/:requestId',authenticate,platformSurveyOriginGuard,(req,res,next)=>{res.setHeader('Cache-Control','no-store');next()},
   handle(req=>trainingStandardManagementRequest(req.user!.userId,req.params.combinationId,req.params.requestId,req.query)))
 router.post('/standard-combinations/:combinationId/use-grants',authenticate,platformSurveyOriginGuard,
-  handle(req=>grantTrainingStandardCombinationUse(req.user!.userId,req.params.combinationId,req.body)))
+  handle(req=>grantTrainingStandardCombinationUse(req.user!.userId,req.params.combinationId,req.body,req.user!)))
 router.post('/standard-combination-use-grants/:grantId/revoke',authenticate,platformSurveyOriginGuard,
-  handle(req=>revokeTrainingStandardCombinationUse(req.user!.userId,req.params.grantId,req.body)))
+  handle(req=>revokeTrainingStandardCombinationUse(req.user!.userId,req.params.grantId,req.body,req.user!)))
 router.use(authenticate, requireTeacher)
 router.use('/:id/courses/:courseId/attempts/:attemptId/interpretations',trainingReinterpretationsRouter)
 router.use('/:id/content-reports/courses/:courseId',trainingContentReportsRouter)

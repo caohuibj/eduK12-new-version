@@ -1,3 +1,4 @@
+import {trainingAdminProof} from '../helpers/training-admin-proof'
 import {randomUUID} from 'node:crypto'
 import {writeFile} from 'node:fs/promises'
 import {beforeAll,afterAll,describe,it,expect} from 'vitest'
@@ -46,26 +47,26 @@ suite('Training business configuration names and expected draft selection',()=>{
  })
  it('normally names two different R for two receivers and records the complete original request without changing C/P',async()=>{
   fullInput=issue(full,teacher.id,'基础教学报告',2)
-  first=await service.grantTrainingStandardCombinationUse(manager.id,full.id,fullInput)
+  first=await service.grantTrainingStandardCombinationUse(manager.id,full.id,fullInput,trainingAdminProof())
   expect(first.version).toBe(3)
-  second=await service.grantTrainingStandardCombinationUse(manager.id,empty.id,issue(empty,other.id,'无反馈科研配置'))
+  second=await service.grantTrainingStandardCombinationUse(manager.id,empty.id,issue(empty,other.id,'无反馈科研配置'),trainingAdminProof())
   const a=await db.assessmentManagementEvent.findUniqueOrThrow({where:{id:fullInput.requestId}})
   expect(a.metadata).toMatchObject({configurationName:fullInput.configurationName,selfGrant:false,requestIntent:{actorId:manager.id,combinationId:full.id,userId:teacher.id,expectedUseVersion:2,configurationName:fullInput.configurationName}})
   const mine=await service.listTrainingStandardCombinationChoices(teacher.id),theirs=await service.listTrainingStandardCombinationChoices(other.id)
   expect(mine).toHaveLength(1);expect(theirs).toHaveLength(1);fullChoice=mine[0]
   expect(fullChoice).toMatchObject({authorizationMode:'PRECISE',configurationName:fullInput.configurationName,available:true,selectedBinding:{authorizationId:first.id,authorizationRevision:3}})
   expect(theirs[0]).toMatchObject({authorizationMode:'PRECISE',configurationName:'无反馈科研配置',available:true})
-  expect(await service.grantTrainingStandardCombinationUse(manager.id,full.id,fullInput)).toMatchObject({id:first.id,replayed:true})
-  await expect(service.grantTrainingStandardCombinationUse(manager.id,full.id,{...fullInput,configurationName:'changed intent'})).rejects.toThrow('请求编号已用于其他授权')
-  await expect(service.grantTrainingStandardCombinationUse(manager.id,full.id,issue(full,teacher.id,'不能原位改名',3))).rejects.toMatchObject({statusCode:409})
+  expect(await service.grantTrainingStandardCombinationUse(manager.id,full.id,fullInput,trainingAdminProof())).toMatchObject({id:first.id,replayed:true})
+  await expect(service.grantTrainingStandardCombinationUse(manager.id,full.id,{...fullInput,configurationName:'changed intent'},trainingAdminProof())).rejects.toThrow('请求编号已用于其他授权')
+  await expect(service.grantTrainingStandardCombinationUse(manager.id,full.id,issue(full,teacher.id,'不能原位改名',3),trainingAdminProof())).rejects.toMatchObject({statusCode:409})
   observations.push({fullUseId:first.id,fullUseRevision:3,emptyOtherUseId:second.id,twoRecipients:true,fullName:fullInput.configurationName})
  })
  it('blocks both same-name R options, then uses an explicit revoke/reissue to make both business choices unambiguous',async()=>{
-  const duplicate=await service.grantTrainingStandardCombinationUse(manager.id,empty.id,issue(empty,teacher.id,fullInput.configurationName))
+  const duplicate=await service.grantTrainingStandardCombinationUse(manager.id,empty.id,issue(empty,teacher.id,fullInput.configurationName),trainingAdminProof())
   const ambiguous=await service.listTrainingStandardCombinationChoices(teacher.id)
   expect(ambiguous).toHaveLength(2);expect(ambiguous.every((row:any)=>row.available===false&&row.unavailableReason.includes('同名'))).toBe(true)
-  await service.revokeTrainingStandardCombinationUse(manager.id,duplicate.id,{expectedVersion:1,reason:'Explicit business-name revision'})
-  await service.grantTrainingStandardCombinationUse(manager.id,empty.id,issue(empty,teacher.id,'不反馈的独立用途',2))
+  await service.revokeTrainingStandardCombinationUse(manager.id,duplicate.id,{expectedVersion:1,reason:'Explicit business-name revision'},trainingAdminProof())
+  await service.grantTrainingStandardCombinationUse(manager.id,empty.id,issue(empty,teacher.id,'不反馈的独立用途',2),trainingAdminProof())
   const current=await service.listTrainingStandardCombinationChoices(teacher.id)
   expect(current).toHaveLength(2);expect(current.every((row:any)=>row.available)).toBe(true)
   fullChoice=current.find((row:any)=>row.combination.releaseId===full.id);emptyChoice=current.find((row:any)=>row.combination.releaseId===empty.id)
@@ -95,8 +96,8 @@ suite('Training business configuration names and expected draft selection',()=>{
  },30000)
  it('requires the original selected revision after a named reissue and leaves old drafts, frozen labels and old request results intact',async()=>{
   if(!published||!waiting||!coursePublished)throw Error('Prior publications failed; dependent reissue forbidden')
-  await service.revokeTrainingStandardCombinationUse(manager.id,first.id,{expectedVersion:3,reason:'New explicit named revision'})
-  await service.grantTrainingStandardCombinationUse(manager.id,full.id,issue(full,teacher.id,'后续基础报告用途',4))
+  await service.revokeTrainingStandardCombinationUse(manager.id,first.id,{expectedVersion:3,reason:'New explicit named revision'},trainingAdminProof())
+  await service.grantTrainingStandardCombinationUse(manager.id,full.id,issue(full,teacher.id,'后续基础报告用途',4),trainingAdminProof())
   await expect(products.publish(actor,waiting.id,{revision:waiting.revision})).rejects.toMatchObject({statusCode:403})
   const blank=await products.create(actor,{requestId:randomUUID(),name:'Reject stale catalog selection',questionnaireType:'GENERAL',publicEnabled:false})
   await expect(products.addItem(actor,blank.id,{revision:blank.revision,item:{type:'SCALE',scaleId:fullChoice.scaleId,

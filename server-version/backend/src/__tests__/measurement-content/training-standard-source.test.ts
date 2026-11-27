@@ -1,3 +1,4 @@
+import {trainingAdminProof} from '../helpers/training-admin-proof'
 import {afterEach,describe,expect,it,vi} from 'vitest'
 vi.mock('../../config/database',()=>({prisma:{}}))
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
@@ -227,13 +228,25 @@ describe('exact Training entry approval precedes grant and publication',()=>{
   await expect(run(f)).rejects.toMatchObject({statusCode:409})
   expect(f.h.writes).toEqual([])
  })
+ it('requires a recent administrator proof for an entry-authorized configuration write',async()=>{
+  const f=trainingSourceHarness()
+  const {prisma}=await import('../../config/database'),client=prisma as any,previous=client.$transaction
+  client.$transaction=async(fn:any)=>fn(f.db)
+  try{
+   const {grantTrainingStandardCombinationUse}=await import('../../modules/measurement-content/standard-combination-use')
+   const request={requestId:tid(101),userId:ids.owner,combinationHash:f.h.row.combination_hash}
+   await expect(grantTrainingStandardCombinationUse(ids.issuer,ids.combo,request,trainingAdminProof(301)))
+    .rejects.toMatchObject({statusCode:403,code:'ADMIN_KEY_STEP_UP_REQUIRED'})
+   expect(f.h.writes).toEqual([])
+  }finally{client.$transaction=previous}
+ })
  it('does not issue a Training use for a combination without Training entry approval',async()=>{
   const f=trainingSourceHarness();f.h.trainingDecision='PENDING'
   const {prisma}=await import('../../config/database'),client=prisma as any,previous=client.$transaction
   client.$transaction=async(fn:any)=>fn(f.db)
   try{
    const {grantTrainingStandardCombinationUse}=await import('../../modules/measurement-content/standard-combination-use')
-   await expect(grantTrainingStandardCombinationUse(ids.issuer,ids.combo,{requestId:tid(101),userId:ids.owner,combinationHash:f.h.row.combination_hash})).rejects.toMatchObject({statusCode:409})
+   await expect(grantTrainingStandardCombinationUse(ids.issuer,ids.combo,{requestId:tid(101),userId:ids.owner,combinationHash:f.h.row.combination_hash},trainingAdminProof())).rejects.toMatchObject({statusCode:409})
    expect(f.h.writes).toEqual([])
   }finally{client.$transaction=previous}
  })

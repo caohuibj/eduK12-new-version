@@ -7,7 +7,7 @@ import type {CatalogSourceSnapshot} from './catalog.sources'
 /** New-parent admission only (the exported name predates non-Scale governance).
  * Hold the caller's Project/Wave and exact source locks through START commit.
  * An existing Attempt resumes, checkpoints and finalizes its frozen binding. */
-export async function assertSurveyScaleCollectionAllowed(tx:Prisma.TransactionClient,snapshot:ResearchFrozenPublication){
+export async function assertSurveyScaleCollectionAllowed(tx:Prisma.TransactionClient,snapshot:ResearchFrozenPublication,publicationId?:string){
   const identities:Array<Awaited<ReturnType<typeof snapshotPolicyIdentity>>>=[]
   const knownIdentities=new Map<string,Awaited<ReturnType<typeof snapshotPolicyIdentity>>>()
   for(const unit of snapshot.units){
@@ -20,7 +20,7 @@ export async function assertSurveyScaleCollectionAllowed(tx:Prisma.TransactionCl
     knownIdentities.set(unit.draftId,identity)
   }
   await prefetchToolPolicyAdmission(tx,identities,'SURVEY')
-  await assertSurveyPublicationNotPaused(tx,snapshot,knownIdentities)
+  await assertSurveyPublicationNotPaused(tx,snapshot,knownIdentities,publicationId)
   const scales=snapshot.units.filter(unit=>unit.kind==='SCALE')
   if(!scales.length)return
   const ids=scales.flatMap(unit=>{

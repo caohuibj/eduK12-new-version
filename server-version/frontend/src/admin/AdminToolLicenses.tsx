@@ -4,6 +4,7 @@ import api from '../api/client'
 import {ToolCatalogTagsPanel} from '../components/tool-licensing/ToolCatalogTags'
 import {products,type Product,type ToolLicenseFocus} from './toolLicenseFocus'
 import {BatchConfirmation, isBatchReceipt, matchesBatchPreview, readPendingBatch, type BatchCommit, type BatchIntent, type BatchPreview, type BatchReceipt} from './AdminToolLicenseBatch'
+import {firstLicenseCutover,toolLicenseRolloutLabel,type ToolLicenseEnrollment} from './toolLicenseRollout'
 import {licenseAssignmentPath} from './standardAssignmentTarget'
 import {LicenseHistory} from './LicenseRecordDetails'
 import './tool-licenses.css'
@@ -13,7 +14,7 @@ const catalog='/admin/tool-catalog-tags'
 type Subject={id:string;label:string;description?:string}
 type Tool={key:string;name:string;family:string;tags?:string[]}
 type LicenseTool=Tool&{limit:number|null;used:number}
-type License={id:string;product:Product;subjectId:string;nextLicenseId?:string|null;missingTools?:string[];subjectType:string;subjectLabel:string;startsAt:string;expiresAt:string;revision:number;status:'SCHEDULED'|'ACTIVE'|'EXPIRED'|'TERMINATED';reason:string;tools:LicenseTool[]}
+type License={id:string;product:Product;subjectId:string;nextLicenseId?:string|null;missingTools?:string[];enrollment?:ToolLicenseEnrollment;subjectType:string;subjectLabel:string;startsAt:string;expiresAt:string;revision:number;status:'SCHEDULED'|'ACTIVE'|'EXPIRED'|'TERMINATED';reason:string;tools:LicenseTool[]}
 type TerminationImpact=Pick<License,'id'|'revision'|'product'|'status'|'subjectLabel'>&{tools:Array<Pick<Tool,'key'|'name'>>;meteredPublications:number;outstandingReservations:number}
 type Page<T>={list:T[];hasMore:boolean;enforcedProducts?:Product[];pilotToolFamilies?:Partial<Record<Product,string[]>>}
 type SelectedTool=Tool&{limitInput:string;used:number}
@@ -237,7 +238,7 @@ function ProductLicenses({actorId,product,active,initialToolKey,initialSubjectId
   }
   if(!subject)return
   const intent:Issue={...request,subjectId:subject.id}
-  if(!window.confirm(`确认向 ${subject.label} 签发 ${products[product]} 工具许可？\n${displayTime(intent.startsAt)} 至 ${displayTime(intent.expiresAt)}\n${selected.map(tool=>tool.name+'（'+(tool.limitInput.trim()===''?'不限次数':tool.limitInput+'次')+'）').join('、')}\n原因：${intent.reason}`))return
+  if(!window.confirm(`确认向 ${subject.label} 签发 ${products[product]} 工具许可？\n${displayTime(intent.startsAt)} 至 ${displayTime(intent.expiresAt)}\n${selected.map(tool=>tool.name+'（'+(tool.limitInput.trim()===''?'不限次数':tool.limitInput+'次')+'）').join('、')}\n原因：${intent.reason}${running?'\n'+firstLicenseCutover:''}`))return
   try{sessionStorage.setItem(storageKey,JSON.stringify(intent))}catch{setStorageError('无法保存待核对请求，已阻止签发。请保留当前页面并检查浏览器存储。');return}
   setPending(intent);await sendIssue(intent)
  })
@@ -321,7 +322,7 @@ function ProductLicenses({actorId,product,active,initialToolKey,initialSubjectId
  }
  return <>
   {active&&<ToolCatalogTagsPanel product={product} onChange={()=>{setTagRevision(value=>value+1);tools.refresh()}}/>}
-  <p className="sys-message" role="status">{running?`当前入口已启用工具许可发布校验试点${runningFamilies?'，覆盖'+runningFamilies:''}。具体工具仍须满足原版本和入口规则。`:'当前入口尚未启用工具许可发布校验试点。实际发布仍按原入口权限执行。'}</p>
+  <p className="sys-message" role="status">{running?`当前入口已启用工具许可发布校验试点${runningFamilies?'，覆盖'+runningFamilies:''}。 ${firstLicenseCutover}`:'当前入口尚未启用工具许可发布校验试点。实际发布仍按原入口权限执行。'}</p>
   {focusedKey&&<div className="sys-message"><p>当前查看此工具的许可{tools.data?.list[0]?.name?' · '+tools.data.list[0].name:''}</p><button type="button" disabled={locked} onClick={clearFocus}>查看全部工具许可</button></div>}
   {schoolDetails.loading&&<p role="status">正在读取学校详情…</p>}
   {schoolDetails.error&&<p role="alert">{schoolDetails.error}</p>}
@@ -336,7 +337,7 @@ function ProductLicenses({actorId,product,active,initialToolKey,initialSubjectId
    <button type="button" disabled={busy} onClick={confirmBatch}>重试同一批次并核对结果</button>
   </section>}
   {batchPreview&&<BatchConfirmation preview={batchPreview.result} selectedSubjects={batchSubjects} busy={busy}
-   onCancel={()=>setBatchPreview(null)} onConfirm={confirmBatch} formatTime={displayTime}/>}
+   onCancel={()=>setBatchPreview(null)} onConfirm={confirmBatch} formatTime={displayTime} commercialCheckEnabled={running}/>}
   <section className="tool-license-editor" aria-label="编制工具许可">
    <h3>{editing?'调整工具范围与额度':renewing?renewing.status==='TERMINATED'?'重新签发工具许可':'续期工具许可':'新建工具许可'}</h3>
    {!editing&&!renewing&&<label className="tool-batch-toggle">
@@ -427,6 +428,7 @@ function ProductLicenses({actorId,product,active,initialToolKey,initialSubjectId
      <div className="sys-record-body">
       {!!row.missingTools?.length&&<p>下一期减少工具 · {row.missingTools.join('、')}</p>}
       <p>{row.reason} · 修订 {row.revision}</p>
+      {row.enrollment&&<p>{toolLicenseRolloutLabel(row.enrollment,displayTime)}</p>}
       <ul>{row.tools.map(tool=><li key={tool.key}>
        {tool.name} · {families[tool.family]??tool.family} · {tool.limit===null?'不限次数':'总量 '+tool.limit+' 次'}
        {' · 已用 '+tool.used+' 次'}{tool.limit!==null?' · 剩余 '+Math.max(0,tool.limit-tool.used)+' 次':''}

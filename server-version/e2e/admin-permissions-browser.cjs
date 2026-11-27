@@ -320,7 +320,7 @@ async function verifyProductionOriginClosure(page){
   const target=await api(sessions.system.page,'/admin/permissions/accounts?keyword='+encodeURIComponent(fixture.training.username))
   const grant=target.body.data.accounts.find(x=>x.id===fixture.training.id).entries.find(x=>x.entry==='TRAINING')
   const start=performance.now()
-  check((await api(sessions.system.page,`/admin/permissions/accounts/${fixture.training.id}/entries/TRAINING`,'PUT',{active:false,expectedVersion:grant.version,reason:'synthetic HTTP revocation'})).status===200,'revoke')
+  check((await api(sessions.system.page,`/admin/permissions/accounts/${fixture.training.id}/entries/TRAINING`,'PUT',{active:false,expectedVersion:grant.version,reason:'synthetic HTTP revocation',offboarding:{mode:'EMERGENCY'}})).status===200,'revoke')
   check((await api(sessions.training.page,'/users')).status===401,'old session invalid immediately after revoke commit')
   const revokeToDenialMs=performance.now()-start
   await login(sessions.training.page,fixture.training)

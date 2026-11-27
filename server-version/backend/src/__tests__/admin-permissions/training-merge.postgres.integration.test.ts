@@ -88,7 +88,7 @@ suite('merged Training source, public-round and export authority',()=>{
   it('revoke and regrant never revive the old manifest, intent or READY download',async()=>{
     const change=(active:boolean,expectedVersion:number)=>permissions.changeEntryGrant({actorUserId:ids.system,
       actorSession:{tokenVersion:0,adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()},targetUserId:ids.training,
-      entry:'TRAINING',active,expectedVersion,reason:'synthetic merged Training revocation'})
+      entry:'TRAINING',active,expectedVersion,offboarding:active?undefined:{mode:'EMERGENCY'},reason:'synthetic merged Training revocation'})
     await change(false,1)
     await expect(worker.prepareAssessmentExport(intent)).rejects.toMatchObject({statusCode:404})
     await expect(worker.revalidateAssessmentExport(intent)).rejects.toMatchObject({statusCode:404})

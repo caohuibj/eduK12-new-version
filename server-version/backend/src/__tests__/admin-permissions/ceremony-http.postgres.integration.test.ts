@@ -63,7 +63,7 @@ suite('actual API password/key/step-up/recovery ceremonies (synthetic crypto)',(
     await db.adminSecurityChallenge.updateMany({where:{userId:f.user.id,purpose:'STEP_UP'},data:{expiresAt:new Date(Date.now()-1000)}})
     expect((await f.client.call('/api/admin/security/step-up/verify','POST',{response:assertion(f.k,options.body.data.options.challenge,3)})).status).toBe(403)
     const actor=await fixture(true)
-    await service.changeEntryGrant({actorUserId:actor.user.id,actorSession:{tokenVersion:0,adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()},targetUserId:f.user.id,entry:'TRAINING',active:false,expectedVersion:1,reason:'synthetic HTTP ceremony revoke'})
+    await service.changeEntryGrant({actorUserId:actor.user.id,actorSession:{tokenVersion:0,adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()},targetUserId:f.user.id,entry:'TRAINING',active:false,offboarding:{mode:'EMERGENCY'},expectedVersion:1,reason:'synthetic HTTP ceremony revoke'})
     expect((await f.client.call('/api/users')).status).toBe(401)
     f.client.cookies.delete('ptool_session')
     expect((await f.client.call('/api/auth/login','POST',{username:f.user.username,password:f.password})).body.data.user.role).toBe('STUDENT')

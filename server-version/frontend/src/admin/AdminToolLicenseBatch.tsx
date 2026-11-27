@@ -1,3 +1,4 @@
+import {firstLicenseCutover} from './toolLicenseRollout'
 import {useEffect,useRef} from 'react'
 import type {Product} from './toolLicenseFocus'
 
@@ -67,8 +68,8 @@ export function isBatchReceipt(receipt:BatchReceipt|undefined,input:BatchCommit)
    &&sameTools(row.tools,input.tools)))
 }
 
-export function BatchConfirmation({preview,selectedSubjects,busy,onCancel,onConfirm,formatTime}:{
- preview:BatchPreview;selectedSubjects:BatchSubject[];busy:boolean;onCancel:()=>void;onConfirm:()=>void;formatTime:(value:string)=>string
+export function BatchConfirmation({preview,selectedSubjects,busy,onCancel,onConfirm,formatTime,commercialCheckEnabled}:{
+ preview:BatchPreview;selectedSubjects:BatchSubject[];busy:boolean;onCancel:()=>void;onConfirm:()=>void;formatTime:(value:string)=>string;commercialCheckEnabled?:boolean
 }){
  const conflicts=new Map(preview.conflicts.map(row=>[row.subjectId,row]))
  const section=useRef<HTMLElement>(null)
@@ -76,6 +77,7 @@ export function BatchConfirmation({preview,selectedSubjects,busy,onCancel,onConf
  return <section className="sys-message tool-batch-preview" aria-label="批量签发预览" tabIndex={-1} ref={section}>
   <h3>批量签发预览</h3>
   <p>{formatTime(preview.startsAt)} 至 {formatTime(preview.expiresAt)}</p>
+  {commercialCheckEnabled&&<p>{firstLicenseCutover}</p>}
   <p>每个授权对象分别获得以下工具及额度。标签用于选工具，已确认的名单会记录在本次许可。</p>
   <h4>授权对象（{selectedSubjects.length}）</h4>
   <ul>{selectedSubjects.map(subject=>{
