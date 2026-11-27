@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react'
-import { CHINESE_SELF_CONCEPT_ACTIONS, type ChineseSelfConceptBand } from './declaredReportActionBand'
+import { CHINESE_SELF_CONCEPT_ACTIONS, type DeclaredActionBand } from './declaredReportActionBand'
 import underline from '../../assets/chinese-self-concept-actions-v2/very_low.webp'
 import bookmark from '../../assets/chinese-self-concept-actions-v2/low.webp'
 import notes from '../../assets/chinese-self-concept-actions-v2/middle.webp'
 import closeReading from '../../assets/chinese-self-concept-actions-v2/high.webp'
 import retelling from '../../assets/chinese-self-concept-actions-v2/very_high.webp'
+import courtyard from '../../assets/who5-fortnight-v1/courtyard.webp'
+import sketch from '../../assets/who5-fortnight-v1/sketch.webp'
 import doorComic from '../../assets/chinese-self-concept-door-v1.webp'
 
 export function DeclaredReportIllustration({ illustrationKey }: { illustrationKey?: string }) {
@@ -22,20 +24,22 @@ export function DeclaredReportIllustration({ illustrationKey }: { illustrationKe
 }
 
 const actions = {
+  who5_under_13: { src: courtyard, width: 752, height: 1024, alt: '树下的长椅上，小林打开笔记本，一位信任的大人坐在身边听。' },
+  who5_from_13: { src: sketch, width: 752, height: 1024, alt: '小林把画了小鸟的便笺钉在桌边，记下愿意再做的小事。' },
   very_low: { src: underline, width: 512, alt: '小禾在读懂的一句课文下面画线。' },
   low: { src: bookmark, width: 512, alt: '小禾把橙色书签夹进课本，记下想聊的一页。' },
   middle: { src: notes, width: 512, alt: '摊开的笔记本上，一张便笺画着灯泡，另一张画着问号。' },
   high: { src: closeReading, width: 480, alt: '小禾拿着放大镜看课文，手指向原文中圈出的一处。' },
   very_high: { src: retelling, width: 572, alt: '小禾合上课本，给同桌讲刚读到的内容。' },
-} satisfies Record<ChineseSelfConceptBand, { src: string; width: number; alt: string }>
+} satisfies Record<DeclaredActionBand, { src: string; width: number; height?: number; alt: string }>
 
-export function DeclaredBandFeedback({ band, children }: { band?: ChineseSelfConceptBand; children: ReactNode }) {
+export function DeclaredBandFeedback({ band, children }: { band?: DeclaredActionBand; children: ReactNode }) {
   if (!band) return <>{children}</>
   const action = actions[band]
   return (
     <div className="grid items-center gap-3 sm:grid-cols-[minmax(0,1fr)_10rem]">
       {children}
-      <img src={action.src} alt={action.alt} width={action.width} height={512}
+      <img src={action.src} alt={action.alt} width={action.width} height={'height' in action ? action.height : 512}
         loading="lazy" decoding="async" className="h-auto w-40 max-w-full justify-self-center rounded-lg" />
     </div>
   )

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 // Public artwork bundled with the client. Private or uploaded images still require ASSET bindings.
-export const reportIllustrationKeySchema=z.enum(['chinese-self-concept-door-v1','chinese-self-concept-door-with-actions-v2'])
+export const reportIllustrationKeySchema=z.enum(['chinese-self-concept-door-v1','chinese-self-concept-door-with-actions-v2','who5-fortnight-v1'])
 
 const prose=z.string().trim().min(1).max(20000)
 const key=z.string().trim().min(1).max(240)
