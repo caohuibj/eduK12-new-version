@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "academic_self_efficacy_chinese_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "academic_self_efficacy-very-low.webp",
+      "alt": "学生在课本中圈出自己已读懂的一句。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "academic_self_efficacy-low.webp",
+      "alt": "学生拿着带便签的一页向同伴请教。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "low"
+    },
+    {
+      "file": "academic_self_efficacy-middle.webp",
+      "alt": "学生并排比较阅读任务与写作任务的记录。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "middle"
+    },
+    {
+      "file": "academic_self_efficacy-high.webp",
+      "alt": "学生试着用熟悉的读法理解一页新文章。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "high"
+    },
+    {
+      "file": "academic_self_efficacy-very-high.webp",
+      "alt": "学生对照自己事先预计的难点和实际练习的记录。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生在小组里讨论便签上记下的一处阅读细节。",
+    "width": 506,
+    "height": 506
+  }
+}

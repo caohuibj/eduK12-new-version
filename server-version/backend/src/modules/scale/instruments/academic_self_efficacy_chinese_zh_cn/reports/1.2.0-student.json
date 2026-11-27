@@ -1,0 +1,122 @@
+{
+  "toolKey": "academic_self_efficacy_chinese_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "语文学习自我效能图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对项目5题、1–5 分选项、最少4题的均分计分及原理论分档。"
+      }
+    },
+    "primaryScoreKeys": [
+      "academic_self_efficacy"
+    ],
+    "scoreOrder": [
+      "academic_self_efficacy"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "academic_self_efficacy",
+        "headline": "长文章读不下去时，从哪一句开始？",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "读一篇长文章时，小文看完第一段就忘了开头在讲谁。她把出现的人物记在便签上，重新读了几句，发现一个动作和前面的语气对不上。她把这个细节带到小组里去问，接下来就知道自己要从哪儿再读一遍。\n\n“遇到这种语文任务，我有多大把握做下去？”这是理解学习自我效能的一种方式。完成一个阅读动作、借到一个提示、独立写出一段开头，都会让下一次的判断更具体。找一项自己读过或写过的小任务，说说你已经有把握做到哪一步。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "圈出一句读懂的话",
+            "summary": "从最近学过的一页找出一句读懂的话。记下提到的人或物，再用自己的话写下发生了什么。读一遍前后两句核对。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "只在一个地方请人提示",
+            "summary": "用便签标出卡住的一句，问老师或同桌一个具体问题。听完试着重读这一小段，写出自己现在理解的句意。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "比一比阅读和写作",
+            "summary": "选一个阅读任务和一个写作任务，做前分别写一句预计能完成什么。做完看看哪种任务的判断更接近实际，下次该从哪里练。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "把一个用过的方法带到下一次",
+            "summary": "读一页略陌生的短文，试着用熟悉的办法，比如追踪一个人物的动作。读完找一句原文核对你的理解。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "用新任务核对自己的预计",
+            "summary": "试一次较陌生的阅读或表达任务。先写可能卡住的地方，做完标出实际最难的一步，再记下次准备如何开始。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "做完一次阅读或写作，记下自己预计能做的第一步、结果和真正帮到你的方法。"
+          }
+        ],
+        "scoreLabel": "语文学习自我效能均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "至少答4道题才计算均分。均分描述你这次对自己完成语文任务的把握。",
+      "五档沿用按 1–5 分量尺估算的区间，用于选择一条试用建议。报告省略学段比较。"
+    ],
+    "disclaimer": "学生可以用这份报告回顾一次真实课堂经历，也可以拿一个具体问题跟同伴或老师聊一聊。",
+    "artworkKey": "academic_self_efficacy_chinese_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
