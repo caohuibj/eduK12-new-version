@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "academic_self_concept_english_zh_cn",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "816a47d3ceaa97b47da4afdb7660c10eedd59611a28059899bbe915456f8d1ec",
+  "baseParametersHash": "8508fe5ed0bebb350d34a11b9fb7b99d333bf048efcd5402d40f87fd3a25d76f",
+  "variants": [
+    {
+      "key": "student_english_actions",
+      "title": "英语学习自评图文版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "artworkKey": "academic_self_concept_english_zh_cn/1.0.0/1.2.0",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "Codex 内容审定",
+            "reviewedAt": "2026-11-27T00:00:00Z",
+            "basis": "逐题核对项目学科替换版四题、五点选项、均分计分和三题最低作答规则。英语版尚无同版本经验样本，五档仅为量尺范围的试用估算，不作为常模、能力或诊断界线。"
+          }
+        },
+        "primaryScoreKeys": ["academic_self_concept"],
+        "scoreOrder": ["academic_self_concept"],
+        "interpretations": [
+          {
+            "scoreKey": "academic_self_concept",
+            "headline": "我怎么看自己的英语学习",
+            "source": {"type": "reference_context"},
+            "summary": "英语课上，小林读到一段新对话，一个短语让她停了下来。她先想：\"我英语不行。\"再看一眼，她发现旁边画着雨伞，前一句还有一个熟悉的天气词。她试着猜了一个意思，又用这个意思说出一句很短的话，请同桌听听顺不顺。她没有一下子学会整篇，却找到了一条能继续往前走的线索。\n\n\"我觉得自己英语学得怎么样\"，是英语学科自我概念。它不是词汇量、口音或考试分数的替身，而是你对自己英语学习表现形成的整体印象。这样的印象会被很多小经历慢慢改写，也可能影响下一次遇到陌生表达时，你愿不愿意猜一猜、说一说、再核对。读报告时，不需要证明自己\"行\"或\"不行\"；更有用的问题是：最近一次听、说、读、写中，哪一条线索真的帮你继续下去了？",
+            "bands": [
+              {"key": "very_low", "label": "回到你的英语课", "summary": "这次，你较少认同这些关于英语学习的正向描述。找一段最近读过或听过的材料，只圈出一个你确实认得的词、画面或语气。先把这一条线索算进去，再问它能帮你猜到什么。", "guidance": []},
+              {"key": "low", "label": "回到你的英语课", "summary": "这次，你对这些正向描述的认同偏少。把最近卡住的一句话夹上书签，旁边只留一个具体问题：是没认出词、没跟上语速，还是不确定怎么开口？问题越具体，帮助越容易找到。", "guidance": []},
+              {"key": "middle", "label": "回到你的英语课", "summary": "你的均分落在试用量尺的中间一段，不必把它翻译成\"普通\"。挑一次真实的听说读写经历，分别记下已经明白、借助提示明白和仍想确认的地方，你会看到自己的英语学习并不是一个模糊的总标签。", "guidance": []},
+              {"key": "high", "label": "回到你的英语课", "summary": "从这次回答看，你对自己的英语学习比较有把握。试着把一段刚读懂的内容合上书讲给同伴听，再翻回原文找一处漏掉或理解得不够准的细节。把握经得住核对，才会更可靠。", "guidance": []},
+              {"key": "very_high", "label": "回到你的英语课", "summary": "你这次对自己的英语学习很有信心。找一段比平时稍陌生的材料，先根据上下文预测意思，再查看后文或词典修正。高自信不是不需要查证，而是敢于先尝试，也愿意让证据改写自己的猜测。", "guidance": []}
+            ],
+            "guidance": [
+              {"category": "reflection", "text": "把\"我英语行不行\"换成一次可回放的经历：我看见或听见了什么线索？我据此做了什么猜测？后来怎样核对？"},
+              {"category": "strategy", "text": "本周做一次\"一条线索练习\"：听或读一小段，只记录一个帮助你理解的词、画面、语气或上下文关系。"}
+            ],
+            "scoreLabel": "英语学习自评均分（试用版）",
+            "provisional": true
+          }
+        ],
+        "limitations": [
+          "均分来自四道正向题，至少回答三题；它不分别测量听、说、读、写，也不能据此判断具体语言技能。",
+          "英语版五档按 1—5 分可选范围等距划分，是试用估算，不是同年级常模、百分位、能力等级或心理阈值。",
+          "结果描述本次自我看法，不替代考试、课堂表现或语言任务，也不能推断智力、天赋或未来表现。"
+        ],
+        "disclaimer": "这份报告供七至十二年级学生回顾本次对英语学习的看法，可与老师一起讨论，不用于排名、分流或诊断。"
+      }
+    }
+  ]
+}

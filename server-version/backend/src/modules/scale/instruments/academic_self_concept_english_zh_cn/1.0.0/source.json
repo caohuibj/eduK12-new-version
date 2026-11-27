@@ -6,7 +6,7 @@
   },
   "catalog": {
     "schemaVersion": 1,
-    "catalogManifestVersion": 2,
+    "catalogManifestVersion": 3,
     "catalogStatus": "REVIEWED",
     "scientificMaturity": "PILOT",
     "identity": {
@@ -22,7 +22,12 @@
       "constructOverlapTags": [
         "academic_self_concept",
         "english",
-        "student_self_report"
+        "student_self_report",
+        "subject_specific_self_concept",
+        "language_learning",
+        "learning_motivation",
+        "secondary_education",
+        "reflective_learning"
       ]
     },
     "population": {
