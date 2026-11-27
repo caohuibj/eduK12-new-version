@@ -52,7 +52,6 @@ async function readPreview(tx: Tx, actor: ToolLicenseActor, scope: Scope, lock =
   const stable = stableScope(scope)
   const subjects: LicenseSubject[] = []
   const conflicts: Conflict[] = []
-  const tools = await validateToolLicenseItems(tx, scope.product, stable.tools)
   const overlapping = await findOverlappingToolLicenseSubjects(tx, { ...scope, subjectIds: stable.subjectIds })
   const eligible = await eligibleBatchSubjects(tx, scope.product, stable.subjectIds, lock)
   for (const subjectId of stable.subjectIds) {
@@ -66,6 +65,7 @@ async function readPreview(tx: Tx, actor: ToolLicenseActor, scope: Scope, lock =
       conflicts.push({ subjectId, label: subject.label, reason: '此入口已有与所选期限重叠的许可' })
     }
   }
+  const tools = await validateToolLicenseItems(tx, scope.product, stable.tools)
   const reviewed = {
     requestId: stable.requestId, product: stable.product,
     startsAt: stable.startsAt, expiresAt: stable.expiresAt, reason: stable.reason, subjects, tools, conflicts,
@@ -128,8 +128,10 @@ export async function createToolLicenseBatch(actor: ToolLicenseActor, raw: unkno
     // product/subject locks, which also synchronize ordinary single issuance.
     await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock(hashtextextended('tool-license-batch:'||${requestId}::text,0))`
     const [committed] = await tx.$queryRaw<Array<{ id: string }>>`SELECT id FROM tool_licenses WHERE id=${requestId}`
-    if (committed) recheck()
-    if (committed) return { requestId, licenses: await issuedReceipts(tx, ids, digest) }
+    if (committed) {
+      recheck()
+      return { requestId, licenses: await issuedReceipts(tx, ids, digest) }
+    }
 
     await lockToolLicenseSubjects(tx, scope.product, subjectIds)
     const review = await readPreview(tx, actor, scope, true).catch(error => {

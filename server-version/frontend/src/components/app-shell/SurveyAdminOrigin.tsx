@@ -1,14 +1,17 @@
 import { useEffect, type ReactNode } from 'react'
+import { standardAssignmentReturnTo } from '../../admin/standardAssignmentTarget'
 import { productOrigins, SURVEY_ADMIN_PATH } from '../../products/origins'
 import { surveyAppearanceFromSearch, surveyAppearanceHref } from '../../survey/survey-appearance-links'
 
 /** Choose the final cookie host before mounting credentials or governance requests.
- * Only the fixed destination and a validated appearance hint may cross origins. */
+ * Preserve a validated assignment target and appearance hint on the fixed destination. */
 export default function SurveyAdminOrigin({ children, login = false }: { children: ReactNode; login?: boolean }) {
   const origins = productOrigins()
   const requested = new URLSearchParams(window.location.search).get('returnTo')
-  const returnTo = requested === SURVEY_ADMIN_PATH || requested === '/admin/training' ? requested : '/users'
-  const destination = origins ? origins.admin + (login ? `/admin/login?returnTo=${encodeURIComponent(returnTo)}` : SURVEY_ADMIN_PATH) : null
+  const linked = standardAssignmentReturnTo(requested)
+  const returnTo = linked?.startsWith(SURVEY_ADMIN_PATH+'?') ? linked : requested === SURVEY_ADMIN_PATH || requested === '/admin/training' ? requested : '/users'
+  const tool = standardAssignmentReturnTo(SURVEY_ADMIN_PATH+window.location.search)
+  const destination = origins ? origins.admin + (login ? `/admin/login?returnTo=${encodeURIComponent(returnTo)}` : tool??SURVEY_ADMIN_PATH) : null
   const appearance = surveyAppearanceFromSearch(window.location.search)
   const target = destination && login && appearance ? surveyAppearanceHref(destination, appearance) : destination
   const move = Boolean(origins && origins.admin !== window.location.origin)

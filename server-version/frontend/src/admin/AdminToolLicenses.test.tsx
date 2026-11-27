@@ -104,7 +104,7 @@ it('creates a separate non-overlapping renewal with the old tool limits and no c
  await within(screen.getByRole('region',{name:'工具许可列表'})).findByText(subject.label,{selector:'strong'})
  const list=expandRecord();fireEvent.click(list.getByRole('button',{name:'续期'}))
  const from=screen.getByLabelText('生效时间（本地时间）') as HTMLInputElement
- expect(Date.parse(from.value)).toBeGreaterThanOrEqual(Date.parse(row.expiresAt))
+ expect(Date.parse(from.value)).toBe(Date.parse(row.expiresAt))
  expect(screen.getByLabelText('额度 · '+scale.name)).toHaveValue(10)
  fireEvent.change(screen.getByLabelText('本次授权原因'),{target:{value:'续签新一期'}})
  vi.mocked(window.confirm).mockReturnValue(true)
@@ -321,4 +321,23 @@ it('retains the same confirmed request after a network interruption and an expir
  expect(client.post.getMockImplementation()).toBe(defaultPost)
  expect(client.post.mock.calls.slice(1).map(([, body])=>body)).toEqual([submitted,submitted,submitted])
  expect(sessionStorage.getItem('admin-tool-license-batch:system:SCHOOL')).toBeNull()
+})
+
+
+it('loads audit history on demand and carries the licensed school and tool to the assignment workspace',async()=>{
+ const schoolId='00000000-0000-4000-8000-000000000001'
+ records=[{...row,subjectId:schoolId,tools:[{...row.tools[0],key:'SCALE:fixture'}]}]
+ const path=base+'/'+row.id+'/history'
+ client.get.mockImplementation(async(url:string)=>url===path?reply([{
+  revision:4,actor:'合成管理员',createdAt:row.startsAt,action:'UPDATED',reason:'调整额度',
+  tools:[{...scale,limit:10}],previous:[{...scale,limit:20}],
+ }]):read(url))
+ renderLicenses()
+ await within(screen.getByRole('region',{name:'工具许可列表'})).findByText(subject.label,{selector:'strong'})
+ const list=expandRecord()
+ expect(list.getByRole('link',{name:'由 School 管理员分配版本'})).toHaveAttribute('href','/admin/huischool?standardTool=fixture&subjectId='+schoolId)
+ expect(client.get).not.toHaveBeenCalledWith(path)
+ fireEvent.click(list.getByText('查看变更历史'))
+ expect(await list.findByText('AUDIT 合成量表 额度 20 → 10')).toBeVisible()
+ expect(client.get).toHaveBeenCalledWith(path)
 })

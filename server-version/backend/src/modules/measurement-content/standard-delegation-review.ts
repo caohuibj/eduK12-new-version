@@ -6,6 +6,7 @@ import type {AdminSessionProof} from '../admin-permissions/proof'
 import {EDUCATION_STANDARD_USE_ACTION} from '../assessment-authorization/education-standard-use'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
+import {canonicalHash} from '../assessment-runtime/canonical'
 import {readCurrentStandardCombination} from './standard-combination-source'
 import {readStandardDelegationCoverage} from './standard-delegations.service'
 import {issueAdminContentRoot,issueAdminStandardCombinationRoot,lockCurrentContentSystemActor,
@@ -27,7 +28,9 @@ const version=z.number().int().positive()
 const listQuery=z.object({page}).strict()
 const detailQuery=z.object({successorGrantId:uuid.optional(),candidateQuery:z.string().trim().max(100).default(''),candidatePage:page,impactPage:page}).strict()
 const transferInput=z.object({requestId:uuid,successorId:uuid,expectedVersion:version,reason}).strict()
-const withdrawalInput=z.object({expectedVersion:version,reason,impactDigest:digest,successorGrantId:uuid.optional(),continueIds:z.array(uuid).max(2000).default([])}).strict()
+const withdrawalInput=z.object({expectedVersion:version,reason,impactDigest:digest,successorGrantId:uuid.optional(),continueIds:z.array(uuid).max(2000)
+ .refine(ids=>new Set(ids).size===ids.length,'延续配置不可重复').default([])}).strict()
+ .refine(input=>!input.continueIds.length||Boolean(input.successorGrantId),'延续配置需要接任委托')
 const size=25
 const txOptions={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:10000}
 const entry=(product:Product)=>product==='SCHOOL'?'HUISCHOOL':'HUITEACHER'
@@ -64,42 +67,61 @@ async function root(tx:Tx,accountId:string,grantId:string,lock=false){
 }
 
 type Impact={count:number;digest:string;list:{id:string;label:string;title:string;expiresAt:Date;reissued:boolean}[];covered:number}
-async function impact(tx:Tx,grant:Pick<Root,'id'|'accountId'|'product'|'schoolId'>,page=1,successor?:string,continueIds:string[]=[],lock=false){
+async function impact(tx:Tx,grant:Pick<Root,'id'|'accountId'|'product'|'schoolId'|'resourceKey'>,page=1,successor?:string,continuing?:readonly string[]){
+ const checkReissues=successor&&(continuing===undefined||continuing.length>0)
  const [impact]=await tx.$queryRaw<Impact[]>(Prisma.sql`
   WITH linked AS MATERIALIZED (
-   SELECT u.id,u.version,person.username AS label,
-    COALESCE(a.metadata->>'configurationName',s.snapshot->>'title',s.tool_key) AS title,
-    u.expires_at AT TIME ZONE 'UTC' AS "expiresAt"
-    ,${successor ? Prisma.sql`EXISTS (
-      SELECT 1 FROM content_capability_grants n JOIN assessment_management_events e ON e.id=n.id
-        AND e.action=a.action AND e.resource_id=a.resource_id AND e.actor_id=n.issuer_id
-      JOIN content_capability_grants parent ON parent.id=${successor} AND parent.subject_id=n.issuer_id
-      JOIN admin_entry_grants entry ON entry.user_id=n.issuer_id AND entry.entry=${entry(grant.product)}
-        AND entry.revoked_at IS NULL AND entry.id=e.metadata#>>'{selectedBinding,binding,authorization,authority,0,id}'
-        AND entry.version::text=e.metadata#>>'{selectedBinding,binding,authorization,authority,0,revision}'
-      WHERE n.subject_id=u.subject_id AND n.product=u.product AND n.scope_id=u.scope_id AND n.scope_kind=u.scope_kind
-        AND n.resource_kind=u.resource_kind AND n.resource_keys=u.resource_keys AND n.capabilities=u.capabilities
-        AND n.revoked_at IS NULL AND n.expires_at>=u.expires_at AND n.valid_from<=GREATEST(u.valid_from,statement_timestamp() AT TIME ZONE 'UTC')
-        AND e.metadata#>>'{selectedBinding,binding,configurationHash}'=a.metadata#>>'{selectedBinding,binding,configurationHash}'
-        AND e.metadata#>>'{selectedBinding,binding,authorization,authority,1,id}'=parent.id
-        AND e.metadata#>>'{selectedBinding,binding,authorization,authority,1,revision}'=parent.version::text
-        AND e.metadata#>>'{selectedBinding,binding,authorization,revision}'=n.version::text
-        AND parent.revoked_at IS NULL AND parent.product=u.product AND parent.scope_id=u.scope_id
-      ORDER BY n.id LIMIT 1 ${lock ? Prisma.sql`FOR SHARE OF n` : Prisma.empty}
-    )` : Prisma.sql`false`} AS reissued
+   SELECT u.id,u.version,u.subject_id,u.resource_keys,u.valid_from,u.expires_at,u.product,u.scope_id,
+    a.resource_id,a.metadata#>>'{selectedBinding,binding,configurationHash}' AS configuration_hash,
+    person.username AS label,COALESCE(a.metadata->>'configurationName',s.snapshot->>'title',s.tool_key) AS title
    FROM content_capability_grants u JOIN assessment_management_events a ON a.id=u.id
     AND a.action=${EDUCATION_STANDARD_USE_ACTION} AND a.actor_id=u.issuer_id
    JOIN survey_standard_releases s ON s.id=a.resource_id JOIN users person ON person.id=u.subject_id
    WHERE u.issuer_id=${grant.accountId} AND u.product=${grant.product}
     AND u.scope_id=${grant.schoolId} AND u.scope_kind='ORGANIZATION' AND u.resource_kind='material'
     AND u.capabilities=ARRAY['material.use']::text[] AND u.revoked_at IS NULL
-    AND u.expires_at>clock_timestamp() AT TIME ZONE 'UTC'
+    AND u.expires_at>statement_timestamp() AT TIME ZONE 'UTC'
     AND a.metadata#>>'{selectedBinding,binding,authorization,authority,1,id}'=${grant.id}
+  ), visible AS (
+   SELECT * FROM linked ORDER BY id LIMIT ${size} OFFSET ${(page-1)*size}
+  ), reissued AS MATERIALIZED (
+   ${checkReissues ? Prisma.sql`
+     SELECT old.id FROM ${continuing===undefined?Prisma.sql`visible`:Prisma.sql`linked`} old
+     WHERE ${continuing===undefined?Prisma.sql`TRUE`:Prisma.sql`old.id=ANY(${[...continuing]}::text[])`}
+     AND EXISTS (
+      SELECT 1
+      FROM content_capability_grants n JOIN assessment_management_events e ON e.id=n.id
+        AND e.action=${EDUCATION_STANDARD_USE_ACTION} AND e.resource_id=old.resource_id AND e.actor_id=n.issuer_id
+      JOIN content_capability_grants parent ON parent.id=${successor} AND parent.subject_id=n.issuer_id
+      JOIN users manager ON manager.id=parent.subject_id AND manager.id<>${grant.accountId}
+        AND manager.platform_role='STANDARD' AND manager.account_domain IN ('TRAINING','LEGACY')
+        AND manager.is_active AND NOT manager.is_frozen AND NOT manager.must_change_password
+        AND (manager.expires_at IS NULL OR manager.expires_at>clock_timestamp())
+      JOIN admin_entry_grants manager_entry ON manager_entry.user_id=manager.id AND manager_entry.entry=${entry(grant.product)}
+        AND manager_entry.revoked_at IS NULL AND manager_entry.id=e.metadata#>>'{selectedBinding,binding,authorization,authority,0,id}'
+        AND manager_entry.version::text=e.metadata#>>'{selectedBinding,binding,authorization,authority,0,revision}'
+      WHERE n.subject_id=old.subject_id AND n.product=old.product AND n.scope_id=old.scope_id
+        AND n.scope_kind='ORGANIZATION' AND n.resource_kind='material' AND n.resource_keys=old.resource_keys
+        AND n.capabilities=ARRAY['material.use']::text[] AND n.revoked_at IS NULL
+        AND n.expires_at>=old.expires_at AND n.expires_at>clock_timestamp() AT TIME ZONE 'UTC'
+        AND n.valid_from<=GREATEST(old.valid_from,statement_timestamp() AT TIME ZONE 'UTC')
+        AND e.metadata#>>'{selectedBinding,binding,configurationHash}'=old.configuration_hash
+        AND e.metadata#>>'{selectedBinding,binding,authorization,authority,1,id}'=parent.id
+        AND e.metadata#>>'{selectedBinding,binding,authorization,authority,1,revision}'=parent.version::text
+        AND e.metadata#>>'{selectedBinding,binding,authorization,revision}'=n.version::text
+        AND parent.revoked_at IS NULL AND parent.product=old.product AND parent.scope_id=old.scope_id
+        AND parent.scope_kind='ORGANIZATION' AND parent.resource_kind='material'
+        AND parent.capabilities=ARRAY['material.distribute']::text[]
+        AND parent.resource_keys=ARRAY[${grant.resourceKey}]::text[]
+        AND parent.valid_from<=clock_timestamp() AT TIME ZONE 'UTC' AND parent.expires_at>=old.expires_at
+      ORDER BY n.id LIMIT 1 ${continuing!==undefined ? Prisma.sql`FOR SHARE OF n` : Prisma.empty}
+     )` : Prisma.sql`SELECT NULL::text AS id WHERE FALSE`}
   )
-  SELECT count(*)::int AS count,count(*) FILTER (WHERE reissued AND id=ANY(${continueIds}::text[]))::int AS covered,
+  SELECT count(*)::int AS count,(SELECT count(*)::int FROM reissued) AS covered,
    encode(digest(COALESCE(string_agg(id||':'||version::text,',' ORDER BY id),''),'sha256'),'hex') AS digest,
    COALESCE((SELECT jsonb_agg(row ORDER BY row.id) FROM (
-    SELECT id,label,title,"expiresAt",reissued FROM linked ORDER BY id LIMIT ${size} OFFSET ${(page-1)*size}
+    SELECT v.id,v.label,v.title,v.expires_at AT TIME ZONE 'UTC' AS "expiresAt",(r.id IS NOT NULL) AS reissued
+    FROM visible v LEFT JOIN reissued r ON r.id=v.id
    ) row),'[]'::jsonb) AS list FROM linked`)
  return {...impact,hasMore:impact.count>page*size}
 }
@@ -176,7 +198,8 @@ export async function issueStandardDelegationSuccessor(actorId:string,proof:Admi
 
 export async function withdrawStandardDelegationReview(actorId:string,proof:AdminSessionProof,rawAccountId:string,rawGrantId:string,raw:unknown){
  const accountId=uuid.parse(rawAccountId),grantId=uuid.parse(rawGrantId),input=withdrawalInput.parse(raw)
- const reason=input.successorGrantId?'已核对接任委托 '+input.successorGrantId+'：'+input.reason:input.reason
+ const continuation=input.continueIds.length?'，延续 '+input.continueIds.length+' 份（'+canonicalHash([...input.continueIds].sort()).slice(0,32)+'）':''
+ const reason=input.successorGrantId?'已核对接任委托 '+input.successorGrantId+continuation+'：'+input.reason:input.reason
  return revokeAdminContentGrant(actorId,proof,grantId,{expectedVersion:input.expectedVersion,reason},async(tx,record)=>{
   const grant=await root(tx,accountId,grantId)
   if(record.revoked_at)return
@@ -190,9 +213,9 @@ export async function withdrawStandardDelegationReview(actorId:string,proof:Admi
     ||successor.resourceKey!==grant.resourceKey||successor.expiresAt<grant.expiresAt)
     unavailable('接任人的学校、入口、范围或有效期不匹配')
   }
-  const affected=await impact(tx,grant,1,input.successorGrantId,input.continueIds,true)
+  const affected=await impact(tx,grant,1,input.successorGrantId,input.continueIds)
   if(affected.digest!==input.impactDigest)unavailable('下游配置范围已变化，请重新查看影响后撤销')
-  if(input.continueIds.length && (!input.successorGrantId || affected.covered!==input.continueIds.length))
+  if(affected.covered!==input.continueIds.length)
     unavailable('选中延续的配置仍缺少接任人同对象、同版本和期限的重发记录，请重新核对')
  })
 }

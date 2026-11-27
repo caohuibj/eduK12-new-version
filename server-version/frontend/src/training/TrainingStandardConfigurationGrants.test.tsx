@@ -124,6 +124,15 @@ describe('Training exact issuance durable original-intent recovery',()=>{
  })
 })
 
+it('preselects the licensed teacher after choosing an eligible version',async()=>{
+ render(<TrainingStandardConfigurationWorkspace actorId={id(5)} initialStandard={{toolKey:choice.toolKey,subjectId:person.id}}/>)
+ fireEvent.click(await screen.findByRole('button',{name:'管理此配置授权'}))
+ const dialog=await screen.findByRole('dialog',{name:'分配固定量表配置'})
+ await waitFor(()=>expect(within(dialog).getByLabelText('接收培训师')).toHaveValue(person.id))
+ expect(api.grants).toHaveBeenCalledExactlyOnceWith(choice.id,{userId:person.id})
+ expect(api.issue).not.toHaveBeenCalled()
+})
+
 it('opens the exact Training grant editor chosen by the shared C/P/R finder without issuing immediately',async()=>{
  render(<TrainingStandardConfigurationWorkspace actorId={id(5)}/>);await screen.findByRole('button',{name:'管理此配置授权'});fireEvent.click(screen.getByText('按题本、参数和报告查找已批准配置'))
  fireEvent.change(screen.getByLabelText('量表工具'),{target:{value:choice.toolKey}})

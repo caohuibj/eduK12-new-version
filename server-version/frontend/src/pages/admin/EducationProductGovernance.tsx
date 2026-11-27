@@ -1,5 +1,5 @@
-import {lazy,Suspense,useState} from 'react'
-import {readStandardAssignmentTarget} from '../../admin/standardAssignmentTarget'
+import {lazy,Suspense,useEffect,useState} from 'react'
+import {readStandardAssignmentTarget,type StandardAssignmentTarget} from '../../admin/standardAssignmentTarget'
 import {Link,useLocation} from 'react-router-dom'
 import {useAuth} from '../../contexts/AuthContext'
 import {sessionFetch} from '../../api/client'
@@ -20,6 +20,7 @@ type Envelope<T>={code:string|number;message:string;data:T}
 const entitlementLabels:Record<string,string>={ACTIVE:'已开通',SUSPENDED:'已暂停'}
 const labels:Record<Product,string>={HUISCHOOL:'校园心理健康',HUITEACHER:'教师发展与学校改进'}
 const endpoint='/api/platform/education'
+const searchParams=(keyword:string,page:number)=>'?'+new URLSearchParams({q:keyword.trim(),page:String(page)})
 
 async function request<T>(path:string,method='GET',data?:unknown):Promise<T>{
   const response=await sessionFetch(endpoint+path,{
@@ -55,7 +56,6 @@ export default function EducationProductGovernance({product}:{product?:Product})
   const allowed=hasAdminEntry(user,selectedProduct)
   const loaded=loadedSchool?.id
   const adminPath=(id:string)=>'/organizations/'+id+'/products/'+selectedProduct
-  const searchParams=(keyword:string,page:number)=>'?'+new URLSearchParams({q:keyword.trim(),page:String(page)})
   const read=async (target:School)=>{
     const [data,roster]=await Promise.all([
       request<Entitlement[]>('/organizations/'+target.id+'/products'),
@@ -113,7 +113,8 @@ export default function EducationProductGovernance({product}:{product?:Product})
     </nav>
     {error&&<p role="alert" className="epg-error">{error}</p>}
     {notice&&<p role="status" className="epg-notice">{notice}</p>}
-    {initial?.subjectId&&user&&<section aria-label="许可对象的固定版本分配"><h2>固定版本分配 · {initial.toolKey}</h2><p>学校编号 {initial.subjectId}</p><Suspense fallback={<p>正在读取许可对象的固定配置…</p>}><EducationStandardConfigurations actorId={user.id} organizationId={initial.subjectId} product={selectedProduct} initialTool={initial.toolKey} initialRelease={initial.releaseId}/></Suspense></section>}
+    {initial?.subjectId&&user?<FocusedStandardAssignment key={user.id+':'+selectedProduct+':'+initial.subjectId+':'+initial.toolKey}
+      actorId={user.id} organizationId={initial.subjectId} product={selectedProduct} target={initial}/>:<>
     <ToolCatalogTagsPanel product={selectedProduct === 'HUISCHOOL' ? 'SCHOOL' : 'TEACHER'}/>
     <div className="epg-panel">
       <h2>选择正式学校</h2>
@@ -207,6 +208,33 @@ export default function EducationProductGovernance({product}:{product?:Product})
         <p>密码仅随当前受控操作提交，完成后清空；不写入 URL、日志或本地存储。
           所有操作由后端校验对应入口授权、最近安全密钥验证、当前密码及本校产品状态。</p>
       </div>
-    </fieldset>}
+    </fieldset>}</>}
+  </section>
+}
+
+function FocusedStandardAssignment({actorId,organizationId,product,target}:{
+  actorId:string;organizationId:string;product:Product;target:StandardAssignmentTarget
+}){
+  const [school,setSchool]=useState<School|null>(null)
+  const [error,setError]=useState('')
+  useEffect(()=>{
+    let live=true
+    void request<SearchPage<School>>('/organizations'+searchParams(organizationId,1)).then(({list})=>{
+      if(!live)return
+      const match=list.find(row=>row.id===organizationId)
+      if(!match)throw new Error('未找到此许可对应的学校，请核对学校及入口')
+      setSchool(match)
+    }).catch(cause=>{if(live)setError(cause instanceof Error?cause.message:'读取许可学校失败')})
+    return ()=>{live=false}
+  },[organizationId])
+  return <section aria-label="许可对象的固定版本分配">
+    <Link to={entryPaths[product]}>返回学校治理</Link>
+    {error&&<p role="alert">{error}</p>}
+    {!school&&!error&&<p role="status">正在核对许可学校…</p>}
+    {school&&<><p>许可学校 <strong>{school.name}</strong></p>
+      <Suspense fallback={<p role="status">正在读取本校固定配置…</p>}>
+        <EducationStandardConfigurations actorId={actorId} organizationId={school.id} product={product}
+          initialTool={target.toolKey} initialRelease={target.releaseId}/>
+      </Suspense></>}
   </section>
 }

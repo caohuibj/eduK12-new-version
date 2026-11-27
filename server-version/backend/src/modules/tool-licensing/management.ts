@@ -16,7 +16,7 @@ type Tx = Prisma.TransactionClient
 export type ToolLicenseActor = { actorUserId: string; actorSession: AdminSessionProof }
 type LicenseItemInput = { key: string; limit: number | null }
 type LicenseStatus = 'SCHEDULED' | 'ACTIVE' | 'EXPIRED' | 'TERMINATED'
-type LicenseItem = LicenseItemInput & { name: string; family: ToolLicenseFamily; used: number }
+type LicenseItem = LicenseItemInput & { name: string; family: ToolLicenseFamily; used: number; reserved?: number }
 type LicenseRow = {
   id: string
   product: ToolLicenseProduct
@@ -31,6 +31,8 @@ type LicenseRow = {
   status: LicenseStatus
   reason: string
   tools: LicenseItem[]
+  nextLicenseId?: string | null
+  missingTools?: string[]
 }
 const options = { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted, maxWait: 5000, timeout: 10000 }
 const fail = (status: number, message: string): never => { throw new AdminPermissionError(status, message) }
@@ -49,10 +51,13 @@ const projection = (quota = false, renewal = false) => Prisma.sql`
         AND n.tool_key=i.tool_key AND n.removed_at IS NULL) ORDER BY i.name,i.tool_key) AS "missingTools",` : Prisma.empty}
     COALESCE((SELECT jsonb_agg(jsonb_build_object('key',i.tool_key,'name',i.name,'family',i.family,
       'limit',i.usage_limit,'used',i.used
-      ${quota ? Prisma.sql`,'reserved',CASE WHEN l.product IN ('SCHOOL','TEACHER') THEN (
-        SELECT COALESCE(sum(c.quantity),0) FROM tool_license_charges c WHERE c.license_id=i.license_id
-        AND c.tool_key=i.tool_key AND c.settle_after IS NOT NULL AND c.settled_at IS NULL) END` : Prisma.empty}) ORDER BY i.name,i.tool_key)
-      FROM tool_license_items i WHERE i.license_id=l.id AND i.removed_at IS NULL),'[]'::jsonb) AS tools
+      ${quota ? Prisma.sql`,'reserved',COALESCE(ledger.reserved,0)` : Prisma.empty}) ORDER BY i.name,i.tool_key)
+      FROM tool_license_items i
+      ${quota ? Prisma.sql`LEFT JOIN (
+        SELECT c.tool_key,sum(c.quantity) AS reserved FROM tool_license_charges c WHERE c.license_id=l.id
+          AND c.settle_after IS NOT NULL AND c.settled_at IS NULL GROUP BY c.tool_key
+      ) ledger ON ledger.tool_key=i.tool_key` : Prisma.empty}
+      WHERE i.license_id=l.id AND i.removed_at IS NULL),'[]'::jsonb) AS tools
   FROM tool_licenses l JOIN tool_license_events e ON e.license_id=l.id AND e.revision=l.revision
   ${renewal ? Prisma.sql`LEFT JOIN LATERAL (SELECT n.id FROM tool_licenses n WHERE n.product=l.product
     AND n.subject_id=l.subject_id AND n.starts_at=l.expires_at AND n.terminated_at IS NULL ORDER BY n.id LIMIT 1) next ON true` : Prisma.empty}
@@ -209,6 +214,7 @@ export async function writeNewToolLicenses(tx: Tx, value: {
     INSERT INTO tool_licenses (id,product,subject_type,subject_id,subject_label,starts_at,expires_at,request_digest)
     SELECT id,${product},${toolLicenseSubjectType(product)},subject,label,${startsAt},${expiresAt},${digest}
     FROM unnest(${ids}::text[],${recipients.map(r=>r.subject.id)}::text[],${recipients.map(r=>r.subject.label)}::text[]) AS recipient(id,subject,label)
+    ORDER BY id
     ON CONFLICT (id) DO NOTHING
   `
   if (inserted !== ids.length) fail(409, '该请求编号已用于另一份授权')

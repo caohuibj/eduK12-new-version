@@ -168,7 +168,7 @@ describe.skipIf(!isolatedDatabase)('tool licensing on isolated PostgreSQL', () =
     expect((await listToolLicenses({ product: 'SURVEY', subjectId:subject, family:'FORM' })).list).toHaveLength(0)
     const own = await readOwnToolLicense('SURVEY',subject,subject)
     expect(own.license).toMatchObject({status:'ACTIVE',tools:[{key:reserveKey,assignment:'PENDING'}]})
-    expect(Object.keys(own.license!).sort()).toEqual(['expiresAt','startsAt','status','tools'])
+    expect(Object.keys(own.license!).sort()).toEqual(['expiresAt','product','startsAt','status','subjectId','tools'])
     await expect(readOwnToolLicense('TRAINING',subject,subject)).resolves.toMatchObject({license:null})
     expect((await listCurrentLicenseSet(prisma,'SURVEY')).list.some(tool=>tool.key===reserveKey)).toBe(true)
     expect((await listLicenseTools(prisma, 'SURVEY', { key: reserveKey })).list.map(tool => tool.key)).toEqual([reserveKey])

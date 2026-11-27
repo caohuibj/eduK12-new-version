@@ -1,7 +1,7 @@
 import {afterEach,describe,expect,it,vi} from 'vitest'
 vi.mock('../../config/database',()=>({prisma:{}}))
 import {AdminPermissionError} from '../../modules/admin-permissions/service'
-import {listLicenseSubjects,listLicenseTools,requireLicenseSubject,requireLicenseTools} from '../../modules/tool-licensing/directory'
+import {eligibleBatchSubjects,listLicenseSubjects,listLicenseTools,requireLicenseSubject,requireLicenseTools} from '../../modules/tool-licensing/directory'
 
 const id='10000000-0000-4000-8000-000000000001'
 type Db=Parameters<typeof listLicenseTools>[0]
@@ -28,7 +28,7 @@ describe('tool licence subject directory',()=>{
   expect(sql).toContain("u.account_domain IN ('TRAINING','LEGACY') AND u.role='TEACHER' AND u.teacher_approved")
   expect(sql).toContain("u.platform_role='STANDARD'")
   expect(sql).toContain('NOT u.is_frozen AND NOT u.must_change_password')
-  expect(sql).toContain('u.expires_at>clock_timestamp()')
+  expect(sql).toContain('expires_at>clock_timestamp()')
   expect(sql).not.toContain('admin_entry_grants')
  })
  it('rechecks and locks the exact researcher, qualification and MFA inside the issuing transaction',async()=>{
@@ -40,15 +40,27 @@ describe('tool licence subject directory',()=>{
   expect(sql.text).toContain('JOIN survey_researcher_grants g')
   expect(sql.text).toContain('JOIN survey_mfa_credentials m')
   expect(sql.text).toContain('FOR SHARE OF u,g,m')
-  expect(sql.values.filter((value:unknown)=>value===id)).toHaveLength(2)
+  expect(sql.values).toContainEqual([id])
  })
- it('locks only the selected school and uses the same active entitlement predicate',async()=>{
+ it('locks the selected school and its matching active entitlement',async()=>{
   const {db,query}=database([{id,label:'合成学校'}])
   await requireLicenseSubject(db,'TEACHER',id)
   const sql=query.mock.calls[0][0]
-  expect(sql.text).toContain('FOR SHARE OF o')
+  expect(sql.text).toContain('FOR SHARE OF o,e')
   expect(sql.values).toContain('HUITEACHER')
-  expect(sql.values.filter((value:unknown)=>value===id)).toHaveLength(2)
+  expect(sql.values).toContainEqual([id])
+ })
+ it.each(['SCHOOL','TEACHER','TRAINING','SURVEY'] as const)('reads each %s batch once and locks only on confirmation',async(product)=>{
+  const second='10000000-0000-4000-8000-000000000002'
+  const {db,query}=database([{id,label:'合成对象'}])
+  const ids=[id,second]
+  await expect(eligibleBatchSubjects(db,product,ids,false)).resolves.toEqual(new Map([[id,{id,label:'合成对象'}]]))
+  await eligibleBatchSubjects(db,product,ids,true)
+  expect(query).toHaveBeenCalledTimes(2)
+  const [preview,confirmation]=query.mock.calls.map(([sql])=>sql)
+  expect(preview.text).not.toContain('FOR SHARE')
+  expect(confirmation.text).toMatch(/ORDER BY [ou]\.id\s+FOR SHARE/)
+  expect(confirmation.values).toContainEqual(ids)
  })
  it('does not accept an object that disappeared or lost qualification after selection',async()=>{
   const {db}=database()

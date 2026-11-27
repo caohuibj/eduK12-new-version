@@ -138,7 +138,7 @@ jobs:
           NODE
       - name: clear reports from previous regression jobs
         # Self-hosted /tmp persists between jobs; never upload old-focus evidence.
-        run: rm -f /tmp/eduk12-backend-vitest-fixtures.json /tmp/eduk12-backend-vitest-${{ matrix.group }}.json /tmp/eduk12-backend-inventory-${{ matrix.group }}.json /tmp/eduk12-backend-vitest.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-teacher-runtime-vitest.json /tmp/eduk12-cognitive-install-vitest.json /tmp/eduk12-cognitive-admin-intake-vitest.json /tmp/eduk12-library-http-vitest.json /tmp/eduk12-component-import-vitest.json /tmp/eduk12-parent-vitest.json /tmp/eduk12-r5-vitest.json /tmp/eduk12-hosted-ci-env.txt /tmp/eduk12-teacher-self-group.json /tmp/eduk12-library-self-group.json /tmp/eduk12-teacher-private-group.json /tmp/eduk12-school-private-source.json /tmp/eduk12-school-composition-delta.json /tmp/eduk12-school-native-source.json /tmp/eduk12-school-native-reports.json /tmp/eduk12-education-marker.json /tmp/eduk12-education-feedback-policy.json /tmp/eduk12-education-standard-marker.json /tmp/eduk12-education-license-selection.json /tmp/eduk12-education-publication.json /tmp/eduk12-group-native.json /tmp/eduk12-evc-lifecycle.json /tmp/eduk12-evc-restore.json /tmp/eduk12-legacy-education-setup.json
+        run: rm -f /tmp/eduk12-backend-vitest-fixtures.json /tmp/eduk12-backend-vitest-${{ matrix.group }}.json /tmp/eduk12-backend-inventory-${{ matrix.group }}.json /tmp/eduk12-backend-vitest.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-teacher-runtime-vitest.json /tmp/eduk12-cognitive-install-vitest.json /tmp/eduk12-cognitive-admin-intake-vitest.json /tmp/eduk12-library-http-vitest.json /tmp/eduk12-component-import-vitest.json /tmp/eduk12-parent-vitest.json /tmp/eduk12-r5-vitest.json /tmp/eduk12-hosted-ci-env.txt /tmp/eduk12-teacher-self-group.json /tmp/eduk12-library-self-group.json /tmp/eduk12-teacher-private-group.json /tmp/eduk12-school-private-source.json /tmp/eduk12-school-composition-delta.json /tmp/eduk12-school-native-source.json /tmp/eduk12-school-native-reports.json /tmp/eduk12-education-marker.json /tmp/eduk12-education-feedback-policy.json /tmp/eduk12-education-standard-marker.json /tmp/eduk12-education-license-selection.json /tmp/eduk12-education-publication.json /tmp/eduk12-group-native.json /tmp/eduk12-evc-lifecycle.json /tmp/eduk12-evc-restore.json /tmp/eduk12-legacy-education-setup.json /tmp/eduk12-license-batch.json /tmp/eduk12-license-handoff.json
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
@@ -223,10 +223,10 @@ jobs:
           for db in tool_licensing_batch_test_20261127 tool_licensing_student_final_test_20261127; do
             docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool "$db"
           done
-          DATABASE_URL='postgresql://ptool:ptool123@localhost:5432/tool_licensing_batch_test_20261127' TOOL_LICENSING_TEST_DB=1 PERF_ISOLATED_TEST_MODE=1 PERF_SQL_EVENT_COUNT=1 npm test -- src/__tests__/tool-licensing/batch.postgres.test.ts --reporter=default --reporter=json --outputFile=/tmp/license-batch.json
-          node scripts/assert-release-test-report.mjs /tmp/license-batch.json src/__tests__/tool-licensing/batch.postgres.test.ts
-          DATABASE_URL='postgresql://ptool:ptool123@localhost:5432/tool_licensing_student_final_test_20261127' STANDARD_DELEGATION_REVIEW_PG=1 npm test -- src/__tests__/integration/standard-delegation-review.postgres.integration.test.ts --reporter=default --reporter=json --outputFile=/tmp/license-handoff.json
-          node scripts/assert-release-test-report.mjs /tmp/license-handoff.json src/__tests__/integration/standard-delegation-review.postgres.integration.test.ts
+          DATABASE_URL='postgresql://ptool:ptool123@localhost:5432/tool_licensing_batch_test_20261127' TOOL_LICENSING_TEST_DB=1 PERF_ISOLATED_TEST_MODE=1 PERF_SQL_EVENT_COUNT=1 npm test -- src/__tests__/tool-licensing/batch.postgres.test.ts --reporter=default --reporter=json --outputFile=/tmp/eduk12-license-batch.json
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-license-batch.json src/__tests__/tool-licensing/batch.postgres.test.ts
+          DATABASE_URL='postgresql://ptool:ptool123@localhost:5432/tool_licensing_student_final_test_20261127' STANDARD_DELEGATION_REVIEW_PG=1 npm test -- src/__tests__/integration/standard-delegation-review.postgres.integration.test.ts --reporter=default --reporter=json --outputFile=/tmp/eduk12-license-handoff.json
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-license-handoff.json src/__tests__/integration/standard-delegation-review.postgres.integration.test.ts
       - name: backfill check-in token protection
         id: regression-data
         run: npm run db:backfill:checkin-tokens
@@ -336,6 +336,8 @@ jobs:
           '/tmp/eduk12-backend-vitest-${{ matrix.group == 'fixtures' && 'base' || matrix.group }}.json'
           '/tmp/eduk12-backend-inventory-${{ matrix.group }}.json'
           --exclude=src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
+          --exclude=src/__tests__/tool-licensing/batch.postgres.test.ts
+          --exclude=src/__tests__/integration/standard-delegation-review.postgres.integration.test.ts
           --exclude=src/__tests__/integration/training-mac-export.postgres.integration.test.ts
           --exclude=src/__tests__/integration/educationRosterJobs.postgres.integration.test.ts
           --exclude=src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts
@@ -550,6 +552,8 @@ jobs:
           /tmp/eduk12-group-native.json
           /tmp/eduk12-evc-lifecycle.json
           /tmp/eduk12-evc-restore.json
+          /tmp/eduk12-license-batch.json
+          /tmp/eduk12-license-handoff.json
       - name: capture hosted runner resources
         if: always() && (matrix.group == 'fixtures' || matrix.group == 'focused')
         run: |-
@@ -595,6 +599,8 @@ jobs:
             /tmp/eduk12-group-native.json
             /tmp/eduk12-evc-lifecycle.json
             /tmp/eduk12-evc-restore.json
+            /tmp/eduk12-license-batch.json
+            /tmp/eduk12-license-handoff.json
             /tmp/eduk12-legacy-education-setup.json
             /tmp/eduk12-parent-vitest.json
             /tmp/eduk12-r5-vitest.json

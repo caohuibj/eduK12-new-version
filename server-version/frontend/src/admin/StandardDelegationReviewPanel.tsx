@@ -88,13 +88,16 @@ function Review({accountId,accountLabel}:{accountId:string;accountLabel:string})
   const affected=detail.affected.count
   const target=handoff?'完成交接并撤销原委托':'终止原委托'
   if(!handoff&&continueIds.length)throw new Error('已选择需要延续的配置，请完成交接或取消勾选后再终止')
+  if(handoff&&continueIds.length&&checkedSuccessor!==successorGrantId)throw new Error('请先核对接任人重发记录')
+  if(handoff&&detail.affected.list.some(item=>continueIds.includes(item.id)&&!item.reissued))
+   throw new Error('当前页仍有需要延续但尚未重发的配置')
   if(!window.confirm(target+'？'+(handoff?'已选择延续 '+continueIds.length+' 份。':'')+'当前有 '+affected+' 份固定配置引用该委托。撤销会停止这些配置的新发布，已入场作答仍可完成。仍需使用的固定配置应由接任人重新签发。'))return
   await api.post(base+'/grants/'+detail.grant.id+'/revoke',{
    expectedVersion:detail.grant.version,reason:reason.trim(),impactDigest:detail.affected.digest,
    ...(successorGrantId?{successorGrantId,...(continueIds.length?{continueIds}:{})}:{}),
   })
   if(!active.current)return
-  setDetail(null);setCandidate(null);setReason('');setNotice('原分发委托已撤销。')
+  setDetail(null);setCandidate(null);setContinueIds([]);setReason('');setNotice('原分发委托已撤销。')
   await readList(listPage)
  })
 
@@ -121,8 +124,10 @@ function Review({accountId,accountLabel}:{accountId:string;accountLabel:string})
     {combination.title} · 题本 {combination.contentVersion} · 参数 {combination.parametersVersion} · 报告 {combination.reportVersion}
    </li>)}</ul>}
    <p>有 {detail.affected.count} 份有效期内或待生效的固定配置引用此委托。</p>
+   {detail.grant.status==='ACTIVE'&&detail.affected.count>0&&<p>勾选需要延续的配置，接任人按原对象和版本重新签发。</p>}
+   {continueIds.length>0&&<p>已选择延续 {continueIds.length} 份 <button type="button" disabled={busy||Boolean(pending)} onClick={()=>setContinueIds([])}>清空选择</button></p>}
    {!!detail.affected.list.length&&<ul>{detail.affected.list.map(item=><li key={item.id}><label><input type="checkbox" disabled={busy||Boolean(pending)||detail.grant.status!=='ACTIVE'} checked={continueIds.includes(item.id)}
-      onChange={event=>setContinueIds(old=>event.target.checked?[...old,item.id]:old.filter(id=>id!==item.id))}/>延续 {item.label} · {item.title} · 到期 {date(item.expiresAt)}</label>
+      onChange={event=>{const checked=event.target.checked;setContinueIds(old=>checked?[...old,item.id]:old.filter(id=>id!==item.id))}}/>延续 {item.label} · {item.title} · 到期 {date(item.expiresAt)}</label>
       {candidate?.grantId&&candidate.grantId===checkedSuccessor&&(item.reissued?' · 已重发':' · 待重发')}</li>)}</ul>}
    {(impactPage>1||detail.affected.hasMore)&&<div className="system-actions">
     <button type="button" disabled={busy||impactPage===1||Boolean(pending)}
@@ -143,7 +148,7 @@ function Review({accountId,accountLabel}:{accountId:string;accountLabel:string})
      <button type="button" disabled={busy||!detail.moreCandidates||Boolean(pending)}
        onClick={()=>action(()=>readGrant(detail.grant.id,search,candidatePage+1,impactPage))}>下一页接任人</button>
     </div>}
-    {candidate?.grantId&&<button type="button" disabled={busy} onClick={()=>action(()=>readGrant(detail.grant.id,search,candidatePage,impactPage))}>核对重发记录（已选延续 {continueIds.length} 份）</button>}
+    {candidate?.grantId&&<button type="button" disabled={busy} onClick={()=>action(()=>readGrant(detail.grant.id,search,candidatePage,impactPage))}>核对重发记录</button>}
     {candidate&&<p>接任人 {candidate.label} · {candidate.grantId?'同范围委托已就绪':'待签发'}</p>}
    </>}
    {detail.grant.status!=='REVOKED'&&<>

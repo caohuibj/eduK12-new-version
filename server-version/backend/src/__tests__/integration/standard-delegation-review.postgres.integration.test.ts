@@ -72,11 +72,21 @@ suite('exact grant account review and handoff (isolated PostgreSQL)',()=>{
   const continuation={...withdraw,continueIds:[oldUse.id]}
   await expect(withdrawStandardDelegationReview(system.id,proof(),incumbent.id,oldId,continuation))
    .rejects.toMatchObject({statusCode:409})
+  // A successor grant with the right identity but a shorter period cannot cover the old configuration.
+  await grantEducationStandardConfigurationUse(successor.id,scope,source.id,{
+   ...use(input.requestId,'仍需补足期限'),expiresAt:new Date(Date.parse(expiresAt)-1000).toISOString(),
+  })
+  await expect(withdrawStandardDelegationReview(system.id,proof(),incumbent.id,oldId,continuation))
+   .rejects.toMatchObject({statusCode:409})
   await grantEducationStandardConfigurationUse(successor.id,scope,source.id,use(input.requestId,'接任人重新签发配置'))
   const reviewed=await readStandardDelegationReview(system.id,proof(),incumbent.id,oldId,{successorGrantId:input.requestId})
   expect(reviewed.affected.list).toMatchObject([{id:oldUse.id,reissued:true}])
   await expect(withdrawStandardDelegationReview(system.id,proof(),incumbent.id,oldId,continuation))
    .resolves.toMatchObject({changed:true,version:2})
+  await expect(withdrawStandardDelegationReview(system.id,proof(),incumbent.id,oldId,continuation))
+   .resolves.toMatchObject({changed:false,version:2})
+  await expect(withdrawStandardDelegationReview(system.id,proof(),incumbent.id,oldId,withdraw))
+   .rejects.toMatchObject({statusCode:409})
   expect((await read()).grant.status).toBe('REVOKED')
   expect(await db.assessmentManagementEvent.findUniqueOrThrow({where:{id:oldUse.id}})).toEqual(original)
  },45_000)

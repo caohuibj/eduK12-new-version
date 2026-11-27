@@ -18,15 +18,16 @@ function changes(event:Event) {
   return result
 }
 
-function usePage<T>(path:string) {
-  const [rows,setRows] = useState<T[]>([])
+function useHistoryPage(path:string) {
+  const [rows,setRows] = useState<Event[]>([])
   const [error,setError] = useState('')
   const [loading,setLoading] = useState(false)
   useEffect(()=>{
     let active=true
     setRows([]);setError('');setLoading(Boolean(path))
-    if(path) void api.get<T[]>(path).then(response=>{
-      if(active)setRows(response.data!)
+    if(path) void api.get<Event[]>(path).then(response=>{
+      if(!Array.isArray(response.data))throw new Error('读取历史失败，请重新展开')
+      if(active)setRows(response.data)
     }).catch(cause=>{if(active)setError(cause instanceof Error?cause.message:'读取失败，请重新展开')})
       .finally(()=>{if(active)setLoading(false)})
     return ()=>{active=false}
@@ -38,12 +39,12 @@ export function LicenseHistory({id}:{id:string}) {
   const [open,setOpen] = useState(false)
   const [pages,setPages] = useState<number[]>([])
   const before=pages[pages.length-1]
-  const {rows,error,loading}=usePage<Event>(open?base+id+'/history'+(before?'?before='+before:''):'')
-  return <details onToggle={event=>setOpen(event.currentTarget.open)}><summary>查看变更历史</summary>
+  const {rows,error,loading}=useHistoryPage(open?base+id+'/history'+(before?'?before='+before:''):'')
+  return <details onToggle={event=>{setOpen(event.currentTarget.open);if(!event.currentTarget.open)setPages([])}}><summary>查看变更历史</summary>
     {loading&&<p role="status">正在读取历史…</p>}{error&&<p role="alert">{error}</p>}
     <ol>{rows.map(event=><li key={event.revision}><strong>修订 {event.revision} · {event.action==='TERMINATED'?'终止':event.action==='CREATED'?'签发':'调整'}</strong>
       <p>{new Date(event.createdAt).toLocaleString('zh-CN')} · {event.actor} · {event.reason}</p>
-      <ul>{changes(event).map((change,i)=><li key={i}>{change}</li>)}</ul>
+      {event.action!=='TERMINATED'&&<ul>{changes(event).map(change=><li key={change}>{change}</li>)}</ul>}
     </li>)}</ol>
     {pages.length>0&&<button type="button" onClick={()=>setPages(p=>p.slice(0,-1))}>较新修订</button>}
     {rows.length>0&&rows[rows.length-1].revision>1&&<button type="button" onClick={()=>setPages(p=>[...p,rows[rows.length-1].revision])}>较早修订</button>}

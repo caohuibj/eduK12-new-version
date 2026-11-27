@@ -2,16 +2,27 @@ import {render,screen,fireEvent,waitFor} from '@testing-library/react'
 import {MemoryRouter} from 'react-router-dom'
 import {beforeEach,describe,expect,it,vi} from 'vitest'
 import type {User} from '../../types'
+import {licenseAssignmentPath} from '../../admin/standardAssignmentTarget'
 import EducationProductGovernance from './EducationProductGovernance'
 import {sessionFetch} from '../../api/client'
 const state=vi.hoisted(()=>({user:null as User|null}))
 vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>state}))
 vi.mock('../../api/client',()=>({sessionFetch:vi.fn()}))
-vi.mock('./EducationStandardConfigurations',()=>({default:()=>null}))
+vi.mock('./EducationStandardConfigurations',()=>({default:({organizationId,product,initialTool}:{organizationId:string;product:string;initialTool?:string})=>initialTool?<p>{organizationId} · {product} · {initialTool}</p>:null}))
 vi.mock('./EducationCognitiveConfigurations',()=>({default:()=>null}))
 vi.mock('../../admin/securityKey',()=>({reauthenticateAdmin:vi.fn()}))
 beforeEach(()=>{vi.mocked(sessionFetch).mockReset();state.user={id:'admin',username:'admin',role:'TEACHER',platformRole:'STANDARD',entryGrants:[{entry:'HUISCHOOL',version:1},{entry:'HUITEACHER',version:1}]} as User})
 describe('education product governance presentation',()=>{
+ it.each([['HUISCHOOL','SCHOOL'],['HUITEACHER','TEACHER']] as const)('preselects the verified license school and tool in %s',async(product,entry)=>{
+  const id='11260000-0000-4000-8000-000000000001'
+  const request=vi.mocked(sessionFetch)
+  request.mockResolvedValue(new Response(JSON.stringify({code:0,data:{list:[{id,name:'Linked School'}],page:1,hasMore:false}})))
+  render(<MemoryRouter initialEntries={[licenseAssignmentPath(entry,id,'SCALE:licensed_scale')]}><EducationProductGovernance product={product}/></MemoryRouter>)
+  expect(await screen.findByText('Linked School')).toBeVisible()
+  expect(await screen.findByText(id+' · '+product+' · licensed_scale')).toBeVisible()
+  expect(screen.queryByLabelText('学校名称')).not.toBeInTheDocument()
+  expect(request).toHaveBeenCalledExactlyOnceWith('/api/platform/education/organizations?q='+id+'&page=1',expect.objectContaining({method:'GET'}))
+ })
  it.each([['HUISCHOOL','School'],['HUITEACHER','Teacher']] as const)('keeps %s sensitive verification collapsed without clearing the draft',(product,brand)=>{
   render(<MemoryRouter><EducationProductGovernance product={product}/></MemoryRouter>)
   expect(screen.getByText(`${brand} · 管理员工作台`)).toBeInTheDocument()

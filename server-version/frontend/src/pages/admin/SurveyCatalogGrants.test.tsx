@@ -17,6 +17,23 @@ const next=()=>screen.getByRole('button',{name:'来源下一页'})
 const previous=()=>screen.getByRole('button',{name:'来源上一页'})
 const query=()=>screen.getByRole('button',{name:'查询可授权版本'})
 
+it('loads the linked researcher and standard versions without submitting changes',async()=>{
+  const subjectId='11260000-0000-4000-8000-000000000001'
+  const target={id:subjectId,username:'Linked Researcher',status:'ACTIVE'}
+  const version=(key:string,title:string)=>({
+    ref:{kind:'SCALE',sourceId:'survey-standard:'+subjectId,sourceVersion:'1'},title,available:true,
+    configuration:{toolKey:key,instrumentVersion:'1',report:null,axes:{CONTENT:'1',PARAMETERS:'1',REPORT:'1'}},
+  })
+  const api=vi.fn(async(path:string)=>path.startsWith('/researchers?')
+    ?{list:[target]}
+    :{page:1,hasMore:false,terminalReason:null,list:[version('licensed_scale','Linked Version'),version('different_scale','Other Version')]})
+  render(<SurveyCatalogGrants api={api as CatalogApi} password="" researchers={[]} initialStandard={{subjectId,toolKey:'licensed_scale'}}/>)
+  expect(await screen.findByRole('heading',{name:'Linked Version'})).toBeVisible()
+  expect(screen.getByLabelText('授权给研究者')).toHaveValue(subjectId)
+  expect(screen.queryByRole('heading',{name:'Other Version'})).not.toBeInTheDocument()
+  expect(api.mock.calls).toEqual([['/researchers?userId='+subjectId],['/source-catalog?kind=SCALE&page=1&keyword=licensed_scale']])
+})
+
 describe('source catalog pagination controls',()=>{
   it('uses server page and hasMore, blocks repeated asynchronous Next clicks, and stops at the 1000-source cap',async()=>{
     const first=deferred<SourcePage>(),last=deferred<SourcePage>()
