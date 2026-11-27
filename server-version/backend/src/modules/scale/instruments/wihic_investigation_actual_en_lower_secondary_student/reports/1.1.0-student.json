@@ -1,0 +1,96 @@
+{
+  "toolKey": "wihic_investigation_actual_en_lower_secondary_student",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student",
+  "title": "WIHIC | Try turning a guess into a question you can test",
+  "report": {
+    "reportVersion": "1.1.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "Eight English items 25–32 and the five frequency choices match Fraser (2023), Appendix A Table A1. The appendix’s top answer is Almost Always. Source © Fraser 2023, CC BY 4.0. The project retains C and the eight-item complete-response mean (1–5), without thresholds. This version adds original feedback only, for the student who answered."
+      }
+    },
+    "primaryScoreKeys": [
+      "investigation"
+    ],
+    "scoreOrder": [
+      "investigation"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "investigation",
+        "scoreLabel": "Classroom investigation (1–5 average)",
+        "headline": "Try turning a guess into a question you can test",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Two students think a longer paper bridge will hold more weight. They build two versions with the same paper and change only the length. The first result surprises them. They look at what happened, try again, and leave room for a different answer than the guess they started with.\n\nYour answers describe how often this class gave you opportunities to ask a question, look for evidence, and explain what you found. Investigation can mean a test, comparing examples, or making sense of a diagram. A result that surprises you can give you a useful next question.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Pick one question from a class topic. Make a prediction, choose what you could compare, then record what you actually see. Keep your prediction and your observation separate."
+          },
+          {
+            "category": "reflection",
+            "text": "Explain to a partner how the evidence affects your first idea. If you still aren’t sure, name one more result or example that would help you decide."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "© Barry J. Fraser, 2023. Adapted from What Is Happening In this Class? (WIHIC), Appendix A, Table A1, in The Evolution of the Field of Learning Environments Research, Education Sciences, 13(3), 257. https://doi.org/10.3390/educsci13030257 (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). The project presents one part separately, with its own instruction, scoring of complete answers, and student feedback.",
+      "The result is the mean of eight answers about one class. The five original answer choices run from Almost Never (1) to Almost Always (5). If an answer is missing, this part has no score.",
+      "Using this separate eight-question form with English-reading students ages 12–15 in grades 7–9 is this project’s scope. This item set has no separate validation or group benchmark. Each part of WIHIC stands alone in the report."
+    ],
+    "disclaimer": "This report describes your experience in one class. It is for reflection and does not grade you, your classmates, or your teacher.",
+    "artworkKey": "wihic_investigation_actual_en_lower_secondary_student/1.0.0/1.1.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
