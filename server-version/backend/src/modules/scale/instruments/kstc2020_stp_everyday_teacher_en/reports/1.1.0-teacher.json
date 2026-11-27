@@ -1,0 +1,96 @@
+{
+  "toolKey": "kstc2020_stp_everyday_teacher_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "Science teaching self-reflection | Give a familiar question a scientific way forward",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "The 7 English item texts and order match the corresponding factor in Kang et al. Appendix B, pp. 510–513. The original study used five frequency positions; methods §3.1 lists only endpoints 1 = rarely and 5 = always. The project preserves numeric 2–4 and the complete-response 1–5 factor mean. No study averages, norms or thresholds are used."
+      }
+    },
+    "primaryScoreKeys": [
+      "stp_everyday"
+    ],
+    "scoreOrder": [
+      "stp_everyday"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "stp_everyday",
+        "scoreLabel": "Connecting science with everyday life (descriptive mean, 1–5)",
+        "headline": "Give a familiar question a scientific way forward",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "On the walk to school, some places feel much warmer than others. A class compares photographs, surface materials and shade, then evaluates which evidence would help decide where to place a shaded seat. Different roles emerge: collecting measurements, checking a claim, and deciding what matters to people who use the space.\n\nThese answers reflect how often you report helping students connect science with claims in the media, everyday decisions, ethics or work people do. Notice where the everyday example gives students a reason to use evidence. That is a stronger starting point than an example that ends as soon as it gets their attention.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Choose one question students might ask outside school. Bring two sources or a small set of observations. Ask which evidence would help people decide, who could provide it, and what uncertainty remains."
+          },
+          {
+            "category": "reflection",
+            "text": "Ask each group where they might see the same kind of science used in a job or community decision. Compare the examples for how people use the evidence."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Kang, N.-H., Kang, H., Maeng, S., Park, J., & Jeong, E. (2020). Teacher Competency in Competency-Focused Science Teaching in the South Korean Context: Teacher Self-Assessment Instrument Development and Application. Asia-Pacific Science Education, 6(2), 480–513. https://doi.org/10.1163/23641177-BJA10012 (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). The project separates each published factor and supplies its own instructions, complete-answer rule and feedback.",
+      "This score is the mean of 7 responses, from 1 (rarely) to 5 (always), and requires all 7 answers. It describes self-reported practices and may include judgments about your understanding or effectiveness. It contains no objective performance score, norm, or cross-factor total.",
+      "The original study used the full instrument with 210 South Korean primary and secondary science teachers. This research and self-reflection version uses the published English item wording. The project has not obtained the Korean administration form. Separate use of this factor and equivalence to a Chinese version have not been established."
+    ],
+    "disclaimer": "For your own professional learning and research reflection as a science teacher. The result supports a conversation about practice and does not establish teaching quality, teacher eligibility, or student outcomes.",
+    "artworkKey": "kstc2020_stp_everyday_teacher_en/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

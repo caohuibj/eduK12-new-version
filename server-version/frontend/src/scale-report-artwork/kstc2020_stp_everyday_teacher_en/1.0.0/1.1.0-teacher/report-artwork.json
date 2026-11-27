@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "kstc2020_stp_everyday_teacher_en/1.0.0/1.1.0-teacher",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "Students and their teacher discuss two shady and sunny spots in the school courtyard.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
