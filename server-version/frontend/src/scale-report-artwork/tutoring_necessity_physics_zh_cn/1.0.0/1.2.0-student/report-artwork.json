@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "tutoring_necessity_physics_zh_cn/1.0.0/1.2.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生面对斜面小车、电路和运动图像，平等比较实验、示意图、老师、同伴、模拟与课外帮助等路径。",
+    "width": 512,
+    "height": 512
+  },
+  "bands": [
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "very_low",
+      "file": "very-low.webp",
+      "alt": "学生在老师给出一个受力图提示后，用新的小车装置独立判断。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "low",
+      "file": "low.webp",
+      "alt": "一个物理问题周围连接实验、示意图、老师、同伴、模拟和课外帮助等平等路径。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "middle",
+      "file": "middle.webp",
+      "alt": "学生把可能有帮助、当前需要和唯一基础三个判断分别放在独立场景中核对。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "high",
+      "file": "high.webp",
+      "alt": "学生先设定预测新电路或小车变化并解释证据的目标，再用新条件核对。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "very_high",
+      "file": "very-high.webp",
+      "alt": "三格连续场景呈现获得演示、再次尝试和独立判断新的物理装置。",
+      "width": 512,
+      "height": 512
+    }
+  ]
+}
