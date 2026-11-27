@@ -1,0 +1,128 @@
+{
+  "toolKey": "tutoring_necessity_biology_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "生物补习必要性信念｜学生反思版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目自编三题、六点选项、无反向计分、至少两题与均分规则；沿用一至六分的五段理论试用量尺。报告只解释补习必要性信念，不把分数写成生物成绩、客观补习需要、补习效果或付费建议。"
+      }
+    },
+    "primaryScoreKeys": [
+      "tutoring_necessity"
+    ],
+    "scoreOrder": [
+      "tutoring_necessity"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "tutoring_necessity",
+        "headline": "先找到生物问题卡在哪一层",
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "观察叶片显微图时，小岚看见了气孔，却解释不清它与水分散失的关系。她先想到：“是不是得去补习？”老师请她把困难拆开：是不认识结构、看不懂实验条件，还是不会用证据解释变化？她发现自己卡在最后一步。看过一个示范后，她换了一组实验结果重新解释，终于能说清证据指向什么。\n\n补习必要性信念记录的是你怎样看课外补习对生物成绩的帮助、自己是否需要补习，以及补习是不是取得好成绩的基础。它不是成绩、能力或补习真实效果，也不能替你决定是否购买课程。均分高或低都没有统一的好坏方向。\n\n生物学习中的困难可能出现在识别结构、理解过程、读取图表、控制变量或用证据解释等不同环节。课堂提问、实验观察、教材图示、同伴讨论、自主练习和课外帮助都可能解决不同问题。先把“我需要补习”改写成“我在什么任务的哪一步需要什么帮助”，再用一个新例子检查是否能独立完成。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "用一个新例子检查现有支持",
+            "summary": "这次均分落在理论试用量尺的较低一段，只表示你较少认同补习是必要基础，不证明当前支持一定够用。选一个最近卡住的生物任务，写明是结构、过程、图表、变量还是证据解释；使用一次课堂或自学支持后，换一个同类例子独立完成。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "为一个问题画出支持路径",
+            "summary": "这次均分落在理论试用量尺的偏低一段。把一个具体问题放在中间，周围列出教材图示、实验观察、老师答疑、同伴讨论和课外帮助。每种支持旁只写它能解决的一步，先试最容易获得的一种，再用新材料核对效果。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "把三个判断分开核对",
+            "summary": "这次均分落在理论试用量尺的中间一段，不代表态度摇摆。补习“可能有帮助”、自己“现在需要”、补习是好成绩的“基础”是三个不同判断。分别找一个生物学习例子，看看差异来自任务类型、反馈不足，还是练习方式。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "先约定可观察的帮助目标",
+            "summary": "这次均分落在理论试用量尺的偏高一段，表示你较认同补习的重要性，但不等于某种补习已经有效。若准备增加支持，先约定一个具体目标，例如能根据一组新数据解释变量与结果的关系；随后用没有提示的新材料检查。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "让提示逐步退场",
+            "summary": "这次均分落在理论试用量尺的较高一段，表示你很认同补习是学好生物的重要条件。这不是错误，也不是必须付费的结论。连续记录三次“原来卡点—获得提示—新例子独立完成”，再与老师或家长讨论帮助是否正在变成自己的方法。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把“生物需要补习”改写成一句可检查的话：“我在___任务的___步骤需要___帮助。”"
+          },
+          {
+            "category": "strategy",
+            "text": "选一个结构、过程、图表或实验问题，记录“卡点—支持—新例子独立完成结果”，再决定下一步。"
+          }
+        ],
+        "scoreLabel": "生物补习必要性信念均分（理论试用）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "均分来自三道正向题；至少回答两题才计算。相同均分可能来自不同回答组合，缺失作答不记作低分。",
+      "五档按一至六分可选范围划分，是理论试用分档，不是同年级常模、百分位、补习效果阈值或经数据验证的心理转折点。",
+      "结果测量的是对课外补习必要性的信念，不是生物成绩、实际能力、客观学习困难、焦虑程度或未来表现。",
+      "报告不推荐或反对任何付费安排。具体支持选择应结合任务、现有资源、时间与家庭情况，由学生与可信赖的成人共同讨论。"
+    ],
+    "disclaimer": "这是一份帮助中学生梳理生物学习支持选择的反思报告，不用于诊断、排名、升学分流、教师评价或替代真实学习表现。",
+    "artworkKey": "tutoring_necessity_biology_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

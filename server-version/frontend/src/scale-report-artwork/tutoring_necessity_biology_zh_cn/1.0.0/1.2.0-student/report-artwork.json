@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "tutoring_necessity_biology_zh_cn/1.0.0/1.2.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生面对叶片结构、显微观察和实验结果，平等比较老师、同伴、教材、实验与课外帮助等支持路径。",
+    "width": 512,
+    "height": 512
+  },
+  "bands": [
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "very_low",
+      "file": "very-low.webp",
+      "alt": "学生在老师给出一个提示后，用新的叶片显微图独立检查理解。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "low",
+      "file": "low.webp",
+      "alt": "一个生物问题周围连接教材、显微观察、老师、同伴和课外帮助等多条平等路径。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "middle",
+      "file": "middle.webp",
+      "alt": "学生分别观察生长条件、过程变化和结果，练习把不同判断分开。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "high",
+      "file": "high.webp",
+      "alt": "学生先设定用新实验结果解释变量关系的目标，再独立核对另一组材料。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "very_high",
+      "file": "very-high.webp",
+      "alt": "三格连续场景呈现获得提示、再次尝试和独立解释新的生物现象。",
+      "width": 512,
+      "height": 512
+    }
+  ]
+}
