@@ -1,0 +1,96 @@
+{
+  "toolKey": "kstc2020_stp_engagement_teacher_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "Science teaching self-reflection | Make room for a first idea to change",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "The 6 English item texts and order match the corresponding factor in Kang et al. Appendix B, pp. 510–513. The original study used five frequency positions; methods §3.1 lists only endpoints 1 = rarely and 5 = always. The project preserves numeric 2–4 and the complete-response 1–5 factor mean. No study averages, norms or thresholds are used."
+      }
+    },
+    "primaryScoreKeys": [
+      "stp_engagement"
+    ],
+    "scoreOrder": [
+      "stp_engagement"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "stp_engagement",
+        "scoreLabel": "Supporting productive participation (descriptive mean, 1–5)",
+        "headline": "Make room for a first idea to change",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Some students jump into a science discussion while others need a little time to work out what they think. The teacher asks everyone to make a quick drawing before sharing in pairs. Different explanations emerge. The teacher uses those ideas to adjust the next question while the class is still exploring.\n\nThe average describes how you report adapting science teaching to students’ thinking and interest, offering them ways to explain, and keeping the classroom respectful. The score records your perspective. Pair it with one short sample of how students actually took part, including students whose thinking might be easy to miss.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Plan a quiet pause and a short partner exchange before one whole-class science discussion. Invite one idea from each pair through speech, a drawing, or a quick note."
+          },
+          {
+            "category": "reflection",
+            "text": "Notice a sign that the class needs a different question or example. Change one part of the plan, then look for who can now offer an explanation."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Kang, N.-H., Kang, H., Maeng, S., Park, J., & Jeong, E. (2020). Teacher Competency in Competency-Focused Science Teaching in the South Korean Context: Teacher Self-Assessment Instrument Development and Application. Asia-Pacific Science Education, 6(2), 480–513. https://doi.org/10.1163/23641177-BJA10012 (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). The project separates each published factor and supplies its own instructions, complete-answer rule and feedback.",
+      "This score is the mean of 6 responses, from 1 (rarely) to 5 (always), and requires all 6 answers. It describes self-reported practices and may include judgments about your understanding or effectiveness. It contains no objective performance score, norm, or cross-factor total.",
+      "The original study used the full instrument with 210 South Korean primary and secondary science teachers. This research and self-reflection version uses the published English item wording. The project has not obtained the Korean administration form. Separate use of this factor and equivalence to a Chinese version have not been established."
+    ],
+    "disclaimer": "For your own professional learning and research reflection as a science teacher. The result supports a conversation about practice and does not establish teaching quality, teacher eligibility, or student outcomes.",
+    "artworkKey": "kstc2020_stp_engagement_teacher_en/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
