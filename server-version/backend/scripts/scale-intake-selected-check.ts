@@ -11,7 +11,7 @@ import { inspectScaleContent } from './scale-onboarding-check.mjs'
 import { inspectSelectedScaleImports } from '../../../.github/scripts/declarative-content.mjs'
 import { parseScaleInstrumentSourceSchema } from '../src/modules/scale/onboarding/schema'
 import { validateScaleInstrumentSource } from '../src/modules/scale/onboarding/validate-instrument'
-import { hashScaleDefinition, isScaleContentItem } from '../src/modules/scale/scale-definition'
+import { hashScaleDefinition, isScaleContentItem, type ScaleReportDefinition } from '../src/modules/scale/scale-definition'
 import { canonicalHash } from '../src/modules/assessment-runtime/canonical'
 import { referenceSetHash } from '../src/modules/assessment-runtime/reference-binding'
 import { snapshotScaleInstrumentSource } from '../src/modules/scale/onboarding/source-snapshot'
@@ -19,7 +19,7 @@ import { buildScaleResult, parseScaleResultV2, type ScaleResultV2 } from '../src
 import { readScaleReportVariantMaterial } from '../src/modules/scale/onboarding/report-variants'
 import { compileStandardCombinationReport } from '../src/modules/measurement-content/standard-combination'
 import { standardReportParameterBlockers } from '../src/modules/measurement-content/standard-report-parameters'
-import { validateReportTemplateBindings } from '../src/modules/measurement-content/report-template'
+import { validateReportTemplateBindings, type ReportTemplate } from '../src/modules/measurement-content/report-template'
 import type { ScaleInstrumentSourceV1 } from '../src/modules/scale/onboarding/types'
 import type { ScaleAnswer } from '../src/modules/scale/scale-scoring'
 
@@ -130,6 +130,11 @@ export function checkSelectedSource(source: ScaleInstrumentSourceV1) {
   }
   const executable = source.executable, definition = executable.definition
   assert.ok(!definition.scoring.scorerKey && !(executable.scorerPlugins?.length), 'CUSTOM_SCORER_REQUIRES_PLATFORM_ROUTE')
+  const compiledReport = compileStandardCombinationReport(source.catalog.identity.canonicalName, definition, true)
+  assert.deepEqual(compiledReport.blockers, [], 'REPORT_TEMPLATE_COMPILE_BLOCKER')
+  assert.ok(compiledReport.template, 'REPORT_TEMPLATE_MISSING')
+  validateReportTemplateBindings(compiledReport.template, definition.scoring.scores.map(score => score.key), [])
+  checkSelectedReportDisclosureCompatibility(source, definition.report, compiledReport.template)
   const cache = new Map<string, ScaleResultV2>()
   const run = (answers: ScaleAnswer[]) => {
     const key = canonicalHash(answers)
@@ -199,6 +204,36 @@ export function checkSelectedSource(source: ScaleInstrumentSourceV1) {
     referencePolicy: definition.referencePolicy.type, issues: validation.issues }
 }
 
+/** A selected report with declared bands must be consumable by at least one
+ * audience represented by its own audience contract. This mirrors the
+ * runtime's existing fail-closed requirements without widening them or adding
+ * a participant-side lookup: numeric results, references, interpretations and
+ * derived labels must all already be allowed by the frozen source policy. */
+export function checkSelectedReportDisclosureCompatibility(
+  source: ScaleInstrumentSourceV1,
+  report: ScaleReportDefinition,
+  template: ReportTemplate,
+) {
+  const bandBlocks = template.blocks.filter(block => block.type === 'REFERENCE_BAND')
+  if (!bandBlocks.length) return { bandBlocks: 0, audience: report.audienceContract?.audience ?? null, disclosedBy: [] as string[] }
+  const audience = report.audienceContract?.audience
+  assert.ok(audience, 'REPORT_BAND_TARGET_AUDIENCE_REQUIRED')
+  const targetAudiences = audience === 'student'
+    ? ['respondent', 'subject'] as const
+    : audience === 'teacher'
+      ? ['teacher'] as const
+      : ['respondent'] as const
+  const disclosedBy = targetAudiences.filter(target => {
+    const capabilities = source.disclosure?.audiences[target]
+    return capabilities?.numericScores
+      && capabilities.references
+      && capabilities.individualInterpretations
+      && capabilities.scoreDerivedLabels
+  })
+  assert.ok(disclosedBy.length, `REPORT_REFERENCE_BANDS_NOT_DISCLOSED:${audience}:${targetAudiences.join(',')}`)
+  return { bandBlocks: bandBlocks.length, audience, disclosedBy }
+}
+
 /** Report-only material reuses the selected source's immutable C/P axes. Check
  * its schema/hash binding and its actual score/reference/template consumers,
  * without rescoring the unchanged golden fixtures for every writing variant. */
@@ -216,6 +251,7 @@ export function checkSelectedReportVariants(source: ScaleInstrumentSourceV1, raw
     assert.ok(compiled.template, 'REPORT_TEMPLATE_MISSING')
     assert.equal(compiled.template.artworkKey,variant.report.artworkKey,'REPORT_ARTWORK_FREEZE_MISMATCH')
     validateReportTemplateBindings(compiled.template, definition.scoring.scores.map(score => score.key), [])
+    checkSelectedReportDisclosureCompatibility(source, variant.report, compiled.template)
     return { key: variant.key, reportVersion: variant.report.reportVersion, artworkKey: variant.report.artworkKey ?? null }
   })
 }

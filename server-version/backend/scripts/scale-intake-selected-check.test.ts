@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url'
 import { test } from 'node:test'
 import { checkSelectedHistory, checkSelectedSource, readSelectedSource, checkSelectedBundleDependencies, checkSelectedBuiltinDependencies, checkSelectedReportVariants, checkSelectedReportVariantHistory } from './scale-intake-selected-check'
 import cfqVariants from '../src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/report-variants.json'
+import { canonicalHash } from '../src/modules/assessment-runtime/canonical'
+import { scaleSourceAxisPayloads } from '../src/modules/scale/onboarding/source-snapshot'
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const file = 'server-version/backend/src/modules/scale/instruments/academic_self_concept_biology_zh_cn/1.0.0/instrument.ts'
 const source = () => JSON.parse(readFileSync(resolve(repo, file.replace('instrument.ts', 'source.json')), 'utf8'))
@@ -148,4 +150,26 @@ test('ordinary report artwork identity is checked without adding a participant g
  const value=source(),report=value.executable.definition.report
  report.artworkKey=`other_scale/${value.identity.instrumentVersion}/${report.reportVersion}`
  assert.throws(()=>checkSelectedSource(value),/报告配图标识/)
+})
+
+test('default declared bands require existing target-audience reference and label disclosure', () => {
+ const accepted=source()
+ assert.doesNotThrow(()=>checkSelectedSource(accepted))
+ const noReferences=source()
+ for(const audience of ['respondent','subject'])noReferences.disclosure.audiences[audience].references=false
+ assert.throws(()=>checkSelectedSource(noReferences),/REPORT_REFERENCE_BANDS_NOT_DISCLOSED:student:respondent,subject/)
+ const noLabels=source()
+ for(const audience of ['respondent','subject'])noLabels.disclosure.audiences[audience].scoreDerivedLabels=false
+ assert.throws(()=>checkSelectedSource(noLabels),/REPORT_REFERENCE_BANDS_NOT_DISCLOSED:student:respondent,subject/)
+})
+
+test('optional report variants use the same declared-band disclosure check', () => {
+ const value=source(),parts=scaleSourceAxisPayloads(value)
+ const material={schemaVersion:1,instrumentKey:value.identity.instrumentKey,instrumentVersion:value.identity.instrumentVersion,
+  baseContentHash:canonicalHash(parts.content),baseParametersHash:canonicalHash(parts.parameters),variants:[{
+   key:'alternate',title:'替代报告',report:{...structuredClone(value.executable.definition.report),reportVersion:'9.9.9'},
+  }]}
+ assert.doesNotThrow(()=>checkSelectedReportVariants(value,material))
+ for(const audience of ['respondent','subject'])value.disclosure.audiences[audience].references=false
+ assert.throws(()=>checkSelectedReportVariants(value,material),/REPORT_REFERENCE_BANDS_NOT_DISCLOSED:student:respondent,subject/)
 })
