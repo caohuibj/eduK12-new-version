@@ -11,6 +11,7 @@ import type {Triplet} from '../../survey/standard-triplet.model'
 import {
   assertGitScalePublisher, publishScaleRelease, type GitScalePublication, type StandardRelease,
 } from '../../survey/standard-triplet.service'
+import {ensureStandardNativeScale} from './standard-release-native'
 
 export type GitScaleRelease = {
   releaseKey: string
@@ -139,6 +140,7 @@ async function syncTool(tx:Prisma.TransactionClient,input:{actorId:string;gitCom
     const measurement=prior.measurement_release&&await getContentRelease(tx,prior.measurement_release.releaseId,true)
     if(!measurement||measurement.layer!=='MEASUREMENT'||measurement.status!=='PUBLISHED'
       ||measurement.contentHash!==prior.measurement_release?.contentHash)conflict('RECOVERY_MEASUREMENT_UNAVAILABLE:'+releaseKey)
+    if(allowedEntries.some(product=>product!=='SURVEY'))await ensureStandardNativeScale(tx,actorId,prior.snapshot,true)
     await approveStandardCombinationEntryPolicies(tx,identity,allowedEntries,actorId,reason(gitCommitSha),{preservePause:true})
     await tx.$executeRaw`UPDATE survey_standard_releases SET state='ONLINE',version=version+1,updated_at=clock_timestamp() WHERE id=${prior.id}`
     await record(releaseKey,prior.id,prior.version+1,'ONLINE',allowedEntries,prior.state==='WITHDRAWN'?'RESTORED':'SCOPE_CHANGED')

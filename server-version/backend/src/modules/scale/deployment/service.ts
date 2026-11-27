@@ -116,7 +116,7 @@ export const resolveScaleStartDeployment = async (input: {
   }
 
   const deployment = await readActiveScaleDeployment(input.db, input.scale.id)
-  if (!deployment) {
+  if (!deployment || (deployment.policy.schemaVersion === 2 && deployment.policy.exactStandardOnly && !exact)) {
     // Six existing executable identities remain on the explicit PR-1 legacy
     // profile until PR-4 migrates their deployment rows. Any newly onboarded
     // STANDARD identity must have an ACTIVE binding before its first start.

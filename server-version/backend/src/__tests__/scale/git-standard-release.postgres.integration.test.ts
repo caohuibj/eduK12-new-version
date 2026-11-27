@@ -8,6 +8,10 @@ import {composeTriplet, sourceParts, type Part, type Triplet} from '../../module
 import {standardReleaseRow, withdrawStandardTriplet} from '../../modules/survey/standard-triplet.service'
 import {toolReference} from '../../modules/survey/tool-reference'
 import {requireIsolatedReleaseDatabase} from '../integration/integration-env'
+import {getScaleInstrumentSource} from '../../modules/scale/onboarding/instrument-registry'
+import {resolveScaleStartDeployment} from '../../modules/scale/deployment/service'
+import {hashScaleDefinition} from '../../modules/scale/scale-definition'
+import {Prisma} from '@prisma/client'
 
 const url=process.env.GIT_SCALE_RELEASE_TEST_DATABASE_URL
 const suite=url?describe:describe.skip
@@ -68,5 +72,25 @@ suite('Git policy uses the existing exact scale publication lifecycle',()=>{
     expect(await sync('c',[first])).toEqual([{...a,action:'MANUAL_HOLD'}])
     expect((await standardReleaseRow(prisma,a.releaseId)).state).toBe('WITHDRAWN')
     expect(await prisma.materialGrant.count({where:{resourceType:'STANDARD_COMBINATION'}})).toBe(grantsBefore)
+  },30000)
+
+  it('enables the exact report when an existing legacy scale expands from Survey to Training',async()=>{
+    const key='who5',instrumentVersion='1.0.0'
+    const source=getScaleInstrumentSource(key,instrumentVersion)!
+    const definition=source.executable!.definition
+    const scale=await prisma.scale.create({data:{name:'WHO-5 fixture',code:key,instrumentVersion,
+      instrumentClass:'STANDARD',status:'PUBLISHED',creatorId:adminId,
+      definition:definition as unknown as Prisma.InputJsonValue,definitionHash:hashScaleDefinition(definition)}})
+    const parts=Object.fromEntries(sourceParts(key,instrumentVersion).map(part=>[part.axis,part])) as Triplet['parts']
+    const report={...definition.report,reportVersion:'pg-legacy-source-report'}
+    const payload={definition:report,reportVisibility:{schemaVersion:1,policyVersion:'pg-legacy-r',unknownAudience:'DENY',
+      audiences:{subject:{numericScores:true,references:false,scoreDerivedLabels:false,individualInterpretations:true,educationalContent:true,artwork:false}}}}
+    const next=composeTriplet(key,{...parts,REPORT:{...parts.REPORT,payload,version:report.reportVersion,hash:canonicalHash(payload)}})
+    const declaration:GitScaleRelease={releaseKey:'legacy-exact',triplet:next,allowedEntries:['SURVEY'],state:'ONLINE'}
+    expect((await sync('d',[declaration])).find(entry=>entry.releaseKey===declaration.releaseKey)?.action).toBe('PUBLISHED')
+    expect((await sync('e',[{...declaration,allowedEntries:['SURVEY','TRAINING']}])).find(entry=>entry.releaseKey===declaration.releaseKey)?.action).toBe('SCOPE_CHANGED')
+    expect(await resolveScaleStartDeployment({db:prisma,scale,requestedMode:'STANDALONE'})).toMatchObject({kind:'LEGACY_V1',allowNewStarts:true})
+    expect(await resolveScaleStartDeployment({db:prisma,scale,requestedMode:'COMPOSITE',exactStandard:{instrumentKey:key,instrumentVersion}}))
+      .toMatchObject({kind:'MANAGED_V2',allowNewStarts:true})
   },30000)
 })

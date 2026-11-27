@@ -38,7 +38,8 @@ export async function ensureStandardNativeScale(tx: Prisma.TransactionClient, ac
   if (prior?.definition) {
     const stored = scaleDefinitionSchema.parse(prior.definition)
     const {report: _report, referencePolicy: _parameters, source: _source, license: _license, ...content} = stored
-    if (canonicalHash(content) !== triplet.parts.CONTENT.hash || hashScaleDefinition(stored) !== prior.definitionHash) {
+    const contentWithCeiling = source.dataCeiling ? { ...content, dataCeiling: source.dataCeiling } : content
+    if (canonicalHash(contentWithCeiling) !== triplet.parts.CONTENT.hash || hashScaleDefinition(stored) !== prior.definitionHash) {
       throw new Error('STANDARD_NATIVE_CONTENT_CHANGED:' + toolKey)
     }
   }
@@ -61,13 +62,14 @@ export async function ensureStandardNativeScale(tx: Prisma.TransactionClient, ac
     return
   }
   if (await readScaleDeploymentRevision(tx, scale.id, 1)) throw new Error('STANDARD_NATIVE_DEPLOYMENT_RETIRED:' + toolKey)
-  // A migrated legacy scale keeps its existing compatible standalone behavior.
-  if (prior?.status === 'PUBLISHED' && getLegacyScaleCompatibilityProfile(toolKey, instrumentVersion)) return
+  const legacy = prior?.status === 'PUBLISHED' && getLegacyScaleCompatibilityProfile(toolKey, instrumentVersion)
+  if (legacy && !triplet.effectiveDisclosure) return
   if (policy.usageRequirements?.allowedDeploymentModes?.length && !policy.usageRequirements.allowedDeploymentModes.includes('COMPOSITE')) {
     throw new Error('STANDARD_NATIVE_MODE_UNAVAILABLE:' + toolKey)
   }
   await activateScaleDeploymentRevision({db:tx,id:randomUUID(),scaleId:scale.id,createdByUserId:actor,
     policy:{schemaVersion:2,revision:1,locale:policy.contentLocale,territory:'ZZ',deploymentModes:['COMPOSITE'],
       runtimePolicyHash:policy.runtimePolicyHash,inFlightCompletion:'FROZEN_DEADLINE',
+      ...(legacy ? {exactStandardOnly:true as const} : {}),
       ...(source.localization ? {localizationVersion:source.localization.localizationVersion} : {})}})
 }

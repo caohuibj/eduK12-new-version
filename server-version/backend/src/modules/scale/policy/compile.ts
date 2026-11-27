@@ -29,6 +29,8 @@ export interface CompiledScalePolicyV1 {
   usageRequirements?: InstrumentUsageRequirementsV1
   educationalFeedback?: EducationalFeedbackDefinitionV1
   referenceBindings: Array<{ referenceVersion: string; referenceHash: string }>
+  /** Admission identity of C before the approved P/R projection is bound. */
+  sourceRuntimePolicyHash?: string
   runtimePolicyHash: string
 }
 
@@ -46,6 +48,7 @@ export const compiledScalePolicyV1Schema = z.object({
     referenceVersion: z.string().min(1),
     referenceHash: z.string().regex(/^[0-9a-f]{64}$/),
   }).strict()),
+  sourceRuntimePolicyHash: z.string().regex(/^[0-9a-f]{64}$/).optional(),
   runtimePolicyHash: z.string().regex(/^[0-9a-f]{64}$/),
 }).strict()
 
@@ -59,6 +62,7 @@ const unsignedCompiledPolicy = (policy: Omit<CompiledScalePolicyV1, 'runtimePoli
   disclosure: policy.disclosure,
   ...(policy.usageRequirements ? { usageRequirements: policy.usageRequirements } : {}),
   ...(policy.educationalFeedback ? { educationalFeedback: policy.educationalFeedback } : {}),
+  ...(policy.sourceRuntimePolicyHash ? { sourceRuntimePolicyHash: policy.sourceRuntimePolicyHash } : {}),
   referenceBindings: policy.referenceBindings,
 })
 
@@ -108,7 +112,7 @@ export function bindScaleCombinationPolicy(
     referenceVersion: reference.referenceVersion,
     referenceHash: canonicalHash(reference.entries.some(entry => entry.governance) ? { ...reference, status: 'ACTIVE' } : reference),
   })).sort((a, b) => a.referenceVersion.localeCompare(b.referenceVersion) || a.referenceHash.localeCompare(b.referenceHash))
-  const effective = { ...sourcePolicy, disclosure, referenceBindings }
+  const effective = { ...sourcePolicy, disclosure, referenceBindings, sourceRuntimePolicyHash: sourcePolicy.runtimePolicyHash }
   return { ...effective, runtimePolicyHash: canonicalHash(unsignedCompiledPolicy(effective)) }
 }
 
