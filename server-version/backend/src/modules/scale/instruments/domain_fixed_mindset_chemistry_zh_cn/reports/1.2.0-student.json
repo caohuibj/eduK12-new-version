@@ -1,0 +1,123 @@
+{
+  "toolKey": "domain_fixed_mindset_chemistry_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "化学学习天赋信念｜学生行动版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目自编三题、六点认同选项、无反向计分、至少两题与均分规则；沿用默认 P wave1-20261001-v2 的初高中历史便利样本五档。报告只解释对化学学习天赋是否固定的认同，不把低分等同于已测得成长心态，也不把高分解释为能力上限；未修改 C、P、阈值和缺失规则。"
+      }
+    },
+    "primaryScoreKeys": [
+      "domain_fixed_mindset"
+    ],
+    "scoreOrder": [
+      "domain_fixed_mindset"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "domain_fixed_mindset",
+        "headline": "一次卡住，不必替未来下结论",
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "配平化学方程式时，小南又漏数了一种元素。他在草稿上写了句“我大概不擅长这个”，后来把每种元素单独列出来，才发现前三题都卡在同一个地方。他改了一步，下一道题终于走通了。\n\n这几道题记录你有多认同化学学习的天赋很难改变。做完可以回想最近一次卡住的时候：你当时如何看待自己？题目里到底发生了什么？选一个很小的步骤，记下你试了什么，以及后来有什么变化。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "把一次进步留下证据",
+            "summary": "挑一个最近变顺的小环节，写下你原来卡在哪里、做了什么调整、现在能做到哪一步。少认同“天赋固定”，不等于每次都会进步；具体记录能让判断更有根据。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "把“不会”拆成哪一步",
+            "summary": "找一道最近做错的题，只圈出最先卡住的一步。为这一步选一种帮助：看一个例题、问一个问题或重画一张图。做完同类题，再比较哪里真的变了。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "给两种解释都找证据",
+            "summary": "选一次有进步和一次没进步的经历。分别写下任务难度、练习方法和获得的帮助。平均分在中间不代表你“摇摆”，这些具体差别比一个标签更值得看。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "做一次可比较的小实验",
+            "summary": "挑一个很小的知识点，先做一道题并记录卡点；得到一次针对性提示后，再做一道同类题。只比较这两次的步骤，不急着用结果证明自己“有”或“没有”天赋。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "先让一个小环节松动",
+            "summary": "请老师或同学把一个难点拆成两三步，选最小的一步练两次。记录哪种提示有用、哪里仍然困难。你不必马上改变看法，只需要给新的证据留一个位置。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "用三格小记录留下“开始时会什么—尝试了什么—后来能做到什么”，只描述这一次，不给能力封顶。"
+          }
+        ],
+        "scoreLabel": "化学天赋固定信念均分（历史参考试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "三道题至少答两道，按已答题目计算均分。试用分组沿用本项目同学段历史便利样本：初中 N=737，高中 N=702；两学段分别参照，不能跨学段比较。",
+      "历史参考不是全国常模。较高分只表示更认同“天赋固定”的说法，不是化学能力上限；较低分也不等于已经测得成长心态、学习策略或实际进步。",
+      "量表不测教师是否喜欢化学。感受到教师热情，和自己是否相信学习可以成长，是两种不同体验，任何一项都不能代替成绩、能力或未来表现。"
+    ],
+    "disclaimer": "这份报告供七至十二年级学生回顾自己的学习信念。它不诊断能力，也不要求你立刻改变观点。",
+    "artworkKey": "domain_fixed_mindset_chemistry_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

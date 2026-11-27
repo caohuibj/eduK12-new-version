@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "domain_fixed_mindset_chemistry_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "domain_fixed_mindset-very-low.webp",
+      "alt": "学生对照两次化学练习，在笔记中圈出发生变化的一步",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "domain_fixed_mindset-low.webp",
+      "alt": "学生把一道化学题拆成小步骤，并为卡住的一步寻找提示",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "low"
+    },
+    {
+      "file": "domain_fixed_mindset-middle.webp",
+      "alt": "学生用放大镜比较一次进步和一次未进步的学习记录",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "middle"
+    },
+    {
+      "file": "domain_fixed_mindset-high.webp",
+      "alt": "学生在两道同类化学题之间做一次有记录的小比较",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "high"
+    },
+    {
+      "file": "domain_fixed_mindset-very-high.webp",
+      "alt": "学生和老师把一个化学难点拆成几块可尝试的小任务",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "两个学生对照化学练习纸，圈出先前漏记的一处。",
+    "width": 506,
+    "height": 506
+  }
+}
