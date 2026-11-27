@@ -1,0 +1,137 @@
+{
+  "toolKey": "tswq_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-teacher",
+  "title": "Teacher wellbeing at school (pilot)",
+  "report": {
+    "reportVersion": "1.2.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en"
+    },
+    "primaryScoreKeys": [
+      "school_connectedness",
+      "teaching_efficacy",
+      "teacher_subjective_wellbeing"
+    ],
+    "scoreOrder": [
+      "school_connectedness",
+      "teaching_efficacy",
+      "teacher_subjective_wellbeing"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "school_connectedness",
+        "scoreLabel": "School Connectedness",
+        "headline": "Notice when you feel part of the school",
+        "summary": "At a planning meeting, a colleague asks what you think and makes time to listen. Later in the week, you may find it harder to speak up in another setting. This score adds up four responses about belonging, being yourself, feeling cared for, and being treated with respect at your school. The sum ranges from 4 to 16. A higher sum means you reported these experiences more often.",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Recall one recent moment when you felt included and one when you found it harder to take part. Write down what was happening and what made a difference."
+          },
+          {
+            "category": "environment",
+            "text": "Choose one practical step within reach, such as asking a trusted colleague for a brief check-in or agreeing how everyone will get time to speak at a team meeting."
+          }
+        ],
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true
+      },
+      {
+        "scoreKey": "teaching_efficacy",
+        "scoreLabel": "Teaching Efficacy",
+        "headline": "Look closely at one lesson",
+        "summary": "Picture a class in which a new explanation helped students get started. On a different day, a similar explanation may have needed a second example. This score adds up four responses about how effective, helpful, and accomplished you felt in your work as a teacher. The sum ranges from 4 to 16. A higher sum means you reported these experiences more often.",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Pick one lesson. Note what you tried and what you actually observed, such as whether students could begin the task or explain an example in their own words."
+          },
+          {
+            "category": "strategy",
+            "text": "Try one change in the next lesson. You might model the first step, give students time to practise it, and use a short exit prompt to decide what to explain again."
+          }
+        ],
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true
+      },
+      {
+        "scoreKey": "teacher_subjective_wellbeing",
+        "scoreLabel": "Teacher Subjective Wellbeing",
+        "headline": "Read both parts of the total",
+        "summary": "The total adds up all eight responses, with a possible range of 8 to 32. The same total can come from different experiences. Feeling supported by colleagues and feeling effective in class can vary independently. Read the two scores alongside the total, keeping the setting and period of your responses in mind.",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Write one sentence about a school relationship or routine and one about a teaching experience. Use the notes to decide what you want to understand better."
+          },
+          {
+            "category": "strategy",
+            "text": "Select one small next step you can try this week. Review what happened before you decide whether to keep it, adapt it, or ask a colleague for help."
+          }
+        ],
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "Each displayed result is a raw sum of the required items for that score. When reviewing your responses, use the time period stated in the questionnaire. The original TSWQ guide uses the past month.",
+      "Scores describe your account of experiences at school. This pilot provides no population norms, percentiles, or thresholds. Classroom resources, relationships, and the context in which you answered can inform how you read the scores.",
+      "Questionnaire attribution: Tyler L. Renshaw, 2020, Teacher Subjective Wellbeing Questionnaire (TSWQ): Measure and user guide (https://osf.io/6548v), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Initial development: Renshaw, Long, and Cook, 2015 (https://doi.org/10.1037/spq0000112). Huisurvey authored this pilot report and its illustration. The English items, response options, and scoring are unchanged."
+    ],
+    "disclaimer": "This pilot report is for personal reflection and descriptive research. Do not use these scores for diagnosis, staff appraisal, employment decisions, or school rankings.",
+    "artworkKey": "tswq_en/1.0.0/1.2.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

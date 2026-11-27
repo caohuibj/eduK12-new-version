@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "tswq_en/1.0.0/1.2.0-teacher",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "Three teachers talk together while planning a lesson in a sunlit classroom.",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}
