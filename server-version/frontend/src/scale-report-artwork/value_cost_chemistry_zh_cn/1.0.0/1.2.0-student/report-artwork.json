@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "value_cost_chemistry_zh_cn/1.0.0/1.2.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生在一张桌面上分别观察化学与生活的联系，以及学习、休息和其他活动的时间安排。",
+    "width": 512,
+    "height": 512
+  },
+  "bands": [
+    {
+      "scoreKey": "value",
+      "bandKey": "very_low",
+      "file": "value-very-low.webp",
+      "alt": "学生从生锈的自行车链条出发，寻找一个可以确认的化学线索。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "value",
+      "bandKey": "low",
+      "file": "value-low.webp",
+      "alt": "学生比较一个化学概念能解释的现象和暂时还不能解释的问题。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "value",
+      "bandKey": "middle",
+      "file": "value-middle.webp",
+      "alt": "学生把化学的重要、用途和个人优先安排分别连接到具体例子。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "value",
+      "bandKey": "high",
+      "file": "value-high.webp",
+      "alt": "学生把一个有意义的化学主题改写成步骤清楚、范围有限的小任务。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "value",
+      "bandKey": "very_high",
+      "file": "value-very-high.webp",
+      "alt": "学生向同伴解释生活中的化学现象，并保留同伴提出的后续问题。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "cost",
+      "bandKey": "very_low",
+      "file": "cost-very-low.webp",
+      "alt": "学生完成一项化学任务，同时在时间安排中保留用餐、睡眠和兴趣活动。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "cost",
+      "bandKey": "low",
+      "file": "cost-low.webp",
+      "alt": "学生比较没有数字的计划时钟和实际时钟，观察最有产出的时间段。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "cost",
+      "bandKey": "middle",
+      "file": "cost-middle.webp",
+      "alt": "四张独立图卡呈现任务占时、可用时间不足、其他安排挤占和舍弃其他活动。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "cost",
+      "bandKey": "high",
+      "file": "cost-high.webp",
+      "alt": "学生把一次学习分成做题、查找、卡住、求助和整理，只调整其中最耗时的一段。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "cost",
+      "bandKey": "very_high",
+      "file": "cost-very-high.webp",
+      "alt": "学生带着三次时间记录与可信赖的成人讨论优先顺序，同时保留睡眠和活动。",
+      "width": 512,
+      "height": 512
+    }
+  ]
+}

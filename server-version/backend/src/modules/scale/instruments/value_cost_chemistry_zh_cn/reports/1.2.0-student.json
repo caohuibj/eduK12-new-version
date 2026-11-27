@@ -1,0 +1,183 @@
+{
+  "toolKey": "value_cost_chemistry_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "化学学习价值与时间代价｜学生双维度版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目自编七题、六点选项、无反向计分，以及三题价值均分和四题时间与取舍代价均分。两个维度沿用各自的初高中历史便利样本分档，分别呈现，不相加、不相减、不合成总分。"
+      }
+    },
+    "primaryScoreKeys": [
+      "value",
+      "cost"
+    ],
+    "scoreOrder": [
+      "value",
+      "cost"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "value",
+        "headline": "化学和我的问题，能不能接上线",
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "自行车链条为什么会生锈？保温杯内胆为什么能减慢散热？小岚在放学路上记下两个问题，回到课堂才发现，它们分别连着氧化和材料性质。那一刻，她不是突然“爱上整本化学”，而是找到了一条从课本通向真实问题的线。\n\n学科价值记录的是你是否觉得化学重要、有用，以及自己是否重视它。它不是兴趣、成绩、能力或实际投入的总评。觉得化学有价值，不代表每一章都喜欢；暂时没找到价值，也不说明不努力。价值感更像一条连接：课程内容能否回答你关心的问题、帮助你理解世界，或服务于当前与未来的目标。\n\n可以从一个真实问题开始，而不是先要求自己“必须重视”。写下问题，再找本章的一条概念、一个实验或一项证据与它相连。找到连接是一种结果；暂时找不到也同样是有用的信息。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "先从一个真实问题找连接",
+            "summary": "这次价值得分在同学科、同学段历史参考组中相对较低，不等于你不认真或不适合学化学。选一个身边问题，例如除锈、清洁、保温或材料选择，只查本章能解释其中哪一小步。最后写下“找到的连接”或“仍没找到的地方”，不强迫自己得出积极结论。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "把“有用”写成具体用途",
+            "summary": "这次价值得分在历史参考组中相对偏低。任选一个正在学的概念，分别补完两句话：“它能帮助我理解___”“它暂时不能解决___”。带着第二个空格去问老师或查资料。具体用途比一句“化学很重要”更容易检验。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "分开看重要、有用和重视",
+            "summary": "这次价值得分在历史参考组中相对居中，不表示你时而重视、时而忽视。为“重要”“有用”“我愿意优先安排”各写一个例子，看看三者是否一致。只选择其中一个最想弄清的差异，作为下一次课堂提问。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "把价值变成一个有限目标",
+            "summary": "这次价值得分在历史参考组中相对偏高。挑一个你认为有意义的内容，把它改写成一项本周能完成的任务，例如用粒子观点解释一个现象，或核对一种材料选择的依据。完成后检查证据是否支持你的解释，不必仅靠延长学习时间证明重视。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "用解释与分享检验这条连接",
+            "summary": "这次价值得分在历史参考组中相对较高，表示你很认同化学重要、有用并值得重视。选一个真实问题，尝试用三句话向同伴说明化学概念怎样帮助理解它，再邀请对方追问一个“为什么”。能补充证据或承认还不知道的部分，比把价值变成口号更可靠。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "“重要”“有用”和“我愿意优先安排”是三种不同判断；哪一种最符合你这周的真实体验？"
+          },
+          {
+            "category": "strategy",
+            "text": "用一个身边问题连接本章概念，写下找到的证据、没解释清的地方和下一条问题。"
+          }
+        ],
+        "scoreLabel": "化学学习价值均分（试用版）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "cost",
+        "headline": "看见时间去了哪里，也保留该保留的生活",
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "小岚觉得化学作业“总是占很久”，可她把一次学习过程画成时间线后发现：真正做题用了二十五分钟，找不到笔记来回翻了十分钟，卡在一道题上又过了二十分钟。时间记录没有责怪她，反而指出了最值得调整的一段。\n\n时间与取舍代价记录的是你是否觉得化学占用太多时间、难以投入足够时间，或需要舍弃其他事情。它不是实际时长、效率、勤奋程度或心理健康的测量。高分不代表不该学，低分也不保证安排没有问题。\n\n价值和代价可以同时很高，也可以同时很低；它们不相加、不相减，更不会互相抵消。先记录一次真实过程，再区分“任务本身”“卡住等待”“找资料或求助”各用了多少时间。能看见时间如何分布，才可能和老师、家长一起做小而实际的调整。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "用一次记录核对轻松感",
+            "summary": "这次时间代价得分在同学科、同学段历史参考组中相对较低，只表示你较少认同题目中的时间负担，不代表实际安排一定理想。记录一次化学学习的开始、结束、完成内容和休息，确认轻松感来自任务合适、方法有效，还是尚未遇到更困难的部分。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "比较计划时间和实际时间",
+            "summary": "这次时间代价得分在历史参考组中相对偏低。下一次开始前先写预计结束时间，完成后补上实际时间，并圈出最有产出的十分钟。只保留一个有效做法，不因为负担暂时不高就把任务无限加长。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "分开看占时、投入不足与取舍",
+            "summary": "这次时间代价得分在历史参考组中相对居中，不等于负担忽高忽低。回看四题，区分“化学本身占时”“我投入不够”“其他事情挤占时间”“为了化学舍弃别的事”。为最符合的一项记录一个真实例子，避免让均分掩盖不同问题。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "只调整最耗时的一小段",
+            "summary": "这次时间代价得分在历史参考组中相对偏高。把最近一次学习拆成做题、查找、卡住、求助和整理五段，选最长或最反复的一段。与老师或家长讨论一个可试一周的小调整，例如提前准备资料、给卡题设定求助点或减少重复抄写，同时保留原定休息。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "带着时间证据讨论优先顺序",
+            "summary": "这次时间代价得分在历史参考组中相对较高，说明你很认同化学占时或需要较多取舍，但分数不能说明原因。连续记录三次任务、实际用时、卡点和被挤掉的安排，带着记录与老师或家长核对任务优先级、支持方式和可保留的休息；不要只靠再压缩睡眠或其他重要活动解决。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "占用太多、投入不足和舍弃其他事情并不是同一个问题；哪一项最接近你最近的情况？"
+          },
+          {
+            "category": "strategy",
+            "text": "记录一次学习中的“完成任务—查找—卡住—求助—整理”时间，只选择一个环节做小调整，并保留休息。"
+          }
+        ],
+        "scoreLabel": "化学学习时间与取舍均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "学科价值由前三题取平均，至少回答两题；时间与取舍代价由后四题取平均，至少回答三题。缺失作答不记作低分。",
+      "两个维度分别报告，不相加、不相减，也不形成一个总体“好坏”分数；高价值可以与高代价同时出现。",
+      "分档来自项目历史便利样本：初中约七百三十七人、高中七百零二人。它只提供同学科、同学段相对位置，不是全国常模；两个学段和两个维度的分界均不同，不能直接互比。",
+      "价值分数不等于兴趣、能力、努力或实际选择；代价分数不等于真实学习时长、效率、压力诊断或形成原因。",
+      "若时间安排持续影响睡眠、饮食、身体状态或日常生活，应带着具体记录向可信赖的成人或合格专业人员求助，不能只依赖本报告。"
+    ],
+    "disclaimer": "这是一份帮助中学生分别理解化学学习价值和时间取舍的反思报告，不用于诊断、排名、升学分流、教师评价或替代真实学习记录。",
+    "artworkKey": "value_cost_chemistry_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
