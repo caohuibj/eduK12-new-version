@@ -1,0 +1,244 @@
+{
+  "toolKey": "selfie4t_2022tk_professional_engagement_en_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "SELFIEforTEACHERS | Turn a digital habit into a shared professional practice",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "European Commission JRC129699 Toolkit Annex I: 9 English stems and 54 descriptions in Area 1 match the registered C after punctuation/whitespace normalization. The official 2023 JRC131282 guide supplies the six scored levels and zero-point not-aware option. Both documents carry CC BY 4.0 with source and change attribution. C, source options and P are unchanged."
+      }
+    },
+    "primaryScoreKeys": [
+      "competence_1_1",
+      "competence_1_2",
+      "competence_1_3",
+      "competence_1_4",
+      "competence_1_5",
+      "competence_1_6",
+      "competence_1_7",
+      "competence_1_8",
+      "competence_1_9"
+    ],
+    "scoreOrder": [
+      "competence_1_1",
+      "competence_1_2",
+      "competence_1_3",
+      "competence_1_4",
+      "competence_1_5",
+      "competence_1_6",
+      "competence_1_7",
+      "competence_1_8",
+      "competence_1_9"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_1_1",
+        "scoreLabel": "Organisational communication (self-position, 0–6)",
+        "headline": "Make it clear where people should look",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Sending the same update through three channels can still leave families unsure which message is current. A dependable route and a predictable rhythm make communication easier to follow. This response describes how you use digital communication with your education community.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Select one recurring update. Name the main channel, say when the information will appear, and provide an accessible route for people who cannot use it."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_1_2",
+        "scoreLabel": "Online learning environments (self-position, 0–6)",
+        "headline": "Keep the learning path clear and permissions proportionate",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "When assignments, feedback, and reminders are scattered, learners spend attention looking for the work. Organising an environment also means giving people the right level of access and protecting the information it contains. Your selected statement describes how you manage those choices.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Follow one learner’s route from the course opening page to the next activity and its feedback. Remove one navigation detour and check that only the intended people can see private work."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_1_3",
+        "scoreLabel": "Professional collaboration (self-position, 0–6)",
+        "headline": "Share an experiment far enough to learn from it",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A colleague who receives a folder may not know which change made the lesson work. Sharing the plan, one sample, and what happened next gives them something to try and improve. This response concerns how you collaborate using digital tools.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "With one colleague, use a shared document to record who will try one change, what evidence each of you will bring back, and when you will compare it."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_1_4",
+        "scoreLabel": "School infrastructure (self-position, 0–6)",
+        "headline": "Name the recurring obstacle",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A classroom tool can sound straightforward until device booking, connectivity, or technical support gets in the way. A concrete description of the obstacle gives your school a starting point. This response reflects how you use and help improve school-level digital arrangements.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Record when one recurring problem happens, who it affects, and one practical change to try. Bring the example to the colleague responsible for the relevant service."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_1_5",
+        "scoreLabel": "Reflective practice (self-position, 0–6)",
+        "headline": "Run a small teaching experiment",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A lesson may feel smooth while leaving some learners confused. A short note and one piece of work can help test what you thought happened. Your response describes how digital tools support reflection on your own and shared practice.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "After a lesson, record one choice you made, one piece of evidence about its effect, and one thing you would change. Revisit the note after attempting the change."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_1_6",
+        "scoreLabel": "Digital life (self-position, 0–6)",
+        "headline": "Model the habits learners can see",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Responding respectfully in a shared space, asking before posting someone else’s work, and correcting a mistake openly are everyday opportunities to model digital citizenship. This selection describes how you contribute professionally and ethically in digital settings.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Choose one online practice you use with learners or colleagues. Make the reason for a good step visible once, such as why you ask permission before sharing an image."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_1_7",
+        "scoreLabel": "Professional learning through digital technologies (self-position, 0–6)",
+        "headline": "Bring one useful idea back from a network",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "An online community, recording, or workshop can open a professional conversation that would never happen locally. The value becomes clearer when you adapt an idea and see what it does in your own context. This response concerns learning through digital channels.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Find one example connected to a question you already have. Try a small part of it and report back what transferred to your setting and what had to change."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_1_8",
+        "scoreLabel": "Professional learning about digital technologies (self-position, 0–6)",
+        "headline": "Choose a question before choosing a course",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "The next useful step may be understanding accessible documents, making feedback easier to use, or getting better at a tool the school already supports. This response concerns your own learning about digital technologies and their use in teaching.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Write one precise question about a difficulty you face. Find a resource that helps you address it, and decide what thing you should be able to make or do afterwards."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_1_9",
+        "scoreLabel": "Computational thinking (self-position, 0–6)",
+        "headline": "Show the steps that made a solution work",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A class can practise computational thinking by breaking a problem into steps, spotting a pattern, or testing a rule. Writing the reasoning in a form someone else can follow makes it teachable. Your response describes how you develop this part of professional practice.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Take one everyday classroom process and sketch the steps needed to reproduce it. Ask a colleague to follow them once and record where an assumption needs to be made explicit."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "© European Union 2022 and 2023. Adapted from Anastasia Economou, SELFIEforTEACHERS Toolkit (2022), doi:10.2760/626409, Annex I, and SELFIEforTEACHERS: Designing and developing a self-reflection tool for teachers’ digital competence (2023), doi:10.2760/561258, p.11 and Annex 1. Both CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). The project separates this area and supplies new instructions and feedback. No EU endorsement is implied.",
+      "Each competence stands alone. The six ordered A1–C2 statements are represented by 1–6. A selected zero records ‘I am not aware of this competence’; an omitted response stays missing. There is no area total, proficiency band, or rank.",
+      "This fixed English project adaptation is for primary and secondary teachers reflecting on their own practice. The separate area has no independent validation or Chinese-language equivalence."
+    ],
+    "disclaimer": "For teachers’ own professional learning and reflection. The selection describes self-reported practice in one area of the fixed English adaptation and supplies no appraisal, school ranking, or EU certification.",
+    "artworkKey": "selfie4t_2022tk_professional_engagement_en_teacher_self/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
