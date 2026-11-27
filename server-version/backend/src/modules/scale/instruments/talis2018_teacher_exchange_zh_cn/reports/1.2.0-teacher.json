@@ -1,0 +1,93 @@
+{
+  "toolKey": "talis2018_teacher_exchange_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-teacher",
+  "title": "教师交流与协调回顾（试用）",
+  "report": {
+    "reportVersion": "1.2.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "primaryScoreKeys": [
+      "teacher_exchange"
+    ],
+    "scoreOrder": [
+      "teacher_exchange"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "teacher_exchange",
+        "scoreLabel": "教师交流与协调类别均分",
+        "headline": "想一想哪些交流真正帮助了下一步工作",
+        "summary": "你可能经常和同事互换教学资料，却很少一起商量如何评估学生的进步。这四题分别涉及资料交换、特定学生学习发展讨论、协调进步评价标准和团队会议。1–6 是原有频率类别的编码，四题答全后求均值。分数较高表示本次自报的交流与协调通常更频繁。",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回顾一次近期的交流，记下议题是什么，你是否拿到了可用材料、共识或清楚的后续分工。也可以留意上述四种活动中哪一种几乎没有机会发生。"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一项具体的教学任务和同事试一次短交流，例如各带一件匿名作业，商量一个可以一起使用的评价标准，再约定如何看后续学生表现。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "频率是有序类别，级间时间跨度不相等。均分不是每周、每月或每年的实际次数。",
+      "本结果只覆盖交流与协调四项，协作是否帮到教学需要结合具体产出和体验理解。",
+      "本项目按答全的题目取等权原始均分。结果不能直接与 OECD 因子分、国际调查结果或常模对照。当前试用报告没有独立常模、评分等级或阈值。",
+      "来源：OECD（2018），Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (People's Republic of China), ISCED 2（简体中文），https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip。",
+      "本内容改编自 OECD 原作。改编稿中的观点和论证不代表 OECD 或其成员国的官方观点。"
+    ],
+    "disclaimer": "供成人初中教师回顾本次作答。请勿用于教师绩效、录用、问责或学校排名。",
+    "artworkKey": "talis2018_teacher_exchange_zh_cn/1.0.0/1.2.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
