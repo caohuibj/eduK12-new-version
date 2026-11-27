@@ -11,6 +11,7 @@ import {interpretContentBinding,type FinalInterpretation,type FinalInterpretatio
 import {renderDeclaredReport,DECLARATIVE_REPORT_GENERATOR} from '../measurement-content/report-renderer'
 import {trainingMeasurementSourceScopeMatchesForConsumer} from '../composite/training-content-binding'
 import {trainingReportDisclosureAllowed,type TrainingMetricDisclosure} from '../composite/training-metric-disclosure'
+import {intersectDisclosureCapabilities,resolveAudienceDisclosure} from '../scale/policy/disclosure'
 import type {AssessmentReferenceEntry,ReferenceContext} from '../assessment-reference/reference'
 import {authorizeTrainingReinterpretation,recheckTrainingReinterpretationAuthority,trainingInterpretationSource,readTrainingInterpretationFacts,readTrainingInterpretationDisclosure,
  interpretationFail,trainingReinterpretationContextSchema,type TrainingReinterpretationContext,type TrainingInterpretationParent} from './reinterpretation-source'
@@ -92,6 +93,7 @@ function assertDisclosure(disclosure:TrainingMetricDisclosure|null,policy:Frozen
  // No accepted execution has no personal values to disclose. Its NOT_EXECUTED
  // receipt remains readable; never fabricate a policy or new execution for it.
  if(!disclosure)return
+ if(disclosure.capabilities.artwork!==undefined&&!disclosure.capabilities.numericScores)interpretationFail('DISCLOSURE_DENIED')
  if(policy.choices.some(choice=>!disclosure.referenceMetricKeys.has(choice.metricKey))
   ||report&&!trainingReportDisclosureAllowed(disclosure,report.content))interpretationFail('DISCLOSURE_DENIED')
 }
@@ -153,11 +155,16 @@ export async function createTrainingReinterpretation(context:TrainingReinterpret
   const interpretation=await interpretContentBinding({binding,contentBindingHash:canonicalHash(binding),readFacts:()=>facts,
    readRelease:async(id,hash)=>{const release=await reader.read(id);if(release.contentHash!==hash)interpretationFail('RELEASE_IDENTITY');return release}})
   const personal=interpretation.units[0]
+  const exactVisibility=template?.content.effectiveDisclosure
+    ?resolveAudienceDisclosure(template.content.effectiveDisclosure,'teacher'):undefined
+  const visibility=exactVisibility&&facts.disclosure?intersectDisclosureCapabilities(exactVisibility,facts.disclosure.capabilities)
+    :exactVisibility??(facts.disclosure?.capabilities.artwork!==undefined?facts.disclosure.capabilities:undefined)
   const report=template&&personal.report.status==='READY'?renderDeclaredReport(template.content.template,
    facts.metrics.filter(metric=>template!.content.metricKeys.includes(metric.key)).map(metric=>({metricKey:metric.key,value:metric.value,
     unit:measurement.content.metrics.find(m=>m.metricKey===metric.key)!.unit,
     status:facts.quality==='interpretable'&&metric.status==='OK'?'INTERPRETABLE':facts.quality==='invalid'?'INVALID':'UNAVAILABLE'})),
-   personal.references.map(reference=>({metricKey:reference.metricKey,referenceKind:reference.referenceKind,status:reference.status==='AVAILABLE'?'AVAILABLE':'UNAVAILABLE',bandKey:reference.values?.bandKey??null}))):null
+   personal.references.map(reference=>({metricKey:reference.metricKey,referenceKind:reference.referenceKind,status:reference.status==='AVAILABLE'?'AVAILABLE':'UNAVAILABLE',bandKey:reference.values?.bandKey??null,reason:reference.reason})),
+   visibility):null
   const artifact:TrainingInterpretationArtifact={schemaVersion:1,semantics:'EXPLICIT_IMMUTABLE_INTERPRETATION',actorId:c.actorId,reason:input.reason,
    courseId:c.courseId,compositeId:c.compositeId,attemptId:c.attemptId,attemptEpoch:parent.attemptEpoch,itemId:input.itemId,
    sourceAggregateHash:parent.aggregateInputHash!,sourceBindingHash:parent.trainingContentBindingHash!,sourceReceiptHash:parent.trainingContentInterpretationHash!,

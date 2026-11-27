@@ -1,3 +1,4 @@
+import { GIT_RELEASE_USERNAME, isGitReleaseAccount } from '../utils/gitReleaseIdentity'
 import { config } from '../config'
 import { loadCurrentPrincipal } from '../modules/organization/principal'
 import { beginAdminLogin, needsAdminKey } from '../modules/admin-permissions/security'
@@ -35,7 +36,7 @@ const LOGIN_DUMMY_HASH = '$2a$10$fuhNGsB2Z5/iwZtxlw1usOIb5sbX2OzkV/cccQJRbkSpHu2
 
 const teacherRegisterSchema = z.object({
   teacherCode: z.string().trim().toUpperCase().regex(/^[0-9A-HJKMNP-TV-Z]{8}$/, '教师码格式无效'),
-  username: z.string().min(4, '用户名至少4个字符').max(20, '用户名最多20个字符'),
+  username: z.string().min(4, '用户名至少4个字符').max(20, '用户名最多20个字符').refine(name => name !== GIT_RELEASE_USERNAME, '该账号名不可使用'),
   password: z.string().min(PASSWORD_MIN_LENGTH, '密码至少8个字符').max(PASSWORD_MAX_LENGTH, '密码最多128个字符').refine(isValidPassword, '密码必须包含字母和数字'),
   nickname: z.string().min(1, '真实姓名不能为空'),
 }).strict()
@@ -46,7 +47,7 @@ const verifyTeacherCodeSchema = z.object({
 
 const studentRegisterSchema = z.object({
   courseCode: z.string().min(1, '课程码不能为空'),
-  username: z.string().min(4, '用户名至少4个字符').max(20, '用户名最多20个字符'),
+  username: z.string().min(4, '用户名至少4个字符').max(20, '用户名最多20个字符').refine(name => name !== GIT_RELEASE_USERNAME, '该账号名不可使用'),
   password: z.string().min(PASSWORD_MIN_LENGTH, '密码至少8个字符').max(PASSWORD_MAX_LENGTH, '密码最多128个字符').refine(isValidPassword, '密码必须包含字母和数字'),
   nickname: z.string().min(2, '姓名至少2个字符'),
 }).strict()
@@ -98,7 +99,7 @@ export const authController = {
         })
       )
       const usable = Boolean(
-        current && current.isActive && !current.isFrozen
+        current && !isGitReleaseAccount(current.id, current.username) && current.isActive && !current.isFrozen
         && (!current.expiresAt || current.expiresAt > new Date())
         && (current.role !== UserRole.TEACHER || current.teacherApproved)
       )

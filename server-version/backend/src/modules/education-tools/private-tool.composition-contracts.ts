@@ -1,4 +1,4 @@
-import {disclosureCapabilitiesV1Schema} from '../scale/policy/schema'
+import {effectiveDisclosureCapabilitiesSchema} from '../scale/policy/schema'
 import {assessmentContextKeySchema} from '../assessment-context/context'
 import {z} from 'zod'
 import {resultAudiencePolicySchema} from '../assessment-policy/result-disclosure'
@@ -117,7 +117,7 @@ export type EducationCompositionRuntimeAnchor=z.infer<typeof educationCompositio
 
 /** Exact approved source descriptor; authority stays outside frozen content. */
 export const educationStandardSourceSchema=z.object({releaseId:id,combinationHash:hash,toolKey:z.string().min(1),instrumentVersion:z.string().min(1),
- nativeDefinitionHash:hash,parametersAxisHash:hash,reportAxisHash:hash,respondentDisclosure:disclosureCapabilitiesV1Schema,reportAudience:z.enum(['student','teacher','parent'])}).strict()
+ nativeDefinitionHash:hash,parametersAxisHash:hash,reportAxisHash:hash,respondentDisclosure:effectiveDisclosureCapabilitiesSchema,reportAudience:z.enum(['student','teacher','parent'])}).strict()
 export type EducationStandardSource=z.infer<typeof educationStandardSourceSchema>
 
 export const educationLibrarySourceSchema=z.object({entryId:id,approvedSnapshotHash:hash,nativeDefinitionHash:hash,

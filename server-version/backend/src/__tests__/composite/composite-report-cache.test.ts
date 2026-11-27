@@ -2,11 +2,39 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { encryptCompositeCollectionReport, decryptCompositeCollectionReport } from '../../modules/composite/composite-report-cache'
 import { resolveLegacyScaleProjectionPolicy } from '../../modules/scale/projection/policy-resolver'
 import { projectCompositeCollectionReport } from '../../modules/composite/composite-report.projector'
+import { DISCLOSURE_PRESETS } from '../../modules/scale/policy/disclosure'
 
 const binding = { attemptId: 'cache-attempt', attemptEpoch: 1, slotSetHash: 'a'.repeat(64), contextHash: null, aggregateInputHash: 'b'.repeat(64) }
 beforeAll(() => { process.env.DATA_ENCRYPTION_KEY = '5'.repeat(64) })
 
 describe('encrypted report materialization boundary', () => {
+  it('projects the frozen R opening and illustration in the participant view only', () => {
+    const unit = { itemId: 'scale', type: 'SCALE', scaleId: 's', scaleName: 'Test', scores: [],
+      method: { reportVersion: 'selected-r', reportAudience: 'student' },
+      interpretations: [{ scoreKey: 'total', headline: '档位', interpretation: '档位反馈', guidance: [], limitations: [], referenceVersion: 'p' }],
+    }
+    const presentation = { reportVersion: 'selected-r', artworkKey: 'sample/1.0.0/selected-r',
+      introductions: [{ scoreKey: 'total', headline: '开篇', summary: '开篇正文', guidance: ['一般建议'] }],
+    }
+    const policy = { disposition: 'FROZEN_V2', disclosure: { schemaVersion: 1, policyVersion: 'p', unknownAudience: 'DENY',
+      audiences: { subject: { ...DISCLOSURE_PRESETS.FULL_REPORT(), artwork: true }, teacher: DISCLOSURE_PRESETS.SCORES() },
+    } }
+    Object.defineProperty(unit, '__scaleReportPresentation', { value: presentation, enumerable: false })
+    Object.defineProperty(unit, '__scaleProjectionPolicy', { value: policy, enumerable: false })
+    const encrypted = encryptCompositeCollectionReport({ id: binding.attemptId, unitReports: [unit] }, binding)
+    const restored = decryptCompositeCollectionReport(encrypted, binding)
+    expect(JSON.stringify(restored)).not.toContain('开篇正文')
+    expect(projectCompositeCollectionReport(restored, 'participant').unitReports[0]).toMatchObject({
+      artworkKey: presentation.artworkKey, introductions: presentation.introductions, interpretations: unit.interpretations,
+    })
+    const staff = projectCompositeCollectionReport(restored, 'teacher').unitReports[0]
+    expect(staff).toMatchObject({ reportKind: 'scores' })
+    expect(staff).not.toHaveProperty('artworkKey')
+    expect(staff).not.toHaveProperty('introductions')
+    restored.unitReports[0].method.reportVersion = 'other-r'
+    expect(projectCompositeCollectionReport(restored, 'participant').unitReports[0]).not.toHaveProperty('artworkKey')
+  })
+
   it('preserves hidden frozen disclosure metadata without serializing it into an HTTP projection', () => {
     const policy = resolveLegacyScaleProjectionPolicy('unrecognized-standard', '1.0.0', 'STANDARD')
     const unit = { itemId: 'scale-1', type: 'SCALE', kind: 'scale', scaleId: 's', scaleCode: 'unrecognized-standard', scaleName: 'Restricted', result: null, scores: [{ key: 'secret', value: 77 }] }

@@ -1,12 +1,13 @@
 import {SurveyReinterpretationStudio} from './SurveyReinterpretationStudio'
 import {ReportDetails} from '../modules/reporting/ReportPrimitives'
+import {ScaleReportArtworkHero,ScaleReportBandArtwork} from '../modules/reporting/ScaleReportArtwork'
 import type {ReactNode} from 'react'
 import {useEffect,useRef,useState} from 'react'
 type History={list:{id:string;createdAt:string}[];nextAfterId:string|null}
 type SavedExplanation={artifactId:string;finalId:string;accessAudience:string;artifact:{report:DeclaredReport|null;binding:{units:{instrumentKey:string}[]}}}
 type Pointer={releaseId:string;contentHash:string}
 type List={list:{finalId:string;attemptCode:string;completedAt:string;reports:{instrumentKey:string;measurementRelease:Pointer;reportRelease:Pointer|null;status:string}[]}[];nextAfterId:string|null}
-export type DeclaredReport={title:string|null;blocks:unknown[];limitations:string[];disclaimer:string|null}
+export type DeclaredReport={title:string|null;blocks:unknown[];limitations:string[];disclaimer:string|null;artworkKey?:string}
 type View={accessAudience:'researcher';intendedAudience:string;sourceFinalHash:string;contentBindingHash:string;reportRelease:Pointer;
   interpretationSemantics:string;lifecycleNotices:{layer:string;releaseId:string;status:string}[];report:DeclaredReport}
 const reportStatus:Record<string,string>={READY:'可查看原报告',NOT_SELECTED:'提交时未选模板',NOT_RECORDED:'当时未记录报告状态',UNAVAILABLE:'原报告暂不可用'}
@@ -27,7 +28,8 @@ function Block({value}:{value:unknown}){
 }
 export function SurveyDeclaredReport({report,metadata}:{report:DeclaredReport;metadata?:ReactNode}){return <>
   <h4 className="font-semibold">{report.title??'版本报告'}</h4>
-  {report.blocks.map((block,index)=><Block key={index} value={block}/>)}
+  <ScaleReportArtworkHero artworkKey={report.artworkKey}/>
+  {report.blocks.map((block,index)=><ScaleReportBandArtwork key={index} artworkKey={report.artworkKey} block={block}><Block value={block}/></ScaleReportBandArtwork>)}
   {(metadata||report.limitations.length>0||report.disclaimer)&&<ReportDetails title="报告信息与阅读说明">
     {metadata}{report.limitations.map((line,index)=><p key={index}>{line}</p>)}{report.disclaimer&&<p>{report.disclaimer}</p>}
   </ReportDetails>}

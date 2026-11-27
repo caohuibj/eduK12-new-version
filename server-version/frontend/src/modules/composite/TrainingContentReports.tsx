@@ -1,5 +1,6 @@
 import type { CompositeReportAudience, TrainingContentReport } from './types'
 import { ReportDetails, ReportSection } from '../reporting/ReportPrimitives'
+import { ScaleReportArtworkHero, ScaleReportBandArtwork } from '../reporting/ScaleReportArtwork'
 
 const text=(value:unknown)=>typeof value==='string'?value:''
 const object=(value:unknown):Record<string,unknown>|null=>value!==null&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:null
@@ -28,7 +29,10 @@ function DeclaredBlock({value,showMetricKeys=true}:{value:unknown;showMetricKeys
  * accepts no transport and grants no participant access to Training reports. */
 export function DeclaredReportContent({report,showMetricKeys=true}:{report:NonNullable<TrainingContentReport['rendered']>;showMetricKeys?:boolean}){
   return <>
-    {Array.isArray(report.blocks)&&report.blocks.map((block,i)=><DeclaredBlock key={i} value={block} showMetricKeys={showMetricKeys}/>)}
+    <ScaleReportArtworkHero artworkKey={report.artworkKey}/>
+    {Array.isArray(report.blocks)&&report.blocks.map((block,i)=><ScaleReportBandArtwork key={i} artworkKey={report.artworkKey} block={block}>
+      <DeclaredBlock value={block} showMetricKeys={showMetricKeys}/>
+    </ScaleReportBandArtwork>)}
     {(!!report.limitations?.length||!!report.disclaimer)&&<ReportDetails title="阅读说明与解释边界">
       {Array.isArray(report.limitations)&&report.limitations.length>0&&<ul>{report.limitations.filter(line=>typeof line==='string').map((line,i)=><li key={i}>{line}</li>)}</ul>}
       {typeof report.disclaimer==='string'&&report.disclaimer&&<p>{report.disclaimer}</p>}

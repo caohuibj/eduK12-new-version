@@ -226,7 +226,11 @@ export const resolveProjectionPolicyForAssessment = (assessment: any, result: Sc
       const snapshot = verifiedRuntime ?? (typeof storedSnapshot === 'string'
         ? decryptFrozenScaleRuntimeSnapshot(storedSnapshot)
         : parseVersionedFrozenScaleRuntimeSnapshot(storedSnapshot))
-      if (snapshot.schemaVersion === 2) return { policy: scaleProjectionPolicyFromCompiled(snapshot.compiledPolicy), snapshotError: false }
+      if (snapshot.schemaVersion === 2) return {
+        policy: scaleProjectionPolicyFromCompiled(snapshot.compiledPolicy),
+        snapshotError: false,
+        ...(snapshot.compiledPolicy.sourceRuntimePolicyHash ? { reportDefinition: snapshot.definition.report } : {}),
+      }
     } catch {
       return { policy: resolveLegacyScaleProjectionPolicy('', ''), snapshotError: true }
     }

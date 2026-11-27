@@ -1,3 +1,4 @@
+import { GIT_RELEASE_USERNAME } from '../utils/gitReleaseIdentity'
 import {listTrainingParticipants} from '../services/trainingParticipantList'
 import { changePasswordHandler } from './changePasswordController'
 import { Request, Response } from 'express'
@@ -12,7 +13,7 @@ import { resetPasswordForPlatformAdmin } from './platformAccountController'
 import { setUserActiveState, UserLifecycleError } from '../services/userLifecycleService'
 
 const createUserSchema = z.object({
-  username: z.string().min(3, '用户名至少3个字符'),
+  username: z.string().min(3, '用户名至少3个字符').refine(name => name !== GIT_RELEASE_USERNAME, '该账号名不可使用'),
   password: z.string().min(PASSWORD_MIN_LENGTH, '密码至少8个字符').max(PASSWORD_MAX_LENGTH, '密码最多128个字符').refine(isValidPassword, '密码必须包含字母和数字'),
   role: z.enum(['STUDENT', 'TEACHER', 'PARENT']),
   nickname: z.string().optional(),

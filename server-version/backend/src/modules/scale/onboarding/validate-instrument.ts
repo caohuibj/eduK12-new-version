@@ -67,7 +67,7 @@ export const validateScaleInstrumentSource = (source: ScaleInstrumentSourceV1, o
   if (options.requireInstruction && !source.instruction) issues.push({ path: 'instruction', message: 'INSTRUCTION_NOT_DECLARED', severity: 'error' })
   if (source.instruction && source.instruction.language !== source.executable.contentLocale) issues.push({ path: 'instruction.language', message: 'INSTRUCTION_CONTENT_LOCALE_MISMATCH', severity: 'error' })
   if (!source.applicability) issues.push({ path: 'applicability', message: 'executable source 缺少 applicability', severity: 'error' })
-  if (!source.disclosure) issues.push({ path: 'disclosure', message: 'executable source 缺少 disclosure', severity: 'error' })
+  if (!source.disclosure && !source.dataCeiling) issues.push({ path: 'dataCeiling', message: 'executable source 缺少 dataCeiling 或原版 disclosure', severity: 'error' })
   if (localization && source.executable.contentLocale !== localization.targetLocale) {
     issues.push({
       path: 'executable.contentLocale',

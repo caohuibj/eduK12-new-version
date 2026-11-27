@@ -5,6 +5,7 @@ import {cognitiveProductPlan,cognitiveProductOutputs} from './cognitive-product-
 import {catalogDiscoveryScope,bundleRuntimeSelectionMatches,authoringPolishScope} from './catalog-discovery-scope.mjs';
 import {cognitiveMixedProductScope, acceptanceFor, classifyChanges, contentCodeqlRequired} from './content-scope.mjs';
 import {execFileSync} from 'node:child_process';
+import {isScaleReleaseAsset,selectScaleIntake} from './scale-intake-scope.mjs';
 import {readCognitiveIntakeDiff} from './cognitive-intake-scope.mjs';
 import {verifiedFrontendRetest} from './ci-frontend-retest.mjs';
 export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd(),draft=false}={}) {
@@ -36,6 +37,16 @@ export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd(),draft=
   if(actual.requiresBrowser || scope.scale_intake_light==='true' || scope.scale==='true' || scope.situational==='true' || scope.bundle==='true') failed.push('unsupported-or-mixed-cognitive-intake');
   for(const name of ['scope','content','codeql']) if(needs[name]?.result!=='success')failed.push(name);
   return [...new Set(failed)];
+}
+
+export function recheckScaleReleaseScope(needs,entries,forceFull=false) {
+  if(!entries.some(entry=>isScaleReleaseAsset(entry.file)))return [];
+  const scope=needs.scope?.outputs??{};
+  const isolated=!forceFull&&Boolean(selectScaleIntake(entries)?.toolKeys);
+  if(scope.scale_intake_light!==String(isolated)||scope.scale_release_mixed!==String(!isolated))
+    return ['recomputed-scale-release-scope'];
+  const job=isolated?'content':'scale-release-mixed';
+  return needs[job]?.result==='success'?[]:[job];
 }
 
 export function recheckContentSast(needs,entries,readers) {
@@ -95,6 +106,7 @@ export function requiredChecks(needs, draft) {
   if (scope.cognitive_intake_light === 'true') return ['scope','content',...(!draft?['codeql']:[])];
   const dependencies = scope.scenario === 'dependencies';
   let checks = ['scope'];
+  if(scope.scale_release_mixed==='true')checks.push('scale-release-mixed');
   if (dependencies) checks.push(...(scope.dependencies_frontend_only==='true'?[]:['maintenance','backend','backend-regression']),'frontend-build','frontend','docker');
   if (scope.scenario === 'frontend-test') checks.push('frontend');
   if (scope.maintenance === 'true') checks.push('maintenance');
@@ -236,6 +248,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const needs = readNeeds();
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(process.env.CI_EVENT==='pull_request'||process.env.CI_EVENT==='push'){
+    const {changedEntries}=await import('./content-scope.mjs');
+    failed.push(...recheckScaleReleaseScope(needs,changedEntries(process.env.CI_BASE_SHA),process.env.CI_FORCE_FULL==='true'));
+  }
   if(needs.scope?.outputs?.application_route==='backend-unit'){
     try {const {changedEntries}=await import('./content-scope.mjs');
       if(!unitOnly(changedEntries(process.env.CI_BASE_SHA)))failed.push('recomputed-backend-unit-scope');

@@ -3,7 +3,7 @@ export type ReportReferenceKind='normative_distribution'|'criterion_threshold'|'
 export type ReportTemplateBlock={type:'TEXT';text:string}|{type:'METRIC';metricKey:string;label?:string;display:'RAW'|'REFERENCE_RESULT'}
   |{type:'REFERENCE_BAND';metricKey:string;referenceKind:ReportReferenceKind;bandKey:string;text:string;guidance:string[]}
   |{type:'ASSET';assetId:string;alt:string}|{type:'CHART';metricKeys:string[];style:'BAR'|'TABLE';caption?:string}
-export type ReportTemplateDefinition={title?:string;blocks:ReportTemplateBlock[];limitations:string[];disclaimer?:string}
+export type ReportTemplateDefinition={title?:string;blocks:ReportTemplateBlock[];limitations:string[];disclaimer?:string;artworkKey?:string}
 
 const referenceLabels:Record<ReportReferenceKind,string>={normative_distribution:'常模分布',criterion_threshold:'准则阈值',descriptive_sample:'描述样本',theoretical_range:'理论范围'}
 function ReportBlockPanel({plain,plainTitle,expanded,onExpand,heading,children}:{plain:boolean;plainTitle:string;expanded:boolean;onExpand:()=>void;heading:ReactNode;children:ReactNode}){

@@ -1,3 +1,4 @@
+import { GIT_RELEASE_USERNAME } from '../../utils/gitReleaseIdentity'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -47,7 +48,7 @@ export async function lockAdminMutation(
   const locked = await tx.$queryRaw<LockedAdminAccount[]>`
     SELECT "id","token_version" AS "tokenVersion","platform_role"::text AS "platformRole","account_domain" AS "accountDomain",
       "is_active" AS "isActive","is_frozen" AS "isFrozen","expires_at" AS "expiresAt","must_change_password" AS "mustChangePassword"
-    FROM "users" WHERE "id" IN (${Prisma.join(ids)}) ORDER BY "id" FOR UPDATE`
+    FROM "users" WHERE "id" IN (${Prisma.join(ids)}) AND username<>${GIT_RELEASE_USERNAME} ORDER BY "id" FOR UPDATE`
   const actor = locked.find(row => row.id === input.actorUserId)
   if (!actor || actor.platformRole !== 'SYSTEM_ADMIN' || !actor.isActive || actor.isFrozen
     || (actor.expiresAt && actor.expiresAt <= new Date()) || !['LEGACY', 'TRAINING'].includes(actor.accountDomain)

@@ -14,9 +14,12 @@ import {canonicalScalePresentation} from './catalog-scale.presentation'
 import type {ReportTemplate} from '../measurement-content/report-template'
 import {toolReference,type ToolReference} from './tool-reference'
 import type {CatalogSourceSnapshot} from './catalog.sources'
+import {compileEffectiveDisclosure} from '../scale/policy/disclosure'
+import {audienceDisclosurePolicyV1Schema,scaleDataCeilingSchema} from '../scale/policy/schema'
+import type {AudienceDisclosurePolicyV1} from '../scale/policy/types'
 export type Axis='CONTENT'|'PARAMETERS'|'REPORT'
 export type Part={axis:Axis;version:string;hash:string;payload:unknown;sourceVersion:string;reference:ToolReference}
-export type Triplet={schemaVersion:1;toolKey:string;title:string;instrumentVersion:string;parts:Record<Axis,Part>;definition:ScaleDefinitionV2;references:AssessmentReferenceSetDefinition[];template:ReportTemplate|null;combinationHash:string;blockers:string[];reference:ToolReference}
+export type Triplet={schemaVersion:1;toolKey:string;title:string;instrumentVersion:string;parts:Record<Axis,Part>;definition:ScaleDefinitionV2;references:AssessmentReferenceSetDefinition[];template:ReportTemplate|null;effectiveDisclosure?:AudienceDisclosurePolicyV1;combinationHash:string;blockers:string[];reference:ToolReference}
 const json=<T>(v:T):T=>JSON.parse(JSON.stringify(v))
 export function sourceParts(toolKey:string,version:string):Part[]{
  const source=getScaleInstrumentSource(toolKey,version)
@@ -49,6 +52,10 @@ export function composeTriplet(key:string,parts:Record<Axis,Part>):Triplet{
  const definition={...json(content),source:json(imported?metadata.originalProvenance:source!.executable!.definition.source),license:json(imported?metadata.originalLicense:source!.executable!.definition.license),report:json(selectedReport.definition??noReport),referencePolicy:json(parameters.referencePolicy)} as ScaleDefinitionV2
  const blockers:string[]=[]
  for(const axis of ['CONTENT','PARAMETERS','REPORT'] as const)if(parts[axis].axis!==axis||canonicalHash(parts[axis].payload)!==parts[axis].hash)blockers.push(axis+' 版本内容摘要不匹配')
+ if(selectedReport.parameterVersion!==undefined&&selectedReport.parameterVersion!==parts.PARAMETERS.version)blockers.push('报告绑定的参数版本与当前组合不一致')
+ if(selectedReport.reportVisibility&&parts.REPORT.sourceVersion!==parts.CONTENT.sourceVersion)blockers.push('报告绑定的题本版本与当前组合不一致')
+ const artworkPrefix=key+'/'+parts.CONTENT.sourceVersion+'/'
+ if(definition.report.artworkKey&&!definition.report.artworkKey.startsWith(artworkPrefix))blockers.push('报告配图标识与工具或题本版本不一致')
  const validation=validateScaleDefinition(definition,{instrumentClass:'STANDARD',forPublish:false,scorerKeys:getScaleCustomScorerKeys()})
  blockers.push(...validation.issues.filter(i=>i.severity==='error').map(i=>i.path+'：'+i.message))
  if(!imported){
@@ -71,13 +78,32 @@ export function composeTriplet(key:string,parts:Record<Axis,Part>):Triplet{
  blockers.push(...standardReportParameterBlockers(definition,parameters.references,parts.REPORT.payload!==null,selectedReport.template))
  const variant=parts.REPORT.reference.metadata.reportVariant as {title?:unknown}|undefined
  const baseTitle=imported?String(metadata.title):source!.catalog.identity.canonicalName
- const title=typeof variant?.title==='string'?baseTitle+' · '+variant.title:baseTitle
- const compiled=compileStandardCombinationReport(title,definition,parts.REPORT.payload!==null)
+ const reportTitle=selectedReport.title??variant?.title
+ const title=typeof reportTitle==='string'?baseTitle+' · '+reportTitle:baseTitle
+ const compiled=compileStandardCombinationReport(title,definition,parts.REPORT.payload!==null,parameters.references)
  const template=selectedReport.template??compiled.template,reportBlockers=compiled.blockers
  if(template)try{validateReportTemplateBindings(template,definition.scoring.scores.map(s=>s.key),selectedReport.assetRefs.map(a=>a.assetId))}catch(e){blockers.push(e instanceof Error?e.message:'报告引用不存在的指标或素材')}
+ if(template?.artworkKey&&!template.artworkKey.startsWith(artworkPrefix))blockers.push('报告模板配图标识与工具或题本版本不一致')
+ if(selectedReport.template?.standardScoreBands)blockers.push('不可在报告模板中直接作者填写理论区间；区间由 P 生成')
  blockers.push(...reportBlockers)
  const reference=toolReference('SCALE',key,{content:parts.CONTENT.reference,parameters:parts.PARAMETERS.reference,report:parts.REPORT.reference})
- return {schemaVersion:1,toolKey:key,title,instrumentVersion:parts.CONTENT.sourceVersion,parts:json(parts),definition,references:json(parameters.references),template,combinationHash:standardCombinationHash(key,standardAxisHashes(parts)),blockers:[...new Set(blockers)],reference}
+ const effectiveDisclosure=standardCombinationDisclosure(parts)
+ return {schemaVersion:1,toolKey:key,title,instrumentVersion:parts.CONTENT.sourceVersion,parts:json(parts),definition,references:json(parameters.references),template,
+  ...(effectiveDisclosure?{effectiveDisclosure}:{}),combinationHash:standardCombinationHash(key,standardAxisHashes(parts)),blockers:[...new Set(blockers)],reference}
+}
+
+/** Old release snapshots omit this field. Preserve their exact provenance and
+ * policy semantics instead of filling it from a newer registry at read time. */
+export function standardCombinationDisclosure(parts:Triplet['parts']){
+ const metadata=parts.CONTENT.reference.metadata
+ const visibility=selectedStandardReport(parts.REPORT.payload).reportVisibility
+ if(!visibility&&metadata.dataCeiling===undefined)return undefined
+ if(canonicalHash(metadata)!==parts.CONTENT.reference.metadataHash)throw new Error('STANDARD_CONTENT_REFERENCE_HASH_MISMATCH')
+ const payload=parts.CONTENT.payload as {dataCeiling?:unknown}
+ if(metadata.dataCeiling!==undefined&&!databaseContentSource(parts.CONTENT)
+  &&canonicalHash(payload.dataCeiling??null)!==canonicalHash(metadata.dataCeiling))throw new Error('STANDARD_DATA_CEILING_MISMATCH')
+ return compileEffectiveDisclosure(scaleDataCeilingSchema.optional().parse(metadata.dataCeiling),
+  visibility,audienceDisclosurePolicyV1Schema.optional().parse(metadata.disclosure))
 }
 /** The approved CONTENT source already contains its versioned instruction.
  * Resolve from that immutable record; registry/default changes are not inputs. */

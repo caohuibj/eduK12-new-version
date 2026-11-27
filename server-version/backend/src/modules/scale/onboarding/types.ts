@@ -8,6 +8,7 @@ import type {
   EducationalFeedbackDefinitionV1,
   InstrumentApplicabilityV1,
   InstrumentUsageRequirementsV1,
+  ScaleDataCeilingV1,
 } from '../policy/types'
 
 export interface ScaleGoldenCase {
@@ -87,6 +88,8 @@ export interface ScaleInstrumentSourceV1 {
   /** Explicit new education source version, independent from V1 roles. */
   educationExpertApplicability?: import('../../education-tools/expert-observation.contract').ExpertSourceApplicability
   disclosure?: AudienceDisclosurePolicyV1
+  /** Data ceiling for new content. Historic sources retain legacy disclosure. */
+  dataCeiling?: ScaleDataCeilingV1
   usageRequirements?: InstrumentUsageRequirementsV1
   educationalFeedback?: EducationalFeedbackDefinitionV1
   /** Repository-reviewed authorship provenance, not a client authorization grant. */

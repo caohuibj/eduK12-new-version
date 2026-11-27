@@ -12,7 +12,7 @@ import {readEducationMarkerSource} from '../education-tools/assessment-resource.
 import {readPrivateRuntimeScaleSource,assertPrivateRuntimeCompositeIdentity} from '../education-tools/private-tool.runtime-source'
 import {readLibraryScaleMeasurementSource,readLibraryScaleMeasurementSources} from '../scale-library-governance/training-source'
 import {trainingReferencePolicySchema} from './training-reference-selection'
-import {decodeTrainingStandardItemSource,trainingStandardItemSourceSchema,verifyStoredTrainingStandardItem} from './training-standard-combination'
+import {decodeTrainingStandardItemSource,exactStandardScaleRuntimeInput,trainingStandardItemSourceSchema,verifyStoredTrainingStandardItem,type ExactStandardScaleRuntimeInput} from './training-standard-combination'
 import {readCurrentStandardCombination} from '../measurement-content/standard-combination-source'
 import {frozenTripletInstruction} from '../survey/standard-triplet.model'
 import {readTrainingStandardContentIdentity} from './training-standard-content'
@@ -440,7 +440,7 @@ export function educationCompositionSlotPresentation(binding: NonNullable<Traini
   return {order:new Map(orderedSlots.map((key,index)=>[key,index])),presentation}
 }
 
-export async function prepareTrainingContentAttemptBinding(db:Prisma.TransactionClient,input:{compositeId:string;attemptId:string;epoch:number;snapshot:unknown;snapshotHash:string|null|undefined;scaleArtifacts?:Map<string,PublishedScaleArtifact>;prefetchedReleases?:Map<string,import('../measurement-content/repository').StoredRelease>;composite:{id:string;createdBy?:string|null;items:any[]};resolvedSituational:Map<string,ResolvedSituationalRelease>;educationComposition?:EducationCompositionPolicyBinding}){
+export async function prepareTrainingContentAttemptBinding(db:Prisma.TransactionClient,input:{compositeId:string;attemptId:string;epoch:number;snapshot:unknown;snapshotHash:string|null|undefined;scaleArtifacts?:Map<string,PublishedScaleArtifact>;prefetchedReleases?:Map<string,import('../measurement-content/repository').StoredRelease>;composite:{id:string;createdBy?:string|null;items:any[]};resolvedSituational:Map<string,ResolvedSituationalRelease>;educationComposition?:EducationCompositionPolicyBinding;exactStandardSources?:Map<string,ExactStandardScaleRuntimeInput>}){
   if(input.snapshot==null&&input.snapshotHash==null)return null
   if(!input.snapshot||!input.snapshotHash)fail('SNAPSHOT_INVALID')
   const parsed=trainingContentSnapshotSchema.safeParse(input.snapshot)
@@ -506,6 +506,9 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
       if(!item.standardCombinationSource||canonicalHash(item.standardCombinationSource)!==canonicalHash(unit.source.standardCombination))fail('SOURCE_MISMATCH')
       const standard=await verifyStoredTrainingStandardItem(db,input.composite,item,'COLLECTION')
       if(canonicalHash(standard.reference.measurement)!==canonicalHash(unit.measurement))fail('SOURCE_MISMATCH')
+      if(input.exactStandardSources&&standard.resolved.row.snapshot.effectiveDisclosure){
+        input.exactStandardSources.set(unit.itemId,exactStandardScaleRuntimeInput(standard.resolved.row.snapshot))
+      }
       releases.set(standard.resolved.measurement.releaseId,standard.resolved.measurement)
       continue
     }

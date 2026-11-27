@@ -1,3 +1,4 @@
+import { isGitReleaseAccount } from '../utils/gitReleaseIdentity'
 import { prisma } from '../config/database'
 import { comparePassword, hashPassword, isValidPassword } from '../utils/password'
 
@@ -16,7 +17,7 @@ export async function changeOwnPassword(userId: string | undefined, oldPassword:
   }
   if (oldPassword === newPassword) throw new PasswordChangeError('新密码不能与旧密码相同')
   const user = await prisma.user.findUnique({ where: { id: userId } })
-  if (!user) throw new PasswordChangeError('请先登录', true)
+  if (!user || isGitReleaseAccount(user.id, user.username)) throw new PasswordChangeError('请先登录', true)
   if (!(await comparePassword(oldPassword, user.passwordHash))) throw new PasswordChangeError('旧密码错误')
   // bcrypt can treat distinct UTF-8 strings as the same credential after 72 bytes.
   if (await comparePassword(newPassword, user.passwordHash)) throw new PasswordChangeError('新密码不能与旧密码相同')

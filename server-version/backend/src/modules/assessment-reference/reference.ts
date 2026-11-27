@@ -1,4 +1,4 @@
-import { validateReferenceGovernance, type ReferenceGovernanceV1 } from './governance'
+import { governanceBandFor, validateReferenceGovernance, type ReferenceGovernanceV1 } from './governance'
 import type { ScaleReferencePolicy } from '../scale/scale-definition'
 import type { ScaleScoreValue } from '../scale/scale-scoring'
 import type { AssessmentContextValues } from '../assessment-context'
@@ -552,7 +552,7 @@ export const resolveAssessmentReference = (input: {
       if (entry.governance) {
         const g = entry.governance
         if (value < g.scoreRange.min || value > g.scoreRange.max) return unavailable(selection, 'measurement_mismatch')
-        const band = g.bands.find((b, i) => (i === 0 ? value >= b.lower : value > b.lower) && value <= b.upper)
+        const band = governanceBandFor(g.bands,value)
         criterionBand = band ? { key: band.key, label: band.label, minInclusive: band.lower, maxInclusive: band.upper } : null
       }
       const disclaimer = entry.evidenceLevel === 'literature_beta'

@@ -1,0 +1,238 @@
+{
+  "ars30_2016_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ars30_2016_zh_cn_research/report-materials.json"
+  },
+  "bat23_2020_en/1.0.0/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/bat23_2020_en/report-materials.json"
+  },
+  "bps9_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "6fa885ec74ca01350db25c44bd61c700648b05d1",
+    "path": "docs/scale-intake/materials-three-20261029/bps9_zh_cn_research/report-variants.json"
+  },
+  "bpses5_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/bpses5_zh_cn_research/report-materials.json"
+  },
+  "brcs4_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/brcs4_zh_cn_research/report-materials.json"
+  },
+  "cbi_zh_cn/1.0.1/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/cbi_zh_cn/report-materials.json"
+  },
+  "ccfq18_zh_cn/1.0.0/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/ccfq18_zh_cn/report-materials.json"
+  },
+  "cesd10_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/cesd10_zh_cn_research/report-materials.json"
+  },
+  "cfq7_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "6fa885ec74ca01350db25c44bd61c700648b05d1",
+    "path": "docs/scale-intake/materials-three-20261029/cfq7_zh_cn_research/report-variants.json"
+  },
+  "cfsr12_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/cfsr12_zh_cn_research/report-materials.json"
+  },
+  "chime_s24_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/chime_s24_zh_cn_research/report-materials.json"
+  },
+  "csacs9_zh_cn/1.0.1/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/csacs9_zh_cn/report-materials.json"
+  },
+  "ctas2_cognitive_en/1.0.1/report-variants.json": {
+    "commit": "472237d8dbf6033f1b6ac5b2d965b3240632c4fd",
+    "path": "docs/scale-intake/dual-reports-final-20261029/ctas2_cognitive_en/report-materials.json"
+  },
+  "curiosity_5dcr24_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/curiosity_5dcr24_zh_cn_research/report-materials.json"
+  },
+  "djgls6_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/djgls6_zh_cn_research/report-materials.json"
+  },
+  "ebq16_zh_cn_research/1.0.2/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/ebq16_zh_cn_research/report-materials.json"
+  },
+  "erss19_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/erss19_zh_cn_research/report-materials.json"
+  },
+  "ffmq15_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/ffmq15_zh_cn_research/report-materials.json"
+  },
+  "gad7_zh_cn_research/1.1.0/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/gad7_zh_cn_research/report-materials.json"
+  },
+  "gse3_asku_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/gse3_asku_zh_cn_research/report-materials.json"
+  },
+  "hse_msit_zh_cn/1.0.1/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/hse_msit_zh_cn/report-materials.json"
+  },
+  "ie4_zh_cn_research/1.2.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ie4_zh_cn_research/report-materials.json"
+  },
+  "ipip_attending_emotions10_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ipip_attending_emotions10_zh_cn_research/report-materials.json"
+  },
+  "ipip_emotion_based_decision9_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ipip_emotion_based_decision9_zh_cn_research/report-materials.json"
+  },
+  "ipip_empathic_concern10_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ipip_empathic_concern10_zh_cn_research/report-materials.json"
+  },
+  "ipip_negative_expressivity10_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ipip_negative_expressivity10_zh_cn_research/report-materials.json"
+  },
+  "ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "6fa885ec74ca01350db25c44bd61c700648b05d1",
+    "path": "docs/scale-intake/materials-three-20261029/ipip_neo_c1_self_efficacy10_zh_cn_research/report-variants.json"
+  },
+  "ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ipip_neo_c5_self_discipline10_zh_cn_research/report-materials.json"
+  },
+  "ipip_nfc10_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ipip_nfc10_zh_cn_research/report-materials.json"
+  },
+  "ipip_opt10_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ipip_opt10_zh_cn_research/report-materials.json"
+  },
+  "ipip_positive_expressivity9_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ipip_positive_expressivity9_zh_cn_research/report-materials.json"
+  },
+  "ipip_responsive_distress10_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ipip_responsive_distress10_zh_cn_research/report-materials.json"
+  },
+  "ipip_responsive_joy10_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ipip_responsive_joy10_zh_cn_research/report-materials.json"
+  },
+  "ipip50_zh_cn_research/1.1.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ipip50_zh_cn_research/report-materials.json"
+  },
+  "ips9_2021_zh_cn/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ips9_2021_zh_cn/report-materials.json"
+  },
+  "jss8_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/jss8_zh_cn_research/report-materials.json"
+  },
+  "k6_zh_cn_research/1.1.0/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/k6_zh_cn_research/report-materials.json"
+  },
+  "kseg6_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/kseg6_zh_cn_research/report-materials.json"
+  },
+  "kusiv3_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/kusiv3_zh_cn_research/report-materials.json"
+  },
+  "l1_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/l1_zh_cn_research/report-materials.json"
+  },
+  "maia2_37_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/maia2_37_zh_cn_research/report-materials.json"
+  },
+  "mpmi_s22_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/mpmi_s22_zh_cn_research/report-materials.json"
+  },
+  "mslq_critical_thinking5_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/mslq_critical_thinking5_zh_cn_research/report-materials.json"
+  },
+  "mwq5_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/mwq5_zh_cn_research/report-materials.json"
+  },
+  "ofs10_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/ofs10_zh_cn_research/report-materials.json"
+  },
+  "orvis92_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/orvis92_zh_cn_research/report-materials.json"
+  },
+  "pba23_2018_zh_cn/1.0.1/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/pba23_2018_zh_cn/report-materials.json"
+  },
+  "phq4_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/phq4_zh_cn_research/report-materials.json"
+  },
+  "res9_zh_cn/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/res9_zh_cn/report-materials.json"
+  },
+  "rses10_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/rses10_zh_cn_research/report-materials.json"
+  },
+  "sas_sv10_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/sas_sv10_zh_cn_research/report-materials.json"
+  },
+  "sci8_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/sci8_zh_cn_research/report-materials.json"
+  },
+  "socs_s20_2023_zh_cn/1.0.1/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/socs_s20_2023_zh_cn/report-materials.json"
+  },
+  "sop2_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/sop2_zh_cn_research/report-materials.json"
+  },
+  "srq63_brown_miller_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "ea5fc03cda7f4d78907a1755041113f725580b23",
+    "path": "docs/scale-intake/dual-reports-final-20261029/srq63_brown_miller_zh_cn_research/report-materials.json"
+  },
+  "sswq16_zh_cn_research/1.0.1/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/sswq16_zh_cn_research/report-materials.json"
+  },
+  "teacher_subject_liking_chemistry_zh_cn/1.0.0/report-variants.json": {
+    "commit": "3b90f60af83180a24743010ed860db6990581c03",
+    "path": "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_chemistry_zh_cn/1.0.0/source.json"
+  },
+  "tswq_zh_cn/1.0.1/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/tswq_zh_cn/report-materials.json"
+  },
+  "wibps7_adolescent_zh_cn_research/1.0.0/report-variants.json": {
+    "commit": "68d4b8398d2d2971470581218613266f6bc86974",
+    "path": "docs/scale-intake/dual-reports-next-20261029/wibps7_adolescent_zh_cn_research/report-materials.json"
+  }
+}

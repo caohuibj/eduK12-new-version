@@ -53,6 +53,9 @@ export const scaleDeploymentPolicyV2Schema = z.object({
   deploymentModes: z.array(scaleDeploymentModeSchema).min(1),
   runtimePolicyHash: z.string().regex(/^[0-9a-f]{64}$/),
   localizationVersion: z.string().min(1).optional(),
+  // An exact combination can gain managed admission while its existing
+  // legacy source continues to use the historical compatibility profile.
+  exactStandardOnly: z.literal(true).optional(),
   inFlightCompletion: z.literal('FROZEN_DEADLINE'),
   completionWindowMs: z.number().int().positive().max(30 * 24 * 60 * 60 * 1000).optional(),
 }).strict()

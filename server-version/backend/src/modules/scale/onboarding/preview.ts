@@ -88,7 +88,7 @@ export const previewScaleInstrument = (input: {
       reportQc: source.executable?.definition.report.audienceContract?.qcReview ?? null,
     },
     report: {
-      disclosureAudiences: source.disclosure ? Object.keys(source.disclosure.audiences) : [],
+      disclosureAudiences: Object.keys((source.dataCeiling ?? source.disclosure)?.audiences ?? {}),
       educationalFeedback: Boolean(source.educationalFeedback),
       candidateReportPlan: source.candidatePreview?.reportPlan ?? null,
     },

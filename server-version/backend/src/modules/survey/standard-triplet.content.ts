@@ -31,8 +31,10 @@ export async function copyTripletContent(tx:Prisma.TransactionClient,triplet:Tri
   ?canonicalHash({parameters:triplet.parts.PARAMETERS.hash,report:triplet.parts.REPORT.hash})
   :canonicalHash({parameters:triplet.parts.PARAMETERS.hash,report:triplet.parts.REPORT.hash,audience:reportAudience})
  const report=await publishContentRelease(tx,{layer:'REPORT',family:'SCALE',key:'standard-report:'+measurement.releaseId,version:reportVersion,scope:measurement.scope,sourceReleaseId:null,assetRefs:selectedStandardReport(triplet.parts.REPORT.payload).assetRefs,provenance,
-  content:{projectionVersion:1,measurements:[pointer],metricKeys:triplet.definition.scoring.scores.map(s=>s.key),audience:reportAudience,language:triplet.definition.versionAxes?.locale??'und',generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:triplet.template}},actorId)
+  content:{projectionVersion:1,measurements:[pointer],metricKeys:triplet.definition.scoring.scores.map(s=>s.key),audience:reportAudience,language:triplet.definition.versionAxes?.locale??'und',generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:triplet.template,
+   ...(triplet.effectiveDisclosure?{effectiveDisclosure:triplet.effectiveDisclosure}:{})}},actorId)
  binding.reportRelease={releaseId:report.releaseId,contentHash:report.contentHash}
+ if(triplet.effectiveDisclosure)binding.reportDisclosure=triplet.effectiveDisclosure
  return binding
 }
 export async function bindApprovedTripletContent(tx:Prisma.TransactionClient,unit:ResearchFrozenUnit,actor:string){

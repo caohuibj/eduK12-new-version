@@ -7,7 +7,7 @@ import {join,dirname} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {selectScaleIntake,readScaleIntakeDiff,scaleIntakeToolingChanged} from './scale-intake-scope.mjs';
 import {classifyChanges,contentCodeqlRequired} from './content-scope.mjs';
-import {requiredChecks,failedChecks,recheckContentSast} from './merge-gate.mjs';
+import {requiredChecks,failedChecks,recheckContentSast,recheckScaleReleaseScope} from './merge-gate.mjs';
 import {renderManifest} from '../../server-version/backend/scripts/generate-situational-instruments.mjs';
 import {componentFingerprint} from '../../server-version/scripts/release/policy.mjs';
 const file='server-version/backend/src/modules/scale/instruments/test_scale/1.0.0/instrument.ts';
@@ -94,6 +94,42 @@ test('deletions renames symlinks executables duplicates and noncanonical paths c
  for(const e of [{...add(file),newMode:'120000'},{...add(file),newMode:'100755'},{...mod(file),status:'D',newMode:'000000'},
  {...mod(file),status:'R'},{...mod(file),oldMode:'120000'},add(file.replace('/test_scale/','/../')),add(file+'\n')])assert.equal(selectScaleIntake([e]),null);
  assert.equal(selectScaleIntake([add(file),add(file)]),null);
+});
+test('new release assets and manifest-only rollback use the single content job',()=>{
+ const manifest=file.replace('1.0.0/instrument.ts','releases.json');
+ const parameter=file.replace('1.0.0/instrument.ts','parameters/1.1.0.json');
+ const report=file.replace('1.0.0/instrument.ts','reports/1.1.0.json');
+ const remove=file=>({file,status:'D',oldMode:'100644',newMode:'000000'});
+ const files=[manifest,parameter,report];
+ const readers={readHeadFile:()=>'{ "version": "1.1.0" }'};
+ for(const entries of [files.map(add),[remove(manifest)],[mod(manifest)]]){
+  assert.deepEqual(selectScaleIntake(entries).toolKeys,['test_scale']);
+  assert.equal(classifyChanges(entries).scale_intake_light,true);
+  assert.equal(classifyChanges(entries).frontend,false);
+  assert.equal(contentCodeqlRequired(entries,readers),false);
+  assert.equal(contentCodeqlRequired(entries,{readHeadFile:()=> '[]'}),entries[0].status!=='D');
+  assert.equal(classifyChanges([...entries,mod(file)]).scale_intake_light,false);
+ }
+ assert.equal(selectScaleIntake([{...add(report),newMode:'120000'}]),null);
+ for(const version of [parameter,report])assert.equal(selectScaleIntake([remove(version)]),null);
+ const isolated={scope:{outputs:{scale_intake_light:'true',scale_release_mixed:'false'}}, content:{result:'success'}};
+ assert.deepEqual(recheckScaleReleaseScope(isolated,files.map(add)),[]);
+ assert.deepEqual(recheckScaleReleaseScope(isolated,[remove(report)]),['recomputed-scale-release-scope']);
+ const mixed={scope:{outputs:{scale_intake_light:'false',scale_release_mixed:'true'}}, 'scale-release-mixed':{result:'success'}};
+ const mixedEntries=[add(manifest),mod(file)];
+ assert.deepEqual(recheckScaleReleaseScope(mixed,mixedEntries),[]);
+ for(const result of ['skipped','failure','cancelled',undefined])
+  assert.deepEqual(recheckScaleReleaseScope({...mixed,'scale-release-mixed':{result}},mixedEntries),['scale-release-mixed']);
+ assert.deepEqual(recheckScaleReleaseScope(mixed,files.map(add),true),[]);
+});
+
+test('checks mixed Scale declarations in parallel and still requires the selected result',()=>{
+ const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+ const router=ci.slice(ci.indexOf('\n  scope:'),ci.indexOf('\n  content:'));
+ assert.doesNotMatch(router,/scale:check/);
+ const job=ci.slice(ci.indexOf('  scale-release-mixed:'),ci.indexOf('  visual:'));
+ assert.match(job,/needs: scope[\s\S]+scale_release_mixed == 'true'[\s\S]+uses: .\/\.github\/workflows\/scale-onboarding-boundary.yml/);
+ assert.match(ci.slice(ci.indexOf('  merge-gate:')),/^    - scale-release-mixed$/m);
 });
 test('required merge gate consumes content and actual CodeQL, never standalone focused success',()=>{
  const disabled=Object.fromEntries(['maintenance','presentation','frontend','documentation','media2','media7','situational_video','situational_branching','video_core','app_shell','canonical_visual','perf_smoke','ops'].map(k=>[k,'false']));

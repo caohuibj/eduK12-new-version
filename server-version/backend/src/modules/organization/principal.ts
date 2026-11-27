@@ -1,3 +1,4 @@
+import { isGitReleaseAccount } from '../../utils/gitReleaseIdentity'
 import { UserRole, type Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import type { AdminEntry } from '../admin-permissions/service'
@@ -109,7 +110,7 @@ export async function loadCurrentPrincipal(userId: string, db: Pick<Prisma.Trans
   const row = rows[0]
   if (!row) return null
   const resolvedUserId = row.userId ?? row.id
-  if (!resolvedUserId) return null
+  if (!resolvedUserId || isGitReleaseAccount(resolvedUserId, row.username)) return null
   // Legacy ADMIN is only a historical business label. Project the compatibility
   // ADMIN role exclusively inside Training, from a current explicit grant.
   const training = ['LEGACY','TRAINING'].includes(row.accountDomain)

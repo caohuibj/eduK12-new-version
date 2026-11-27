@@ -30,6 +30,8 @@ export interface DisclosureCapabilitiesV1 {
   itemScores: boolean
   methods: boolean
   educationalContent: boolean
+  /** Explicit on releases with independent report visibility. */
+  artwork?: boolean
 }
 
 export type ScaleDisclosureAudience = 'respondent' | 'subject' | 'teacher' | 'researcher'
@@ -40,6 +42,16 @@ export interface AudienceDisclosurePolicyV1 {
   audiences: Partial<Record<ScaleDisclosureAudience, DisclosureCapabilitiesV1>>
   unknownAudience: 'DENY'
 }
+
+type AudiencePolicyFor<T> = Omit<AudienceDisclosurePolicyV1, 'audiences'> & {
+  audiences: Partial<Record<ScaleDisclosureAudience, T>>
+}
+
+export type ScaleDataCeilingV1 = AudiencePolicyFor<Pick<DisclosureCapabilitiesV1,
+  'rawAnswers' | 'itemScores' | 'methods' | 'resultQualityDetails'>>
+
+export type ScaleReportVisibilityV1 = AudiencePolicyFor<Required<Pick<DisclosureCapabilitiesV1,
+  'numericScores' | 'references' | 'scoreDerivedLabels' | 'individualInterpretations' | 'educationalContent' | 'artwork'>>>
 
 /** Source-owned requirements; durable grants stay in InstrumentAuthorization. */
 export interface InstrumentUsageRequirementsV1 {

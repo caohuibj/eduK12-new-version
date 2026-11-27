@@ -5,7 +5,7 @@ import {cognitiveMixedProductScope,cognitiveProductPlan,cognitiveProductOutputs}
 import {backendApiFocus} from './backend-api-scope.mjs';
 import {catalogDiscoveryScope,catalogDiffBase,bundleFamilyScope,bundleRuntimeScope,authoringPolishScope} from './catalog-discovery-scope.mjs';
 import {selectCognitiveIntake, cognitiveTaskRoot} from './cognitive-intake-scope.mjs';
-import {selectScaleIntake} from './scale-intake-scope.mjs';
+import {selectScaleIntake,isScaleReleaseAsset,selectScaleReleaseAssets} from './scale-intake-scope.mjs';
 import {declarationReaders,verifiedDeclarativeContent} from './declarative-content.mjs';
 import {homepageCopyPlan,publicRenderBoundary} from './homepage-copy-scope.mjs';
 import { execFileSync } from 'node:child_process';
@@ -29,7 +29,8 @@ export function domainFor(file) {
       || new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/fixtures/(valid|missing|invalid|not-applicable)\\.json$`).test(file)
       || new RegExp(`^${modules}assessment-bundle/ci-fixtures/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+\\.json$`).test(file)
       || file === `${modules}assessment-bundle/generated/packages.json`) return 'bundle';
-  if (new RegExp(`^${modules}scale/instruments/[a-zA-Z0-9_-]+/[^/]+/(?:instrument\\.ts|source\\.json|README\\.md|THIRD_PARTY_LICENSE\\.md)$`).test(file)
+  if (isScaleReleaseAsset(file)
+      || new RegExp(`^${modules}scale/instruments/[a-zA-Z0-9_-]+/[^/]+/(?:instrument\\.ts|source\\.json|README\\.md|THIRD_PARTY_LICENSE\\.md)$`).test(file)
       || file === `${modules}scale/instruments/learning-motivation-wave1-data.json`
       || file === `${modules}scale/onboarding/instruments.generated.ts`
       || file.startsWith('server-version/backend/src/__tests__/scale/instruments/')
@@ -228,6 +229,7 @@ export {cognitiveMixedProductScope} from './cognitive-product-scope.mjs';
 
 export function classifyChanges(entries, forceFull = false, readers = {}) {
   const result = classify(entries.map(entry => entry.file));
+  const scaleReleaseAssets = !forceFull && Boolean(selectScaleReleaseAssets(entries));
   const cognitiveIntake = !forceFull && readers.readHeadFile ? selectCognitiveIntake(entries,readers.readHeadFile,{readBaseFile:readers.readBaseFile}) : null;
   if(cognitiveIntake?.selected) Object.assign(result,{content:true,frontend:false,presentation:false,documentation:false,domains:['cognitive']});
   const regularChanges = entries.every(({ status, oldMode, newMode }) =>
@@ -246,10 +248,10 @@ export function classifyChanges(entries, forceFull = false, readers = {}) {
     backend_focus:backendFocus||'full',
     maintenance: !forceFull && result.maintenance && maintenanceChanges,
     documentation: !forceFull && result.documentation && regularChanges,
-    content: !forceFull && result.content && regularChanges,
+    content: !forceFull && result.content && (regularChanges || scaleReleaseAssets),
     cognitive_intake_light: cognitiveIntake?.selected === true,
     cognitive_intake_plan: cognitiveIntake?.selected ? cognitiveIntake : null,
-    scale_intake_light: !forceFull && result.content && regularChanges && Boolean(selectScaleIntake(entries)),
+    scale_intake_light: !forceFull && result.content && (regularChanges || scaleReleaseAssets) && Boolean(selectScaleIntake(entries)),
     presentation: !forceFull && result.presentation && regularChanges,
     frontend: !forceFull && (result.frontend||affectedFrontend) && regularChanges,
     frontend_affected: affectedFrontend,
@@ -380,7 +382,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     frontend_build:catalogDiscovery?false:frontendBuild, ui_required:uiRequired,
     media_selection:JSON.stringify(mediaSelection), media_groups:JSON.stringify(mediaSelection.length ? mediaPlan(mediaSelection) : []),
     cognitive_intake_light:result.cognitive_intake_light === true,cognitive_intake_plan:JSON.stringify(result.cognitive_intake_plan || null),
-    scale_intake_light: result.scale_intake_light === true, scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'),
+    scale_intake_light: result.scale_intake_light === true,
+    scale_release_mixed: result.scale_intake_light !== true && entries.some(entry=>isScaleReleaseAsset(entry.file)),
+    scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'),
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
       [key, Array.isArray(value) ? JSON.stringify(value) : value])) };

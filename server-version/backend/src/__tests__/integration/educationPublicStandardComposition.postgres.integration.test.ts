@@ -23,6 +23,8 @@ import {csrfProtection} from '../../middleware/csrf'
 import {generateToken} from '../../utils/jwt'
 import {listCampusStudentTasks} from '../../modules/campus/activity.tasks'
 import {HUITEACHER_AUTH_COOKIE_NAME,HUITEACHER_CSRF_COOKIE_NAME,SCHOOL_AUTH_COOKIE_NAME,SCHOOL_CSRF_COOKIE_NAME,CSRF_HEADER_NAME} from '../../utils/authCookies'
+import {canonicalHash} from '../../modules/assessment-runtime/canonical'
+import type {ScaleReportDefinition} from '../../modules/scale/scale-definition'
 
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
 suite('Exact approved Standard C/P/R in an ordinary education questionnaire',()=>{
@@ -52,10 +54,21 @@ suite('Exact approved Standard C/P/R in an ordinary education questionnaire',()=
   const pub={instrumentKey:KEY,instrumentVersion:VERSION,actorUserId:system,visibility:'HIDDEN' as const,allowedProducts:['SURVEY' as const]}
   const planned=await publication.planStandardScalePublication(db,pub);expect(planned.blockers).toEqual([])
   await publication.publishStandardScale(db,{...pub,expectedProofHash:planned.proofHash})
-  const {sourceParts}=await import('../../modules/survey/standard-triplet.model'),{previewStandardTriplet,approveStandardTriplet,standardReleaseRow}=await import('../../modules/survey/standard-triplet.service')
-  const parts=sourceParts(KEY,VERSION),selection={toolKey:KEY,CONTENT:parts.find(p=>p.axis==='CONTENT')!.hash,PARAMETERS:parts.find(p=>p.axis==='PARAMETERS')!.hash,REPORT:parts.find(p=>p.axis==='REPORT')!.hash}
-  const triplet=await previewStandardTriplet(db,system,selection);expect(triplet.blockers).toEqual([])
-  const online=await approveStandardTriplet(system,{...selection,requestId:randomUUID(),expectedCombinationHash:triplet.combinationHash,reason:'Synthetic exact source approval',allowedProducts:['SURVEY']},proof())
+  const {sourceParts,composeTriplet}=await import('../../modules/survey/standard-triplet.model')
+  const {publishScaleRelease,standardReleaseRow}=await import('../../modules/survey/standard-triplet.service')
+  const [CONTENT,PARAMETERS,defaultReport]=sourceParts(KEY,VERSION)
+  const reportVersion='synthetic-independent-report-v2'
+  const reportVisibility={numericScores:true,references:true,scoreDerivedLabels:true,individualInterpretations:true,educationalContent:true,artwork:false}
+  const payload={
+    definition:{...(defaultReport.payload as ScaleReportDefinition),reportVersion,artworkKey:KEY+'/'+VERSION+'/synthetic-art'},
+    parameterVersion:PARAMETERS.version,
+    reportVisibility:{schemaVersion:1,policyVersion:reportVersion,unknownAudience:'DENY',audiences:{respondent:reportVisibility}},
+  }
+  const REPORT={...defaultReport,version:reportVersion,payload,hash:canonicalHash(payload)}
+  const triplet=composeTriplet(KEY,{CONTENT,PARAMETERS,REPORT});expect(triplet.blockers).toEqual([])
+  const selection={toolKey:KEY,CONTENT:CONTENT.hash,PARAMETERS:PARAMETERS.hash,REPORT:REPORT.hash}
+  const online=await db.$transaction(tx=>publishScaleRelease(tx,{...selection,requestId:randomUUID(),expectedCombinationHash:triplet.combinationHash,
+   reason:'Synthetic exact source approval',allowedProducts:['SURVEY','SCHOOL']}, triplet, {source:'ADMIN_UI',actor:system,proof:proof()}))
   standardId=online.id;standardHash=triplet.combinationHash;original=await standardReleaseRow(db,standardId)
   expect(await db.$queryRaw(Prisma.sql`SELECT id FROM survey_standard_trials WHERE release_id=${standardId}`)).toHaveLength(3)
   const app=express();app.use(express.json());app.use('/api',csrfProtection)
@@ -97,6 +110,7 @@ suite('Exact approved Standard C/P/R in an ordinary education questionnaire',()=
   const stored=await db.compositeAssessment.findUniqueOrThrow({where:{id:fixed.runtime.compositeId}}),snapshot=stored.trainingContentSnapshot as any
   const exact=snapshot.units.find((unit:any)=>unit.source.educationStandard)
   expect(exact.source.educationStandard).toMatchObject({releaseId:standardId,combinationHash:standardHash,parametersAxisHash:original.snapshot.parts.PARAMETERS.hash,reportAxisHash:original.snapshot.parts.REPORT.hash,reportAudience:'student'})
+  expect(exact.source.educationStandard.respondentDisclosure).toMatchObject({artwork:false,individualInterpretations:true,rawAnswers:false})
   expect(exact.referencePolicy.choices.length).toBeGreaterThan(0);expect(exact.report).toBeTruthy()
   expect(await db.compositeAssessment.count({where:{creationKey:{startsWith:'education-composition:SCHOOL:'},createdBy:f.managerUserId}})).toBe(2)
   for(const [index,version] of [fixed,second].entries())await addPrivateCompositionRunTrack({organizationId:f.organizationId,runId:f.runId,actorUserId:f.managerUserId,parent:{kind:'SCHOOL_ACTIVITY',id:f.workflow.id}},
@@ -128,6 +142,7 @@ suite('Exact approved Standard C/P/R in an ordinary education questionnaire',()=
   expect(feedback.data.units).toHaveLength(3)
   expect(feedback.data.units[0]).toMatchObject({state:'READY',nativeScaleUnits:expect.any(Array)})
   expect(feedback.data.units[1]).toMatchObject({state:'READY',declaredReport:{blocks:expect.any(Array)}})
+  expect(feedback.data.units[1].declaredReport).not.toHaveProperty('artworkKey')
   expect(feedback.data.units[1].nativeScaleUnits).toBeUndefined()
   expect(feedback.data.units[2]).toMatchObject({state:'READY',declaredReport:feedback.data.units[1].declaredReport})
   expect(feedback.data.units[2].blockId).not.toBe(feedback.data.units[1].blockId)

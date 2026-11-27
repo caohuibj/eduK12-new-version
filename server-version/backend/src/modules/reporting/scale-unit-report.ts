@@ -3,6 +3,7 @@ import { resolveStoredScaleResult } from '../assessment-runtime/compact-assessme
 import { isScaleReportFactsView } from '../assessment-runtime/compact-scale-facts'
 import { safeDecrypt } from '../../utils/encryption'
 import { parseScaleResultV2, type ScaleResultV2 } from '../scale/scale-result'
+import type { ScaleReportDefinition } from '../scale/scale-definition'
 import { resolveEffectiveScaleDisclosure } from '../scale/projection/context'
 import {
   projectExternalEducationalFeedback,
@@ -42,6 +43,26 @@ export interface ScaleUnitReport {
   totalTime: number | null
   method: ScaleResultV2['method'] | null
   decryptError?: boolean
+  __scaleReportPresentation?: ScaleReportPresentation
+}
+
+type ScaleReportPresentation = {
+  reportVersion: string
+  artworkKey?: string
+  introductions: Array<{ scoreKey: string; headline: string; summary: string; guidance: string[] }>
+}
+
+/** Preserve only display data from the same frozen R used for scoring. */
+export const attachScaleReportPresentation = (unit: object, definition?: ScaleReportDefinition): void => {
+  if (!definition) return
+  const presentation: ScaleReportPresentation = {
+    reportVersion: definition.reportVersion,
+    ...(definition.artworkKey ? { artworkKey: definition.artworkKey } : {}),
+    introductions: definition.interpretations.map(({ scoreKey, headline, summary, guidance }) => ({
+      scoreKey, headline, summary, guidance: guidance.map(entry => entry.text),
+    })),
+  }
+  Object.defineProperty(unit, '__scaleReportPresentation', { value: presentation, enumerable: false })
 }
 
 export type DecodedReportField<T extends object> = { ok: true; value: T | null } | { ok: false }
@@ -131,7 +152,8 @@ const externalBase = (report: ScaleUnitReport) => ({
 /** Content selection only. A caller must derive this from a verified frozen
  * report definition. It never changes viewer audience or disclosure powers. */
 export interface ScaleUnitReportProjectionOptions {
-  contentAudience: NonNullable<ScaleResultV2['method']['reportAudience']>
+  contentAudience?: NonNullable<ScaleResultV2['method']['reportAudience']>
+  participantPresentation?: ScaleReportPresentation
 }
 
 /** Strict audience-safe serializer for ScaleUnitReport, including stored aggregates. */
@@ -144,12 +166,21 @@ export const projectScaleUnitReport = (report: ScaleUnitReport, context: ScalePr
   const capabilities = { ...resolveEffectiveScaleDisclosure(context) }
   const expectedAudience = options?.contentAudience ?? (['respondent','subject'].includes(context.audience) ? 'student' : context.audience === 'teacher' ? 'teacher' : null)
   const allowRawFeedback = capabilities.individualInterpretations && (!report.method?.reportAudience || report.method.reportAudience === expectedAudience)
+  const frozen = options?.participantPresentation
+  const presentation = frozen && context.audience === 'subject' && report.method?.reportAudience === expectedAudience
+    && report.method?.reportVersion === frozen.reportVersion && report.quality?.status !== 'invalid' ? frozen : undefined
+  const artworkKey = capabilities.artwork ? presentation?.artworkKey : undefined
+  const introductions = capabilities.educationalContent || capabilities.individualInterpretations
+    ? presentation?.introductions.filter(entry => !capabilities.individualInterpretations
+      || report.interpretations.some(interpretation => interpretation.scoreKey === entry.scoreKey && interpretation.interpretation !== entry.summary))
+    : undefined
   const rich = capabilities.references
     || capabilities.individualInterpretations
     || capabilities.scoreDerivedLabels
     || capabilities.resultQualityDetails
     || capabilities.itemScores
     || capabilities.methods
+    || Boolean(artworkKey || introductions?.length)
   const feedback = projectExternalEducationalFeedback(context.frozenPolicy.educationalFeedback)
 
   if (!capabilities.numericScores && !rich) {
@@ -189,6 +220,8 @@ export const projectScaleUnitReport = (report: ScaleUnitReport, context: ScalePr
     ...(quality ? { quality, caveats: report.caveats.map(String) } : {}),
     ...(method ? { method } : {}),
     ...(capabilities.educationalContent && feedback ? { educationalFeedback: feedback } : {}),
+    ...(artworkKey ? { artworkKey } : {}),
+    ...(introductions?.length ? { introductions } : {}),
     disclaimer: report.disclaimer,
   }
 }

@@ -52,7 +52,9 @@ const strictScaleUnit = (unit: any, audience: CompositeReportAudience): any => {
     method: unit?.method ?? unit?.result?.method ?? null,
     ...(unit?.decryptError ? { decryptError: true } : {}),
   }
-  return projectScaleUnitReport(internal, contextForScaleUnit(unit, audience))
+  return projectScaleUnitReport(internal, contextForScaleUnit(unit, audience), {
+    participantPresentation: audience === 'participant' ? unit.__scaleReportPresentation : undefined,
+  })
 }
 
 export const projectCompositeUnitReports = (

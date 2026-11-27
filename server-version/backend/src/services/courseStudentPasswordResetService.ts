@@ -1,3 +1,4 @@
+import { isGitReleaseAccount } from '../utils/gitReleaseIdentity'
 import { randomUUID } from 'node:crypto'
 import { Prisma, UserRole, PlatformRole } from '@prisma/client'
 import { prisma } from '../config/database'
@@ -154,6 +155,7 @@ export async function resetEnrolledStudentPassword(input: {
       const target = targets[0]
       if (
         !target
+        || isGitReleaseAccount(target.id, target.username)
         || target.role !== UserRole.STUDENT
         || !['LEGACY','TRAINING'].includes(target.accountDomain)
         || target.platformRole !== PlatformRole.STANDARD

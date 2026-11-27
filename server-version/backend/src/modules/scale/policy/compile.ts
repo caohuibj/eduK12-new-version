@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import {
-  audienceDisclosurePolicyV1Schema,
+  effectiveDisclosurePolicySchema,
   educationalFeedbackDefinitionV1Schema,
   instrumentApplicabilityV1Schema,
   instrumentUsageRequirementsV1Schema,
@@ -13,6 +13,8 @@ import type {
   InstrumentUsageRequirementsV1,
 } from './types'
 import type { ScaleInstrumentSourceV1 } from '../onboarding/types'
+import { compileEffectiveDisclosure } from './disclosure'
+import type { AssessmentReferenceSetDefinition } from '../../assessment-reference/reference'
 
 export const SCALE_POLICY_COMPILER_VERSION = 'scale-policy-compiler-v1' as const
 
@@ -27,6 +29,8 @@ export interface CompiledScalePolicyV1 {
   usageRequirements?: InstrumentUsageRequirementsV1
   educationalFeedback?: EducationalFeedbackDefinitionV1
   referenceBindings: Array<{ referenceVersion: string; referenceHash: string }>
+  /** Admission identity of C before the approved P/R projection is bound. */
+  sourceRuntimePolicyHash?: string
   runtimePolicyHash: string
 }
 
@@ -37,13 +41,14 @@ export const compiledScalePolicyV1Schema = z.object({
   instrumentVersion: z.string().regex(/^[0-9]+\.[0-9]+\.[0-9]+$/),
   contentLocale: z.string().min(1),
   applicability: instrumentApplicabilityV1Schema,
-  disclosure: audienceDisclosurePolicyV1Schema,
+  disclosure: effectiveDisclosurePolicySchema,
   usageRequirements: instrumentUsageRequirementsV1Schema.optional(),
   educationalFeedback: educationalFeedbackDefinitionV1Schema.optional(),
   referenceBindings: z.array(z.object({
     referenceVersion: z.string().min(1),
     referenceHash: z.string().regex(/^[0-9a-f]{64}$/),
   }).strict()),
+  sourceRuntimePolicyHash: z.string().regex(/^[0-9a-f]{64}$/).optional(),
   runtimePolicyHash: z.string().regex(/^[0-9a-f]{64}$/),
 }).strict()
 
@@ -57,16 +62,17 @@ const unsignedCompiledPolicy = (policy: Omit<CompiledScalePolicyV1, 'runtimePoli
   disclosure: policy.disclosure,
   ...(policy.usageRequirements ? { usageRequirements: policy.usageRequirements } : {}),
   ...(policy.educationalFeedback ? { educationalFeedback: policy.educationalFeedback } : {}),
+  ...(policy.sourceRuntimePolicyHash ? { sourceRuntimePolicyHash: policy.sourceRuntimePolicyHash } : {}),
   referenceBindings: policy.referenceBindings,
 })
 
 export const compileScalePolicy = (source: ScaleInstrumentSourceV1): CompiledScalePolicyV1 => {
   if (!source.executable) throw new Error('Catalog-only ScaleInstrumentSource cannot compile a runtime policy')
   if (!source.applicability) throw new Error('Executable ScaleInstrumentSource requires applicability')
-  if (!source.disclosure) throw new Error('Executable ScaleInstrumentSource requires disclosure')
+  if (!source.disclosure && !source.dataCeiling) throw new Error('Executable ScaleInstrumentSource requires a data ceiling or legacy disclosure')
 
   const applicability = instrumentApplicabilityV1Schema.parse(source.applicability) as InstrumentApplicabilityV1
-  const disclosure = audienceDisclosurePolicyV1Schema.parse(source.disclosure) as AudienceDisclosurePolicyV1
+  const disclosure = compileEffectiveDisclosure(source.dataCeiling, undefined, source.disclosure)
   const usageRequirements = source.usageRequirements
     ? instrumentUsageRequirementsV1Schema.parse(source.usageRequirements) as InstrumentUsageRequirementsV1
     : undefined
@@ -93,6 +99,21 @@ export const compileScalePolicy = (source: ScaleInstrumentSourceV1): CompiledSca
     referenceBindings,
   }
   return { ...unsigned, runtimePolicyHash: canonicalHash(unsignedCompiledPolicy(unsigned)) }
+}
+
+/** Bind the published report and exact P to the existing runtime policy. The
+ * source policy still governs operational admission and subject applicability. */
+export function bindScaleCombinationPolicy(
+  sourcePolicy: CompiledScalePolicyV1,
+  disclosure: AudienceDisclosurePolicyV1,
+  references: readonly AssessmentReferenceSetDefinition[],
+): CompiledScalePolicyV1 {
+  const referenceBindings = references.map(reference => ({
+    referenceVersion: reference.referenceVersion,
+    referenceHash: canonicalHash(reference.entries.some(entry => entry.governance) ? { ...reference, status: 'ACTIVE' } : reference),
+  })).sort((a, b) => a.referenceVersion.localeCompare(b.referenceVersion) || a.referenceHash.localeCompare(b.referenceHash))
+  const effective = { ...sourcePolicy, disclosure, referenceBindings, sourceRuntimePolicyHash: sourcePolicy.runtimePolicyHash }
+  return { ...effective, runtimePolicyHash: canonicalHash(unsignedCompiledPolicy(effective)) }
 }
 
 export const parseCompiledScalePolicy = (value: unknown): CompiledScalePolicyV1 => (

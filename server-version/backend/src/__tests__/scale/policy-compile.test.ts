@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { hashScaleDefinition } from '../../modules/scale/scale-definition'
 import { compileScalePolicy, hashCompiledScalePolicy } from '../../modules/scale/policy/compile'
 import { listScaleInstrumentSources } from '../../modules/scale/onboarding/instrument-registry'
+import { compileEffectiveDisclosure, DISCLOSURE_PRESETS, resolveAudienceDisclosure } from '../../modules/scale/policy/disclosure'
 
 describe('compiled scale policy', () => {
   it('is deterministic and self-hashing', () => {
@@ -57,5 +58,32 @@ describe('compiled scale policy', () => {
   it('does not compile catalog-only candidates', () => {
     const source = listScaleInstrumentSources().find((candidate) => !candidate.executable)!
     expect(() => compileScalePolicy(source)).toThrow(/Catalog-only/)
+  })
+
+  it('freezes report visibility independently of the legacy report flags and raw-data ceiling', () => {
+    const envelope={schemaVersion:1 as const,unknownAudience:'DENY' as const}
+    const legacy={...envelope,policyVersion:'c1',audiences:{
+      teacher:{...DISCLOSURE_PRESETS.SCORES(),methods:true},
+    }}
+    const visibility={numericScores:true,references:true,scoreDerivedLabels:true,individualInterpretations:true,educationalContent:true,artwork:false}
+    const policy=compileEffectiveDisclosure(undefined,{...envelope,policyVersion:'r2',audiences:{teacher:visibility}},legacy)
+    expect(resolveAudienceDisclosure(policy,'teacher')).toEqual({...visibility,rawAnswers:false,itemScores:false,methods:true,resultQualityDetails:false})
+    expect(resolveAudienceDisclosure(policy,'subject')).toMatchObject({numericScores:false,artwork:false})
+    expect(resolveAudienceDisclosure(policy,'unregistered')).toEqual(DISCLOSURE_PRESETS.NONE())
+    expect(compileEffectiveDisclosure(undefined,undefined,legacy)).toEqual(legacy)
+  })
+
+  it('preserves implicit legacy artwork when a C data ceiling is introduced', () => {
+    const envelope = { schemaVersion: 1 as const, unknownAudience: 'DENY' as const }
+    const ceiling = { ...envelope, policyVersion: 'c2', audiences: {} }
+    const legacy = { ...envelope, policyVersion: 'old-r', audiences: {
+      subject: DISCLOSURE_PRESETS.EDUCATIONAL_ONLY(),
+      teacher: DISCLOSURE_PRESETS.SCORES(),
+    } }
+    const policy = compileEffectiveDisclosure(ceiling, undefined, legacy)
+    expect(resolveAudienceDisclosure(policy, 'subject')).toMatchObject({ artwork: true, rawAnswers: false })
+    expect(resolveAudienceDisclosure(policy, 'teacher')).toMatchObject({ artwork: false, numericScores: true })
+    expect(resolveAudienceDisclosure(compileEffectiveDisclosure(ceiling,
+      { ...envelope, policyVersion: 'new-r', audiences: {} }, legacy), 'subject')).toMatchObject({ artwork: false })
   })
 })

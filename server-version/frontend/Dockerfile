@@ -30,7 +30,7 @@ ENV VITE_HUITEACHER_IMPROVEMENT_ENABLED=${VITE_HUITEACHER_IMPROVEMENT_ENABLED}
 ENV VITE_REPORT_PRIVACY_PREFERENCES_V1_ENABLED=${VITE_REPORT_PRIVACY_PREFERENCES_V1_ENABLED}
 ENV VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED=${VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED}
 ENV VITE_REPORT_PRIVACY_SCHOOL_V2_ENABLED=${VITE_REPORT_PRIVACY_SCHOOL_V2_ENABLED}
-RUN npm run build
+RUN npm run build && node scripts/scale-artwork-inventory.mjs /app/scale-artwork-inventory.json
 
 FROM nginx:1.31.6-alpine3.24-slim AS runtime
 # Optional regional prefix; empty retains the base image's official repositories.
@@ -44,5 +44,6 @@ RUN if [ -n "$ALPINE_MIRROR" ]; then \
     && apk add --no-cache --upgrade 'libexpat>=2.8.5-r0'
 # 覆盖默认站点：SPA + /api /uploads /socket.io 反向代理到 backend:3000
 COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/scale-artwork-inventory.json /usr/local/share/eduk12/scale-artwork-inventory.json
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80

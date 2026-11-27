@@ -1,6 +1,7 @@
 import {frozenScaleInstructionSchema} from '../assessment-runtime/frozen-scale-instruction'
 import {frozenTripletInstruction} from '../survey/standard-triplet.model'
 import type {TrainingContentSnapshot} from '../composite/training-content-binding'
+import type {ExactStandardScaleRuntimeInput} from '../composite/training-standard-combination'
 import {resolveAudienceDisclosure} from '../scale/policy/disclosure'
 import {Prisma,type Scale} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -50,7 +51,7 @@ export async function readEducationStandardSources(tx:Prisma.TransactionClient,s
   const descriptor=educationStandardSourceSchema.parse({releaseId:row.id,combinationHash:row.combination_hash,toolKey:row.snapshot.toolKey,
    instrumentVersion:row.snapshot.instrumentVersion,nativeDefinitionHash:canonicalHash(row.snapshot.definition),
    parametersAxisHash:row.snapshot.parts.PARAMETERS.hash,reportAxisHash:row.snapshot.parts.REPORT.hash,
-   respondentDisclosure:resolveAudienceDisclosure(row.snapshot.parts.CONTENT.reference.metadata.disclosure as Parameters<typeof resolveAudienceDisclosure>[0],'respondent'),
+   respondentDisclosure:resolveAudienceDisclosure(row.snapshot.effectiveDisclosure??row.snapshot.parts.CONTENT.reference.metadata.disclosure as Parameters<typeof resolveAudienceDisclosure>[0],'respondent'),
    reportAudience:row.snapshot.definition.report.audienceContract?.audience??'teacher'})
   result.set(row.id,{row,measurement,scale,descriptor})
  }
@@ -65,13 +66,14 @@ export type EducationStandardLeaf={row:ExactStandardCombination;measurement:Extr
  * reread installed C or a full M body, rebuild P/R, or accept a caller receipt. */
 export async function readEducationStandardStartSources(tx:Prisma.TransactionClient,units:TrainingContentSnapshot['units'],scales:readonly Scale[]){
  const ids=[...new Set(units.map(unit=>unit.source.educationStandard?.releaseId).filter((id):id is string=>!!id))]
- const result=new Map<string,Pick<import('../survey/standard-triplet.model').Triplet,'toolKey'|'instrumentVersion'|'definition'|'references'>&{instruction:import('../assessment-runtime/frozen-scale-instruction').FrozenScaleInstruction|null;importedScaleId?:string}>()
+ const result=new Map<string,ExactStandardScaleRuntimeInput>()
  if(!ids.length)return result
  type Row={id:string;hash:string;toolKey:string;instrumentVersion:string;definition:import('../scale/scale-definition').ScaleDefinitionV2;
-  references:import('../survey/standard-triplet.model').Triplet['references'];instruction:unknown;nativeScaleId:string|null;measurement:{releaseId:string;contentHash:string}}
+  references:ExactStandardScaleRuntimeInput['references'];effectiveDisclosure:ExactStandardScaleRuntimeInput['effectiveDisclosure']|null;
+  instruction:unknown;nativeScaleId:string|null;measurement:{releaseId:string;contentHash:string}}
  const rows=await tx.$queryRaw<Row[]>(Prisma.sql`SELECT id,combination_hash AS hash,snapshot->>'toolKey' AS "toolKey",snapshot->>'instrumentVersion' AS "instrumentVersion",
   snapshot->'definition' AS definition,snapshot->'references' AS references,snapshot#>'{parts,CONTENT,reference,metadata,instruction}' AS instruction,
-  snapshot#>>'{parts,CONTENT,reference,metadata,databaseSource,scaleId}' AS "nativeScaleId",
+  snapshot#>>'{parts,CONTENT,reference,metadata,databaseSource,scaleId}' AS "nativeScaleId",snapshot->'effectiveDisclosure' AS "effectiveDisclosure",
   measurement_release AS measurement FROM survey_standard_releases WHERE id IN (${Prisma.join(ids)}) AND state='ONLINE' ORDER BY id`)
  for(const unit of units){
   const source=unit.source.educationStandard;if(!source)continue
@@ -83,7 +85,9 @@ export async function readEducationStandardStartSources(tx:Prisma.TransactionCli
   if(result.has(row.id))continue
   const instructionValue=row.instruction as {text?:unknown;language?:unknown;version?:unknown}|null
   const instruction=instructionValue===null?null:frozenScaleInstructionSchema.parse({text:instructionValue.text,language:instructionValue.language,version:instructionValue.version,origin:'INSTRUMENT_SOURCE'})
-  result.set(row.id,{toolKey:row.toolKey,instrumentVersion:row.instrumentVersion,definition:row.definition,references:row.references,instruction,...(row.nativeScaleId?{importedScaleId:row.nativeScaleId}:{})})
+  if(row.effectiveDisclosure&&canonicalHash(resolveAudienceDisclosure(row.effectiveDisclosure,'respondent'))!==canonicalHash(source.respondentDisclosure))privateToolFail('PUBLIC_STANDARD_FROZEN_SOURCE_INVALID')
+  result.set(row.id,{toolKey:row.toolKey,instrumentVersion:row.instrumentVersion,definition:row.definition,references:row.references,instruction,
+   ...(row.effectiveDisclosure?{effectiveDisclosure:row.effectiveDisclosure}:{}),...(row.nativeScaleId?{importedScaleId:row.nativeScaleId}:{})})
  }
  return result
 }

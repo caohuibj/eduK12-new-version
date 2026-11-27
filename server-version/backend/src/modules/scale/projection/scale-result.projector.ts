@@ -88,6 +88,15 @@ export const projectScaleResult = (input: ProjectScaleResultInput): ExternalScal
 
   const quality = capabilities.resultQualityDetails ? projectExternalScaleQuality(input.result.quality) : null
   const method = capabilities.methods ? projectExternalScaleMethod(input.result.method) : null
+  const interpretations = capabilities.artwork!==undefined&&(!capabilities.references||!capabilities.scoreDerivedLabels)
+    ? input.result.interpretations.filter(interpretation=>interpretation.referenceVersion===null)
+    : input.result.interpretations
+  const rawScoreFeedback = input.result.rawScoreFeedback && (capabilities.artwork===undefined||capabilities.scoreDerivedLabels)
+    ? projectRawScoreFeedback(input.result.rawScoreFeedback,capabilities.scoreDerivedLabels).map(feedback=>{
+      if(capabilities.artwork!==false)return feedback
+      const {images:_,materials:__,...text}=feedback
+      return text
+    }) : undefined
   return {
     ...base,
     kind: 'full',
@@ -96,7 +105,7 @@ export const projectScaleResult = (input: ProjectScaleResultInput): ExternalScal
       ? { references: projectExternalScaleReferences(input.result.references, capabilities) }
       : {}),
     ...(capabilities.individualInterpretations
-      ? { interpretations: projectExternalInterpretations(input.result.interpretations, capabilities), ...(input.result.rawScoreFeedback ? { rawScoreFeedback: projectRawScoreFeedback(input.result.rawScoreFeedback, capabilities.scoreDerivedLabels) } : {}) }
+      ? { interpretations: projectExternalInterpretations(interpretations, capabilities), ...(rawScoreFeedback ? { rawScoreFeedback } : {}) }
       : {}),
     ...(quality ? { quality, caveats: input.result.caveats.map(String) } : {}),
     ...(capabilities.itemScores

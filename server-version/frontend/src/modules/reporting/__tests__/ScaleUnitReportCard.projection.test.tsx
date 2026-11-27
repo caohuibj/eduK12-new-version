@@ -24,6 +24,27 @@ const baseReport = (): SafeScaleUnitReport => ({
 })
 
 describe('ScaleUnitReportCard audience-safe DTO rendering', () => {
+  it('renders the frozen opening and the illustration associated with the returned reference band', () => {
+    render(<ScaleUnitReportCard report={{
+      ...baseReport(),
+      artworkKey: 'who5/1.0.0/1.1.0-student',
+      introductions: [{ scoreKey: 'raw_total', headline: '读懂这次结果', summary: '介绍本次报告。', guidance: ['从一次小事开始。'] }],
+      interpretations: [{ scoreKey: 'raw_total', headline: '给自己一点空间', label: null, interpretation: '当前档位正文。',
+        guidance: [], limitations: [], referenceVersion: 'p' }],
+      references: [{ scoreKey: 'raw_total', referenceVersion: 'p', referenceKind: 'criterion_threshold', status: 'available',
+        evidenceLevel: 'literature_beta', label: '', value: 12, mean: null, sd: null, z: null, t: null, percentile: null,
+        criterionBand: { key: 'who5_under_13', label: '当前档位', minInclusive: 0, maxInclusive: 12 },
+        meanDifference: null, source: null, population: null, instrumentVersion: null, scoringVersion: null,
+        limitations: [], disclaimer: '',
+      }],
+    }} />)
+    expect(screen.getByText('介绍本次报告。')).toBeInTheDocument()
+    expect(screen.getByText('从一次小事开始。')).toBeInTheDocument()
+    expect(screen.getByText('当前档位正文。')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: '坐在校园里的学生和朋友聊近况' })).toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: '学生用画本记下最近喜欢的一个瞬间' })).not.toBeInTheDocument()
+  })
+
   it('renders educational content without falling through to hidden score fields', async () => {
     const user = userEvent.setup()
     const report = {

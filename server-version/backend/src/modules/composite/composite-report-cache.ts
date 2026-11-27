@@ -12,7 +12,7 @@ type Envelope = {
   binding: ReportBinding
   contentHash: string
   report: Record<string, any>
-  policies: Array<{ itemId: string; scaleProjectionPolicy?: unknown; frozenMetricDefinitions?: unknown }>
+  policies: Array<{ itemId: string; scaleProjectionPolicy?: unknown; scaleReportPresentation?: unknown; frozenMetricDefinitions?: unknown }>
 }
 
 /** Preserve server-only disclosure metadata that ordinary JSON would discard. */
@@ -22,6 +22,7 @@ export const encryptCompositeCollectionReport = (report: Record<string, any>, bi
   const policies = units.map(unit => ({
     itemId: unit.itemId,
     ...(unit.__scaleProjectionPolicy ? { scaleProjectionPolicy: unit.__scaleProjectionPolicy } : {}),
+    ...(unit.__scaleReportPresentation ? { scaleReportPresentation: unit.__scaleReportPresentation } : {}),
     ...(unit.__frozenMetricDefinitions ? { frozenMetricDefinitions: unit.__frozenMetricDefinitions } : {}),
   }))
   const content = JSON.parse(JSON.stringify({ report, policies })) as Pick<Envelope, 'report' | 'policies'>
@@ -87,6 +88,9 @@ export const decryptCompositeCollectionReport = (encrypted: string, binding: Rep
     const policy = byItem.get(unit.itemId)
     if (policy?.scaleProjectionPolicy) Object.defineProperty(unit, '__scaleProjectionPolicy', {
       value: policy.scaleProjectionPolicy, enumerable: false,
+    })
+    if (policy?.scaleReportPresentation) Object.defineProperty(unit, '__scaleReportPresentation', {
+      value: policy.scaleReportPresentation, enumerable: false,
     })
     if (policy?.frozenMetricDefinitions) Object.defineProperty(unit, '__frozenMetricDefinitions', {
       value: policy.frozenMetricDefinitions, enumerable: false,

@@ -3,7 +3,10 @@ import {prepareRelease,assetReference} from './release'
 import type {StoredRelease} from './repository'
 import {scaleMeasurementRelease} from './scale'
 import type {ScaleDefinitionV2} from '../scale/scale-definition'
-import {reportTemplateSchema,type ReportTemplate} from './report-template'
+import {frozenReportTemplateSchema,type ReportTemplate} from './report-template'
+import type {AssessmentReferenceSetDefinition} from '../assessment-reference/reference'
+import {scaleReportVisibilitySchema} from '../scale/policy/schema'
+import type {ScaleReportVisibilityV1} from '../scale/policy/types'
 import {z} from 'zod'
 export const standardCombinationPointerSchema=z.object({releaseId:z.string().guid(),combinationHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict()
 
@@ -19,26 +22,52 @@ export type StandardCombinationRecord={
   measurement_release:{releaseId:string;contentHash:string}|null
 }
 export function selectedStandardReport(payload:unknown){
- if(payload&&typeof payload==='object'&&'definition'in payload&&'template'in payload){
-  const p=payload as {definition:ScaleDefinitionV2['report'];template:unknown;assetRefs?:unknown}
-  return {definition:p.definition,template:reportTemplateSchema.parse(p.template),assetRefs:z.array(assetReference).parse(p.assetRefs??[])}
+ if(payload&&typeof payload==='object'&&'definition'in payload){
+  const p=payload as {definition:ScaleDefinitionV2['report'];title?:unknown;template?:unknown;assetRefs?:unknown;reportVisibility?:unknown;parameterVersion?:unknown}
+  return {definition:p.definition,template:p.template===undefined?null:frozenReportTemplateSchema.parse(p.template),assetRefs:z.array(assetReference).parse(p.assetRefs??[]),
+   reportVisibility:p.reportVisibility===undefined?undefined:scaleReportVisibilitySchema.parse(p.reportVisibility) as ScaleReportVisibilityV1,
+   parameterVersion:z.string().min(1).optional().parse(p.parameterVersion),title:z.string().trim().min(1).max(120).optional().parse(p.title)}
  }
- return {definition:payload as ScaleDefinitionV2['report']|null,template:null,assetRefs:[]}
+ return {definition:payload as ScaleDefinitionV2['report']|null,template:null,assetRefs:[],reportVisibility:undefined,parameterVersion:undefined,title:undefined}
+}
+
+function sharedTheoreticalBands(definition:ScaleDefinitionV2,references:readonly AssessmentReferenceSetDefinition[],metricKey:string){
+ const choices=definition.referencePolicy.type==='declared'?definition.referencePolicy.selections.filter(s=>s.scoreKey===metricKey):[]
+ if(choices.length!==1||choices[0].referenceKind!=='theoretical_range')return null
+ const sets=references.filter(r=>r.referenceVersion===choices[0].referenceVersion)
+ if(sets.length!==1||sets[0].status!=='ACTIVE')return null
+ const entries=sets[0].entries.filter(entry=>entry.scoreKey===metricKey&&entry.referenceKind==='theoretical_range')
+ if(!entries.length||entries.some(entry=>entry.evidenceLevel!=='theoretical'||entry.governance?.kind!=='THEORETICAL_RANGE'))return null
+ const tables=entries.map(entry=>entry.governance!.bands.map(({key,lower,upper})=>({key,lower,upper})))
+ const [ranges]=tables
+ if(!ranges.length||tables.some(table=>canonicalHash(table)!==canonicalHash(ranges)))return null
+ return {metricKey,ranges}
 }
 
 /** One mechanical R adapter for both entries. Titles/text come from the stored
  * approved source; this does not consult a newer registry or rewrite prose. */
-export function compileStandardCombinationReport(title:string,definition:ScaleDefinitionV2,configured:boolean){
+export function compileStandardCombinationReport(title:string,definition:ScaleDefinitionV2,configured:boolean,references:readonly AssessmentReferenceSetDefinition[]=[]){
  const blocks:ReportTemplate['blocks']=[],blockers:string[]=[]
+ let standardScoreBands:ReportTemplate['standardScoreBands']
  if(configured)for(const key of definition.report.scoreOrder){
   const score=definition.scoring.scores.find(s=>s.key===key),text=definition.report.interpretations.find(r=>r.scoreKey===key)
   if(!score||!text){blockers.push('报告缺少指标或解释：'+key);continue}
-  blocks.push({type:'METRIC',metricKey:key,label:score.label,display:'RAW'},{type:'TEXT',text:text.headline+'\n'+text.summary})
+  if(text.source.type==='shared_theoretical_range'){
+   const table=sharedTheoreticalBands(definition,references,key)
+   if(standardScoreBands||!table||table.ranges.length!==text.bands.length||table.ranges.some(range=>!text.bands.some(b=>b.key===range.key))){
+    blockers.push('均分反馈要求所选参数的全部适用范围使用同一套完整理论分段：'+key)
+   }else standardScoreBands=table
+  }
+  blocks.push({type:'METRIC',metricKey:key,label:text.scoreLabel??score.label,display:'RAW'},{type:'TEXT',text:text.headline+'\n'+text.summary})
   for(const guidance of text.guidance)blocks.push({type:'TEXT',text:guidance.text})
   const selected=definition.referencePolicy.type==='declared'?definition.referencePolicy.selections.filter(s=>s.scoreKey===key):[]
   for(const band of text.bands)for(const selection of selected)blocks.push({type:'REFERENCE_BAND',metricKey:key,referenceKind:selection.referenceKind,bandKey:band.key,text:band.label+'\n'+band.summary,guidance:band.guidance.map(g=>g.text)})
  }
- return {template:configured?reportTemplateSchema.parse({title,blocks,limitations:definition.report.limitations,disclaimer:definition.report.disclaimer}):null,blockers}
+ return {template:configured?frozenReportTemplateSchema.parse({title,blocks,
+  ...(standardScoreBands?{standardScoreBands}:{}),
+  ...(definition.report.artworkKey?{artworkKey:definition.report.artworkKey}:{}),
+  ...(definition.report.illustrationKey?{illustrationKey:definition.report.illustrationKey}:{}),
+  limitations:definition.report.limitations,disclaimer:definition.report.disclaimer}):null,blockers}
 }
 
 /** Preserve the existing approved-combination hash scheme byte for byte.

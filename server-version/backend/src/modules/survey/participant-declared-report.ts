@@ -1,3 +1,5 @@
+import { resolveAudienceDisclosure } from '../scale/policy/disclosure'
+import { canonicalHash } from '../assessment-runtime/canonical'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { isParticipantReportAudience } from '../assessment-policy/tool-report-eligibility'
@@ -107,10 +109,21 @@ export async function attachSurveyParticipantDeclaredReports(
     const item = nextMeasurements[candidate.index]
     if (!isRawMeasurement(item)) continue
 
+    const disclosure=candidate.unit.contentSelection?.reportDisclosure
+    if(canonicalHash(disclosure??null)!==canonicalHash(report.content.effectiveDisclosure??null))continue
+    const visibility=disclosure?resolveAudienceDisclosure(disclosure,'subject'):undefined
     const reportMetricKeys = new Set(report.content.metricKeys)
     const allowedMetrics = item.metrics.filter((m) => reportMetricKeys.has(m.key))
+    if(visibility&&!visibility.numericScores&&visibility.references&&visibility.scoreDerivedLabels){
+      const stored=result.units.find(unit=>unit.instrumentKey===candidate.unit.instrumentKey)
+      const scores=(stored?.privateScoring as {scores?:Array<{key:string;value:number|null;status:string}>}|null)?.scores
+      const selected=new Set(candidate.unit.participantFeedback?.metricKeys??[])
+      for(const score of scores??[])if(reportMetricKeys.has(score.key)&&selected.has(score.key)&&score.status==='calculated'&&typeof score.value==='number'&&Number.isFinite(score.value)){
+        allowedMetrics.push({key:score.key,label:score.key,value:score.value,unit:null,status:'OK'})
+      }
+    }
     const allowedMetricKeys = new Set(allowedMetrics.map((m) => m.key))
-    if (!allowedMetricKeys.size) continue
+    if (!allowedMetricKeys.size && (!visibility||visibility.numericScores)) continue
 
     const metricFacts: ReportMetricFact[] = allowedMetrics.map((m) => ({
       metricKey: m.key,
@@ -126,9 +139,10 @@ export async function attachSurveyParticipantDeclaredReports(
         referenceKind: ref.referenceKind,
         status: ref.status === 'AVAILABLE' ? 'AVAILABLE' : 'UNAVAILABLE',
         bandKey: ref.values?.bandKey ?? null,
+        reason: ref.reason,
       }))
 
-    const declaredReport = renderDeclaredReport(report.content.template, metricFacts, referenceFacts)
+    const declaredReport = renderDeclaredReport(report.content.template, metricFacts, referenceFacts, visibility)
     nextMeasurements[candidate.index] = {
       ...item,
       declaredReport,

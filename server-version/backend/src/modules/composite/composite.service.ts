@@ -42,7 +42,7 @@ import { anonymousWholeSubmitQueued, reportForegroundGateQueueDepth } from '../.
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
-import {freezeExactStandardScaleDefinition} from './training-standard-combination'
+import {freezeExactStandardScaleDefinition,type ExactStandardScaleRuntimeInput} from './training-standard-combination'
 import {readVerifiedEducationStart,readVerifiedCompositionStart,readVerifiedLongitudinalEducationAttempt,bindVerifiedEducationAttempt,type VerifiedEducationStart,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
 import {readVerifiedFieldStart,fieldCompositionBinding,type VerifiedFieldStart} from '../huiteacher/fieldComposition.contract'
 import {resolveEducationAssessmentSituationalItems} from '../education-tools/assessment-resource.source'
@@ -159,7 +159,7 @@ import { buildCognitiveSingleTaskReport } from '../cognitive/single-task-report'
 import { isTaskSatisfied } from '../assessment-runtime/form-policy'
 import { loadCompositeTypedFormValues } from '../assessment-runtime/typed-form-facts'
 import { typedCompositeFormQuestion, validateTypedCompositeSectionDefinition, legacyFormValueProjection } from '../assessment-runtime/typed-form'
-import { buildFormBackgroundReport, buildScaleUnitReport, SCALE_REPORT_DEFINITION_VERSION, SCALE_REPORT_DISCLAIMER } from '../reporting/scale-unit-report'
+import { attachScaleReportPresentation, buildFormBackgroundReport, buildScaleUnitReport, SCALE_REPORT_DEFINITION_VERSION, SCALE_REPORT_DISCLAIMER } from '../reporting/scale-unit-report'
 import {
   buildScaleResultForRecord,
   encryptScaleAnswers,
@@ -3930,12 +3930,31 @@ const createAttempt = async (
   // present and absent deployments are reused by the per-scale freeze and plan verification.
   await preloadScaleDeploymentsForStart(db, composite)
   const wholeV2Mode = finalOnly && !flowEnabled && isCompositeWholeV2Enabled()
+  const newAttemptId = randomUUID()
+  const exactStandardSources = new Map<string,ExactStandardScaleRuntimeInput>()
+  const prepareContentBinding = () => prepareTrainingContentAttemptBinding(db as Prisma.TransactionClient,{
+    compositeId:composite.id,attemptId:newAttemptId,epoch:attemptEpoch,
+    snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,
+    composite,resolvedSituational:situationalReleases,educationComposition,scaleArtifacts:trainingScaleArtifacts,
+    prefetchedReleases:startReads?.releases,
+    ...(wholeV2Mode&&hasStandardCombinations?{exactStandardSources}:{}),
+  })
+  // Exact Training bindings already read and verify each selected release.
+  // Reuse that read for the plan instead of querying the release a second time.
+  const earlyContentCandidate=wholeV2Mode&&hasStandardCombinations?await prepareContentBinding():undefined
+  if(wholeV2Mode)for(const unit of educationStandardUnits){
+    const exact=educationStandards.get(unit.source.educationStandard!.releaseId)
+    if(exact?.effectiveDisclosure){
+      if(canonicalHash(exact.definition)!==unit.source.educationStandard!.nativeDefinitionHash)throw compositeForbidden('教育标准量表冻结内容不一致')
+      exactStandardSources.set(unit.itemId,exact)
+    }
+  }
   const wholeV2Plan = wholeV2Mode
     ? await materializeCompositePublicationPlan(composite.id, db, {
         id: composite.id,
         publishedAt: composite.publishedAt ?? null,
         updatedAt: composite.updatedAt,
-      })
+      },exactStandardSources)
     : null
   let candidateMedia: AssessmentAssetIdentityV1[] = []
   if (wholeV2Plan) {
@@ -4028,15 +4047,9 @@ const createAttempt = async (
     }
   }
 
-  const newAttemptId = randomUUID()
   // Validate the whole frozen candidate set before any random draw. Execution
   // sources must match the frozen release; never choose the latest pointer here.
-  const contentCandidate=await prepareTrainingContentAttemptBinding(db as Prisma.TransactionClient,{
-    compositeId:composite.id,attemptId:newAttemptId,epoch:attemptEpoch,
-    snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,
-    composite,resolvedSituational:situationalReleases,educationComposition,scaleArtifacts:trainingScaleArtifacts,
-    prefetchedReleases:startReads?.releases,
-  })
+  const contentCandidate=earlyContentCandidate===undefined?await prepareContentBinding():earlyContentCandidate
   // Keep the full publication graph for the post-commit WHOLE_V2 projection.
   // Variant scope validates the frozen union before applying the drawn subset.
   const startPublicationComposite = composite
@@ -7170,6 +7183,7 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
                   scalePlanSlot?.instrumentClass ?? item.scale?.instrumentClass,
                 )
             Object.defineProperty(report, '__scaleProjectionPolicy', { value: policy, enumerable: false })
+            if (scalePlanSlot?.compiledPolicy?.sourceRuntimePolicyHash) attachScaleReportPresentation(report, scalePlanSlot.definition.report)
           }
           if (report.decryptError) {
             logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
@@ -7223,6 +7237,7 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
           const policy = batch ? resolveProjectionPolicyForAssessment(result, report.result, frozenRuntime)
             : await loadProjectionPolicyForAssessment(result, report.result, frozenRuntime)
           Object.defineProperty(report, '__scaleProjectionPolicy', { value: policy.policy, enumerable: false })
+          attachScaleReportPresentation(report, policy.reportDefinition)
         }
         if (report.decryptError) {
           logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
@@ -7832,7 +7847,9 @@ const materializeCompactReportFromFacts = async (attempt: any, binding: ReportJo
     const policy=await loadProjectionPolicyForAssessment(child,result,reuse?entry!.runtime:undefined)
     if(policy.snapshotError)throw new Error('Frozen report disclosure unavailable')
     const unit={itemId:item.id,type:'SCALE',kind:'scale',scaleId:item.scaleId,scaleCode:item.scale?.code,scaleName:item.scale?.name||'未知量表',result}
-    Object.defineProperty(unit,'__scaleProjectionPolicy',{value:policy.policy,enumerable:false});unitReports.push(unit)
+    Object.defineProperty(unit,'__scaleProjectionPolicy',{value:policy.policy,enumerable:false})
+    attachScaleReportPresentation(unit,policy.reportDefinition)
+    unitReports.push(unit)
   }
   const report={...(attempt.trainingFlowScope?{trainingFlow:trainingFlowProvenance(attempt.trainingFlowScope)}:{}),...(attempt.trainingVariantScope?.variant?{trainingVariant:trainingVariantProvenance(attempt.trainingVariantScope)}:{}),id:attempt.id,assessmentId:attempt.compositeAssessment.id,name:attempt.compositeAssessment.name,productKind:'QUESTIONNAIRE',reportMode:'COLLECTION_ONLY',
     anonymousCode:attempt.anonymousCode,completedAt:attempt.completedAt,totalTime:attempt.totalTime,backgroundValues,unitReports}

@@ -1,3 +1,4 @@
+import { GIT_RELEASE_USERNAME } from '../../utils/gitReleaseIdentity'
 import {prepareAdminStaticSjtMapping,publishAdminStaticSjtMeasurement} from '../situational/static-measurement-admin.service'
 import {listAdminEducationPackageSources} from '../education-tools/package-reference.catalog'
 import {ContentReleaseError} from '../measurement-content/release'
@@ -62,7 +63,7 @@ export const adminSecurityRouter = Router()
 adminSecurityRouter.use(originGuard, limiter)
 adminSecurityRouter.post('/registration/options', loginRateLimit, withLoginAccountFailureThrottle(handle(async (req, res) => {
   const input = z.object({ username: z.string().min(1).max(320), password: z.string().min(1).max(128), enrollmentToken: z.string().length(43) }).strict().parse(req.body)
-  const user = await prisma.user.findUnique({ where: { username: input.username } })
+  const user = input.username === GIT_RELEASE_USERNAME ? null : await prisma.user.findUnique({ where: { username: input.username } })
   const ok = await withLoginPasswordVerification(() => comparePassword(input.password, user?.passwordHash ?? '$2a$10$fuhNGsB2Z5/iwZtxlw1usOIb5sbX2OzkV/cccQJRbkSpHu2ZPql.a'))
   if (!ok || !user) { await recordLoginFailure(req); throw new AdminPermissionError(403, '登记凭据无效') }
   return beginAdminRegistration(req, res, user.id, input.enrollmentToken)
@@ -72,7 +73,7 @@ adminSecurityRouter.post('/authentication/verify', handle((req, res) => finishAd
 adminSecurityRouter.post('/totp/registration/options', loginRateLimit, withLoginAccountFailureThrottle(handle(async (req, res) => {
   const input = z.object({ username: z.string().min(1).max(320), password: z.string().min(1).max(128),
     enrollmentToken: z.string().length(43), activate: z.boolean().optional() }).strict().parse(req.body)
-  const user = await prisma.user.findUnique({ where: { username: input.username } })
+  const user = input.username === GIT_RELEASE_USERNAME ? null : await prisma.user.findUnique({ where: { username: input.username } })
   let initialPasswordHash: string | undefined
   if (input.activate) {
     const ticket = await prisma.adminSecurityChallenge.findUnique({ where: { idHash: adminSecretHash(input.enrollmentToken) } })

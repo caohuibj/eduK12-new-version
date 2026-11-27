@@ -369,10 +369,12 @@ export const createScaleAdmissionForRuntime = async (input: {
     })
   }
 
+  const sourceRuntimePolicyHash=input.runtime.compiledPolicy.sourceRuntimePolicyHash
   const deployment = await resolveScaleStartDeployment({
     db: input.db,
     scale: input.scale,
     requestedMode: input.requestedMode,
+    ...(sourceRuntimePolicyHash?{exactStandard:{instrumentKey:input.runtime.instrumentKey,instrumentVersion:input.runtime.instrumentVersion}}:{}),
   })
   if (deployment.kind !== 'MANAGED_V2' || !deployment.allowNewStarts) {
     throw new InstrumentFinalSubmitError(
@@ -381,7 +383,7 @@ export const createScaleAdmissionForRuntime = async (input: {
       409,
     )
   }
-  if (deployment.runtimePolicy.runtimePolicyHash !== input.runtime.runtimePolicyHash) {
+  if (deployment.runtimePolicy.runtimePolicyHash !== (sourceRuntimePolicyHash??input.runtime.runtimePolicyHash)) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结策略与当前部署绑定不匹配', 409)
   }
 

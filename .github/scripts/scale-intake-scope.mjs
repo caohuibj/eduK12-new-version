@@ -16,8 +16,27 @@ const source=/^server-version\/backend\/src\/modules\/scale\/instruments\/([a-z]
 const metadata=/^server-version\/backend\/src\/modules\/scale\/instruments\/[a-z][a-z0-9_]*\/[0-9]+\.[0-9]+\.[0-9]+\/(README\.md|THIRD_PARTY_LICENSE\.md)$/;
 const notes=/^docs\/(scale-intake|scale-instruments)\/[a-zA-Z0-9_./-]+\.(md|json|txt)$/;
 const index='server-version/backend/src/modules/scale/onboarding/instruments.generated.ts';
+const releaseAsset=/^server-version\/backend\/src\/modules\/scale\/instruments\/([a-z][a-z0-9_]*)\/(releases\.json|(?:parameters|reports)\/[a-zA-Z0-9][a-zA-Z0-9._-]*\.json)$/;
+export const isScaleReleaseAsset = file => releaseAsset.test(file);
+
+export function selectScaleReleaseAssets(entries) {
+ if(!entries.length)return null;
+ const tools=new Set(),files=new Set();
+ for(const {file,status,oldMode,newMode} of entries){
+  const match=releaseAsset.exec(file);
+  if(!match||files.has(file))return null;
+  if(!(status==='A'&&oldMode==='000000'&&newMode==='100644'||
+       status==='M'&&oldMode==='100644'&&newMode==='100644'||
+       status==='D'&&match[2]==='releases.json'&&oldMode==='100644'&&newMode==='000000'))return null;
+  tools.add(match[1]);files.add(file);
+ }
+ return {toolKeys:[...tools].sort(),files:[...files].sort()};
+}
+
 export function selectScaleIntake(entries) {
  if(!Array.isArray(entries)||!entries.length)return null;
+ const declared=selectScaleReleaseAssets(entries);
+ if(declared)return declared;
  const files=new Set(),sources=new Set();
  for(const e of entries) {
   if(!e||typeof e.file!=='string'||/[\\\x00-\x1f\x7f]/.test(e.file)||e.file.split('/').some(p=>!p||p==='.'||p==='..')||files.has(e.file))return null;
@@ -38,19 +57,26 @@ export function parseScaleIntakeRawDiff(raw) {
   assert.ok(m&&parts[i+1],'Unsupported raw diff');entries.push({file:parts[i+1],oldMode:m[1],newMode:m[2],status:m[5]});}
  return entries;
 }
-export function readScaleIntakeDiff(base,head,{cwd=process.cwd()}={}) {
+export function readScaleIntakeDiff(base,head,{cwd=process.cwd(),declarationsOnly=false}={}) {
  assert.match(base||'',/^[a-f0-9]{40}$/,'Exact base required');assert.match(head||'',/^[a-f0-9]{40}$/,'Exact checkout required');
  assert.notEqual(base,head,'Empty candidate');
  const root=execFileSync('git',['rev-parse','--show-toplevel'],{cwd,encoding:'utf8'}).trim();
  const git=(...args)=>execFileSync('git',args,{cwd:root,encoding:'utf8',maxBuffer:8*1024*1024});
  assert.equal(git('rev-parse','HEAD').trim(),head,'Checkout identity mismatch');
- const entries=parseScaleIntakeRawDiff(git('diff','--raw','--abbrev=40','--no-renames','-z',base,head));
+ const diff=parseScaleIntakeRawDiff(git('diff','--raw','--abbrev=40','--no-renames','-z',base,head));
+ const entries=declarationsOnly?diff.filter(entry=>isScaleReleaseAsset(entry.file)):diff;
  const selected=selectScaleIntake(entries);assert.ok(selected,'Not an isolated Scale declaration intake');
  // A changed JSON source must retain its actual ordinary declaration wrapper.
- for(const file of selected.sources)assert.match(git('ls-tree',head,'--',file),/^100644 blob [a-f0-9]{40}\t/,'Missing/nonregular instrument wrapper');
+ for(const file of selected.sources??[])assert.match(git('ls-tree',head,'--',file),/^100644 blob [a-f0-9]{40}\t/,'Missing/nonregular instrument wrapper');
+ if(selected.toolKeys)for(const {file,status} of entries){
+  if(status==='M'&&!file.endsWith('/releases.json')){
+   assert.deepEqual(JSON.parse(git('show',head+':'+file)),JSON.parse(git('show',base+':'+file)),
+    'Existing parameter/report versions are immutable; add a new version: '+file);
+  }
+ }
  return {base,head,entries,...selected};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
- try {const result=readScaleIntakeDiff(process.env.SCALE_INTAKE_BASE_SHA,process.env.SCALE_INTAKE_HEAD_SHA);console.log(JSON.stringify({status:'SELECTED_SCALE_INTAKE',...result}));}
+ try {const result=readScaleIntakeDiff(process.env.SCALE_INTAKE_BASE_SHA,process.env.SCALE_INTAKE_HEAD_SHA,{declarationsOnly:process.argv[2]==='--changed-declarations'});console.log(JSON.stringify({status:'SELECTED_SCALE_INTAKE',...result}));}
  catch(e){console.error(e.message);process.exitCode=1;}
 }

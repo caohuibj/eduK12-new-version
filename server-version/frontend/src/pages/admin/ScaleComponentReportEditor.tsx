@@ -1,3 +1,4 @@
+import type { ReportVisibility } from '../../api/scaleComponentImport'
 import type { RawScoreFeedback } from '../../modules/scale/rawScoreFeedback'
 
 export type StandardReportBand = {
@@ -14,10 +15,13 @@ export type StandardReportGuidance = {
 export type StandardReportInterpretationSource =
   | { type: 'score_only' }
   | { type: 'reference_context' }
+  | { type: 'shared_theoretical_range' }
   | { type: 'reference'; referenceVersion?: string; referenceKind?: string }
 
 export type StandardReportInterpretation = {
   scoreKey: string
+  scoreLabel?: string
+  provisional?: true
   headline: string
   source: StandardReportInterpretationSource
   summary: string
@@ -26,6 +30,8 @@ export type StandardReportInterpretation = {
 }
 
 export type StandardReportDefinition = {
+  artworkKey?: string
+  illustrationKey?: string
   audienceContract?: {
     schemaVersion: 1
     respondent: 'STUDENT_SELF' | 'ADULT_SELF' | 'PARENT_REPORT' | 'TEACHER_REPORT' | 'OBSERVER_REPORT'
@@ -47,6 +53,106 @@ type ScaleReport = StandardReportDefinition
 type Interpretation = StandardReportInterpretation
 type Band = StandardReportBand
 type Guidance = StandardReportGuidance
+
+const REPORT_AUDIENCES = {
+  respondent: '作答者',
+  subject: '被测者',
+  teacher: '教师',
+  researcher: '研究者',
+} as const
+
+const REPORT_CAPABILITIES = {
+  numericScores: '指标分数',
+  references: '参考分数',
+  scoreDerivedLabels: '分数分档',
+  individualInterpretations: '个人解读',
+  educationalContent: '科普与建议',
+  artwork: '配图',
+} as const
+
+type Audience = keyof typeof REPORT_AUDIENCES
+type Capability = keyof typeof REPORT_CAPABILITIES
+const emptyVisibility: Record<Capability, boolean> = {
+  numericScores: false,
+  references: false,
+  scoreDerivedLabels: false,
+  individualInterpretations: false,
+  educationalContent: false,
+  artwork: false,
+}
+
+export function ScaleComponentReportPresentation({
+  version,
+  visibility,
+  artworkKey,
+  onArtworkChange,
+  templateArtworkKey,
+  onTemplateArtworkChange,
+  disabled,
+  onVisibilityChange,
+}: {
+  version: string
+  visibility?: ReportVisibility
+  artworkKey?: string
+  onArtworkChange: (key: string) => void
+  templateArtworkKey?: string
+  onTemplateArtworkChange?: (key: string) => void
+  disabled: boolean
+  onVisibilityChange: (visibility: ReportVisibility) => void
+}) {
+  const updateVisibility = (audience: Audience, capability: Capability, checked: boolean) => {
+    if (!visibility) return
+    onVisibilityChange({
+      ...visibility,
+      audiences: {
+        ...visibility.audiences,
+        [audience]: { ...(visibility.audiences[audience] ?? emptyVisibility), [capability]: checked },
+      },
+    })
+  }
+
+  return (
+    <details className="component-technical">
+      <summary>报告展示范围与配图</summary>
+      <div className="mt-3 space-y-3">
+        <p className="component-help">这些设置按报告版本冻结。原始答卷、单题分和计分方法仍受题本权限约束。</p>
+        {visibility ? (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {(Object.keys(REPORT_AUDIENCES) as Audience[]).map(audience => (
+              <fieldset key={audience} disabled={disabled} className="min-w-0 space-y-2 rounded-lg border p-3">
+                <legend className="px-1 font-medium">{REPORT_AUDIENCES[audience]}</legend>
+                {(Object.keys(REPORT_CAPABILITIES) as Capability[]).map(capability => (
+                  <label key={capability} className="component-check">
+                    <input type="checkbox" checked={visibility.audiences[audience]?.[capability] ?? false}
+                      onChange={event => updateVisibility(audience, capability, event.target.checked)} />
+                    {REPORT_CAPABILITIES[capability]}
+                  </label>
+                ))}
+              </fieldset>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <p className="component-help">当前沿用旧版展示规则。设置独立范围后，请勾选各类受众可以看到的内容。</p>
+            {!disabled && <button type="button" disabled={!version.trim()} onClick={() => onVisibilityChange({
+              schemaVersion: 1, policyVersion: version.trim(), unknownAudience: 'DENY', audiences: {},
+            })}>设置报告展示范围</button>}
+          </div>
+        )}
+        <label className="component-field">
+          报告配图标识
+          <input value={artworkKey ?? ''} disabled={disabled} placeholder="工具标识/题本版本/配图版本"
+            onChange={event => onArtworkChange(event.target.value)} />
+        </label>
+        {onTemplateArtworkChange && <label className="component-field">
+          自定义模板配图标识
+          <input value={templateArtworkKey ?? ''} disabled={disabled} placeholder="工具标识/题本版本/配图版本"
+            onChange={event => onTemplateArtworkChange(event.target.value)} />
+        </label>}
+      </div>
+    </details>
+  )
+}
 
 const GUIDANCE_CATEGORIES: Array<{ value: Guidance['category']; label: string }> = [
   { value: 'reflection', label: '反思' },
@@ -120,9 +226,8 @@ export function ScaleComponentReportEditor({
             <span className="component-badge">
               {entry.source.type === 'score_only'
                 ? '仅分数'
-                : entry.source.type === 'reference_context'
-                  ? '选定参数分档'
-                  : '精确参考分档'}
+                : entry.source.type === 'reference_context' ? '选定参数分档'
+                  : entry.source.type === 'shared_theoretical_range' ? '共同理论区间' : '精确参考分档'}
             </span>
           </div>
           <label className="component-field">

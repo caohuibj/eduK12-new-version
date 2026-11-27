@@ -1,3 +1,4 @@
+import { GIT_RELEASE_USERNAME } from '../../utils/gitReleaseIdentity'
 import { randomBytes, randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -26,6 +27,7 @@ async function enrollmentTicket(
 }
 
 export async function createEntryAdmin(input: Operator & { username: string; entry: AdminEntry }) {
+  if (input.username === GIT_RELEASE_USERNAME) throw new AdminPermissionError(409, '该账号名不可使用')
   const passwordHash = await hashPassword(randomBytes(32).toString('base64url'))
   try {
     return await prisma.$transaction(async tx => {

@@ -134,10 +134,10 @@ export async function approveToolEntryPolicies(tx:Prisma.TransactionClient,ident
  const products=exactToolEntryProducts(rawProducts)
  return writeEntryPolicies(tx,identity,products,actorId,reason)
 }
-export async function approveStandardCombinationEntryPolicies(tx:Prisma.TransactionClient,identity:PolicyIdentity,rawProducts:unknown,actorId:string,reason:string){
+export async function approveStandardCombinationEntryPolicies(tx:Prisma.TransactionClient,identity:PolicyIdentity,rawProducts:unknown,actorId:string,reason:string,options:{preservePause?:boolean}={}){
  if(!/^standard-release:[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(identity.resourceKey)
   ||!/^[a-f0-9]{64}$/.test(identity.fingerprint))throw new AdminPermissionError(400,'教育入口批准必须指向精确标准组合')
- return writeEntryPolicies(tx,identity,exactStandardCombinationEntryProducts(rawProducts),actorId,reason)
+ return writeEntryPolicies(tx,identity,exactStandardCombinationEntryProducts(rawProducts),actorId,reason,options.preservePause??false)
 }
 /** The system profile publisher supplies the server-resolved artifact hash.
  * Approval never grants a recipient use or asserts an entry adapter is ready. */
@@ -146,7 +146,7 @@ export async function approveCognitiveProfileEntryPolicies(tx:Prisma.Transaction
   ||!/^[a-f0-9]{64}$/.test(identity.fingerprint))throw new AdminPermissionError(400,'认知入口批准必须指向精确配置和 profile')
  return writeEntryPolicies(tx,identity,exactStandardCombinationEntryProducts(rawProducts),actorId,reason)
 }
-async function writeEntryPolicies<T extends StandardCombinationEntryProduct>(tx:Prisma.TransactionClient,identity:PolicyIdentity,products:T[],actorId:string,reason:string){
+async function writeEntryPolicies<T extends StandardCombinationEntryProduct>(tx:Prisma.TransactionClient,identity:PolicyIdentity,products:T[],actorId:string,reason:string,preservePause=false){
  await lockToolPolicyMutation(tx,[identity])
  // A later explicit scope change stops new admission in removed entries.
  await tx.$executeRaw(Prisma.sql`UPDATE survey_tool_policies SET decision='RETURNED',reason=${reason},reviewed_by=${actorId},
@@ -154,7 +154,8 @@ async function writeEntryPolicies<T extends StandardCombinationEntryProduct>(tx:
   AND product NOT IN (${Prisma.join(products)}) AND decision<>'RETURNED'`)
  for(const product of products)await tx.$executeRaw`INSERT INTO survey_tool_policies(product,resource_key,fingerprint,decision,paused,reason,reviewed_by)
   VALUES(${product},${identity.resourceKey},${identity.fingerprint},'APPROVED',false,${reason},${actorId})
-  ON CONFLICT(product,resource_key,fingerprint) DO UPDATE SET decision='APPROVED',paused=false,reason=EXCLUDED.reason,
+  ON CONFLICT(product,resource_key,fingerprint) DO UPDATE SET decision='APPROVED',
+   paused=CASE WHEN ${preservePause} THEN survey_tool_policies.paused ELSE false END,reason=EXCLUDED.reason,
    reviewed_by=EXCLUDED.reviewed_by,version=survey_tool_policies.version+1,updated_at=clock_timestamp()`
  return products
 }

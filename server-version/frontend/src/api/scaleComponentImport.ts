@@ -6,7 +6,11 @@ import type {ReportTemplateDefinition} from '../modules/assessment-core/report/R
 
 export type ComponentAxis='CONTENT'|'PARAMETERS'|'REPORT'
 export type ComponentPointer={releaseId:string;combinationHash:string}
-export type ReportPayload=StandardReportDefinition|{definition:StandardReportDefinition;template:ReportTemplateDefinition;assetRefs?:Array<{assetId:string;sha256:string;mediaType:string}>}
+export type ReportVisibility={schemaVersion:1;policyVersion:string;unknownAudience:'DENY';audiences:Partial<Record<
+ 'respondent'|'subject'|'teacher'|'researcher',
+ Record<'numericScores'|'references'|'scoreDerivedLabels'|'individualInterpretations'|'educationalContent'|'artwork',boolean>>>}
+export type ReportPayload=StandardReportDefinition|{definition:StandardReportDefinition;title?:string;template?:ReportTemplateDefinition;
+ assetRefs?:Array<{assetId:string;sha256:string;mediaType:string}>;parameterVersion?:string;reportVisibility?:ReportVisibility}
 export type ComponentDocument={toolKey:string;configurationName:string;baseCombination:ComponentPointer|null;changedParts:{
  CONTENT?:{version:string;definition:ScaleDefinition;metadata:Record<string,unknown>};PARAMETERS?:{version:string;payload:unknown|null};REPORT?:{version:string;payload:ReportPayload|null}}}
 export type ComponentDraft=ComponentDocument&{id:string;revision:number;publishedReleaseId:string|null;updatedAt:string}
