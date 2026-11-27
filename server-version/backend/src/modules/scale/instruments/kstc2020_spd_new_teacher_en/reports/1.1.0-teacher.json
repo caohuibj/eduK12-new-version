@@ -1,0 +1,96 @@
+{
+  "toolKey": "kstc2020_spd_new_teacher_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "Science teaching self-reflection | Build one useful question with someone else",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "The 3 English item texts and order match the corresponding factor in Kang et al. Appendix B, pp. 510–513. The original study used five frequency positions; methods §3.1 lists only endpoints 1 = rarely and 5 = always. The project preserves numeric 2–4 and the complete-response 1–5 factor mean. No study averages, norms or thresholds are used. The item count follows Appendix B and Table 4; Table 7 reports conflicting counts and is not used as evidence for this report."
+      }
+    },
+    "primaryScoreKeys": [
+      "spd_new"
+    ],
+    "scoreOrder": [
+      "spd_new"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "spd_new",
+        "scoreLabel": "Collaborative inquiry and professional learning (descriptive mean, 1–5)",
+        "headline": "Build one useful question with someone else",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A science teacher notices that students record results but rarely explain what the results mean. A colleague sees something similar. They try two prompts in their classes and compare work samples without identifying learners. The teachers leave with an example they can use and a more precise question for the next lesson.\n\nYour answers describe reported involvement in teacher communities, inquiries into your teaching, and work with families or community partners. The paper calls this group the ‘new mode’ of professional development. What matters for reflection is the opportunity to learn with others, which varies with time, relationships, and school arrangements.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Ask one colleague to help investigate a practical classroom question. Agree on a small change, what you will observe, and when to compare the findings."
+          },
+          {
+            "category": "environment",
+            "text": "Where a community group or family can contribute, agree what everyone will bring, how student privacy will be protected, and how you will give the results back."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Kang, N.-H., Kang, H., Maeng, S., Park, J., & Jeong, E. (2020). Teacher Competency in Competency-Focused Science Teaching in the South Korean Context: Teacher Self-Assessment Instrument Development and Application. Asia-Pacific Science Education, 6(2), 480–513. https://doi.org/10.1163/23641177-BJA10012 (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). The project separates each published factor and supplies its own instructions, complete-answer rule and feedback.",
+      "This score is the mean of 3 responses, from 1 (rarely) to 5 (always), and requires all 3 answers. It describes self-reported practices and may include judgments about your understanding or effectiveness. It contains no objective performance score, norm, or cross-factor total.",
+      "The original study used the full instrument with 210 South Korean primary and secondary science teachers. This research and self-reflection version uses the published English item wording. The project has not obtained the Korean administration form. Separate use of this factor and equivalence to a Chinese version have not been established."
+    ],
+    "disclaimer": "For your own professional learning and research reflection as a science teacher. The result supports a conversation about practice and does not establish teaching quality, teacher eligibility, or student outcomes.",
+    "artworkKey": "kstc2020_spd_new_teacher_en/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
