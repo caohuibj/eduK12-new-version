@@ -1,0 +1,96 @@
+{
+  "toolKey": "k6_zh_cn_research",
+  "contentVersion": "1.1.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-adult",
+  "title": "给最近的难受找一个具体说法（试用）",
+  "report": {
+    "reportVersion": "1.2.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 来源和内容核对",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "作者网站普通话表和评分指南，保留六题、30 天与 0–24 原合计。一般求助表述参考 NIMH。"
+      }
+    },
+    "primaryScoreKeys": [
+      "k6_total"
+    ],
+    "scoreOrder": [
+      "k6_total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "k6_total",
+        "scoreLabel": "过去 30 天的困扰频次合计（0–24）",
+        "headline": "给最近的难受找一个具体说法",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "回看最近的 30 天，你也许能记起几晚心里一直绷着，或有一段时间，平常顺手的事都变得费力。K6 把这些难受出现得有多频繁记下来。想读懂结果，可以先问自己两个问题。什么场合最吃力，哪些时刻能稍微缓过来？写下一个具体例子，比笼统地给自己下判断更容易开口求助。\n\n这一份试用分是六道题的合计。分数越高，表示你在这次填答中提到这些困扰的频率更高。保留你对当时情境的理解，生活变化、睡眠、健康和身边的支持都值得一并考虑。",
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "可以选过去一个月里印象深的一天，写下困扰出现的时间、当时的事情，以及有没有影响睡眠、工作或日常安排。"
+          },
+          {
+            "category": "support",
+            "text": "如果困扰持续、变重或明显影响日常生活，可以带着这个例子和信任的人、全科医生或合适的心理健康专业人员谈谈。即使分数不高，只要你觉得需要帮助，就可以开口。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "普通话自评 K6 的六个频次题，回顾过去 30 天。每题按 0–4 计分，答满六题后求和 0–24。仅使用六道计分题，作者另列的影响与就医问题属于扩展表。",
+      "当前 P 沿用原分。这里的分数用于描述本次感受，没有本用途适用的常模和诊断分界。",
+      "Kessler 等（2003），Archives of General Psychiatry，60(2)，184–189。© Ronald C. Kessler, PhD. 2006。普通话题本由黄悦勤和刘平为 Composite International Diagnostic Interview Advisory Committee 翻译。保留作者指定署名，报告与插画为项目新增。"
+    ],
+    "disclaimer": "这份成人试用报告用于描述自评感受。医疗诊断和个体治疗需要专业人员进一步了解。",
+    "artworkKey": "k6_zh_cn_research/1.1.0/1.2.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-adult",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}
