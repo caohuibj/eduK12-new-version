@@ -8,7 +8,7 @@ afterEach(()=>vi.unstubAllGlobals())
 describe('Survey administrator entry link',()=>{
   it.each([
     ['http://survey.localhost:5173','http://localhost:5173'],
-    ['https://survey.eduk12.top','https://training.eduk12.top'],
+    ['https://survey.eduk12.top','https://admin.eduk12.top'],
     ['http://unknown.localhost:5173',null],
   ])('renders the trusted target for %s',async(origin,admin)=>{
     window.history.replaceState(null,'','/login')
@@ -18,9 +18,9 @@ describe('Survey administrator entry link',()=>{
     vi.stubGlobal('fetch',fetcher)
     render(<SurveyApp/> )
     await screen.findByRole('heading',{name:'研究者登录'})
-    if(admin)expect(screen.getByRole('link',{name:'系统管理员入口：研究者与工具授权'})).toHaveAttribute('href',admin+'/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
+    if(admin)expect(screen.getByRole('link',{name:'Survey 管理员入口：研究者与工具授权'})).toHaveAttribute('href',admin+'/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
     else{
-      expect(screen.queryByRole('link',{name:'系统管理员入口：研究者与工具授权'})).not.toBeInTheDocument()
+      expect(screen.queryByRole('link',{name:'Survey 管理员入口：研究者与工具授权'})).not.toBeInTheDocument()
       expect(screen.getByText('当前地址未配置管理员入口。')).toBeInTheDocument()
     }
     expect(fetcher).toHaveBeenCalledTimes(2) // Existing me + capabilities; link resolution adds no requests.
