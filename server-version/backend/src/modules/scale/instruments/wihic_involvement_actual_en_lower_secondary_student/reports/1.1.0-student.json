@@ -1,0 +1,96 @@
+{
+  "toolKey": "wihic_involvement_actual_en_lower_secondary_student",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student",
+  "title": "WIHIC | Find one way to get your idea into the room",
+  "report": {
+    "reportVersion": "1.1.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "Eight English items 17–24 and the five frequency choices match Fraser (2023), Appendix A Table A1. The appendix’s top answer is Almost Always. Source © Fraser 2023, CC BY 4.0. The project retains C and the eight-item complete-response mean (1–5), without thresholds. This version adds original feedback only, for the student who answered."
+      }
+    },
+    "primaryScoreKeys": [
+      "involvement"
+    ],
+    "scoreOrder": [
+      "involvement"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "involvement",
+        "scoreLabel": "Classroom participation (1–5 average)",
+        "headline": "Find one way to get your idea into the room",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A class is comparing ways to solve a problem. Dani needs a moment to think and writes a tiny sketch before talking to a partner. The partner shows a different route. When the group compares both, Dani’s sketch helps everyone see how the two routes connect.\n\nYour answers describe how often you had chances to discuss, ask questions, share your thinking, or explain an idea in class. Participation can happen out loud, through a written note, or in a conversation with a partner. A busy discussion can leave little thinking time. You can use this report to choose a way of joining in that fits you.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Before the next discussion, jot down a question or a rough idea. Try it with a partner first, or offer it as a written note if the class uses one."
+          },
+          {
+            "category": "reflection",
+            "text": "After class, remember one thing another person said that changed how you saw the task. Note one moment when something you offered helped move the conversation along."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "© Barry J. Fraser, 2023. Adapted from What Is Happening In this Class? (WIHIC), Appendix A, Table A1, in The Evolution of the Field of Learning Environments Research, Education Sciences, 13(3), 257. https://doi.org/10.3390/educsci13030257 (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). The project presents one part separately, with its own instruction, scoring of complete answers, and student feedback.",
+      "The result is the mean of eight answers about one class. The five original answer choices run from Almost Never (1) to Almost Always (5). If an answer is missing, this part has no score.",
+      "Using this separate eight-question form with English-reading students ages 12–15 in grades 7–9 is this project’s scope. This item set has no separate validation or group benchmark. Each part of WIHIC stands alone in the report."
+    ],
+    "disclaimer": "This report describes your experience in one class. It is for reflection and does not grade you, your classmates, or your teacher.",
+    "artworkKey": "wihic_involvement_actual_en_lower_secondary_student/1.0.0/1.1.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
