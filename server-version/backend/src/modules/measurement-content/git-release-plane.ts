@@ -7,6 +7,7 @@ const declarationDirectories = {
   scale: 'scale/instruments',
   bundle: 'assessment-bundle/packages',
   cognitive: 'cognitive/tasks',
+  sjt: 'situational/instruments',
 } as const
 
 type Family = keyof typeof declarationDirectories
@@ -18,7 +19,7 @@ export function parseContentSelector(selector: string): { family: Family; toolKe
   }
   const family = match[1] as Family
   const toolKey = match[2]
-  if (family !== 'cognitive' && !/^[a-z][a-z0-9_]*$/.test(toolKey)) {
+  if ((family === 'scale' || family === 'bundle') && !/^[a-z][a-z0-9_]*$/.test(toolKey)) {
     throw new Error('Invalid tool key')
   }
   return { family, toolKey }
@@ -45,6 +46,11 @@ export async function checkContentRelease(repoRoot: string, selector: string) {
     const { checkCognitiveGitRelease } = await import('../cognitive/git-release')
     return { family, toolKey, releases: await checkCognitiveGitRelease(root, toolKey) }
   }
+  if (family === 'sjt') {
+    const { checkSjtGitRelease } = await import('../situational/git-release')
+    const result = checkSjtGitRelease(root, toolKey)
+    return { family, ...result }
+  }
   const { checkBundleGitRelease } = await import('../bundle-product/git-release')
   return { family, toolKey, releases: (await checkBundleGitRelease(root, toolKey)).versions }
 }
@@ -66,12 +72,14 @@ export async function syncContentReleases(
   if (!hasScaleControl) throw new Error('The committed snapshot must contain a Scale release control file')
   const bundleRoot = requireDirectory(join(inputRoot, 'bundle'))
   const cognitiveRoot = requireDirectory(join(inputRoot, 'cognitive'))
+  const sjtRoot = requireDirectory(join(inputRoot, 'sjt'))
   const { loadDeclaredScaleReleases } = await import('../scale/declarative/load')
   const { assertLiveScaleReportArtwork } = await import('../scale/declarative/live-artwork')
   const releases = loadDeclaredScaleReleases(scaleRoot)
   assertLiveScaleReportArtwork(scaleRoot, releases)
   const { syncGitScaleReleasesInTransaction } = await import('../scale/onboarding/git-release-publication')
   const { syncCognitiveGitReleases } = await import('../cognitive/git-release')
+  const { syncSjtGitReleases } = await import('../situational/git-publish')
   const { syncBundleGitReleases } = await import('../bundle-product/git-release')
 
   return db.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -79,7 +87,8 @@ export async function syncContentReleases(
     // against another content sync or a legacy Scale-only deployment.
     const scale = await syncGitScaleReleasesInTransaction(tx, { actorId, gitCommitSha, releases })
     const cognitive = await syncCognitiveGitReleases(cognitiveRoot, tx, actorId, gitCommitSha)
+    const sjt = await syncSjtGitReleases(sjtRoot, tx, actorId, gitCommitSha)
     const bundle = await syncBundleGitReleases(bundleRoot, tx, actorId, gitCommitSha)
-    return { gitCommitSha, scale, cognitive, bundle }
+    return { gitCommitSha, scale, cognitive, sjt, bundle }
   }, { timeout: 120_000 })
 }

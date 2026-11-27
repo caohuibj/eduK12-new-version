@@ -27,7 +27,7 @@ export function domainFor(file) {
   if (typeof file !== 'string' || file.split('/').some(part => !part || part === '..' || part === '.')
       || /[\\\x00-\x1f\x7f]/.test(file)) return null;
   const selector = gitContentReleaseSelector(file);
-  if (selector) return selector.split(':')[0];
+  if (selector) return selector.startsWith('sjt:') ? 'situational' : selector.split(':')[0];
   if (new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/(manifest|evidence-map|rules|report|profile|scientific|publication|context)\\.json$`).test(file)
       || new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/fixtures/(valid|missing|invalid|not-applicable)\\.json$`).test(file)
       || new RegExp(`^${modules}assessment-bundle/ci-fixtures/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+\\.json$`).test(file)
@@ -393,7 +393,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     scale_intake_light: result.scale_intake_light === true,
     scale_release_mixed: result.scale_intake_light !== true && entries.some(entry=>isScaleReleaseAsset(entry.file)),
     scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive') && (result.cognitive_intake_light || cognitiveMixed || files.some(file=>domainFor(file)==='cognitive' && isCognitiveRuntimePath(file))),
-    situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
+    situational: result.domains.includes('situational') && files.some(file=>domainFor(file)==='situational' && !gitContentReleaseSelector(file)), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
       [key, Array.isArray(value) ? JSON.stringify(value) : value])) };
   Object.assign(output,{frontend_retest:false,frontend_retest_file:'',

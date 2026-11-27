@@ -42,3 +42,12 @@ test('published manifest identities stay present when a deployment is withdrawn'
   verifyGitContentHistory([change], { readBaseFile, readHeadFile: () => '{"releases":[{"version":"1.0.0","status":"HOLD"}]}' })
   assert.throws(() => verifyGitContentHistory([change], { readBaseFile, readHeadFile: () => '{"releases":[]}' }), /Keep existing/)
 })
+
+test('SJT declaration-only releases do not select arbitrary stimulus or renderer paths', () => {
+  const path = dir + 'situational/instruments/workplace-choices/'
+  assert.equal(gitContentReleaseSelector(path + '1.1.0/content.json'), 'sjt:workplace-choices')
+  assert.equal(gitContentReleaseSelector(path + 'reports/1.1.1.json'), 'sjt:workplace-choices')
+  assert.equal(gitContentReleaseSelector(path + '1.1.0/instrument.json'), null)
+  assert.equal(gitContentReleaseSelector(path + 'reports/1.1.1.ts'), null)
+  assert.throws(() => verifyGitContentHistory([entry(path + '1.1.0/content.json', 'M', '100644', '100644')]), /immutable/)
+})

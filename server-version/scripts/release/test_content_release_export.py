@@ -112,6 +112,22 @@ class ContentReleaseExport(unittest.TestCase):
             set(included),
         )
 
+    def test_sjt_exports_only_declaration_files(self):
+        prefix = f'{MODULES}/situational/instruments/'
+        included = ('example-sjt/releases.json', 'example-sjt/parameters/1.1.0.json', 'example-sjt/reports/1.1.0.json', 'example-sjt/1.0.0/content.json')
+        excluded = ('example-sjt/1.0.0/instrument.json', 'example-sjt/1.0.0/publication.json', 'example-sjt/parameters/01.1.0.json')
+        for relative in included + excluded:
+            self.write(prefix + relative, '{}')
+        self.commit()
+        output = self.repo / 'exported'
+        output.mkdir()
+        result = self.export(output, 'content')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            {str(path.relative_to(output / 'sjt')) for path in (output / 'sjt').rglob('*') if path.is_file()},
+            set(included),
+        )
+
     def test_missing_scale_controls_fail_only_for_generalized_sync(self):
         (self.repo / (SCALE + '/releases.json')).unlink()
         self.commit()

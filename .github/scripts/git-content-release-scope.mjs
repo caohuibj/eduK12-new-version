@@ -1,6 +1,8 @@
 const modules = 'server-version/backend/src/modules/'
 const scale = /^scale\/instruments\/([a-z][a-z0-9_]*)\/(releases\.json|(?:parameters|reports)\/[^/]+\.json|\d+\.\d+\.\d+\/(?:source\.json|instrument\.ts))$/
 const cognitive = /^cognitive\/tasks\/([a-z][a-z0-9_-]{0,79})\/(releases\.json|(?:parameters|reports)\/[A-Za-z0-9][A-Za-z0-9._-]{0,79}\.json)$/
+const sjtVersion = '(?:0|[1-9][0-9]*)(?:\\.(?:0|[1-9][0-9]*)){2}'
+const sjt = new RegExp(`^situational/instruments/([a-z][a-z0-9]*(?:-[a-z0-9]+)*)/(releases\\.json|(?:parameters|reports)/${sjtVersion}\\.json|${sjtVersion}/content\\.json)$`)
 const bundle = /^assessment-bundle\/packages\/([a-z][a-z0-9_]*)\/(releases\.json|\d+\.\d+\.\d+\/.+)$/
 
 /** Cover both dedicated and mixed PRs. Keep versioned bytes and modes fixed
@@ -9,7 +11,7 @@ export function verifyGitContentHistory(entries, { readBaseFile, readHeadFile } 
   for (const { file, status, oldMode, newMode } of entries) {
     if (!file.startsWith(modules)) continue
     const relative = file.slice(modules.length)
-    const artifact = scale.exec(relative) ?? bundle.exec(relative) ?? cognitive.exec(relative)
+    const artifact = scale.exec(relative) ?? bundle.exec(relative) ?? cognitive.exec(relative) ?? sjt.exec(relative)
     if (!artifact) continue
     const control = artifact[2] === 'releases.json'
     const added = status === 'A' && oldMode === '000000' && newMode === '100644'
@@ -39,8 +41,11 @@ export function bundleReleaseSelector(file) {
 
 export function gitContentReleaseSelector(file) {
   if (!file.startsWith(modules)) return null
-  const match = cognitive.exec(file.slice(modules.length))
-  return match ? 'cognitive:' + match[1] : bundleReleaseSelector(file)
+  const relative = file.slice(modules.length)
+  const cognitiveRelease = cognitive.exec(relative)
+  if (cognitiveRelease) return 'cognitive:' + cognitiveRelease[1]
+  const sjtRelease = sjt.exec(relative)
+  return sjtRelease ? 'sjt:' + sjtRelease[1] : bundleReleaseSelector(file)
 }
 
 export function isCognitiveRuntimePath(file) {

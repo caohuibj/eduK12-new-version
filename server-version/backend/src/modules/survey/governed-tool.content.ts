@@ -6,6 +6,7 @@ import type {AssessmentReferenceEntry} from '../assessment-reference/reference'
 import {DECLARATIVE_REPORT_GENERATOR} from '../measurement-content/report-renderer'
 import type {ResearchFrozenUnit} from './publication.service'
 import type {FrozenSurveyContentSelection} from './content-selection'
+import {sjtGitFrozenBindingSchema} from '../situational/git-release.binding'
 import {governedRow,governedFail} from './governed-tool.service'
 export async function bindGovernedToolContent(tx:Prisma.TransactionClient,unit:ResearchFrozenUnit,actor:string){
  const id=unit.sourceProvenance?.surveyToolReleaseId
@@ -23,7 +24,20 @@ export async function bindGovernedToolContent(tx:Prisma.TransactionClient,unit:R
   for(const e of entries)binding.referencePolicy.choices.push({releaseId:reference.releaseId,contentHash:reference.contentHash,entryKey:referenceEntryKey(e.definition),priority:0,metricKey:e.metricKey,referenceKind:e.referenceKind})
  }
  if(a.report){
-  const report=await publishContentRelease(tx,{layer:'REPORT',family:measurement.family,key:'survey-governed-report:'+measurement.releaseId,version:canonicalHash(a.report),scope:measurement.scope,sourceReleaseId:null,assetRefs:[],provenance:{approvedToolId:row.id,approvedHash:row.snapshot_hash,toolReference:row.reference},content:{projectionVersion:1,measurements:[pointer],metricKeys:measurement.content.metrics.map(m=>m.metricKey),audience:a.report.audience??'researcher',language:measurement.content.locale,generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:a.report.template}},actor)
+  let upstreamReport: Awaited<ReturnType<typeof getContentRelease>> = null
+  if(unit.kind==='SJT'&&a.unit?.provenance.sjtGitRelease){
+   const git=sjtGitFrozenBindingSchema.parse(a.unit.provenance.sjtGitRelease)
+   upstreamReport=await getContentRelease(tx,git.reportRelease.releaseId,true)
+   if(!upstreamReport||upstreamReport.layer!=='REPORT'||upstreamReport.contentHash!==git.reportRelease.contentHash
+     ||upstreamReport.scope.kind!=='PLATFORM'||upstreamReport.status!=='PUBLISHED'||upstreamReport.family!=='SJT'
+     ||upstreamReport.content.audience!=='researcher'||canonicalHash(upstreamReport.content.measurements)!==canonicalHash([row.measurement_release])
+     ||canonicalHash(upstreamReport.content.template)!==canonicalHash(a.report.template)
+     ||canonicalHash(upstreamReport.content.effectiveDisclosure??null)!==canonicalHash(git.effectiveDisclosure))
+    governedFail(409,'SJT Git 报告与已批准精确版本不一致')
+   binding.reportDisclosure=git.effectiveDisclosure
+  }
+  const report=await publishContentRelease(tx,{layer:'REPORT',family:measurement.family,key:'survey-governed-report:'+measurement.releaseId,version:canonicalHash(a.report),scope:measurement.scope,sourceReleaseId:upstreamReport?.releaseId??null,assetRefs:[],provenance:{approvedToolId:row.id,approvedHash:row.snapshot_hash,toolReference:row.reference},content:{projectionVersion:1,measurements:[pointer],metricKeys:measurement.content.metrics.map(m=>m.metricKey),audience:a.report.audience??'researcher',language:measurement.content.locale,generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:a.report.template,
+   ...(binding.reportDisclosure?{effectiveDisclosure:binding.reportDisclosure}:{})}},actor)
   binding.reportRelease={releaseId:report.releaseId,contentHash:report.contentHash}
  }
  unit.contentSelection=binding

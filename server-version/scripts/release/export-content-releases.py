@@ -9,6 +9,7 @@ MODULES = 'server-version/backend/src/modules/'
 SCALE_ROOT = MODULES + 'scale/instruments/'
 BUNDLE_ROOT = MODULES + 'assessment-bundle/packages/'
 COGNITIVE_ROOT = MODULES + 'cognitive/tasks/'
+SJT_ROOT = MODULES + 'situational/instruments/'
 ARTWORK_ROOT = 'server-version/frontend/src/scale-report-artwork/'
 SCALE_FILES = re.compile(
     r'[a-z][a-z0-9_]*/(?:releases\.json|(?:parameters|reports)/[a-zA-Z0-9][a-zA-Z0-9._-]*\.json)'
@@ -20,6 +21,11 @@ BUNDLE_FILES = re.compile(
 )
 COGNITIVE_FILES = re.compile(
     r'[a-z][a-z0-9_-]{0,79}/(?:releases\.json|(?:parameters|reports)/[A-Za-z0-9][A-Za-z0-9._-]{0,79}\.json)'
+)
+SJT_VERSION = r'(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*)){2}'
+SJT_FILES = re.compile(
+    r'[a-z][a-z0-9]*(?:-[a-z0-9]+)*/(?:releases\.json|'
+    rf'(?:parameters|reports)/{SJT_VERSION}\.json|{SJT_VERSION}/content\.json)'
 )
 ARTWORK_FILES = re.compile(
     r'[a-z][a-z0-9_]*/\d+\.\d+\.\d+/[a-zA-Z0-9][a-zA-Z0-9._-]*/'
@@ -44,6 +50,7 @@ def export_releases(repo: str, commit: str, output: Path, profile: str) -> None:
     if profile == 'content':
         families.append((BUNDLE_ROOT, BUNDLE_FILES, output / 'bundle'))
         families.append((COGNITIVE_ROOT, COGNITIVE_FILES, output / 'cognitive'))
+        families.append((SJT_ROOT, SJT_FILES, output / 'sjt'))
     for _, _, directory in families:
         directory.mkdir(exist_ok=True)
     roots = [root for root, _, _ in families]
