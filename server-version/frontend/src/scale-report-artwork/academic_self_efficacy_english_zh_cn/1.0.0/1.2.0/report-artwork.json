@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "academic_self_efficacy_english_zh_cn/1.0.0/1.2.0",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生把一段陌生英语听力拆成辨认说话者、场景和行动三个线索。",
+    "width": 1600,
+    "height": 900
+  },
+  "bands": [
+    { "scoreKey": "academic_self_efficacy", "bandKey": "very_low", "file": "very-low.webp", "alt": "学生从短听力中先抓住场景和行动的一个可确认线索。", "width": 768, "height": 768 },
+    { "scoreKey": "academic_self_efficacy", "bandKey": "low", "file": "low.webp", "alt": "学生借助图示提示把听力任务改写成辨人、辨地和辨行动三步。", "width": 768, "height": 768 },
+    { "scoreKey": "academic_self_efficacy", "bandKey": "middle", "file": "middle.webp", "alt": "学生比较听、说、读、写任务中做前预测与做后结果的差异。", "width": 768, "height": 768 },
+    { "scoreKey": "academic_self_efficacy", "bandKey": "high", "file": "high.webp", "alt": "学生在英语沟通任务中区分独立完成、查阅资料和接受提示的部分。", "width": 768, "height": 768 },
+    { "scoreKey": "academic_self_efficacy", "bandKey": "very_high", "file": "very-high.webp", "alt": "学生面对陌生英语沟通任务先预测难度，再按新线索调整策略。", "width": 768, "height": 768 }
+  ]
+}

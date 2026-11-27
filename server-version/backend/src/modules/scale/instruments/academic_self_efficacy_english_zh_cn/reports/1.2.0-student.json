@@ -1,0 +1,123 @@
+{
+  "toolKey": "academic_self_efficacy_english_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "英语学习自我效能｜学生图文试用版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "沿用已上线的五道英语学科学习自我效能题、五点选项、四题最低作答与均分规则。英语版尚无同版本经验常模，五档只按一至五分量尺范围等距划分，用于试用报告选文，不作为能力等级、常模、诊断界线或未来成绩预测。"
+      }
+    },
+    "primaryScoreKeys": [
+      "academic_self_efficacy"
+    ],
+    "scoreOrder": [
+      "academic_self_efficacy"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "academic_self_efficacy",
+        "headline": "从一阵快风里，听出下一步",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "第一次听一段英语校园广播，小岚几乎没跟上。第二次，她先听谁在说话、在哪儿、要做什么，再记下两个反复听见的动作词。虽然还有几句没听清，她已经能跟同桌说出活动的大意。下次遇到陌生的广播，她知道可以先找什么了。\n\n“给我这样一段英语材料，我有多大把握完成任务？”这个判断就是学习自我效能的一部分。知道自己能先听出一个词、能借提示弄懂一句、能用自己的话说出大意，会让你更愿意开始，也更容易在卡住时换种试法。回想最近的一次英语练习，哪一步你原来以为做不到，后来做出来了？",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "先听出一件事",
+            "summary": "选一段熟悉主题的短音频，先回答“谁在做什么”。再听一次，或打开文本，找一句能支持你答案的话。把帮你听懂的词记下来。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "准备一个卡住时能用的提示",
+            "summary": "挑一项十分钟的小任务，写下要做什么、先试哪一步、卡住时查哪里。做完圈出独立完成的地方，再给借到提示的地方画个方框。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "对照两次小练习",
+            "summary": "任选两种练习，比如听一段广播、写一条英文通知。开始前各写下预计能做的部分，做完再核对。选一个下次想多试一步的地方。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "把好用的办法带到下一次",
+            "summary": "完成一段较陌生的材料后，标出真正帮到你的办法，比如抓住段落顺序或找出反复出现的词。再换一段材料试试它是否还管用。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "试一次陌生任务",
+            "summary": "选一段题材或语速稍陌生的材料。做前写一句“我预计这里会卡住”，并准备一个办法。完成后对照实际，只改一项下次的计划。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "本周选一次听、说、读或写的小任务。做前写下预计能完成到哪一步，做后补上实际完成的部分和用到的帮助。"
+          }
+        ],
+        "scoreLabel": "英语学习自我效能均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "五道题至少答四道，按已答题目算均分。均分帮助你回顾这次对自己完成英语学习任务有多大把握。",
+      "五档按 1—5 分量尺范围估算，用于选择一条适合试试的建议。这个版本还没有同年级学生的数据可以作比较。",
+      "缺少年级时，原均分仍可用来选择一条试用建议。报告省略学段参考。"
+    ],
+    "disclaimer": "这份报告供七至十二年级学生回顾自己的学习，也可以带一条练习记录去和老师聊一聊。",
+    "artworkKey": "academic_self_efficacy_english_zh_cn/1.0.0/1.2.0"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
