@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "teacher_subject_liking_english_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "teacher_subject_liking-very-low.webp",
+      "alt": "学生在笔记上留下一处自己听到的停顿。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "teacher_subject_liking-low.webp",
+      "alt": "两名学生听完同一句话后尝试不同的读法。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "low"
+    },
+    {
+      "file": "teacher_subject_liking-middle.webp",
+      "alt": "两份同一节课的笔记并排放着。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "middle"
+    },
+    {
+      "file": "teacher_subject_liking-high.webp",
+      "alt": "学生复述一个课堂里记住的用法，同伴试着换场景使用。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "high"
+    },
+    {
+      "file": "teacher_subject_liking-very-high.webp",
+      "alt": "学生尝试把课堂练过的听法用到一段新材料。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "英语老师示范两种语气，两位学生各自留意不同的课堂细节。",
+    "width": 506,
+    "height": 506
+  }
+}

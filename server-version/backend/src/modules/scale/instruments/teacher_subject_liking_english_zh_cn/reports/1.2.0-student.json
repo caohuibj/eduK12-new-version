@@ -1,0 +1,117 @@
+{
+  "toolKey": "teacher_subject_liking_english_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "学生感知教师喜爱英语图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对项目自编三题、六个正向选项、至少答两道后取均分及两学段已有理论分档。"
+      }
+    },
+    "primaryScoreKeys": [
+      "teacher_subject_liking"
+    ],
+    "scoreOrder": [
+      "teacher_subject_liking"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "teacher_subject_liking",
+        "headline": "同一句话，为什么请大家说两遍？",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "英语课上，老师用两种语气说了一次邀请，再请同学试着换一种说法。小朵觉得老师特别愿意听大家发现细小的区别，后排同学却只记得那天自己没听清。课后他们把各自记得的一句话拿出来，才知道两人当时注意的是不同的事。\n\n这份问卷记录你从课堂表现中感受到的老师对英语的兴趣。老师会停下来问什么，也许会反复听哪个读法，你自己的课堂体验也会影响你留意哪一处。下一次可以把看见或听见的事，和自己对它的理解分开写。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "只记一次老师停下来的时候",
+            "summary": "从最近一节课记下一个细节，比如老师把哪一小段重放了一遍。另写一句你当时为什么注意到它。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "带一个听不清的问题再听",
+            "summary": "选一段自己没听出趣味的话，再听老师示范或课堂录音。挑一个语气或停顿来核对，和同桌互相读一遍。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "用两份记录对照同一节课",
+            "summary": "找一位同学，用各自的笔记说说那节课最记得的一个细节。留意你们把什么当作老师对英语感兴趣的线索。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "转述一次课堂小发现",
+            "summary": "挑一处老师讲得让你印象深刻的表达，用自己的话复述它在什么时候能派上用场。请同桌换个语境试说一句。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "把一种课堂玩法带到新材料",
+            "summary": "从课堂上你喜欢的一种练法里选一个，比如听停顿或模仿两种语气。拿到一段新材料后试一次，记下一处自己发现的变化。",
+            "guidance": []
+          }
+        ],
+        "guidance": [],
+        "scoreLabel": "学生感知教师喜爱英语均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "三道题至少答两道，按已答题目计算均分。分数用来回顾你感受到的课堂体验。",
+      "初中与高中沿用相同的理论五档。报告根据当前均分提供一条试用建议。"
+    ],
+    "disclaimer": "可从一个真实课堂片段读这份报告，挑其中一个做法试一试。",
+    "artworkKey": "teacher_subject_liking_english_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
