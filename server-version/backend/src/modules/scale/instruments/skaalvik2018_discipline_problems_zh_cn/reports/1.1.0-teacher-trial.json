@@ -1,0 +1,92 @@
+{
+  "toolKey": "skaalvik2018_discipline_problems_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher-trial",
+  "title": "课堂干扰带来的负担｜教师自评（试用版）",
+  "report": {
+    "reportVersion": "1.1.0-teacher-trial",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题对照 Skaalvik 与 Skaalvik（2018）已公开英文题文、六级作答端点及已登记简体中文工作译稿。按 2026-10-30 项目已批准的独立使用形式保留 3 题、数字中间选项和完整作答 1–6 均分。新 R 仅调整试用反馈，中文本地效度证据仍待补充。"
+      }
+    },
+    "primaryScoreKeys": [
+      "discipline_problems"
+    ],
+    "scoreOrder": [
+      "discipline_problems"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "discipline_problems",
+        "scoreLabel": "课堂干扰带来的负担（1–6 均分，试用）",
+        "headline": "找到课堂总在什么时候卡住",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "课堂练习刚开始，有人还在找材料，有人已经等不及说起别的事。老师花了好几分钟把大家带回任务。回看具体发生的顺序，有时能发现最值得调整的是课上的一个过渡环节。\n\n这部分回顾你感受到的课堂打断、教学计划难以推进，以及应对课堂行为的时间和精力。均分越高，表示你越认同这些干扰给教学带来负担。结果适合用来找课堂调整和支持的线索。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次最影响教学的情境，记录发生前的安排、可观察行为和自己的回应。和班主任或教研组只讨论一个改动，例如把过渡指令分成两步，下一堂课再观察。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Skaalvik, E. M., & Skaalvik, S. (2018). Job demands and job resources as predictors of teacher motivation and well-being. Social Psychology of Education, 21, 1251–1275，§3.2，https://doi.org/10.1007/s11218-018-9464-8，CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)。项目对该组公开英文题文作简体中文翻译并新增教师反馈。",
+      "本组 3 题取 1–6 分均值，按项目规则须全部作答，中间选项 2–5 只用数字。参考参数暂无适用的常模和分档。",
+      "适用于理解中文的成年教师回顾当前学校工作条件。原研究在挪威进行，对象为 1–10 年级教师。当前中文为项目工作译稿，适用于个人反思和研究试用。"
+    ],
+    "disclaimer": "用于成年教师本人回顾感受到的工作条件和所需支持，适用范围为个人反思与研究试用。",
+    "artworkKey": "skaalvik2018_discipline_problems_zh_cn/1.0.0/1.1.0-teacher-trial"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher-trial",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
