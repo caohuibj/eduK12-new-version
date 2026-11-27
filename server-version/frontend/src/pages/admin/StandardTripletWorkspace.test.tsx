@@ -54,6 +54,111 @@ describe('standard workflow and unified management design UI',()=>{
  it('allows explicit no-report selection and invalidates prior preview',async()=>{await open();fireEvent.click(screen.getByRole('button',{name:'核对三份版本'}));await screen.findByText('三份版本对应关系已核对');fireEvent.change(screen.getByLabelText('文字报告版本'),{target:{value:'empty-report'}});expect(screen.queryByText('三份版本对应关系已核对')).not.toBeInTheDocument();expect(screen.getByRole('button',{name:'批准并试运行，通过后上线'})).toBeDisabled();expect(mock.api.mock.calls.some(c=>String(c[0]).includes('approve'))).toBe(false)})
  it('requires explicit approval confirmation and never grants researcher use',async()=>{await open();fireEvent.change(screen.getByLabelText('本次操作原因'),{target:{value:'核对三份版本'}});fireEvent.click(screen.getByRole('checkbox',{name:'Survey'}));fireEvent.click(screen.getByRole('button',{name:'核对三份版本'}));await screen.findByText('三份版本对应关系已核对');vi.spyOn(window,'confirm').mockReturnValueOnce(false);fireEvent.click(screen.getByRole('button',{name:'批准并试运行，通过后上线'}));await waitFor(()=>expect(window.confirm).toHaveBeenCalled());expect(mock.api.mock.calls.some(c=>/approve|grants/.test(String(c[0])))).toBe(false)})
  it('displays unified roles and both composition types without mutation',async()=>{render(<StandardTripletWorkspace authored={null}/>);await screen.findByText('示例量表');fireEvent.click(screen.getByRole('button',{name:'权限与授权'}));expect(await screen.findByRole('heading',{name:'系统与四个入口管理员的权限边界'})).toBeVisible();expect(screen.getByRole('columnheader',{name:'School 管理员'})).toBeVisible();expect(screen.getByRole('columnheader',{name:'Teacher 管理员'})).toBeVisible();expect(screen.getByText('单纯组合')).toBeVisible();expect(screen.getByText('组合包')).toBeVisible();expect(screen.getByText('规则已确认，运行入口尚未接通')).toBeVisible();expect(mock.api.mock.calls.every(c=>c[1]===undefined)).toBe(true)})
+ it('shows the exact combination status and an informational link to entry authorization duties',async()=>{
+  const read=mock.api.getMockImplementation()!
+  const online={id:'online',state:'ONLINE',combinationHash:'combo'}
+  mock.api.mockImplementation(async(path:string,body:unknown)=>path.startsWith('/catalog')?{list:[{...row,releases:[online]}],hasMore:false}:read(path,body))
+  await open()
+  const steps=screen.getByRole('region',{name:'组合状态与下一步'})
+  expect(within(steps).getByText('目录默认组合 · 已上线')).toBeVisible()
+  expect(within(steps).getByText(/对应入口管理员核对入口范围/)).toBeVisible()
+  fireEvent.click(within(steps).getByRole('button',{name:'查看入口授权职责'}))
+  expect(await screen.findByRole('heading',{name:'系统与四个入口管理员的权限边界'})).toBeVisible()
+  expect(mock.api.mock.calls.every(call=>call[1]===undefined)).toBe(true)
+ })
+ it('does not apply an online directory combination to a different checked combination',async()=>{
+  const read=mock.api.getMockImplementation()!
+  mock.api.mockImplementation(async(path:string,body:unknown)=>{
+   if(path.startsWith('/catalog'))return {list:[{...row,releases:[{id:'online',state:'ONLINE',combinationHash:'combo'}]}],hasMore:false}
+   const result=await read(path,body)
+   return path==='/preview'?{...result,combinationHash:'different'}:result
+  })
+  await open()
+  fireEvent.change(screen.getByLabelText('文字报告版本'),{target:{value:'empty-report'}})
+  expect(screen.getByText('所选组合 · 待核对')).toBeVisible()
+  expect(screen.queryByRole('button',{name:'查看入口授权职责'})).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button',{name:'核对三份版本'}))
+  expect(await screen.findByText('本次核对的组合 · 待审核')).toBeVisible()
+  expect(screen.queryByRole('button',{name:'查看入口授权职责'})).not.toBeInTheDocument()
+ })
+ it('refreshes expanded and reopened approval history without changing the chosen report',async()=>{
+  const read=mock.api.getMockImplementation()!
+  let released={id:'reviewed',state:'TRIAL_RUNNING',combinationHash:'combo',version:2,
+   approvedBy:'system',approvedAt:'2026-11-26T00:00:00Z',blockers:[],versions:Object.fromEntries(row.versions.map(v=>[v.axis,v]))}
+  mock.api.mockImplementation(async(path:string)=>{
+   if(path.startsWith('/catalog'))return {list:[{...row,releases:[released]}],hasMore:false}
+   if(path.startsWith('/candidate'))return {...detail,history:[released]}
+   return read(path)
+  })
+  const opened=await open()
+  const history=within(opened).getByText('申请、批准及试运行记录（1）').closest('details')!
+  history.open=true
+  const report=within(opened).getByLabelText('文字报告版本')
+  fireEvent.change(report,{target:{value:'empty-report'}})
+  expect(within(history).getByRole('button',{name:'重试同一批准版本'})).toBeVisible()
+  released={...released,state:'ONLINE',version:3}
+  fireEvent.click(screen.getByRole('button',{name:/^刷新$/}))
+  expect(await within(history).findByRole('button',{name:'停止新增使用'})).toBeVisible()
+  expect(within(history).queryByRole('button',{name:'重试同一批准版本'})).not.toBeInTheDocument()
+  expect(report).toHaveValue('empty-report')
+  expect(screen.getByText('所选组合 · 待核对')).toBeVisible()
+  opened.open=false
+  released={...released,state:'WITHDRAWN',version:4}
+  fireEvent.click(screen.getByRole('button',{name:/^刷新$/}))
+  await waitFor(()=>expect(within(opened.querySelector('summary')!).getByText('已停止新增使用')).toBeVisible())
+  opened.open=true
+  expect(await within(history).findByRole('heading',{name:'已停止新增使用'})).toBeVisible()
+  expect(within(history).queryByRole('button',{name:'停止新增使用'})).not.toBeInTheDocument()
+  expect(report).toHaveValue('empty-report')
+ })
+ it('opens the exact instrument version selected in onboarding',async()=>{
+  const read=mock.api.getMockImplementation()!
+  const wanted={...row,instrumentVersion:'2',title:'示例量表第二版'}
+  mock.api.mockImplementation(async(path:string)=>{
+   if(path.startsWith('/catalog'))return {list:[row,wanted],hasMore:false}
+   if(path.startsWith('/onboarding-status'))return {list:[{
+    instrumentKey:'fixture',instrumentVersion:'2',name:'目标量表',stage:'已导入',blockers:[],nextActions:[],
+    states:{imported:true,localizationReview:'PENDING',expertReview:'PENDING',scientificMaturity:'PILOT',scientificQualified:false,deployed:false,published:false,visible:false,trainingEntry:'PENDING',surveyEntry:'PENDING'},
+   }],hasMore:false,nextCursor:null}
+   return read(path)
+  })
+  render(<StandardTripletWorkspace authored={null}/>)
+  await screen.findByText('示例量表第二版')
+  fireEvent.click(screen.getByRole('button',{name:'接入状态'}))
+  fireEvent.click(await screen.findByRole('button',{name:'查找该量表的组合上线状态'}))
+  expect(await screen.findByText('目标题本 目标量表 · 2。')).toBeVisible()
+  expect(screen.getByText('示例量表第二版').closest('details')).toHaveAttribute('open')
+  expect(screen.getByText('示例量表').closest('details')).not.toHaveAttribute('open')
+  await waitFor(()=>expect(mock.api).toHaveBeenCalledWith('/candidate/fixture/2'))
+  expect(mock.api).not.toHaveBeenCalledWith('/candidate/fixture/1')
+ })
+ it('confirms withdrawal effect on new and existing participants before applying the current revision',async()=>{
+  const read=mock.api.getMockImplementation()!
+  let released={id:'reviewed-combination',state:'ONLINE',combinationHash:'combo',version:3,
+   approvedBy:'system',approvedAt:'2026-11-26T00:00:00Z',blockers:[],versions:Object.fromEntries(row.versions.map(v=>[v.axis,v]))}
+  mock.api.mockImplementation(async(path:string,body:unknown)=>{
+   if(path.startsWith('/catalog'))return {list:[{...row,releases:[released]}],hasMore:false}
+   if(path.startsWith('/candidate'))return {...detail,history:[released]}
+   if(path==='/reviewed-combination/withdraw'){released={...released,state:'WITHDRAWN',version:4};return released}
+   return read(path,body)
+  })
+  await open()
+  const history=screen.getByText('申请、批准及试运行记录（1）').closest('details')!
+  history.open=true
+  fireEvent.change(screen.getByLabelText('本次操作原因'),{target:{value:'停止本版本新增使用'}})
+  const withdraw=screen.getByRole('button',{name:'停止新增使用'})
+  const confirm=vi.spyOn(window,'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true)
+  try{
+   fireEvent.click(withdraw)
+   expect(confirm).toHaveBeenCalledWith('确认撤下这份组合？撤下后，仅停止接受新被试入场。已入场的被试仍可在原完成期限内按原冻结版本继续作答并提交。历史记录保留。')
+   expect(mock.api.mock.calls.some(call=>String(call[0]).endsWith('/withdraw'))).toBe(false)
+   await waitFor(()=>expect(withdraw).toBeEnabled())
+   fireEvent.click(withdraw)
+   await waitFor(()=>expect(mock.api).toHaveBeenCalledWith('/reviewed-combination/withdraw',{expectedVersion:3,reason:'停止本版本新增使用'}))
+   expect(await screen.findByText('目录默认组合 · 已停止新增使用')).toBeVisible()
+   expect(within(screen.getByRole('region',{name:'组合状态与下一步'})).getByText(/按原冻结版本继续作答并提交/)).toBeVisible()
+  }finally{confirm.mockRestore()}
+ })
 })
 
 

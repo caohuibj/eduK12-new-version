@@ -49,6 +49,15 @@ describe('read-only per-version standard onboarding status',()=>{
   expect(within(row).queryByText('已上线')).not.toBeInTheDocument()
   expect(within(row).queryByRole('button')).not.toBeInTheDocument()
  })
+ it('opens a catalog lookup for a version with executable content without labeling it online',async()=>{
+  const find=vi.fn()
+  render(<StandardOnboardingStatus onFindCombination={find}/>)
+  const row=await screen.findByRole('article')
+  fireEvent.click(within(row).getByRole('button',{name:'查找该量表的组合上线状态'}))
+  expect(find).toHaveBeenCalledExactlyOnceWith({instrumentKey:'pending',instrumentVersion:'1.0',name:'待审译本'})
+  expect(within(row).queryByText('已上线')).not.toBeInTheDocument()
+  expect(api).toHaveBeenCalledExactlyOnceWith('/onboarding-status?limit=25')
+ })
  it('shows each exact version independently and treats a paused approval as stopped',async()=>{
   const published=entry({instrumentVersion:'2.0',stage:'已发布',blockers:[],nextActions:[]})
   published.states={...published.states,deployed:true,published:true,visible:true,trainingEntry:'APPROVED',trainingEntryPaused:true,surveyEntry:'APPROVED'}

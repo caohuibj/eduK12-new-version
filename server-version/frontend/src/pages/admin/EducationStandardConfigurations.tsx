@@ -145,9 +145,11 @@ function ConfigurationSession(props:Props){
   {!loading&&!error&&!rows.length&&<p>{catalogQuery(1,applied)!=='page=1'?'没有匹配的可分发配置，可调整条件或清除筛选。':'当前没有可分发配置。请先完成原件装载、入口批准及本校精确分发委托。'}</p>}
   <ApprovedScaleAxes choices={rows.filter(row=>row.assignable)} disabled={locked||loading} scopeLabel="当前已读取的本校可分发配置，可继续读取更多配置" onSelect={select}/>
   <label>已批准量表配置<select value={combinationId} disabled={locked} onChange={event=>select(event.target.value)}>
-   <option value="">选择固定配置</option>{rows.map(row=><option key={row.id} value={row.id}>{row.title} · C {row.versions.CONTENT} / P {row.versions.PARAMETERS} / R {row.versions.REPORT}{row.assignable?'':' · 仅供回读'}</option>)}
+   <option value="">选择固定配置</option>{rows.map(row=><option key={row.id} value={row.id}>{row.title} · C {row.versions.CONTENT} / P {row.versions.PARAMETERS} / R {row.versions.REPORT}{row.assignable?'':' · 不可新分配'}</option>)}
   </select></label>{more&&<button disabled={locked||loading} onClick={()=>setPage(old=>old+1)}>读取更多配置</button>}
-  {choice&&<><p>量表 · 题本版本 {choice.instrumentVersion}</p><CatalogClassificationTags tags={choice.classificationTags}/><p>{choice.unavailableReason}</p><button disabled={locked||!choice.assignable} onClick={()=>void showPreview()}>查看报告说明</button>
+  {choice&&<><p>量表 · 题本版本 {choice.instrumentVersion}</p><CatalogClassificationTags tags={choice.classificationTags}/><p>{choice.unavailableReason}</p>
+   {!choice.assignable&&<p>此配置不可新分配；仍可查看有权管理的历史授权，历史作答与报告保留原版。</p>}
+   <button disabled={locked||!choice.assignable} onClick={()=>void showPreview()}>查看报告说明</button>
    {preview&&<section aria-label="所选报告说明"><h3>{preview.title}</h3><p>报告版本：{preview.report.reportVersion??'已固定'}</p>
     <p>报告受众：{({student:'学生',teacher:'教师',parent:'家长'} as Record<string,string>)[preview.report.audienceContract?.audience??'']??'依原报告声明'}。请核对施测对象、解释参数和报告受众，管理员决定专业搭配。</p>
     {(preview.report.interpretations??[]).map((item,index)=><article key={index}><strong>{item.headline}</strong><p>{item.summary}</p></article>)}</section>}
@@ -158,7 +160,7 @@ function ConfigurationSession(props:Props){
     {choice.authorities.map(authority=><p key={authority.id}>委托：<code>{authority.id}</code> · 修订 {authority.version}</p>)}</details>
    <form onSubmit={event=>{event.preventDefault();setRecipientPage(1);setSearch(q.trim())}}><label>搜索本校接收者<input disabled={locked||!choice.assignable} value={q} onChange={event=>setQ(event.target.value)}/></label><button disabled={locked||!choice.assignable}>查找</button></form>
    {detailsLoading&&<p role="status">正在读取当前接收者资格…</p>}
-   {!detailsLoading&&choice.assignable&&!recipients.length&&<p>当前学校没有符合本入口资格的接收者。</p>}
+   {!detailsLoading&&choice.assignable&&!recipients.length&&<p>当前学校没有符合本入口资格的接收者。{product==='HUISCHOOL'?'School 接收者需具备本校心理教师岗位及心理专业权限；请由本校 School 管理员核对人员与资格，并按校内正式流程办理。':'Teacher 接收者需为本校有效 Teacher 产品管理员；请在本校产品管理员名单核对，或由对应入口管理员按正式流程办理。'}</p>}
    {!detailsLoading&&replacement&&!recipients.some(row=>row.userId===replacement.userId)&&<p>原接收者尚未在当前有效名单中，请核对其资格或检索原接收者；不能改为另一人。</p>}
    <label>配置接收者<select disabled={locked||detailsLoading||!choice.assignable||Boolean(replacement)} value={recipientId} onChange={event=>setRecipientId(event.target.value)}><option value="">选择接收者</option>{recipients.filter(row=>!replacement||row.userId===replacement.userId).map(row=><option key={row.userId} value={row.userId}>{row.username}</option>)}</select></label>
    <div className="epg-actions">{recipientPage>1&&<button disabled={locked||detailsLoading} onClick={()=>setRecipientPage(old=>old-1)}>上一页接收者</button>}{recipientMore&&<button disabled={locked||detailsLoading} onClick={()=>setRecipientPage(old=>old+1)}>下一页接收者</button>}</div>

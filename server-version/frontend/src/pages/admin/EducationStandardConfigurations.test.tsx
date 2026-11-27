@@ -30,16 +30,41 @@ async function fill(){
 }
 beforeEach(()=>{api.mockReset();sessionStorage.clear();grants=[]})
 describe('education manager exact configuration and unknown-result recovery',()=>{
- it('distinguishes an empty qualified recipient list and an expired historical use without issuing a replacement',async()=>{
+ it.each([
+  ['HUISCHOOL' as const,'School 接收者需具备本校心理教师岗位及心理专业权限；请由本校 School 管理员核对人员与资格，并按校内正式流程办理。'],
+  ['HUITEACHER' as const,'Teacher 接收者需为本校有效 Teacher 产品管理员；请在本校产品管理员名单核对，或由对应入口管理员按正式流程办理。'],
+ ] as const)('%s explains its empty qualified list and retains historical use without granting new rights',async(product,hint)=>{
+  const scopedBase=educationConfigurationBase(props.organizationId,product)
   api.mockImplementation(async path=>{
    if(path.includes('/recipients?'))return {page:1,list:[],hasMore:false} as never
    if(path.includes('/use-grants?page='))return {page:1,hasMore:false,list:[{id:id(7),userId:recipient.userId,username:recipient.username,version:1,revokedAt:null,
     validFrom:'2020-01-01T00:00:00Z',expiresAt:'2021-01-01T00:00:00Z',configurationName:'历史固定配置',canManage:true}]} as never
-   return reads(path) as never
+   return reads(path.replace(scopedBase,base)) as never
   })
-  render(<EducationStandardConfigurations {...props}/>);await screen.findByRole('option',{name:/已批准固定量表 · C/})
+  render(<EducationStandardConfigurations {...props} product={product}/>);await screen.findByRole('option',{name:/已批准固定量表 · C/})
   fireEvent.change(screen.getByLabelText('已批准量表配置'),{target:{value:choice.id}})
-  await screen.findByText('当前学校没有符合本入口资格的接收者。');await screen.findByText(/已过期/)
+  expect(await screen.findByText('当前学校没有符合本入口资格的接收者。'+hint)).toBeVisible()
+  await screen.findByText(/已过期/)
+  fireEvent.click(screen.getByRole('button',{name:'保存固定配置并授权'}))
+  expect(api.mock.calls.every(([path])=>path.startsWith(scopedBase))).toBe(true)
+  expect(api.mock.calls.some(([,method])=>method==='POST')).toBe(false)
+ })
+ it('marks an unavailable configuration as not assignable while keeping authorized history readable',async()=>{
+  api.mockImplementation(async path=>{
+   if(path===base+'?page=1')return {page:1,list:[{...choice,assignable:false,unavailableReason:'该配置已停止新增使用'}],hasMore:false} as never
+   if(path.includes('/use-grants?page='))return {page:1,hasMore:false,list:[{id:id(7),userId:recipient.userId,username:recipient.username,version:2,revokedAt:'2021-01-01T00:00:00Z',
+    validFrom:'2020-01-01T00:00:00Z',expiresAt:'2021-01-01T00:00:00Z',configurationName:'历史固定配置',canManage:true}]} as never
+   throw Error('Unexpected unavailable configuration request '+path)
+  })
+  render(<EducationStandardConfigurations {...props}/>)
+  expect(await screen.findByRole('option',{name:/已批准固定量表.*不可新分配/})).toBeVisible()
+  expect(screen.queryByRole('option',{name:/仅供回读/})).not.toBeInTheDocument()
+  fireEvent.change(screen.getByLabelText('已批准量表配置'),{target:{value:choice.id}})
+  expect(await screen.findByText(recipient.username+' · 历史固定配置')).toBeVisible()
+  expect(screen.getByText('此配置不可新分配；仍可查看有权管理的历史授权，历史作答与报告保留原版。')).toBeVisible()
+  expect(screen.getByRole('button',{name:'保存固定配置并授权'})).toBeDisabled()
+  expect(screen.getByRole('button',{name:'查看报告说明'})).toBeDisabled()
+  expect(api.mock.calls.some(([path])=>path.includes('/recipients?'))).toBe(false)
   expect(api.mock.calls.some(([,method])=>method==='POST')).toBe(false)
  })
  it('School uses its own manager path and shows the original report audience before saving the psychologist configuration',async()=>{
