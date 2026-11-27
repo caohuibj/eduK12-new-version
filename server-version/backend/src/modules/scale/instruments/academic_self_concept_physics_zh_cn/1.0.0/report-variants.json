@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "academic_self_concept_physics_zh_cn",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "02f8ac857a992dbb6eadcb2f7c6ebef94e99fa384eb891ee5ce118cd18807022",
+  "baseParametersHash": "70141e3156225edbbd15e426504c2d4b8be4bb68ba33da89e5184b7373e7f652",
+  "variants": [
+    {
+      "key": "student_physics_actions",
+      "title": "物理学习自评图文版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "artworkKey": "academic_self_concept_physics_zh_cn/1.0.0/1.2.0",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "Codex 内容审定",
+            "reviewedAt": "2026-11-27T00:00:00Z",
+            "basis": "逐题核对项目学科替换版四题、五点选项、均分计分和三题最低作答规则。物理版尚无同版本经验样本，五档仅为量尺范围的试用估算，不作为常模、能力或诊断界线。"
+          }
+        },
+        "primaryScoreKeys": ["academic_self_concept"],
+        "scoreOrder": ["academic_self_concept"],
+        "interpretations": [
+          {
+            "scoreKey": "academic_self_concept",
+            "headline": "我怎么看自己的物理学习",
+            "source": {"type": "reference_context"},
+            "summary": "物理课上，小明看着小车从斜面滑下，又看了看本子里的图线，觉得自己完全没跟上。他没有先背结论，而是在斜面旁贴了两个小标记：小车先到哪里，过一会儿又到哪里。两段距离不一样。他转头问同桌：\"间隔为什么变了？这和图线弯起来有关系吗？\"一个看不懂的图，先变成了一个能观察、能追问的现象。\n\n物理学科自我概念，是你对\"我物理学得怎么样\"形成的整体印象。它不是物理能力证书，也不等于某一次考试。能记住公式、能画图、能从现象找证据、能解释原因，是相关但不同的事情。这样的自我印象也可能影响你是否愿意动手测一次、再画一次、向别人说出自己的猜想。读报告时，可以暂时把\"行不行\"放下，回到一件看得见的事：你观察到了什么？你的解释靠什么证据？",
+            "bands": [
+              {"key": "very_low", "label": "回到你的物理课", "summary": "这次，你较少认同这些关于物理学习的正向描述。先选一个简单现象，只记下两个可观察的事实，比如小车先后在哪里、灯泡有没有亮。先把事实说准，不必马上解释所有原因。", "guidance": []},
+              {"key": "low", "label": "回到你的物理课", "summary": "这次，你对这些正向描述的认同偏少。翻到最近卡住的一张图或一道题，指出第一处真正不懂的连接：是看不懂坐标、不会把现象画出来，还是不知道为什么这样变化？一个具体疑问比\"整章都不会\"更容易解决。", "guidance": []},
+              {"key": "middle", "label": "回到你的物理课", "summary": "你的均分落在试用量尺的中间一段，不必把它读成\"一般\"。把最近的学习分成三类：能用现象解释、提示后能解释、还想做一次实验验证。给每类放一个例子，看看自己真正站在哪里。", "guidance": []},
+              {"key": "high", "label": "回到你的物理课", "summary": "从这次回答看，你对自己的物理学习比较有把握。挑一个会做的题或小实验，先只给同伴看现象和数据，请他追问你为什么这样解释。能把证据和结论接起来，会让自信更扎实。", "guidance": []},
+              {"key": "very_high", "label": "回到你的物理课", "summary": "你这次对自己的物理学习很有信心。给熟悉的实验改一个条件，先预测结果，再测量并比较；如果结果和预测不同，就留下一处修正。物理里的把握，不是不犯错，而是敢让现象检验自己的想法。", "guidance": []}
+            ],
+            "guidance": [
+              {"category": "reflection", "text": "把\"我物理行不行\"换成三句记录：我观察到了什么？我怎样解释？哪一条证据还缺着？"},
+              {"category": "strategy", "text": "本周做一次\"先预测再测量\"：改动一个条件，先画下预测，再记录结果，最后写一句需要修正的地方。"}
+            ],
+            "scoreLabel": "物理学习自评均分（试用版）",
+            "provisional": true
+          }
+        ],
+        "limitations": [
+          "均分来自四道正向题，至少回答三题；它不分别测量计算、实验、建模或概念理解。",
+          "物理版五档按 1—5 分可选范围等距划分，是试用估算，不是同年级常模、百分位、能力等级或心理阈值。",
+          "结果描述本次自我看法，不替代成绩、实验表现或概念测验，也不能推断智力、天赋或未来表现。"
+        ],
+        "disclaimer": "这份报告供七至十二年级学生回顾本次对物理学习的看法，可与老师一起讨论，不用于排名、分流或诊断。"
+      }
+    }
+  ]
+}

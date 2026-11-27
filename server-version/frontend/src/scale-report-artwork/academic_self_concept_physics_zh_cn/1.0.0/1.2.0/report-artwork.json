@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "academic_self_concept_physics_zh_cn/1.0.0/1.2.0",
+  "hero": {"file": "hero.webp", "alt": "课堂插图：学生先被运动图线难住，随后标记小车在斜面上的位置，最后根据距离变化向同伴提出问题。", "width": 1600, "height": 900},
+  "bands": [
+    {"scoreKey": "academic_self_concept", "bandKey": "very_low", "file": "very_low.webp", "alt": "学生用两张胶带标记小车在斜面上的两个位置。", "width": 768, "height": 768},
+    {"scoreKey": "academic_self_concept", "bandKey": "low", "file": "low.webp", "alt": "学生指着运动图线的一处具体疑问向同伴请教。", "width": 768, "height": 768},
+    {"scoreKey": "academic_self_concept", "bandKey": "middle", "file": "middle.webp", "alt": "学生把物理学习例子按能解释、提示后能解释和仍想验证分成三组。", "width": 768, "height": 768},
+    {"scoreKey": "academic_self_concept", "bandKey": "high", "file": "high.webp", "alt": "学生指着小车运动的测量标记向同伴解释证据。", "width": 768, "height": 768},
+    {"scoreKey": "academic_self_concept", "bandKey": "very_high", "file": "very_high.webp", "alt": "学生改变斜面条件，比较第二次测量并修正原来的预测。", "width": 768, "height": 768}
+  ]
+}
