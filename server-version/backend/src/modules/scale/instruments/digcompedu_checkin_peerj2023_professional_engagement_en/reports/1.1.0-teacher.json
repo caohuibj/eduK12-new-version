@@ -1,0 +1,100 @@
+{
+  "toolKey": "digcompedu_checkin_peerj2023_professional_engagement_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "DigCompEdu Check-In | Make one teaching improvement easy to share",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "Publisher’s English supplement dated 2 June 2023, © Ersoy et al., CC BY 4.0, was verified against the preserved SHA-256. The 4 prompts, 20 ordered options and item weights match the registered area; scoring follows the publication’s 0–4 option order. This independent report uses the project’s complete-response area sum (0–16); the original study reports 22-item total levels and did not validate independent area use. No source grading bands are imported."
+      }
+    },
+    "primaryScoreKeys": [
+      "professional_engagement"
+    ],
+    "scoreOrder": [
+      "professional_engagement"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "professional_engagement",
+        "scoreLabel": "Professional engagement (descriptive sum, 0–16)",
+        "headline": "Make one teaching improvement easy to share",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Two instructors are preparing the same simulation in different rooms. Each has changed the briefing in a way that helps, but neither can see what the other tried. They agree to keep one shared version and add a brief note after each session. A small digital routine turns two isolated adjustments into something the whole teaching team can use.\n\nYour answers describe the ways you communicate with students and colleagues, work with peers, and learn about digital teaching. A higher total reflects reporting more developed practices in those areas. Time to experiment, access to peers, and the support available from your department can all shape those answers. Pick a practice that would support an actual teaching goal.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Choose one recurring practical class. With a colleague, share one resource, agree where the current version lives, and add a one-sentence note about what you learned when you used it."
+          },
+          {
+            "category": "reflection",
+            "text": "Choose an online learning opportunity with a concrete application. Decide which part to try in the next class and how you will tell whether it helped."
+          },
+          {
+            "category": "environment",
+            "text": "Where workload or placement schedules keep colleagues from meeting, suggest a short asynchronous check-in and decide when replies are expected."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Ersoy, H., et al. (2024). Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects. PeerJ, 12, e18456. https://doi.org/10.7717/peerj.18456 ; Supplemental Information 1, Digital Competency Assessment Questionnaire for Academicians, 2 June 2023 (https://doi.org/10.7717/peerj.18456/supp-1). Used under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Framework: Redecker, C. (2017), edited by Y. Punie, European Commission JRC, doi:10.2760/159770. This area-only presentation and feedback are project adaptations and imply no author or Commission endorsement.",
+      "This English reflection applies to adult higher-education faculty in health sciences. The original study used a convenience sample of 306 faculty members from six partner universities. The standalone area has no separate validation or local norms.",
+      "The area sum adds 4 equally weighted 0–4 items. Zero is a valid response; an omitted answer leaves the area result unavailable. No scale-wide total, A1–C2 level, percentile or individual certification is reported."
+    ],
+    "disclaimer": "For your own professional learning in health-sciences higher education. This report describes self-reported digital teaching practice and supplies no basis for evaluating teaching performance, ranking faculty, or certifying competence.",
+    "artworkKey": "digcompedu_checkin_peerj2023_professional_engagement_en/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
