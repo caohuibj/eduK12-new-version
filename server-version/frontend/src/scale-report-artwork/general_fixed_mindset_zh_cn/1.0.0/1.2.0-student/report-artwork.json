@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "general_fixed_mindset_zh_cn/1.0.0/1.2.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生在一次拼搭任务未成功后，观察过程、换一种方法、请教一个提示并再次尝试，结果仍保持开放。",
+    "width": 1536,
+    "height": 1024
+  },
+  "bands": []
+}

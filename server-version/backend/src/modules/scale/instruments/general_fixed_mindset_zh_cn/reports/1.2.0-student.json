@@ -1,0 +1,98 @@
+{
+  "toolKey": "general_fixed_mindset_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "一般能力可变性信念｜学生反思版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "沿用项目实际使用的三道中文改编题、六点选项、固定心态方向正向计分及至少两题均分规则；不新增参数、分档、反向成长心态分数或人格类型。项目方已确认中文改编版本的使用权，但整体适配审阅仍为 PENDING，认知访谈尚未建立。"
+      }
+    },
+    "primaryScoreKeys": [
+      "general_fixed_mindset"
+    ],
+    "scoreOrder": [
+      "general_fixed_mindset"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "general_fixed_mindset",
+        "headline": "一次卡住，不等于给自己下了结论",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "面对一个陌生的拼搭任务，小岚第一次没有成功，脑中冒出一句：“我可能就是不够聪明。”她没有急着把这句话当成事实，而是停下来看看哪里出了问题，换了一种摆放方法，又向老师请教了一个提示。第二次尝试仍不完美，却让她看见：一次结果里，既有任务难度，也有方法、经验、帮助和当时状态。\n\n这三道题记录的是你在多大程度上认同“一般聪明程度大致固定、很难改变”。分数越高，表示本次回答越认同这种固定观；分数越低，表示较少认同。它不测智力、成绩、学习能力或发展上限，也不会反向生成一个“成长心态分数”。\n\n信念不是判决书，也不是必须贴在身上的人格标签。更有用的做法，是挑一次最近的学习或生活经历，把“我就是这样”暂时换成几个可以观察的问题：我当时已经知道什么？卡在哪一步？换一个方法、增加一点练习或得到一个提示后，结果有没有变化？这次小实验不保证成功，但能让下一次判断多一点证据。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想最近一次你对自己说“我就是不擅长这个”的学习或生活经历。分别写下任务、第一次结果、当时使用的方法和仍不确定的地方。"
+          },
+          {
+            "category": "strategy",
+            "text": "只选一个可改变的环节做一次小实验：换一种方法、增加一次练习，或请人给一个提示。完成后记录发生了什么，不要求结果一定变好。"
+          }
+        ],
+        "scoreLabel": "一般固定心态均分（项目中文改编版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "三题均按固定心态方向正向计分；至少回答两题才计算均分。高分表示更认同聪明程度固定，低分表示较少认同，不得反向解释成成长心态分数。",
+      "本工具是项目授权使用的三题中文改编版。Dweck、Chiu 与 Hong（1995）仅提供隐含理论的概念背景，不证明当前三题与任何原版量表完全等价。",
+      "项目样本的三题内部一致性可支持项目内研究使用，但不能替代逐题中文适配、学生可读性、结构效度或跨群体等值性的人工核对。",
+      "现有适配记录的总体 reviewStatus 仍为 PENDING，认知访谈尚未建立；报告因此不提供常模、百分位、cut-off、分档或“固定型／成长型人格”分类。",
+      "单次结果可能受到最近经历、题目理解和具体情境影响；它不是智力、能力、成绩、努力程度或未来潜力的测量。"
+    ],
+    "disclaimer": "这是一份帮助学生回看一次学习或生活经历的描述性报告，不用于智力判断、能力鉴定、诊断、排名、教育分流或任何高风险决策。",
+    "artworkKey": "general_fixed_mindset_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
