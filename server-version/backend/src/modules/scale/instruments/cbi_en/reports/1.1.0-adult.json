@@ -1,0 +1,145 @@
+{
+  "toolKey": "cbi_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-adult",
+  "title": "CBI: three distinct views of exhaustion (descriptive)",
+  "report": {
+    "reportVersion": "1.1.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex official-source and editorial cross-check",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "Checked against the official NFA English CBI scale sheet and current NFA reuse notice. Score-only adult draft: three separate dimensions, no total, thresholds, norms, diagnosis, or performance inference. Human occupational-health and final rights sign-off remain pending."
+      }
+    },
+    "primaryScoreKeys": [
+      "personal_burnout",
+      "work_related_burnout",
+      "client_related_burnout"
+    ],
+    "scoreOrder": [
+      "personal_burnout",
+      "work_related_burnout",
+      "client_related_burnout"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "personal_burnout",
+        "scoreLabel": "Personal burnout mean (0–100; descriptive)",
+        "headline": "Start with the pattern, not a label",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This score is the mean of six questions about prolonged physical and psychological fatigue or exhaustion. A higher value means that these experiences were reported more often; it does not identify their cause. Use this result to name the pattern you have noticed and to decide what context needs a closer look, including recovery, health, family demands, and work. It is not a diagnosis and it should not be read as a measure of resilience or personal worth.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Look back over a recent ordinary week and note when your energy dropped, what happened just before it, and what helped it recover."
+          },
+          {
+            "category": "support",
+            "text": "If exhaustion is persistent, worsening, or interfering with daily life, discuss the broader picture with an appropriate health or workplace support; this score alone cannot explain it."
+          }
+        ]
+      },
+      {
+        "scoreKey": "work_related_burnout",
+        "scoreLabel": "Work-related burnout mean (0–100; descriptive)",
+        "headline": "Ask what work is contributing",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This score is the mean of seven questions about exhaustion that you attribute to work. The final question about having energy for family and friends is reverse-scored, as specified by the original CBI. A higher value describes a stronger work-related exhaustion pattern; it does not show that you are performing poorly or prove that one particular job condition caused it. Its most useful role is to open a concrete conversation about work design, demands, resources, and recovery.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "environment",
+            "text": "Choose one recent workday and identify the task, deadline, interruption, or staffing condition that consumed the most energy."
+          },
+          {
+            "category": "strategy",
+            "text": "Turn that example into one workable request, such as clarifying priorities, adjusting a deadline, protecting a break, or adding a resource."
+          }
+        ]
+      },
+      {
+        "scoreKey": "client_related_burnout",
+        "scoreLabel": "Client-related burnout mean (0–100; descriptive)",
+        "headline": "Use only when people-facing work fits your role",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This score is the mean of six questions about exhaustion attributed to working with clients. In the official CBI, “clients” may include patients, social-service recipients, older citizens, or inmates. The score is meaningful only when that kind of people-facing work is part of your role and the wording fits your setting. A higher value is a prompt to examine the demands and support surrounding those interactions, not a judgment of your attitude, empathy, or professional quality.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Identify one type of interaction that is especially draining and separate what belongs to the interaction itself from workload, role boundaries, or missing support."
+          },
+          {
+            "category": "support",
+            "text": "Consider one relevant support around that work, such as supervision, peer consultation, safer boundaries, debriefing, or a change in service arrangements."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "The CBI defines three distinct scales. This report does not create or imply an overall burnout total.",
+      "Personal burnout describes general exhaustion; work-related and client-related scores describe exhaustion attributed by the respondent to those contexts. The scores do not establish causation.",
+      "Client-related burnout should be used only when client-facing work applies and the canonical English referent is appropriate. Any teacher/student adaptation requires a separately governed version.",
+      "No diagnostic cutoff, severity band, norm, percentile, or score-derived label is applied. The three means are descriptive 0–100 scores.",
+      "The official non-response rules are preserved: personal and client-related scores require at least three answered items, and work-related burnout requires at least four.",
+      "NFA permits commercial and non-commercial use provided the required source is clearly cited: Borritz M et al., Burnout among employees in human service work: design and baseline findings of the PUMA study, Scandinavian Journal of Public Health (2006), 34, 49–58."
+    ],
+    "disclaimer": "These self-reported CBI scores are descriptive. They are not a medical diagnosis, a fitness-for-work decision, or a measure of employee performance.",
+    "artworkKey": "cbi_en/1.0.0/1.1.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

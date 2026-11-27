@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "cbi_en/1.0.0/1.1.0-adult",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "An adult worker pauses at the end of the day, with separate visual cues for personal recovery, work demands, and people-facing work.",
+    "width": 1536,
+    "height": 1024
+  },
+  "bands": []
+}
