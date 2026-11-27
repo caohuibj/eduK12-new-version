@@ -1,0 +1,122 @@
+{
+  "toolKey": "academic_self_concept_physics_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "物理学习自评图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "artworkKey": "academic_self_concept_physics_zh_cn/1.0.0/1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目学科替换版四题、五点选项、均分计分和三题最低作答规则。物理版尚无同版本经验样本，五档仅为量尺范围的试用估算，不作为常模、能力或诊断界线。"
+      }
+    },
+    "primaryScoreKeys": [
+      "academic_self_concept"
+    ],
+    "scoreOrder": [
+      "academic_self_concept"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "academic_self_concept",
+        "headline": "我怎么看自己的物理学习",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "物理课上，老师放了一段小车滑下斜面的慢放视频。小明看不懂书上那条往上弯的线，就和同桌把视频每隔同样长的时间暂停一次，在纸上标出车的位置。第二次到第三次的标记隔得更远。他指着纸问：“时间间隔一样，车走过的距离怎么变了？”再回到那张图，曲线的变化和刚才看到的小车终于接上了。\n\n你对自己学物理的整体印象，心理学上叫“物理学科自我概念”。这个印象可能影响你遇到陌生现象时，是愿意先量一量、画一画，还是很快放弃。一次把图和小车联系起来的经历，也能让你重新认识自己是怎么学会的。下次看见一张图，先试着在旁边写下它讲的是哪件事。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "先记两件看得见的事",
+            "summary": "挑一个课堂上见过的现象，写下两个能观察到的细节，比如小车先后停在哪个标记、哪一刻灯亮了。把事实说清，再留一个想问的问题。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "在图上圈出疑问",
+            "summary": "挑一张最近看不懂的图，圈出第一个没想通的地方。是看不明白坐标表示什么，还是不知道哪段线对应哪个动作？指着那里问同桌。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "给三种把握各举一例",
+            "summary": "写下最近见到的三个现象。选一个你能独立解释的、一个借助图才能说明白的、一个想再验证的。给最后一个写下一条要找的数据。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "请同伴追问一句",
+            "summary": "挑一次熟悉的实验，先展示记录的数据，再说自己怎么解释。请同伴问：“你是根据哪条数据这么想的？”试着指给他看。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "改一个条件，再测一次",
+            "summary": "选一个熟悉的小实验，只改一个条件，先写下预测，再记录结果。遇到和预测不一致的地方，留一句你现在会怎样解释。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "下次做实验时分三步记笔记：我观察到了什么？我怎样解释？我还需要哪条证据？"
+          }
+        ],
+        "scoreLabel": "物理学习自评均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "至少答三题才计算本次均分。五档是把 1—5 分均匀分段得到的试用参考，暂没有同版本数据支持同年级比较。",
+      "缺少年级时，原均分仍可用来选择一条试用建议。报告省略学段参考。"
+    ],
+    "disclaimer": "这份报告适合七至十二年级学生自己读，也可以带着一个具体问题和老师聊一聊。"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
