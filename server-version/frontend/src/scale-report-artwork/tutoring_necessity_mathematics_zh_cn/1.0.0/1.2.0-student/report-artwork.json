@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "tutoring_necessity_mathematics_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "tutoring_necessity-very-low.webp",
+      "alt": "学生合上例题，在独立完成的一个步骤旁打勾。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "tutoring_necessity-low.webp",
+      "alt": "学生把有圈记的课本带去答疑，指出一处具体问题。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "low"
+    },
+    {
+      "file": "tutoring_necessity-middle.webp",
+      "alt": "两张错题草稿并排，一张请人讲解开头，一张对照步骤逐项检查。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "middle"
+    },
+    {
+      "file": "tutoring_necessity-high.webp",
+      "alt": "两个不同练习日期的笔记并列，学生独立尝试一题变式。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "high"
+    },
+    {
+      "file": "tutoring_necessity-very-high.webp",
+      "alt": "学生和可信成人围着一张错题讨论可尝试的帮助方式。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生与老师并排看代数草稿，在一个符号旁做记号。",
+    "width": 506,
+    "height": 506
+  }
+}

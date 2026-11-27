@@ -1,0 +1,123 @@
+{
+  "toolKey": "tutoring_necessity_mathematics_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "数学学习支持图文自评",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容草稿核对",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目登记原文、选项、等权均分和最低有效题数，并按原初高中历史参考核对分档。学生图文草稿待审。"
+      }
+    },
+    "primaryScoreKeys": [
+      "tutoring_necessity"
+    ],
+    "scoreOrder": [
+      "tutoring_necessity"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "tutoring_necessity",
+        "scoreLabel": "数学课外补习必要性信念均分（试用版）",
+        "provisional": true,
+        "headline": "先说清需要哪一种帮助",
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "晚自习，小周把一道错题带到老师面前。她原本只想问“要不要再补一补”，说给老师听时才发现，自己会列式，最容易在去括号时漏掉一个负号。老师让她在草稿上给负号做记号，小周又找了一道相似的题，看看这个做法能不能帮她检查同一步。\n\n这几道题记录你怎么看课外补习的帮助和必要性。一项学习困难可以先拆成具体任务，再比较课堂提问、同学讨论、自学材料和课外支持各能提供什么。试过以后，看看自己能不能更独立地完成这一步。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "用一道题核对现在的办法",
+            "summary": "合上例题，独立做一道相似题。给能完成的步骤画个勾，把还没弄懂的一步写成可带到课堂的提问。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "先找一种拿得到的小帮助",
+            "summary": "选一个具体难点，从课本例题、课堂答疑或同学讨论中选一种眼下方便尝试的帮助。做完再写一句，这种帮助解决了哪一步。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "给两类困难配不同的帮助",
+            "summary": "拿两道错题作比较。遇到不知道从何开始的一题，请人解释第一个判断；遇到步骤会做但常算错的一题，给自己列一个小检查表。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "用隔天的变式题检查收获",
+            "summary": "接受一次讲解后，把原题收起来。隔一天做一道条件不同的题，看看能否独立说明最关键的一步。把仍卡住的地方留给下一次提问。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "带着一个目标和老师或家长商量",
+            "summary": "选定本周想解决的一个问题，列出课堂答疑、同伴互助、自学材料和课外支持等可行方式。先试目前可获得的一种，再按独立完成的情况决定下一步。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "从最近一道错题里圈出卡住的步骤，先问自己“我需要新的讲解、一个例子，还是一次独立练习？”"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "三道正向题取等权均分，至少两题有有效答案才计分。1 到 6 从完全不同意到完全同意，原选项没有中性项。均分越高，表示对这组补习必要性描述的平均认同越高。",
+      "分段依据同学段项目历史便利样本。样本里的相对位置和对题目的平均认同是两回事。没有匹配年级时，仍可按获准范围显示原始均分和通用内容，省略历史分段。",
+      "这些题记录学生的看法。是否需要支持、哪种支持有效、目前是否补习以及是否付费，都需要另行了解。分数也不能推断焦虑、家庭资源或成绩。"
+    ],
+    "disclaimer": "这份报告供七至十二年级学生整理一次具体的数学求助经历。请勿用于商业推荐、购买决策、评估家庭条件或要求参加补习。",
+    "artworkKey": "tutoring_necessity_mathematics_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
