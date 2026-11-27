@@ -5,7 +5,7 @@ import {cognitiveMixedProductScope,cognitiveProductPlan,cognitiveProductOutputs}
 import {backendApiFocus} from './backend-api-scope.mjs';
 import {catalogDiscoveryScope,catalogDiffBase,bundleFamilyScope,bundleRuntimeScope,authoringPolishScope} from './catalog-discovery-scope.mjs';
 import {selectCognitiveIntake, cognitiveTaskRoot} from './cognitive-intake-scope.mjs';
-import {selectScaleIntake} from './scale-intake-scope.mjs';
+import {assertScaleContentImmutability,selectScaleIntake} from './scale-intake-scope.mjs';
 import {declarationReaders,verifiedDeclarativeContent} from './declarative-content.mjs';
 import {homepageCopyPlan,publicRenderBoundary} from './homepage-copy-scope.mjs';
 import { execFileSync } from 'node:child_process';
@@ -29,9 +29,11 @@ export function domainFor(file) {
       || new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/fixtures/(valid|missing|invalid|not-applicable)\\.json$`).test(file)
       || new RegExp(`^${modules}assessment-bundle/ci-fixtures/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+\\.json$`).test(file)
       || file === `${modules}assessment-bundle/generated/packages.json`) return 'bundle';
-  if (new RegExp(`^${modules}scale/instruments/[a-zA-Z0-9_-]+/[^/]+/(?:instrument\\.ts|source\\.json|README\\.md|THIRD_PARTY_LICENSE\\.md)$`).test(file)
+  if (new RegExp(`^${modules}scale/instruments/[a-zA-Z0-9_-]+/[^/]+/(?:instrument\\.ts|source\\.json|report-variants\\.json|README\\.md|THIRD_PARTY_LICENSE\\.md)$`).test(file)
       || file === `${modules}scale/instruments/learning-motivation-wave1-data.json`
       || file === `${modules}scale/onboarding/instruments.generated.ts`
+      || file === `${modules}scale/onboarding/report-variants.generated.ts`
+      || /^server-version\/frontend\/src\/scale-report-artwork\/[a-z][a-z0-9_]*\/\d+\.\d+\.\d+\/[A-Za-z0-9][A-Za-z0-9._-]{0,63}\/(?:report-artwork\.json|[a-z][a-z0-9_-]*\.webp)$/.test(file)
       || file.startsWith('server-version/backend/src/__tests__/scale/instruments/')
       || file.startsWith('docs/scale-instruments/') || /^docs\/scale-intake\/[a-zA-Z0-9_./-]+\.(md|json|txt)$/.test(file)) return 'scale';
   if (new RegExp(`^${modules}situational/instruments/[^/]+/[^/]+/(instrument|publication|scientific)\\.json$`).test(file)
@@ -227,6 +229,7 @@ function gitContent(sha,file) {
 export {cognitiveMixedProductScope} from './cognitive-product-scope.mjs';
 
 export function classifyChanges(entries, forceFull = false, readers = {}) {
+  assertScaleContentImmutability(entries,readers);
   const result = classify(entries.map(entry => entry.file));
   const cognitiveIntake = !forceFull && readers.readHeadFile ? selectCognitiveIntake(entries,readers.readHeadFile,{readBaseFile:readers.readBaseFile}) : null;
   if(cognitiveIntake?.selected) Object.assign(result,{content:true,frontend:false,presentation:false,documentation:false,domains:['cognitive']});
@@ -259,9 +262,9 @@ export function classifyChanges(entries, forceFull = false, readers = {}) {
 }
 
 // Explain escalation using the same allowlists and metadata as admission.
-export function platformReasons(entries, forceFull = false) {
+export function platformReasons(entries, forceFull = false, readers = {}) {
   if (forceFull) return [{reason:'explicit-full-request'}];
-  const selected = classifyChanges(entries);
+  const selected = classifyChanges(entries,false,readers);
   if (['maintenance','documentation','content','presentation','frontend','backend_modules'].some(key => selected[key])) return [];
   if (!entries.length) return [{reason:'no-changes-classified'}];
   const reasons = [];
@@ -329,9 +332,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     throw new Error('Choose a step_probe for component CI, or explicitly set full_acceptance=true for whole-platform CI');
   const entries = event === 'workflow_dispatch' ? [] : changedEntries(base);
   const files = entries.map(entry => entry.file);
+  const scopeReaders={readHeadFile:file=>gitContent('HEAD',file),readBaseFile:file=>gitContent(base,file)};
   const result = event === 'workflow_dispatch'
     ? { maintenance:false, content:false, presentation:false, frontend:false, documentation:false, domains:[] }
-    : classifyChanges(entries, full, {readHeadFile:file=>gitContent('HEAD',file),readBaseFile:file=>gitContent(base,file)});
+    : classifyChanges(entries, full, scopeReaders);
   const mixedContent=result.content && result.domains.length>1;
   const cognitiveCandidate=entries.some(e=>/^server-version\/(?:backend\/src\/modules\/cognitive\/(?:tasks|generated|content-candidates)\/|frontend\/src\/modules\/cognitive\/(?:(?:tasks|generated)\/|native-runners\.tsx$))/.test(e.file));
   const cognitiveMixed = cognitiveCandidate && !mixedContent && !result.cognitive_intake_light && cognitiveMixedProductScope(entries, file=>gitContent('HEAD',file),file=>gitContent(base,file));
@@ -424,7 +428,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
         String(error?.message||error).slice(0,350));
     }
   }
-  console.log(JSON.stringify({ ...output, base, validationClosure: result.cognitive_intake_light ? 'selected-cognitive-tasks' : 'all-bundles', platformReasons: catalogDiscovery || dependencies ? [] : platformReasons(entries, full || event === 'workflow_dispatch') }));
+  console.log(JSON.stringify({ ...output, base, validationClosure: result.cognitive_intake_light ? 'selected-cognitive-tasks' : 'all-bundles', platformReasons: catalogDiscovery || dependencies ? [] : platformReasons(entries, full || event === 'workflow_dispatch',scopeReaders) }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
   })().catch(error=>{console.error(error);process.exitCode=1});

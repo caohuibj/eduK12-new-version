@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import {ScaleReportArtworkHero,ScaleReportBandArtwork} from '../modules/reporting/ScaleReportArtwork'
 import type { SurveyImageProof } from './SurveyParticipantImage'
 
 export interface SurveyDeclaredReport {
   generatorVersion: 'DECLARATIVE_REPORT_V1'
   title?: string | null
+  artworkKey?: string
   blocks: unknown[]
   limitations?: string[]
   disclaimer?: string | null
@@ -118,6 +120,7 @@ export function SurveyDeclaredReportView({
   return (
     <section className="border-l-2 border-sky-300 pl-3 space-y-2" aria-label="完整工具报告">
       {typeof report.title === 'string' && report.title && <h5 className="font-semibold text-sm">{report.title}</h5>}
+      <ScaleReportArtworkHero artworkKey={report.artworkKey}/>
       {report.blocks.map((raw, index) => {
         if (!isObj(raw)) return null
         switch (raw.type) {
@@ -131,16 +134,18 @@ export function SurveyDeclaredReportView({
             )
           case 'REFERENCE_BAND':
             return (
-              <div key={index} className="rounded bg-slate-50 p-2.5 space-y-1.5 text-sm">
-                <p className="whitespace-pre-wrap">{str(raw.text)}</p>
-                {Array.isArray(raw.guidance) && raw.guidance.length > 0 && (
-                  <ul className="list-disc pl-5 space-y-1 text-slate-700">
-                    {raw.guidance.filter((line): line is string => typeof line === 'string').map((line, i) => (
-                      <li key={i}>{line}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+              <ScaleReportBandArtwork key={index} artworkKey={report.artworkKey} block={raw}>
+                <div className="rounded bg-slate-50 p-2.5 space-y-1.5 text-sm">
+                  <p className="whitespace-pre-wrap">{str(raw.text)}</p>
+                  {Array.isArray(raw.guidance) && raw.guidance.length > 0 && (
+                    <ul className="list-disc pl-5 space-y-1 text-slate-700">
+                      {raw.guidance.filter((line): line is string => typeof line === 'string').map((line, i) => (
+                        <li key={i}>{line}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </ScaleReportBandArtwork>
             )
           case 'ASSET':
             return proof && typeof raw.assetId === 'string' ? (

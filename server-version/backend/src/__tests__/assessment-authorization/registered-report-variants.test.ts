@@ -3,7 +3,7 @@ import {registeredParts,sourceParts,composeTriplet,type Part} from '../../module
 import {getScaleInstrumentSource} from '../../modules/scale/onboarding/instrument-registry'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {hashScaleDefinition} from '../../modules/scale/scale-definition'
-import {readScaleReportVariantMaterial} from '../../modules/scale/onboarding/report-variants'
+import {readScaleReportVariantMaterial,scaleReportVariantMaterialHash} from '../../modules/scale/onboarding/report-variants'
 import cfq from '../../modules/scale/instruments/cfq7_zh_cn_research/1.0.1/report-variants.json'
 const materials=[cfq,{instrumentKey:'ipip_neo_c1_self_efficacy10_zh_cn_research',instrumentVersion:'1.0.0'},{instrumentKey:'bps9_zh_cn_research',instrumentVersion:'1.0.0'}]
 describe('Reviewed nonempty reports register against the original independent C/P axes',()=>{
@@ -23,5 +23,10 @@ describe('Reviewed nonempty reports register against the original independent C/
    const altered=structuredClone(cfq);change(altered);expect(()=>readScaleReportVariantMaterial(source,altered)).toThrow()
   }
   expect(canonicalHash(source)).toBe(original)
+ })
+ it('keeps an existing report material identity stable when a later R is appended',()=>{
+  const source=getScaleInstrumentSource(cfq.instrumentKey,cfq.instrumentVersion)!,before=readScaleReportVariantMaterial(source,cfq),after=structuredClone(before)
+  after.variants.push({...structuredClone(after.variants[0]),key:'later',title:'后续报告',report:{...structuredClone(after.variants[0].report),reportVersion:'9.9.9'}})
+  expect(scaleReportVariantMaterialHash(after,after.variants[0])).toBe(scaleReportVariantMaterialHash(before,before.variants[0]))
  })
 })
