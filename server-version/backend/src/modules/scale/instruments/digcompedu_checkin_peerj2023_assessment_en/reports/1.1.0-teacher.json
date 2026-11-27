@@ -1,0 +1,96 @@
+{
+  "toolKey": "digcompedu_checkin_peerj2023_assessment_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "DigCompEdu Check-In | Give feedback time to change the next attempt",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "Publisher’s English supplement dated 2 June 2023, © Ersoy et al., CC BY 4.0, was verified against the preserved SHA-256. The 3 prompts, 15 ordered options and item weights match the registered area; scoring follows the publication’s 0–4 option order. This independent report uses the project’s complete-response area sum (0–12); the original study reports 22-item total levels and did not validate independent area use. No source grading bands are imported."
+      }
+    },
+    "primaryScoreKeys": [
+      "assessment"
+    ],
+    "scoreOrder": [
+      "assessment"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "assessment",
+        "scoreLabel": "Assessment (descriptive sum, 0–12)",
+        "headline": "Give feedback time to change the next attempt",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "In a practical class, a feedback comment arrives after the final station has closed. The learner understands it, but there is no chance to act. At the next session the team gathers a short checkpoint before the debrief and leaves time to try again. The same information now has somewhere to go.\n\nYour answers describe reported use of digital assessment to follow progress, notice where support might be needed and give useful feedback. The area total combines those practices. A missing click or a weak score may have more than one explanation. Use a signal to invite a check-in and review actual work before deciding what it means.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "For one simulated skill, add a small checkpoint before learners finish. Return one concrete next action and leave space for a retry or revision in the next practical."
+          },
+          {
+            "category": "reflection",
+            "text": "If one indicator suggests a learner may need help, check a second source and ask about barriers. Use agreed support and privacy arrangements; data alone cannot identify the need."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Ersoy, H., et al. (2024). Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects. PeerJ, 12, e18456. https://doi.org/10.7717/peerj.18456 ; Supplemental Information 1, Digital Competency Assessment Questionnaire for Academicians, 2 June 2023 (https://doi.org/10.7717/peerj.18456/supp-1). Used under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Framework: Redecker, C. (2017), edited by Y. Punie, European Commission JRC, doi:10.2760/159770. This area-only presentation and feedback are project adaptations and imply no author or Commission endorsement.",
+      "This English reflection applies to adult higher-education faculty in health sciences. The original study used a convenience sample of 306 faculty members from six partner universities. The standalone area has no separate validation or local norms.",
+      "The area sum adds 3 equally weighted 0–4 items. Zero is a valid response; an omitted answer leaves the area result unavailable. No scale-wide total, A1–C2 level, percentile or individual certification is reported."
+    ],
+    "disclaimer": "For your own professional learning in health-sciences higher education. This report describes self-reported digital teaching practice and supplies no basis for evaluating teaching performance, ranking faculty, or certifying competence.",
+    "artworkKey": "digcompedu_checkin_peerj2023_assessment_en/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
