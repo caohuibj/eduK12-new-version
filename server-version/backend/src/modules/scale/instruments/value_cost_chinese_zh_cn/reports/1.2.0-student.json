@@ -1,0 +1,173 @@
+{
+  "toolKey": "value_cost_chinese_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "语文学习的价值与时间取舍（试用）",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "artworkKey": "value_cost_chinese_zh_cn/1.0.0/1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容草稿核对",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对语文价值和时间与取舍的独立均分、最低有效题数及原初高中同范围理论分段。两维报告保持试用；图文草稿待审。"
+      }
+    },
+    "primaryScoreKeys": [
+      "value",
+      "cost"
+    ],
+    "scoreOrder": [
+      "value",
+      "cost"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "value",
+        "scoreLabel": "语文学习价值均分（试用）",
+        "headline": "让别人读懂你为什么推荐这本书",
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "小葵要给班级图书角写一张荐书卡。她先写了“这本书很好看”，同桌问：“哪一幕让你想接着读？”她回到书里，找到主人公在树下扶着自行车等同伴的细节。把这一幕说给同桌听后，小葵才知道，自己喜欢的是故事怎样用一个动作让人想知道接下来会发生什么。\n\n前三道题问你觉得语文有多重要、你有多重视它，以及你觉得它有什么用。均分越高，表示你对这些说法的认同越多。可以从一件自己关心的事出发，看看阅读或表达在哪一步帮到了你。",
+        "provisional": true,
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "先把故事里一个动作讲清楚",
+            "summary": "从刚读过的故事里选一个动作，例如有人扶着自行车在树下等同伴。只写一句能讲给朋友听的话，让对方知道发生了什么。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "给推荐卡补一处具体细节",
+            "summary": "回到你想推荐的一页，找一个动作、场景或一句对话。挑一处写进卡片，让没读过的人也能想象那一幕。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "让理由能在原文里找到",
+            "summary": "把你选的故事细节和推荐理由写在卡片两处，再补一句把它们连起来。请同桌读一遍，看对方是否明白你为什么选这一幕。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "请读者指出少了哪条线索",
+            "summary": "把卡片交给同桌先看，请对方告诉你哪里还需要一条线索。回到原文只补一处，再读给对方听。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "把同一张卡改给新读者",
+            "summary": "把荐书卡改给低年级同学看。留下一处能帮助他们进入故事的细节，换掉只有读过原文才懂的词，再问他们读完想了解什么。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次你想把一件事讲清楚的经历。哪条原文线索帮你有话可说？换一个读者时，你会先补充什么？"
+          }
+        ]
+      },
+      {
+        "scoreKey": "cost",
+        "scoreLabel": "语文学习时间与取舍均分（试用）",
+        "headline": "这周的阅读和改稿，怎样排得开？",
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "同一周，小葵还要参加合唱排练。她原来想在排练前读完短文，再把整张推荐卡重写一遍。打开书后她发现空档很短，就先标出要用的一处原文，把需要完整修改的部分留给另一段时间。\n\n后四道题问的是语文功课会不会占用太多时间、自己能否腾出学习时间，以及是不是得舍弃其他活动。均分越高，表示你更认同这些时间和取舍的说法。你可以用一周里的一次真实冲突来想想，哪一步值得先做，哪一步需要帮助。",
+        "provisional": true,
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "留住一段已经用得顺的时间",
+            "summary": "回想这周哪段时间读文章比较顺。下次把它留给一个已经说清的小任务，例如标出一处能用在荐书卡上的细节。做完就合上书。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "短空档先完成一个步骤",
+            "summary": "课后只剩一小段时间时，从读一段、圈一处证据、改一句话中选一项。做完标记下次从哪一页或哪一句接着做。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "把阅读、改稿和排练摆在一起",
+            "summary": "在一周安排里写下读短文、改推荐卡和排练的时间。圈出撞在一起的地方，把需要连续思考的任务移到一个更完整的空档。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "把读不懂和写不清分别拿去问",
+            "summary": "拿一页文章或草稿，标出一处没读懂的原文，再单独标出一句想改顺的话。请老师先帮你看其中一处，另一处留在下一次练习。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "带着一周安排商量一个调整",
+            "summary": "和老师或家人一起看一周计划，说清哪次阅读或改稿挤到了休息或排练。先定一个能完成的语文小目标，再找一项可以挪动的安排。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "记下最近一次语文练习原打算做什么、实际在哪一步卡住、当时还有什么安排。用这一条记录和老师或家人商量。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "语文学习价值与时间取舍各算一个原始均分，保留原 1–6 选项。价值前三题至少两题有效，时间取舍后四题至少三题有效。",
+      "两项的初高中区间均从量尺范围等分而来。试用分段只用于选择报告中的学习建议，还没有适用于这一语文版本的经验参考。",
+      "这个结果记录学生本次对语文价值与时间安排的看法。时间取舍均分不能换算成每周用时，也不能说明学生是否勤奋、成绩如何。"
+    ],
+    "disclaimer": "这份报告供七至十二年级学生回顾阅读表达和时间安排。觉得语文有用与觉得一周时间紧张可以同时出现，两项结果分别理解。请勿用于排名、诊断或分流。"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "value_cost_chinese_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "value-very-low.webp",
+      "alt": "学生选出故事里和自行车有关的动作，画在阅读卡上。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "value",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "value-low.webp",
+      "alt": "学生从两个故事细节中选一项放到荐书卡上。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "value",
+      "bandKey": "low"
+    },
+    {
+      "file": "value-middle.webp",
+      "alt": "学生用一条线把原文细节与卡片上的推荐理由连起来。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "value",
+      "bandKey": "middle"
+    },
+    {
+      "file": "value-high.webp",
+      "alt": "同桌指着荐书卡问一个问题，学生拿着原书准备补充。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "value",
+      "bandKey": "high"
+    },
+    {
+      "file": "value-very-high.webp",
+      "alt": "学生听一位低年级同学说读完的疑问，再改荐书卡。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "value",
+      "bandKey": "very_high"
+    },
+    {
+      "file": "cost-very-low.webp",
+      "alt": "学生利用原本安排好的读书空档，做完一个小步骤后合上书。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "cost",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "cost-low.webp",
+      "alt": "学生对着短空档，在便签上记下下一次继续阅读的位置。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "cost",
+      "bandKey": "low"
+    },
+    {
+      "file": "cost-middle.webp",
+      "alt": "学生在周历上查看阅读、改稿和排练，挪动一项安排。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "cost",
+      "bandKey": "middle"
+    },
+    {
+      "file": "cost-high.webp",
+      "alt": "学生用两张便签区分困难，并请老师先看短文的一处。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "cost",
+      "bandKey": "high"
+    },
+    {
+      "file": "cost-very-high.webp",
+      "alt": "学生与可信成人一起查看周历，保留休息和排练，讨论一个可移动的时段。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "cost",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "两名学生在图书角对照荐书卡和书中关于自行车的一幕。",
+    "width": 512,
+    "height": 512
+  }
+}
