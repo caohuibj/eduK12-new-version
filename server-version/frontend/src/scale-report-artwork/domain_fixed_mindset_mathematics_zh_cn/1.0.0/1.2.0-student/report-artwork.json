@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "domain_fixed_mindset_mathematics_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "domain_fixed_mindset-very-low.webp",
+      "alt": "同一例题与一处条件变化的题纸并排，学生用手指比较。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "domain_fixed_mindset-low.webp",
+      "alt": "两份草稿并排，一处补出的步骤用颜色突出。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "low"
+    },
+    {
+      "file": "domain_fixed_mindset-middle.webp",
+      "alt": "学生用小表格核对坐标图中发生变化的量。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "middle"
+    },
+    {
+      "file": "domain_fixed_mindset-high.webp",
+      "alt": "学生合上示范笔记，在另一题上独立练习同一个步骤。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "high"
+    },
+    {
+      "file": "domain_fixed_mindset-very-high.webp",
+      "alt": "两名学生并排查看一份完成和一份未完成的草稿，圈出一个不同的条件。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "中学生并排查看数值表和坐标图，用笔指出对应的位置。",
+    "width": 506,
+    "height": 506
+  }
+}

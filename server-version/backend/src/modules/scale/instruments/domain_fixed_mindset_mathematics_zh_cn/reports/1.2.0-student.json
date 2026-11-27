@@ -1,0 +1,123 @@
+{
+  "toolKey": "domain_fixed_mindset_mathematics_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "数学学习信念图文自评",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容草稿核对",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目登记原文、选项、等权均分和最低有效题数，并按原初高中历史参考核对分档。学生图文草稿待审。"
+      }
+    },
+    "primaryScoreKeys": [
+      "domain_fixed_mindset"
+    ],
+    "scoreOrder": [
+      "domain_fixed_mindset"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "domain_fixed_mindset",
+        "scoreLabel": "数学学习天赋固定信念均分（试用版）",
+        "provisional": true,
+        "headline": "卡住的一步，可以具体写下来",
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "数学课讲到一次函数。小宁看着表格能算出几个数，却一画图就卡住。她在草稿上写下“我不擅长这类题”。同桌让她先标出两组已经算对的坐标。小宁发现，自己其实会列对应值，难的是把两个数放对坐标轴。下次练习，她就从这一步查起。\n\n这几道题记录你怎么看数学学习天赋会不会改变。答完可以回想一次真实的卡顿，把当时对自己的判断和那道题里发生的事分开记录。你可能发现一个具体的办法，也可能发现需要换个例子或请人解释。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "试一个换条件的例题",
+            "summary": "选一道能说清的题，画出原方法依赖的一个条件。请同伴换一个数字或条件，再一起找出原方法哪一步仍然能用。把理由记在原题边上。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "把两次草稿并排看",
+            "summary": "找两次同类题的草稿。用颜色标出第二次能独立完成的一步，再区分用了什么帮助。如果两次做法一样，也记下这次看清的疑问。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "把一句判断改成可检查的问题",
+            "summary": "从一句“我大概不擅长这类题”出发，把它写成题目里的具体问题，例如“我还没看出哪个量在变”。先用一张小表格或图验证这一点。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "带着一个提示再做一步",
+            "summary": "选一道反复卡在同一处的题，请老师只提示第一处。合上示范，隔一天用一道同类题尝试那一步，记下能否独立做和需要哪些提示。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "带两份草稿去讨论",
+            "summary": "带一道没做通的题和一份能做通的草稿，请同伴帮你找出两题的一处具体差别。约定下次只练一个步骤，保留实际做出来的部分。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "从最近一次数学课选一个真实片段，分别写下自己当时怎么想、做到了哪一步和还想查什么。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "三道正向题取等权均分，至少两题有有效答案才计分。1 到 6 从完全不同意到完全同意，原选项没有中性项。均分越高，表示对这组天赋固定说法的平均认同越高。",
+      "分段依据同学段项目历史便利样本。样本里的相对位置和对题目的平均认同是两回事。没有匹配年级时，仍可按获准范围显示原始均分和通用内容，省略历史分段。",
+      "这个分数反映一次自陈信念。较少认同天赋固定的表述，不能据此推定已形成较强的成长心态。能力、努力、策略和进步需要用各自的证据观察。"
+    ],
+    "disclaimer": "这份报告供七至十二年级学生回顾数学学习中的信念，可用于与老师讨论一次具体经历。请勿用于能力鉴定、诊断、排名或分流。",
+    "artworkKey": "domain_fixed_mindset_mathematics_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
