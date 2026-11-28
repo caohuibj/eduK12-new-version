@@ -1,0 +1,98 @@
+{
+  "toolKey": "sas_sv10_zh_cn_university_2022",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student-illustrated",
+  "title": "大学生手机使用｜图文版",
+  "report": {
+    "reportVersion": "1.1.0-student-illustrated",
+    "primaryScoreKeys": [
+      "phone_use_difficulties"
+    ],
+    "scoreOrder": [
+      "phone_use_difficulties"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "phone_use_difficulties",
+        "scoreLabel": "手机使用相关困扰总分（试用版）",
+        "headline": "把注意力留给你本来想做的事",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这次问卷记录手机使用与你的学习、计划、身体感受和人际联系之间的关系。十题按同意程度计分，总分是 10–60。分数越高，表示你更认同问卷描述的困扰。看结果时，可以先选一个最近受影响的片段，例如想查资料，却顺着消息看了很久。\n\n在大学里，课件、群消息和朋友的联系都可能需要手机。同一个屏幕也会带来中断。挑一个真正想改变的场景，从那个场景的开始和结束分别观察。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次本来有明确目的、后来用得比预期久的经历。开始时你想做什么？当时哪件事被挤到了后面？"
+          },
+          {
+            "category": "strategy",
+            "text": "准备自习时，先写下今天要完成的一小段任务。把非紧急消息留到休息时再看，并在结束后回想自己是否更容易接回原来的思路。"
+          },
+          {
+            "category": "support",
+            "text": "如果问题反复影响学习、休息或与你在意的人相处，可以从最近一次情境说起，与信任的人或学校支持人员一起想办法。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "本版研究样本为山东两所高校 17–24 岁学生。现用十题合计原分，便于阅读；论文也探索了三个维度，本报告未提供分维判断。暂无供此用途采用的分界或等级，缺答不补零。"
+    ],
+    "disclaimer": "这份问卷用于非商业研究及个人观察，一次自评只能反映当时的回答。分数不可用于临床诊断、纪律处分、学生筛选或排名。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容初核",
+        "reviewedAt": "2026-11-28T02:00:00Z",
+        "basis": "作者原始 S1 中文 10 题、指导语、锚点及论文年龄范围核对；本站为新报告试用内容。https://doi.org/10.1371/journal.pone.0278092.s001"
+      }
+    },
+    "artworkKey": "sas_sv10_zh_cn_university_2022/1.0.0/1.1.0-student-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

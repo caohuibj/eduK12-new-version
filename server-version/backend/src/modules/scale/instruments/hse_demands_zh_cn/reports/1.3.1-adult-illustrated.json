@@ -1,0 +1,86 @@
+{
+  "toolKey": "hse_demands_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.1-adult-illustrated",
+  "title": "工作量要和可用时间放在一起看",
+  "report": {
+    "reportVersion": "1.3.1-adult-illustrated",
+    "primaryScoreKeys": [
+      "demands"
+    ],
+    "scoreOrder": [
+      "demands"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "demands",
+        "headline": "工作量要和可用时间放在一起看",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "任务数量、速度、休息时机和不易兼顾的要求，都可能让工作显得拥挤。这个维度越高，表示你在回顾期内报告这些困难相对较少。\n\n比如，同一天多了两件急事，原计划中的工作仍要求按时交付，连休息都被挤掉。回顾是哪几个要求同时出现，往往比只记录“今天很累”更有信息。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "environment",
+            "text": "找一个经常重叠的任务组合，记录各自时限和可用时间。条件允许时，与能安排工作的人核对优先次序，看看哪一项可以延后或分担。"
+          }
+        ],
+        "scoreLabel": "工作要求（1–5 分均分）"
+      }
+    ],
+    "limitations": [
+      "回顾范围为过去六个月。该组共 8 题，答全才计算 1–5 分均分。较高分数表示自述条件相对更有利。",
+      "这组题可单独用于个人回顾。HSE 组织级风险评估基于匿名组级结果、员工讨论和其他资料。",
+      "简体中文为工作译稿。来源为英国健康与安全执行局 HSE 的公开量表材料，遵从 Open Government Licence 的署名要求。"
+    ],
+    "disclaimer": "用于回顾工作条件和讨论支持需要。个人均分无法代表部门或学校，也不能用于个人绩效评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "hse_demands_zh_cn/1.0.0/1.3.1-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.1-adult-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

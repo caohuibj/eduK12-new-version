@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "hse_role_zh_cn/1.0.0/1.3.1-adult-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "几位同事把任务材料铺到同一张桌上，一起确认交接步骤。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

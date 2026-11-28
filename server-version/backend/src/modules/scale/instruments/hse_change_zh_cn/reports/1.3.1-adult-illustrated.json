@@ -1,0 +1,86 @@
+{
+  "toolKey": "hse_change_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.1-adult-illustrated",
+  "title": "变化怎样发生，有没有地方问清楚",
+  "report": {
+    "reportVersion": "1.3.1-adult-illustrated",
+    "primaryScoreKeys": [
+      "change"
+    ],
+    "scoreOrder": [
+      "change"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "change",
+        "headline": "变化怎样发生，有没有地方问清楚",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这个维度关注工作变化发生时，能否提问、能否参与讨论，以及能否了解怎么落实。题目反映的是沟通与参与条件。\n\n知道“下周流程会变”和知道“从哪天起由谁负责、遇到情况找谁”提供的信息不同。前者是通知，后者才让安排可以落实。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "environment",
+            "text": "记下最影响工作的一个具体问题，可从时间、分工或过渡方式中选择。通过合适渠道确认，保留暂时说不清的部分。"
+          }
+        ],
+        "scoreLabel": "变动沟通（1–5 分均分）"
+      }
+    ],
+    "limitations": [
+      "回顾范围为过去六个月。该组共 3 题，答全才计算 1–5 分均分。较高分数表示自述条件相对更有利。",
+      "这组题可单独用于个人回顾。HSE 组织级风险评估基于匿名组级结果、员工讨论和其他资料。",
+      "简体中文为工作译稿。来源为英国健康与安全执行局 HSE 的公开量表材料，遵从 Open Government Licence 的署名要求。"
+    ],
+    "disclaimer": "用于回顾工作条件和讨论支持需要。个人均分无法代表部门或学校，也不能用于个人绩效评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "hse_change_zh_cn/1.0.0/1.3.1-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.1-adult-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

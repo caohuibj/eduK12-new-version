@@ -1,0 +1,86 @@
+{
+  "toolKey": "hse_relationships_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.1-adult-illustrated",
+  "title": "问卷平均分只能记录一部分经历",
+  "report": {
+    "reportVersion": "1.3.1-adult-illustrated",
+    "primaryScoreKeys": [
+      "relationships"
+    ],
+    "scoreOrder": [
+      "relationships"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "relationships",
+        "headline": "问卷平均分只能记录一部分经历",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "关系分记录你报告的紧张、冲突、不当对待等体验。较高均分表示这些经历在作答中相对较少；一次严重经历仍值得认真对待。\n\n多数日子相处顺畅，也可能有一件让人感到不安全的事。一个均分无法说明事件怎样发生，也无法决定需要什么支持。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "如果发生不当对待，优先考虑安全，选择可信或合适的组织支持渠道。可以先了解对方如何处理保密和后续，再决定愿意分享哪些信息。"
+          }
+        ],
+        "scoreLabel": "工作人际关系（1–5 分均分）"
+      }
+    ],
+    "limitations": [
+      "回顾范围为过去六个月。该组共 4 题，答全才计算 1–5 分均分。较高分数表示自述条件相对更有利。",
+      "这组题可单独用于个人回顾。HSE 组织级风险评估基于匿名组级结果、员工讨论和其他资料。",
+      "简体中文为工作译稿。来源为英国健康与安全执行局 HSE 的公开量表材料，遵从 Open Government Licence 的署名要求。"
+    ],
+    "disclaimer": "用于回顾工作条件和讨论支持需要。个人均分无法代表部门或学校，也不能用于个人绩效评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "hse_relationships_zh_cn/1.0.0/1.3.1-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.1-adult-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
