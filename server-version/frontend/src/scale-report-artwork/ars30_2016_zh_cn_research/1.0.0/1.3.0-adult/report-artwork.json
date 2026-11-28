@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "ars30_2016_zh_cn_research/1.0.0/1.3.0-adult",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "桌上有一份批阅过的作业和新草稿，大学生回顾改写计划。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

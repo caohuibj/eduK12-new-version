@@ -1,0 +1,178 @@
+{
+  "toolKey": "ars30_2016_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "作业受挫后的可能反应｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "对照 Cassidy 2016 文中本人受挫情境、表 2 的 30 题、表 3 的 14／9／7 维度、两端作答锚点及 20 个转换方向。沿用原 C/P。"
+      }
+    },
+    "primaryScoreKeys": [
+      "total"
+    ],
+    "scoreOrder": [
+      "total",
+      "perseverance",
+      "reflection_help_seeking",
+      "adaptive_emotional_response"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "total",
+        "scoreLabel": "情境反应合计分（30–150）",
+        "headline": "从一份失利的作业里找出下一步",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "你在问卷里想象自己连续几次没有达到作业目标。30 道题按统一方向加总，较大分值反映你在该情境中更可能报告量表所归类的适应性反应。它把继续尝试、反思求助和情绪反应合起来，实际行动还会受到时间、反馈清晰度和可得支持影响。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一份有难度的作业，把反馈中具体可改的部分与当时的情绪分别写下。"
+          },
+          {
+            "category": "strategy",
+            "text": "优先选一条评价明确、能在下一稿检验的反馈，约定什么时候回看改稿。"
+          },
+          {
+            "category": "support",
+            "text": "如果几条批语互相矛盾，带着原句请老师或同学帮你确认一项最先改的要求。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "perseverance",
+        "scoreLabel": "持续尝试合计分（14–70）",
+        "headline": "继续努力，也检查正在用的办法",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这 14 题涉及能不能在受挫后继续尝试、采用反馈、寻找办法，以及怎样看待原目标。较大数值表示你在这一情境中更可能维持尝试和改进。继续尝试也可以包括调整方法和缩小任务。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "看看上次想继续时，卡住的是没有示例、时间不足，还是还没找到合适的方法。"
+          },
+          {
+            "category": "strategy",
+            "text": "给一次修改设一个短窗口，只把一种新做法放到这一版里检验。"
+          },
+          {
+            "category": "support",
+            "text": "遇到现实上的学业压力，可以找导师讨论目标、时间和可用资源。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "reflection_help_seeking",
+        "scoreLabel": "反思与求助合计分（9–45）",
+        "headline": "把笼统的困惑换成一个能问清的问题",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这 9 题从尝试反思、改变学习办法、主动请教、设定目标并获得鼓励等方向看本次设想。较大数值表示更倾向于主动回看做法和寻求支持。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选自己最难判断的一处反馈，写一条想问清的具体问题。"
+          },
+          {
+            "category": "strategy",
+            "text": "先回看一份草稿、一道题或一条引用，再把尝试过的做法和目前的疑问一起交给对方。"
+          },
+          {
+            "category": "support",
+            "text": "可以通过课程答疑、学习伙伴或教学支持服务请人核对你的理解。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "adaptive_emotional_response",
+        "scoreLabel": "情绪应对合计分（7–35）",
+        "headline": "给受挫时的情绪一点缓冲",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这 7 题统一计分方向后，较大数值表示本次更倾向报告较少失控、慌乱和消极判断。受到批评时感到失望本身很常见，结果描述你对这个情境的设想。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想上次拿到批评性反馈时，第一句话和第一种身体反应各是什么。"
+          },
+          {
+            "category": "strategy",
+            "text": "可以先把反馈放在一边，安排稍后再读的时间，然后选一条最清楚的动作。"
+          },
+          {
+            "category": "support",
+            "text": "如果学业受挫一直影响日常，可以向可信任的人或校园支持服务说清具体变化。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "本报告采用 Cassidy 2016 本人情境与三维分组。分数描述假设反应，适用范围以现有成人版本为准。",
+      "采用已登记中文工作译稿及原计分。数值用于理解本次自陈，当前版本以描述分呈现。",
+      "各分数按原来的完整作答规则计算，漏答保留为缺失。"
+    ],
+    "disclaimer": "适用于既有成人试用研究与自我回顾。临床诊断及其他高风险决定需要相应的专门方法。",
+    "artworkKey": "ars30_2016_zh_cn_research/1.0.0/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
