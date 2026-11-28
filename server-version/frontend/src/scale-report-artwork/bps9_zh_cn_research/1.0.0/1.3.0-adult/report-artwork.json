@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "bps9_zh_cn_research/1.0.0/1.3.0-adult",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "夜晚成年人放下手头活动，台灯和钟表暗示准备休息。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
