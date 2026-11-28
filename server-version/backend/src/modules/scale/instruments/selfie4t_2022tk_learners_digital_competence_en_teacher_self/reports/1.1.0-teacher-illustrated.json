@@ -1,0 +1,176 @@
+{
+  "toolKey": "selfie4t_2022tk_learners_digital_competence_en_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher-illustrated",
+  "title": "SELFIEforTEACHERS | learners digital competence",
+  "report": {
+    "reportVersion": "1.1.0-teacher-illustrated",
+    "primaryScoreKeys": [
+      "competence_6_1",
+      "competence_6_2",
+      "competence_6_3",
+      "competence_6_4",
+      "competence_6_5",
+      "competence_6_6"
+    ],
+    "scoreOrder": [
+      "competence_6_1",
+      "competence_6_2",
+      "competence_6_3",
+      "competence_6_4",
+      "competence_6_5",
+      "competence_6_6"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_6_1",
+        "headline": "Find the evidence behind a claim",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Compare two sources for an online claim. Ask learners to explain what each source shows and what still needs checking."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_6_2",
+        "headline": "Agree how to work together online",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Agree on a channel, a turn-taking rule, and a way to ask for clarification. Practise them in a small online group task."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_6_3",
+        "headline": "Make something new and credit what you used",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Ask students to make a small digital artefact and list the images or ideas they borrowed. Discuss which may be reused."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_6_4",
+        "headline": "Practise asking for help before it is needed",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Use a fictional online wellbeing scenario. Practise pausing, reporting the issue, and contacting a trusted person."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_6_5",
+        "headline": "Pause before making work public",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Check consent, audience, and personal details before sharing work. Give pupils a case where sharing less is the right choice."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_6_6",
+        "headline": "Compare two ways to solve the same problem",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Test two digital approaches on a short task. Ask learners which works better for their purpose and circumstances."
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "Each result describes your selected practice for one competence. The original choices are shown as A1 through C2 (1–6); not yet aware is a valid response (0).",
+      "This self-reflection is for the participating teacher. It supplies no combined score, rank, performance evaluation, or student outcome claim.",
+      "The illustrated reflection prompts are project adaptations. The fixed English items come from the European Commission toolkit and its design report."
+    ],
+    "disclaimer": "For supportive professional learning reflection by the teacher receiving their own authorized results. A1–C2 are this framework’s maturity codes, not grades for teacher quality. No EU endorsement, badge or certificate is issued. Existing access and feedback permissions still apply.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en"
+    },
+    "artworkKey": "selfie4t_2022tk_learners_digital_competence_en_teacher_self/1.0.0/1.1.0-teacher-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

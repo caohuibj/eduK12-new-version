@@ -1,0 +1,86 @@
+{
+  "toolKey": "wihic_cooperation_actual_en_lower_secondary_student",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student-illustrated",
+  "title": "WIHIC | Bring everyone’s findings back to the table",
+  "report": {
+    "reportVersion": "1.1.0-student-illustrated",
+    "primaryScoreKeys": [
+      "cooperation"
+    ],
+    "scoreOrder": [
+      "cooperation"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "cooperation",
+        "headline": "Bring everyone’s findings back to the table",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "One person found a diagram, another spotted a mistake, and a third thought of an example. Cooperation becomes useful when the group puts those pieces together. These answers describe how often you experienced learning and sharing with classmates.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Ask each person in your group for one finding and one question before deciding what to put into the shared work."
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "The score is the average of all eight answers on the original five-point frequency scale. A missing response leaves this result unavailable.",
+      "The result describes one student’s experience in this class. There is no combined WIHIC score, norm, level, or ranking.",
+      "The items are from the 56-item classroom form; this illustrated report and separate digital display are project adaptations."
+    ],
+    "disclaimer": "For research and supportive reflection on classroom experiences. Do not use for teacher appraisal, school ranking, diagnosis or student selection. Discuss concerns with a trusted adult regardless of the score. There is no combined WIHIC total.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "wihic_cooperation_actual_en_lower_secondary_student/1.0.0/1.1.0-student-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

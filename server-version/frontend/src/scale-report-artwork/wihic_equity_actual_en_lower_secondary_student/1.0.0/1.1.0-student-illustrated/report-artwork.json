@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "wihic_equity_actual_en_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "Students get a chance to participate in a classroom discussion.",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "wihic_task_orientation_actual_en_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "A student works through a classroom task in manageable steps.",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

@@ -1,0 +1,158 @@
+{
+  "toolKey": "selfie4t_2022tk_digital_resources_en_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher-illustrated",
+  "title": "SELFIEforTEACHERS | digital resources",
+  "report": {
+    "reportVersion": "1.1.0-teacher-illustrated",
+    "primaryScoreKeys": [
+      "competence_2_1",
+      "competence_2_2",
+      "competence_2_3",
+      "competence_2_4",
+      "competence_2_5"
+    ],
+    "scoreOrder": [
+      "competence_2_1",
+      "competence_2_2",
+      "competence_2_3",
+      "competence_2_4",
+      "competence_2_5"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_2_1",
+        "headline": "See whether the resource fits the lesson",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Try one resource as a learner. Check the reading level, accessibility, source and date before using it."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_2_2",
+        "headline": "Watch someone use what you made",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Ask a learner or colleague to try a small resource you made. Fix the first place where they needed extra directions."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_2_3",
+        "headline": "Check what you can change and why",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Check the licence before adapting a resource and name the learning problem the change will solve. Record your edits and the original source."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_2_4",
+        "headline": "Make resources easy for the right people to find",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Check who can read or edit a shared folder. Name files clearly and remove any unnecessary pupil information."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_2_5",
+        "headline": "Help the next person reuse a resource",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "When sharing, include what it is for, how to credit it, and how it may be reused. Choose a format recipients can actually use."
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "Each result describes your selected practice for one competence. The original choices are shown as A1 through C2 (1–6); not yet aware is a valid response (0).",
+      "This self-reflection is for the participating teacher. It supplies no combined score, rank, performance evaluation, or student outcome claim.",
+      "The illustrated reflection prompts are project adaptations. The fixed English items come from the European Commission toolkit and its design report."
+    ],
+    "disclaimer": "For supportive professional learning reflection by the teacher receiving their own authorized results. A1–C2 are this framework’s maturity codes, not grades for teacher quality. No EU endorsement, badge or certificate is issued. Existing access and feedback permissions still apply.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en"
+    },
+    "artworkKey": "selfie4t_2022tk_digital_resources_en_teacher_self/1.0.0/1.1.0-teacher-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

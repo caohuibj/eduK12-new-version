@@ -1,0 +1,140 @@
+{
+  "toolKey": "selfie4t_2022tk_empowering_learners_en_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher-illustrated",
+  "title": "SELFIEforTEACHERS | empowering learners",
+  "report": {
+    "reportVersion": "1.1.0-teacher-illustrated",
+    "primaryScoreKeys": [
+      "competence_5_1",
+      "competence_5_2",
+      "competence_5_3",
+      "competence_5_4"
+    ],
+    "scoreOrder": [
+      "competence_5_1",
+      "competence_5_2",
+      "competence_5_3",
+      "competence_5_4"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_5_1",
+        "headline": "Try the route your learners will take",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Open a resource on a device learners use. Check keyboard navigation, captions, and whether key instructions are available in more than one form."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_5_2",
+        "headline": "Keep the goal clear while offering different routes",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Give two ways to practise or show the same learning goal. Ask what helped and what made either route harder."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_5_3",
+        "headline": "Give learners one real choice",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Let students choose a question, example, or presentation format, then look at their reasons and the work they produce."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_5_4",
+        "headline": "Let work in one setting lead to the next",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Use a short before-class task whose responses become the first discussion. Make that step clear to students who missed the task."
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "Each result describes your selected practice for one competence. The original choices are shown as A1 through C2 (1–6); not yet aware is a valid response (0).",
+      "This self-reflection is for the participating teacher. It supplies no combined score, rank, performance evaluation, or student outcome claim.",
+      "The illustrated reflection prompts are project adaptations. The fixed English items come from the European Commission toolkit and its design report."
+    ],
+    "disclaimer": "For supportive professional learning reflection by the teacher receiving their own authorized results. A1–C2 are this framework’s maturity codes, not grades for teacher quality. No EU endorsement, badge or certificate is issued. Existing access and feedback permissions still apply.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en"
+    },
+    "artworkKey": "selfie4t_2022tk_empowering_learners_en_teacher_self/1.0.0/1.1.0-teacher-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

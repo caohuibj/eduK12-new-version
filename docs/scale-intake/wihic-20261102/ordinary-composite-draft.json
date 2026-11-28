@@ -1,0 +1,422 @@
+{
+  "schemaVersion": 1,
+  "artifactType": "ordinary-composition-draft-preparation",
+  "status": "VALIDATED_CONTENT_AND_DRAFT_CONTRACT",
+  "title": "WIHIC — Actual Classroom Experiences (English Pilot)",
+  "entry": "SCHOOL",
+  "apiBase": "/api/campus",
+  "motherKey": "wihic56_actual_en_lower_secondary_student",
+  "source": "https://doi.org/10.3390/educsci13030257",
+  "license": "CC BY 4.0",
+  "administration": {
+    "population": "STUDENT",
+    "responseMode": "SELF"
+  },
+  "assessmentItemCount": 56,
+  "requiredContextFields": [
+    {
+      "contextKey": "birthYearMonth",
+      "formType": "year_month",
+      "formLabel": "Birth month and year",
+      "formOptions": []
+    },
+    {
+      "contextKey": "gradeLevel",
+      "formType": "single_choice",
+      "formLabel": "School grade",
+      "formOptions": [
+        {
+          "value": "7",
+          "label": "Grade 7"
+        },
+        {
+          "value": "8",
+          "label": "Grade 8"
+        },
+        {
+          "value": "9",
+          "label": "Grade 9"
+        }
+      ]
+    }
+  ],
+  "afterSourcesAuthorized": {
+    "catalogPath": "/api/campus/organizations/{organizationId}/private-tools/public-sources",
+    "createPath": "/api/campus/organizations/{organizationId}/private-tools",
+    "savePath": "/api/campus/organizations/{organizationId}/private-tools/{draftId}"
+  },
+  "combinedScore": "NONE",
+  "createDraft": {
+    "kind": "COMPOSITION",
+    "title": "WIHIC — Actual Classroom Experiences (English Pilot)"
+  },
+  "instruction": "Think about what actually happens in one current class. Keep the same class in mind for all seven sections. For each statement, choose the answer that best describes how often it happens. The seven sections describe classroom experiences separately.",
+  "components": [
+    {
+      "toolKey": "wihic_student_cohesiveness_actual_en_lower_secondary_student",
+      "title": "WIHIC｜同学凝聚（实际·英文8题）｜初中｜学生填答 · WIHIC | Make the first move easier",
+      "originalItemOrder": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "itemKeys": [
+        "WIHIC01",
+        "WIHIC02",
+        "WIHIC03",
+        "WIHIC04",
+        "WIHIC05",
+        "WIHIC06",
+        "WIHIC07",
+        "WIHIC08"
+      ],
+      "scoreKeys": [
+        "student_cohesiveness"
+      ],
+      "contentHash": "e7652a9add04694079d3ce87ebf5a72fc3e9fc307bc5ebfd4d247db3d223eec8",
+      "contentAxisHash": "9ba891427f470a9963924292820d318dffce23b4edfe3a0db98444ae24691bd1",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "bb3be629edc1204f10c7439d092410fc912e2b58aeab1a9ed481678204433232",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/wihic_student_cohesiveness_actual_en_lower_secondary_student/reports/1.1.0-student-illustrated.json",
+      "artworkKey": "wihic_student_cohesiveness_actual_en_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth",
+        "gradeLevel"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "WIHIC｜同学凝聚（实际·英文8题）｜初中｜学生填答 · WIHIC | Make the first move easier"
+      }
+    },
+    {
+      "toolKey": "wihic_teacher_support_actual_en_lower_secondary_student",
+      "title": "WIHIC｜教师支持（实际·英文8题）｜初中｜学生填答 · WIHIC | A useful answer often starts with a small question",
+      "originalItemOrder": [
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16"
+      ],
+      "itemKeys": [
+        "WIHIC09",
+        "WIHIC10",
+        "WIHIC11",
+        "WIHIC12",
+        "WIHIC13",
+        "WIHIC14",
+        "WIHIC15",
+        "WIHIC16"
+      ],
+      "scoreKeys": [
+        "teacher_support"
+      ],
+      "contentHash": "254029908ab11cc6d41a8b54daf40e4d8164cce87ca1822d3b81ee877d5378b7",
+      "contentAxisHash": "e29a5f4471a9209250f0d81bada28c922dc0b7adfe0d3cf1a376de788b7632a9",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "cfcf249fcf47a9ef9d2412c88cca006d177ae4f92249699d4b2a371b6834e277",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/wihic_teacher_support_actual_en_lower_secondary_student/reports/1.1.0-student-illustrated.json",
+      "artworkKey": "wihic_teacher_support_actual_en_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth",
+        "gradeLevel"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "WIHIC｜教师支持（实际·英文8题）｜初中｜学生填答 · WIHIC | A useful answer often starts with a small question"
+      }
+    },
+    {
+      "toolKey": "wihic_involvement_actual_en_lower_secondary_student",
+      "title": "WIHIC｜课堂参与（实际·英文8题）｜初中｜学生填答 · WIHIC | There is more than one way to join in",
+      "originalItemOrder": [
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24"
+      ],
+      "itemKeys": [
+        "WIHIC17",
+        "WIHIC18",
+        "WIHIC19",
+        "WIHIC20",
+        "WIHIC21",
+        "WIHIC22",
+        "WIHIC23",
+        "WIHIC24"
+      ],
+      "scoreKeys": [
+        "involvement"
+      ],
+      "contentHash": "7f655ef07c64f55341b7313452c99747fa0ad4fc190733a3e872b1780e796292",
+      "contentAxisHash": "88f1eebd47b27bc86b73925acb524d5386ff9aa33089314e2be89faf64f8f2af",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "4d1df91c57ec3e2b841e8585345615dcb82a70f1082fa85e1e54d4d0b7d9ae3d",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/wihic_involvement_actual_en_lower_secondary_student/reports/1.1.0-student-illustrated.json",
+      "artworkKey": "wihic_involvement_actual_en_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth",
+        "gradeLevel"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "WIHIC｜课堂参与（实际·英文8题）｜初中｜学生填答 · WIHIC | There is more than one way to join in"
+      }
+    },
+    {
+      "toolKey": "wihic_investigation_actual_en_lower_secondary_student",
+      "title": "WIHIC｜探究活动（实际·英文8题）｜初中｜学生填答 · WIHIC | Follow the question one step further",
+      "originalItemOrder": [
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32"
+      ],
+      "itemKeys": [
+        "WIHIC25",
+        "WIHIC26",
+        "WIHIC27",
+        "WIHIC28",
+        "WIHIC29",
+        "WIHIC30",
+        "WIHIC31",
+        "WIHIC32"
+      ],
+      "scoreKeys": [
+        "investigation"
+      ],
+      "contentHash": "93726bc12ca6ab835560c1f4b4fdb33f15e8bc223c02238f6426d1d1ef7f16b3",
+      "contentAxisHash": "89aa2660f3a146f14590a7c94e8b29b3f5c3b0e934a96eadd6a4a29eaa6d4113",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "cbbc6d542bafdb476b7bcd56508182fd8bbdcf005d11f386f3c5d03255494a7f",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/wihic_investigation_actual_en_lower_secondary_student/reports/1.1.0-student-illustrated.json",
+      "artworkKey": "wihic_investigation_actual_en_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth",
+        "gradeLevel"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "WIHIC｜探究活动（实际·英文8题）｜初中｜学生填答 · WIHIC | Follow the question one step further"
+      }
+    },
+    {
+      "toolKey": "wihic_task_orientation_actual_en_lower_secondary_student",
+      "title": "WIHIC｜任务导向（实际·英文8题）｜初中｜学生填答 · WIHIC | Find the next thing you can do",
+      "originalItemOrder": [
+        "33",
+        "34",
+        "35",
+        "36",
+        "37",
+        "38",
+        "39",
+        "40"
+      ],
+      "itemKeys": [
+        "WIHIC33",
+        "WIHIC34",
+        "WIHIC35",
+        "WIHIC36",
+        "WIHIC37",
+        "WIHIC38",
+        "WIHIC39",
+        "WIHIC40"
+      ],
+      "scoreKeys": [
+        "task_orientation"
+      ],
+      "contentHash": "4e7416f6ef8cc1fc64d3a20c916740ec5d2038e0b4efbfea6e03618cf307cb08",
+      "contentAxisHash": "c1ed59986723c0c47ef855e93dbcf8215ad06fa4434af00f7790d404182608c7",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "3303be26eab8d3482fd45aead90980d4dfa3826b00349583a9111770eb3c2f88",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/wihic_task_orientation_actual_en_lower_secondary_student/reports/1.1.0-student-illustrated.json",
+      "artworkKey": "wihic_task_orientation_actual_en_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth",
+        "gradeLevel"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "WIHIC｜任务导向（实际·英文8题）｜初中｜学生填答 · WIHIC | Find the next thing you can do"
+      }
+    },
+    {
+      "toolKey": "wihic_cooperation_actual_en_lower_secondary_student",
+      "title": "WIHIC｜同伴合作（实际·英文8题）｜初中｜学生填答 · WIHIC | Bring everyone’s findings back to the table",
+      "originalItemOrder": [
+        "41",
+        "42",
+        "43",
+        "44",
+        "45",
+        "46",
+        "47",
+        "48"
+      ],
+      "itemKeys": [
+        "WIHIC41",
+        "WIHIC42",
+        "WIHIC43",
+        "WIHIC44",
+        "WIHIC45",
+        "WIHIC46",
+        "WIHIC47",
+        "WIHIC48"
+      ],
+      "scoreKeys": [
+        "cooperation"
+      ],
+      "contentHash": "ef4c4ce2f772604bc22bf7f75a18a13e0f68c144e379626330646329c69f42bb",
+      "contentAxisHash": "5cb6f9c88e20039b7c504698c04b35833ccd14763358aec52b62e96e90bbe44f",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "8acec3d0a2c450ba18960724f8e33b41b21ca919e389f8c0d12b2ca74d62dd14",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/wihic_cooperation_actual_en_lower_secondary_student/reports/1.1.0-student-illustrated.json",
+      "artworkKey": "wihic_cooperation_actual_en_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth",
+        "gradeLevel"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "WIHIC｜同伴合作（实际·英文8题）｜初中｜学生填答 · WIHIC | Bring everyone’s findings back to the table"
+      }
+    },
+    {
+      "toolKey": "wihic_equity_actual_en_lower_secondary_student",
+      "title": "WIHIC｜课堂公平（实际·英文8题）｜初中｜学生填答 · WIHIC | Notice who gets a chance to be heard",
+      "originalItemOrder": [
+        "49",
+        "50",
+        "51",
+        "52",
+        "53",
+        "54",
+        "55",
+        "56"
+      ],
+      "itemKeys": [
+        "WIHIC49",
+        "WIHIC50",
+        "WIHIC51",
+        "WIHIC52",
+        "WIHIC53",
+        "WIHIC54",
+        "WIHIC55",
+        "WIHIC56"
+      ],
+      "scoreKeys": [
+        "equity"
+      ],
+      "contentHash": "09547ef70614adfc2945efcf564c059ec889a177ff30858c053a74c95a3ee025",
+      "contentAxisHash": "88c4538442409ac03f4c4c4d2d6589fe7c6d9099efea0d35ad6ddf78638457d4",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "5a0a7df2fd152aff1eddc219b694683a446aa8d4dbcb795426346bfd6555a1a1",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/wihic_equity_actual_en_lower_secondary_student/reports/1.1.0-student-illustrated.json",
+      "artworkKey": "wihic_equity_actual_en_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth",
+        "gradeLevel"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "WIHIC｜课堂公平（实际·英文8题）｜初中｜学生填答 · WIHIC | Notice who gets a chance to be heard"
+      }
+    }
+  ],
+  "reportGuide": "illustrated-composition-review.md",
+  "coverArtwork": "illustrated-composition-cover.webp"
+}

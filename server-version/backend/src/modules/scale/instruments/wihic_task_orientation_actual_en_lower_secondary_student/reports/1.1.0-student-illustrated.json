@@ -1,0 +1,86 @@
+{
+  "toolKey": "wihic_task_orientation_actual_en_lower_secondary_student",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student-illustrated",
+  "title": "WIHIC | Find the next thing you can do",
+  "report": {
+    "reportVersion": "1.1.0-student-illustrated",
+    "primaryScoreKeys": [
+      "task_orientation"
+    ],
+    "scoreOrder": [
+      "task_orientation"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "task_orientation",
+        "headline": "Find the next thing you can do",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Knowing what a task is for and how to get started can make a lesson easier to follow. These answers describe how often you experienced clear goals and stayed with the work.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Before starting, write one line about what a finished task will show. Break the first part into an action you can do in a few minutes."
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "The score is the average of all eight answers on the original five-point frequency scale. A missing response leaves this result unavailable.",
+      "The result describes one student’s experience in this class. There is no combined WIHIC score, norm, level, or ranking.",
+      "The items are from the 56-item classroom form; this illustrated report and separate digital display are project adaptations."
+    ],
+    "disclaimer": "For research and supportive reflection on classroom experiences. Do not use for teacher appraisal, school ranking, diagnosis or student selection. Discuss concerns with a trusted adult regardless of the score. There is no combined WIHIC total.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "wihic_task_orientation_actual_en_lower_secondary_student/1.0.0/1.1.0-student-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

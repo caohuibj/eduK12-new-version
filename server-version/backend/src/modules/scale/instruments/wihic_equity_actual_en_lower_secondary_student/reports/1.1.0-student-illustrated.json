@@ -1,0 +1,86 @@
+{
+  "toolKey": "wihic_equity_actual_en_lower_secondary_student",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student-illustrated",
+  "title": "WIHIC | Notice who gets a chance to be heard",
+  "report": {
+    "reportVersion": "1.1.0-student-illustrated",
+    "primaryScoreKeys": [
+      "equity"
+    ],
+    "scoreOrder": [
+      "equity"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "equity",
+        "headline": "Notice who gets a chance to be heard",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Classroom fairness can show up in small things, including who gets called on, who gets feedback, and who has a chance to try again. These answers describe how often you noticed similar opportunities for different students.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "If something feels unfair, you can keep a specific example and talk it through with an adult you trust. It is okay to ask someone to help."
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "The score is the average of all eight answers on the original five-point frequency scale. A missing response leaves this result unavailable.",
+      "The result describes one student’s experience in this class. There is no combined WIHIC score, norm, level, or ranking.",
+      "The items are from the 56-item classroom form; this illustrated report and separate digital display are project adaptations."
+    ],
+    "disclaimer": "For research and supportive reflection on classroom experiences. Do not use for teacher appraisal, school ranking, diagnosis or student selection. Discuss concerns with a trusted adult regardless of the score. There is no combined WIHIC total.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "wihic_equity_actual_en_lower_secondary_student/1.0.0/1.1.0-student-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

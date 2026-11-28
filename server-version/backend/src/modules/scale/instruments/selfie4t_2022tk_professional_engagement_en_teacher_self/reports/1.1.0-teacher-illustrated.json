@@ -1,0 +1,230 @@
+{
+  "toolKey": "selfie4t_2022tk_professional_engagement_en_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher-illustrated",
+  "title": "SELFIEforTEACHERS | professional engagement",
+  "report": {
+    "reportVersion": "1.1.0-teacher-illustrated",
+    "primaryScoreKeys": [
+      "competence_1_1",
+      "competence_1_2",
+      "competence_1_3",
+      "competence_1_4",
+      "competence_1_5",
+      "competence_1_6",
+      "competence_1_7",
+      "competence_1_8",
+      "competence_1_9"
+    ],
+    "scoreOrder": [
+      "competence_1_1",
+      "competence_1_2",
+      "competence_1_3",
+      "competence_1_4",
+      "competence_1_5",
+      "competence_1_6",
+      "competence_1_7",
+      "competence_1_8",
+      "competence_1_9"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_1_1",
+        "headline": "Let one message do its job",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Choose a school message you send regularly. Check whether everyone who needs it can find it and whether a clearer channel or subject would save a follow-up."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_2",
+        "headline": "Look at the defaults before opening the classroom",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Review who can enter your online space, see work, and change settings. Test the view as a learner before sharing access."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_3",
+        "headline": "Give shared work a place to live",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Start one editable resource with a colleague. Agree where questions and revisions go and compare which decisions became easier to make."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_4",
+        "headline": "Start with one problem the school already has",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Ask colleagues what interrupts an ordinary lesson. Test whether shared equipment, a clearer sign-out routine, or a repair solves that problem."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_5",
+        "headline": "Keep one example for the next lesson",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Save a de-identified teaching example. Note what happened, what the digital tool contributed, and what you would change next time."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_6",
+        "headline": "Think about where a post may travel",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Before posting, ask who may see or forward it. Check consent and how the post will read out of context."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_7",
+        "headline": "Take one idea from an online community into class",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Choose a practice you came across online, try a small version in a lesson, and share what learners found useful."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_8",
+        "headline": "Learn a feature you can practise this week",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Pick a digital skill tied to a real task. Find a short lesson, practise with familiar material, and check where you need help."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_9",
+        "headline": "Break the problem down before choosing a tool",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Lay out the steps in a recurring task. Ask which ones repeat or can be tested separately before choosing a tool."
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "Each result describes your selected practice for one competence. The original choices are shown as A1 through C2 (1–6); not yet aware is a valid response (0).",
+      "This self-reflection is for the participating teacher. It supplies no combined score, rank, performance evaluation, or student outcome claim.",
+      "The illustrated reflection prompts are project adaptations. The fixed English items come from the European Commission toolkit and its design report."
+    ],
+    "disclaimer": "For supportive professional learning reflection by the teacher receiving their own authorized results. A1–C2 are this framework’s maturity codes, not grades for teacher quality. No EU endorsement, badge or certificate is issued. Existing access and feedback permissions still apply.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en"
+    },
+    "artworkKey": "selfie4t_2022tk_professional_engagement_en_teacher_self/1.0.0/1.1.0-teacher-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

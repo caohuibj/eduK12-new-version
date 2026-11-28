@@ -1,0 +1,158 @@
+{
+  "toolKey": "selfie4t_2022tk_teaching_learning_en_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher-illustrated",
+  "title": "SELFIEforTEACHERS | teaching learning",
+  "report": {
+    "reportVersion": "1.1.0-teacher-illustrated",
+    "primaryScoreKeys": [
+      "competence_3_1",
+      "competence_3_2",
+      "competence_3_3",
+      "competence_3_4",
+      "competence_3_5"
+    ],
+    "scoreOrder": [
+      "competence_3_1",
+      "competence_3_2",
+      "competence_3_3",
+      "competence_3_4",
+      "competence_3_5"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_3_1",
+        "headline": "Start from what learners need to do",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Sketch the learning task before choosing technology. Try one tool that lets students show their thinking, then look at their actual work."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_3_2",
+        "headline": "Give guidance learners can act on straight away",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Use a short check-in and offer one clear next step. Look at the student’s next attempt to see what helped."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_3_3",
+        "headline": "Make each group member’s contribution visible",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Give everyone a role and a place to record a contribution. Ask the group how they used each other’s work."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_3_4",
+        "headline": "Give learners a way to check their progress",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Share an example and a short list of success criteria. Ask students to check their work against these before submitting."
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_3_5",
+        "headline": "Decide how to recognise a useful trial",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "This result records the statement that best matched your current practice. Pick one small action to try and use what you notice to decide what comes next.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Name one expected benefit and one possible downside of a new tool. Start small and compare with a familiar approach."
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "Each result describes your selected practice for one competence. The original choices are shown as A1 through C2 (1–6); not yet aware is a valid response (0).",
+      "This self-reflection is for the participating teacher. It supplies no combined score, rank, performance evaluation, or student outcome claim.",
+      "The illustrated reflection prompts are project adaptations. The fixed English items come from the European Commission toolkit and its design report."
+    ],
+    "disclaimer": "For supportive professional learning reflection by the teacher receiving their own authorized results. A1–C2 are this framework’s maturity codes, not grades for teacher quality. No EU endorsement, badge or certificate is issued. Existing access and feedback permissions still apply.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en"
+    },
+    "artworkKey": "selfie4t_2022tk_teaching_learning_en_teacher_self/1.0.0/1.1.0-teacher-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

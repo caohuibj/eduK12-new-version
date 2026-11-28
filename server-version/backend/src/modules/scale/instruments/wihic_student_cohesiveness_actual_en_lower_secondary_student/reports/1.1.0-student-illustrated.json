@@ -1,0 +1,86 @@
+{
+  "toolKey": "wihic_student_cohesiveness_actual_en_lower_secondary_student",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student-illustrated",
+  "title": "WIHIC | Make the first move easier",
+  "report": {
+    "reportVersion": "1.1.0-student-illustrated",
+    "primaryScoreKeys": [
+      "student_cohesiveness"
+    ],
+    "scoreOrder": [
+      "student_cohesiveness"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "student_cohesiveness",
+        "headline": "Make the first move easier",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "In some classes a spare pencil is passed across the table before anyone asks. In others, it can take a while to know whom to turn to. These answers describe how often you experienced friendliness, trust and help from classmates.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Think of one time a classmate made it easier for you to join in. If you feel comfortable, ask that person to work with you on a small task next time."
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "The score is the average of all eight answers on the original five-point frequency scale. A missing response leaves this result unavailable.",
+      "The result describes one student’s experience in this class. There is no combined WIHIC score, norm, level, or ranking.",
+      "The items are from the 56-item classroom form; this illustrated report and separate digital display are project adaptations."
+    ],
+    "disclaimer": "For research and supportive reflection on classroom experiences. Do not use for teacher appraisal, school ranking, diagnosis or student selection. Discuss concerns with a trusted adult regardless of the score. There is no combined WIHIC total.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "wihic_student_cohesiveness_actual_en_lower_secondary_student/1.0.0/1.1.0-student-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

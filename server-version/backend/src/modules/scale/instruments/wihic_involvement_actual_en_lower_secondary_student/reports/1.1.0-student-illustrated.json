@@ -1,0 +1,86 @@
+{
+  "toolKey": "wihic_involvement_actual_en_lower_secondary_student",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student-illustrated",
+  "title": "WIHIC | There is more than one way to join in",
+  "report": {
+    "reportVersion": "1.1.0-student-illustrated",
+    "primaryScoreKeys": [
+      "involvement"
+    ],
+    "scoreOrder": [
+      "involvement"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "involvement",
+        "headline": "There is more than one way to join in",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Joining a class discussion might mean asking a question, building on someone’s point, or sharing an idea in a small group. These answers describe how often you took part in ways like these.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Write one sentence you want to add to a discussion. You can read it aloud, share it with a partner, or hand it in if the teacher makes that possible."
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "The score is the average of all eight answers on the original five-point frequency scale. A missing response leaves this result unavailable.",
+      "The result describes one student’s experience in this class. There is no combined WIHIC score, norm, level, or ranking.",
+      "The items are from the 56-item classroom form; this illustrated report and separate digital display are project adaptations."
+    ],
+    "disclaimer": "For research and supportive reflection on classroom experiences. Do not use for teacher appraisal, school ranking, diagnosis or student selection. Discuss concerns with a trusted adult regardless of the score. There is no combined WIHIC total.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "wihic_involvement_actual_en_lower_secondary_student/1.0.0/1.1.0-student-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

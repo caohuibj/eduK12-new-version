@@ -1,0 +1,339 @@
+{
+  "schemaVersion": 1,
+  "artifactType": "ordinary-composition-draft-preparation",
+  "status": "VALIDATED_CONTENT_AND_DRAFT_CONTRACT",
+  "title": "SELFIEforTEACHERS — 2022 Toolkit (English Pilot)",
+  "entry": "TEACHER",
+  "apiBase": "/api/huiteacher",
+  "motherKey": "selfie4t_2022tk_32_en_teacher_self",
+  "source": "https://publications.jrc.ec.europa.eu/repository/handle/JRC129699",
+  "license": "CC BY 4.0",
+  "administration": {
+    "population": "TEACHER",
+    "responseMode": "SELF"
+  },
+  "assessmentItemCount": 32,
+  "requiredContextFields": [
+    {
+      "contextKey": "birthYearMonth",
+      "formType": "year_month",
+      "formLabel": "Birth month and year",
+      "formOptions": []
+    }
+  ],
+  "afterSourcesAuthorized": {
+    "catalogPath": "/api/huiteacher/organizations/{organizationId}/private-tools/public-sources",
+    "createPath": "/api/huiteacher/organizations/{organizationId}/private-tools",
+    "savePath": "/api/huiteacher/organizations/{organizationId}/private-tools/{draftId}"
+  },
+  "combinedScore": "NONE",
+  "createDraft": {
+    "kind": "COMPOSITION",
+    "title": "SELFIEforTEACHERS — 2022 Toolkit (English Pilot)"
+  },
+  "instruction": "Reflect on your current teaching practice. For each competence, choose the one statement that best describes your current practice. If you are not aware of a competence, choose the option for that. You can use each result to select an area for professional learning.",
+  "components": [
+    {
+      "toolKey": "selfie4t_2022tk_professional_engagement_en_teacher_self",
+      "title": "SELFIEforTEACHERS｜职业参与（9项）｜教师自评｜2022 Toolkit英文固定版 · SELFIEforTEACHERS | professional engagement",
+      "originalItemOrder": [
+        "1.1",
+        "1.2",
+        "1.3",
+        "1.4",
+        "1.5",
+        "1.6",
+        "1.7",
+        "1.8",
+        "1.9"
+      ],
+      "itemKeys": [
+        "S4T_1_1",
+        "S4T_1_2",
+        "S4T_1_3",
+        "S4T_1_4",
+        "S4T_1_5",
+        "S4T_1_6",
+        "S4T_1_7",
+        "S4T_1_8",
+        "S4T_1_9"
+      ],
+      "scoreKeys": [
+        "competence_1_1",
+        "competence_1_2",
+        "competence_1_3",
+        "competence_1_4",
+        "competence_1_5",
+        "competence_1_6",
+        "competence_1_7",
+        "competence_1_8",
+        "competence_1_9"
+      ],
+      "contentHash": "5c184e78e9b63d5a0f2c8eac2042799f3b8096d5a9f969cf13a725bb1ae3d90c",
+      "contentAxisHash": "f3c9f432d81b1b0dadcbeebead7ceed0144f5fb2cbd075ec56dc9578a10de061",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "deb2fa0f9e9740387a0c24e4fb50f3263af4d2221494d14aaea6a4e31f15ca08",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/selfie4t_2022tk_professional_engagement_en_teacher_self/reports/1.1.0-teacher-illustrated.json",
+      "artworkKey": "selfie4t_2022tk_professional_engagement_en_teacher_self/1.0.0/1.1.0-teacher-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "SELFIEforTEACHERS｜职业参与（9项）｜教师自评｜2022 Toolkit英文固定版 · SELFIEforTEACHERS | professional engagement"
+      }
+    },
+    {
+      "toolKey": "selfie4t_2022tk_digital_resources_en_teacher_self",
+      "title": "SELFIEforTEACHERS｜数字资源（5项）｜教师自评｜2022 Toolkit英文固定版 · SELFIEforTEACHERS | digital resources",
+      "originalItemOrder": [
+        "2.1",
+        "2.2",
+        "2.3",
+        "2.4",
+        "2.5"
+      ],
+      "itemKeys": [
+        "S4T_2_1",
+        "S4T_2_2",
+        "S4T_2_3",
+        "S4T_2_4",
+        "S4T_2_5"
+      ],
+      "scoreKeys": [
+        "competence_2_1",
+        "competence_2_2",
+        "competence_2_3",
+        "competence_2_4",
+        "competence_2_5"
+      ],
+      "contentHash": "bfdaf5a252f5b66662844404359807effc73ac9f5213d646ffeccae39ea75f2d",
+      "contentAxisHash": "f162932e065fb2c8f322a0f5d73f165e5a89ba5961e46fece03d60ce74ea1b29",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "8762620bc277b8b48a9361e073bc30d679d944054bd95291cc3f1bd4932deed4",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/selfie4t_2022tk_digital_resources_en_teacher_self/reports/1.1.0-teacher-illustrated.json",
+      "artworkKey": "selfie4t_2022tk_digital_resources_en_teacher_self/1.0.0/1.1.0-teacher-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "SELFIEforTEACHERS｜数字资源（5项）｜教师自评｜2022 Toolkit英文固定版 · SELFIEforTEACHERS | digital resources"
+      }
+    },
+    {
+      "toolKey": "selfie4t_2022tk_teaching_learning_en_teacher_self",
+      "title": "SELFIEforTEACHERS｜教学与学习（5项）｜教师自评｜2022 Toolkit英文固定版 · SELFIEforTEACHERS | teaching learning",
+      "originalItemOrder": [
+        "3.1",
+        "3.2",
+        "3.3",
+        "3.4",
+        "3.5"
+      ],
+      "itemKeys": [
+        "S4T_3_1",
+        "S4T_3_2",
+        "S4T_3_3",
+        "S4T_3_4",
+        "S4T_3_5"
+      ],
+      "scoreKeys": [
+        "competence_3_1",
+        "competence_3_2",
+        "competence_3_3",
+        "competence_3_4",
+        "competence_3_5"
+      ],
+      "contentHash": "5cdce4d92a6ea22fa23c68915f4652982401be510e5d95c5e774168633b72a6e",
+      "contentAxisHash": "efb930066e2c8bab3f7c9f738875b83fa143deca635fde90010479853f3e4418",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "9ecae0ef5406d02307b0661c4961c913bfd47828fda1de2a4c4cb2b44996a665",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/selfie4t_2022tk_teaching_learning_en_teacher_self/reports/1.1.0-teacher-illustrated.json",
+      "artworkKey": "selfie4t_2022tk_teaching_learning_en_teacher_self/1.0.0/1.1.0-teacher-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "SELFIEforTEACHERS｜教学与学习（5项）｜教师自评｜2022 Toolkit英文固定版 · SELFIEforTEACHERS | teaching learning"
+      }
+    },
+    {
+      "toolKey": "selfie4t_2022tk_assessment_en_teacher_self",
+      "title": "SELFIEforTEACHERS｜评价（3项）｜教师自评｜2022 Toolkit英文固定版 · SELFIEforTEACHERS | assessment",
+      "originalItemOrder": [
+        "4.1",
+        "4.2",
+        "4.3"
+      ],
+      "itemKeys": [
+        "S4T_4_1",
+        "S4T_4_2",
+        "S4T_4_3"
+      ],
+      "scoreKeys": [
+        "competence_4_1",
+        "competence_4_2",
+        "competence_4_3"
+      ],
+      "contentHash": "076a716dd8dee3ebc7447fdc88228e22e695d12426873add4c8d049140ccb94a",
+      "contentAxisHash": "bb4476b343ab35838fbd6c11ac03b4aa2ec180c647def3c83736e3219cd3f4af",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "44d6692fcc8abd76fb4077043acafe9102db141e61dd2559b52e519ff536fa0e",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/selfie4t_2022tk_assessment_en_teacher_self/reports/1.1.0-teacher-illustrated.json",
+      "artworkKey": "selfie4t_2022tk_assessment_en_teacher_self/1.0.0/1.1.0-teacher-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "SELFIEforTEACHERS｜评价（3项）｜教师自评｜2022 Toolkit英文固定版 · SELFIEforTEACHERS | assessment"
+      }
+    },
+    {
+      "toolKey": "selfie4t_2022tk_empowering_learners_en_teacher_self",
+      "title": "SELFIEforTEACHERS｜赋能学习者（4项）｜教师自评｜2022 Toolkit英文固定版 · SELFIEforTEACHERS | empowering learners",
+      "originalItemOrder": [
+        "5.1",
+        "5.2",
+        "5.3",
+        "5.4"
+      ],
+      "itemKeys": [
+        "S4T_5_1",
+        "S4T_5_2",
+        "S4T_5_3",
+        "S4T_5_4"
+      ],
+      "scoreKeys": [
+        "competence_5_1",
+        "competence_5_2",
+        "competence_5_3",
+        "competence_5_4"
+      ],
+      "contentHash": "1709d7fed8dad45d5c61530cf6a4e46476faed3b1376da1a7317f5f3b34f2e94",
+      "contentAxisHash": "afffbbff47388203198e380678fd0b7df63ec71419e8c5a0ddd8f86f766f8ca4",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "edb2e81237d62791043026614c0cb7638467f76cadf7054433f0e12a910f491d",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/selfie4t_2022tk_empowering_learners_en_teacher_self/reports/1.1.0-teacher-illustrated.json",
+      "artworkKey": "selfie4t_2022tk_empowering_learners_en_teacher_self/1.0.0/1.1.0-teacher-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "SELFIEforTEACHERS｜赋能学习者（4项）｜教师自评｜2022 Toolkit英文固定版 · SELFIEforTEACHERS | empowering learners"
+      }
+    },
+    {
+      "toolKey": "selfie4t_2022tk_learners_digital_competence_en_teacher_self",
+      "title": "SELFIEforTEACHERS｜促进学习者数字能力（6项）｜教师自评｜2022 Toolkit英文固定版 · SELFIEforTEACHERS | learners digital competence",
+      "originalItemOrder": [
+        "6.1",
+        "6.2",
+        "6.3",
+        "6.4",
+        "6.5",
+        "6.6"
+      ],
+      "itemKeys": [
+        "S4T_6_1",
+        "S4T_6_2",
+        "S4T_6_3",
+        "S4T_6_4",
+        "S4T_6_5",
+        "S4T_6_6"
+      ],
+      "scoreKeys": [
+        "competence_6_1",
+        "competence_6_2",
+        "competence_6_3",
+        "competence_6_4",
+        "competence_6_5",
+        "competence_6_6"
+      ],
+      "contentHash": "1cc516029fb45743a28c9273042ec322fc8ffc6e92ed7be0bc6aa860c0ad9f3d",
+      "contentAxisHash": "2ae451903525008d40adad4bedd220b1dd25ad80f4d1069ac44cdbf5cfb8c105",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "5499c395a8a00a81a4e5c00fe88755eaab1a137ce6f3681869eb348c6c6ccd75",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/selfie4t_2022tk_learners_digital_competence_en_teacher_self/reports/1.1.0-teacher-illustrated.json",
+      "artworkKey": "selfie4t_2022tk_learners_digital_competence_en_teacher_self/1.0.0/1.1.0-teacher-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "SELFIEforTEACHERS｜促进学习者数字能力（6项）｜教师自评｜2022 Toolkit英文固定版 · SELFIEforTEACHERS | learners digital competence"
+      }
+    }
+  ],
+  "reportGuide": "illustrated-composition-review.md",
+  "coverArtwork": "illustrated-composition-cover.webp"
+}
