@@ -1,0 +1,225 @@
+{
+  "toolKey": "orvis92_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-pilot",
+  "title": "从八类活动找出自己愿意试的事｜成人研究试用",
+  "report": {
+    "reportVersion": "1.3.0-pilot",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 来源、计分和内容复核",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对 IPIP 公开 92 项、五档偏好及八类原版活动。本库保持每类均分和原例，无本地职业适配或分档。"
+      }
+    },
+    "primaryScoreKeys": [
+      "leadership",
+      "organization",
+      "altruism",
+      "creativity",
+      "analysis",
+      "production",
+      "adventure",
+      "erudition"
+    ],
+    "scoreOrder": [
+      "leadership",
+      "organization",
+      "altruism",
+      "creativity",
+      "analysis",
+      "production",
+      "adventure",
+      "erudition"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "leadership",
+        "scoreLabel": "带领与影响（1–5 均分）",
+        "headline": "想不想提出方向并带动别人一起做",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "组织一场小活动时，有人喜欢商量方向、说清目标并推动决定。这个均分描述你对相关活动的喜欢程度。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找一个轻量的组织机会，看你最喜欢的是提出想法、协调分工，还是代表团队表达。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "organization",
+        "scoreLabel": "组织与安排（1–5 均分）",
+        "headline": "把事情放进可以推进的顺序",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一张排期、一本条理清楚的记录，或者一份能用的预算，都是组织活动的例子。这一维反映相关任务的吸引力。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "试着安排一次小聚或做一张简单清单，留意整理资料、排顺序与跟进之间哪一步更有意思。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "altruism",
+        "scoreLabel": "助人与照顾（1–5 均分）",
+        "headline": "帮上忙的方式有好几种",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有人愿意解释一个概念，有人愿意倾听或帮助解决生活麻烦。这组题涵盖你对类似助人活动的兴趣。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "从可以短时体验的帮助方式入手，例如带新人熟悉环境，看看你愿意怎样参与。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "creativity",
+        "scoreLabel": "艺术与创作（1–5 均分）",
+        "headline": "拿一个小点子试着做出来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "在一张白纸上改布局、写一个故事开头、排演一段音乐，都涉及创作。这组均分反映参与艺术或创作的兴趣。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找一种成本不高的材料，留半小时做个初稿，观察做的过程是否想继续。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "analysis",
+        "scoreLabel": "分析与探究（1–5 均分）",
+        "headline": "想把一个问题弄明白",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "看到两种你觉得都不太完整的解释，愿意继续找证据、比较线索，这里面有分析与探究的兴趣。均分描述这类活动在本次回答中的吸引力。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一个个人好奇的问题，写出两个可能的解释再找一条证据比较。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "production",
+        "scoreLabel": "动手与自然（1–5 均分）",
+        "headline": "喜欢接触材料、工具或自然环境",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有人偏爱木工和组装，有人乐于照料植物和动物。这组均分包括这些方向，具体活动可以分别探索。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "试一个简单的制作或照料任务，看看你更享受过程里的哪一步。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "adventure",
+        "scoreLabel": "运动与冒险（1–5 均分）",
+        "headline": "哪些有挑战的活动让你愿意参与",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "体力活动、竞争和新鲜挑战在此维度里都有例子。它们的吸引力可以很不一样。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "从安全、有指导的体验开始，例如尝试一次新运动或合适难度的户外活动，分开记录兴奋、压力和体力需求。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "erudition",
+        "scoreLabel": "语言与阅读（1–5 均分）",
+        "headline": "想用文字、语言或阅读理解一些东西",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "查阅材料、找合适措辞、翻译或做文字游戏都贴近这一类兴趣。这个数概括本次对相关活动的喜好。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一件真正想知道的事，用阅读、多语查找或短写作去探索，留意最愿意多花时间的环节。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "保留 92 项美国原版职业与活动情境，按本库八组取 1–5 均分。受访者接触过哪些活动可能影响选择。",
+      "用途限于成人兴趣探索，用实际体验和可行条件理解结果。能力测试、当地职业匹配和录用决策需要其他证据。",
+      "Oregon Vocational Interest Scales（ORVIS），IPIP 官方题表 https://ipip.ori.org/newORVISSurvey.htm 和公共领域说明 https://ipip.ori.org/newPermission.htm 。当前为平台独立中文工作译稿与报告。"
+    ],
+    "disclaimer": "供成人研究与兴趣探索。",
+    "artworkKey": "orvis92_zh_cn_research/1.0.1/1.3.0-pilot"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
