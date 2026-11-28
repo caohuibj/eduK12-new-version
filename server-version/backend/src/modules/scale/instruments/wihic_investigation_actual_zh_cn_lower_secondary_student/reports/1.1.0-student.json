@@ -1,0 +1,92 @@
+{
+  "toolKey": "wihic_investigation_actual_zh_cn_lower_secondary_student",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student",
+  "title": "WIHIC｜从“我觉得”走到“我有依据”｜中文试用版",
+  "report": {
+    "reportVersion": "1.1.0-student",
+    "primaryScoreKeys": [
+      "investigation"
+    ],
+    "scoreOrder": [
+      "investigation"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "investigation",
+        "headline": "从“我觉得”走到“我有依据”",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "两个人对图里的趋势有不同看法。把横轴纵轴说清楚，再找一个实际点来对照，争论就有了可以一起检查的依据。探究往往从这样的一小步开始。\n\n这组回答关注这门课是否常给你机会提出问题、检查证据、解释图表和动手验证。课堂主题和任务安排会影响这些机会的多少。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "挑一个自己好奇的问题，用手边可得的信息试一次。记下原来的猜想、你找到的证据和后来有没有改主意。"
+          },
+          {
+            "category": "support",
+            "text": "如果需要材料或不知道可以怎么查，先和同伴或老师讨论一条在现有条件下可行的验证办法。"
+          }
+        ],
+        "scoreLabel": "探究活动（1–5 平均）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "© Barry J. Fraser 2023。原题及五级频率选项来自 2023 年论文附录 A 表 A1（第 7–8 页）。采用 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。来源：https://doi.org/10.3390/educsci13030257。项目改动包括简体中文直译、依原有七维分开呈现、独立作答说明、完整作答时算术均分以及供学生反思的反馈。",
+      "这一组分数是你对同一门课八道题的平均回答，范围是 1 到 5。需答全八题才会计算分数。",
+      "请结合自己的课堂经历来理解。每个分册单独显示结果，供个人反思，没有常模、分档或跨分册总分。",
+      "本译稿供能理解简体中文的初中七至九年级、12 至 15 岁学生试用。使用范围来自项目设定。译校、理解访谈和本地验证尚待开展。",
+      "这套题直接译自 Fraser 2023 附录 A 的 56 项实际课堂版。请与 2026 年发表的中国学生 52 项修订版分别识别。"
+    ],
+    "disclaimer": "中文试用版。记录你在这门课的体验，供个人反思。遇到困扰时，无论分数是多少，都可以向信任的成年人求助。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

@@ -350,12 +350,19 @@ import { SCALE_INSTRUMENT_SOURCE as source346 } from '../instruments/wibps7_adol
 import { SCALE_INSTRUMENT_SOURCE as source347 } from '../instruments/wibps7_adolescent_zh_cn_research/1.1.0/instrument'
 import { SCALE_INSTRUMENT_SOURCE as source348 } from '../instruments/wihic56_actual_en_lower_secondary_student/1.0.0/instrument'
 import { SCALE_INSTRUMENT_SOURCE as source349 } from '../instruments/wihic_cooperation_actual_en_lower_secondary_student/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source350 } from '../instruments/wihic_equity_actual_en_lower_secondary_student/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source351 } from '../instruments/wihic_investigation_actual_en_lower_secondary_student/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source352 } from '../instruments/wihic_involvement_actual_en_lower_secondary_student/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source353 } from '../instruments/wihic_student_cohesiveness_actual_en_lower_secondary_student/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source354 } from '../instruments/wihic_task_orientation_actual_en_lower_secondary_student/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source355 } from '../instruments/wihic_teacher_support_actual_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source350 } from '../instruments/wihic_cooperation_actual_zh_cn_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source351 } from '../instruments/wihic_equity_actual_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source352 } from '../instruments/wihic_equity_actual_zh_cn_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source353 } from '../instruments/wihic_investigation_actual_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source354 } from '../instruments/wihic_investigation_actual_zh_cn_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source355 } from '../instruments/wihic_involvement_actual_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source356 } from '../instruments/wihic_involvement_actual_zh_cn_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source357 } from '../instruments/wihic_student_cohesiveness_actual_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source358 } from '../instruments/wihic_student_cohesiveness_actual_zh_cn_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source359 } from '../instruments/wihic_task_orientation_actual_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source360 } from '../instruments/wihic_task_orientation_actual_zh_cn_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source361 } from '../instruments/wihic_teacher_support_actual_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source362 } from '../instruments/wihic_teacher_support_actual_zh_cn_lower_secondary_student/1.0.0/instrument'
 import type { ScaleInstrumentSourceV1, ScalePackageV2, VersionedScorerRegistration } from './types'
 
 /** Legacy descriptor arrays are intentionally empty after PR-4 source migration. */
@@ -719,4 +726,11 @@ export const GENERATED_SCALE_INSTRUMENT_SOURCES: readonly ScaleInstrumentSourceV
   source353,
   source354,
   source355,
+  source356,
+  source357,
+  source358,
+  source359,
+  source360,
+  source361,
+  source362,
 ]

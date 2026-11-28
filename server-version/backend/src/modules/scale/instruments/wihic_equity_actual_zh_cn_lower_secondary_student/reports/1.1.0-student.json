@@ -1,0 +1,92 @@
+{
+  "toolKey": "wihic_equity_actual_zh_cn_lower_secondary_student",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student",
+  "title": "WIHIC｜观察每个人有没有机会发声｜中文试用版",
+  "report": {
+    "reportVersion": "1.1.0-student",
+    "primaryScoreKeys": [
+      "equity"
+    ],
+    "scoreOrder": [
+      "equity"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "equity",
+        "headline": "观察每个人有没有机会发声",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有人很快喊出答案时，其他人还在想。后来老师留了一小段时间给大家写下想法，再邀请不同位置的同学说一说。一个安排的改变，能让更多人有机会被听见。\n\n这组回答描述你感觉自己在这门课上获得的提问、答题、帮助和鼓励的机会，与其他同学是否相当。反复遇到类似情形值得和可信任的成年人谈一谈。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "可以记下一个让你觉得机会公平或不公平的例子，想想多一点思考时间或另一种求助方式是否会有帮助。"
+          },
+          {
+            "category": "support",
+            "text": "如果你反复觉得没有机会被听见，可以选择一位在校可信任的成年人，私下说一个例子或写下来。不需要独自想办法解决。"
+          }
+        ],
+        "scoreLabel": "课堂公平（1–5 平均）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "© Barry J. Fraser 2023。原题及五级频率选项来自 2023 年论文附录 A 表 A1（第 7–8 页）。采用 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。来源：https://doi.org/10.3390/educsci13030257。项目改动包括简体中文直译、依原有七维分开呈现、独立作答说明、完整作答时算术均分以及供学生反思的反馈。",
+      "这一组分数是你对同一门课八道题的平均回答，范围是 1 到 5。需答全八题才会计算分数。",
+      "请结合自己的课堂经历来理解。每个分册单独显示结果，供个人反思，没有常模、分档或跨分册总分。",
+      "本译稿供能理解简体中文的初中七至九年级、12 至 15 岁学生试用。使用范围来自项目设定。译校、理解访谈和本地验证尚待开展。",
+      "这套题直接译自 Fraser 2023 附录 A 的 56 项实际课堂版。请与 2026 年发表的中国学生 52 项修订版分别识别。"
+    ],
+    "disclaimer": "中文试用版。记录你在这门课的体验，供个人反思。遇到困扰时，无论分数是多少，都可以向信任的成年人求助。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
