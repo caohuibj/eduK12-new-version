@@ -1,6 +1,13 @@
 /** Teacher Pilot Batch 1: canonical English Job Crafting Questionnaire. PILOT scientific maturity; package release is distinct from DB publication. */
 export const SCALE_INSTRUMENT_SOURCE = {
   "schemaVersion": 1,
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "Rate how often you take each action in the context of your own job. At the top of the scale, “Very Often” means “as often as possible in your workplace”.",
+    "language": "en",
+    "version": "1.0.0",
+    "source": "Slemp & Vella-Brodrick (2013), appendix, p. 145. Wording introduces the original response meaning; the 15 items and options are unchanged."
+  },
   "identity": {
     "instrumentKey": "jcq_en",
     "instrumentVersion": "1.0.0"

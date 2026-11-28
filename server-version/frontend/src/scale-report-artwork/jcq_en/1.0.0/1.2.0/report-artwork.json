@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "jcq_en/1.0.0/1.2.0",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "Two colleagues review a small change to the way they organise a task at work.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

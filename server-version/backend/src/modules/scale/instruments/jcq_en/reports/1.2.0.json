@@ -1,0 +1,137 @@
+{
+  "toolKey": "jcq_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0",
+  "title": "Job crafting | Notice the changes you can actually make",
+  "report": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "task_crafting",
+      "cognitive_crafting",
+      "relational_crafting",
+      "total_job_crafting"
+    ],
+    "scoreOrder": [
+      "task_crafting",
+      "cognitive_crafting",
+      "relational_crafting",
+      "total_job_crafting"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "task_crafting",
+        "scoreLabel": "Task crafting (1–6)",
+        "headline": "Notice the parts of a task you can shape",
+        "summary": "Some jobs let you test a new way to prepare materials or change a small part of how you finish a task. The five answers here describe how often you reported making adjustments of that kind. Opportunities and authority to change tasks vary across roles.",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Pick one recurring task. Write down one part that must stay fixed and one small thing you could test within the usual rules."
+          }
+        ]
+      },
+      {
+        "scoreKey": "cognitive_crafting",
+        "scoreLabel": "Cognitive crafting (1–6)",
+        "headline": "Name what a routine task contributes",
+        "summary": "Two people can do the same work and pay attention to different parts of its purpose. This mean describes how often you reflect on the place of the work in your own life and the way it serves other people or the organisation.",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "When you finish one routine task, note who uses its result and what it makes possible. Check whether that more concrete picture is useful to you."
+          }
+        ]
+      },
+      {
+        "scoreKey": "relational_crafting",
+        "scoreLabel": "Relational crafting (1–6)",
+        "headline": "Make one useful connection",
+        "summary": "The five items look at how often you take an active role in building work relationships. The opportunities may look different in a large team, a remote role, or a job with little time for social contact.",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "If it fits your work, ask a colleague how they approach one shared problem or offer to show a newcomer a step you know well."
+          }
+        ]
+      },
+      {
+        "scoreKey": "total_job_crafting",
+        "scoreLabel": "Overall job crafting (1–6)",
+        "headline": "Read the overall score alongside the three parts",
+        "summary": "The overall mean summarises all 15 answers. A higher value describes more frequent self-reported actions within the opportunities you encounter. The three parts help distinguish changes in the work itself, changes in how you think about it, and changes in whom you connect with.",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Choose one of the three areas you can realistically influence this month and decide what a small worthwhile change would look like."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Each domain averages five items. The overall score averages the full set. These descriptive results concern adult work and opportunities in context.",
+      "Slemp and Vella-Brodrick (2013), International Journal of Wellbeing, 3(2), 126–146. Attributed noncommercial research use. This original report and artwork are independent from the questionnaire."
+    ],
+    "disclaimer": "This pilot report describes responses for reflection in the stated research context.",
+    "artworkKey": "jcq_en/1.0.0/1.2.0"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
