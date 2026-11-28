@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "sdq_teacher_zh_cn/1.0.0/1.1.0-classroom-observation",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "教师观察孩子在课桌和小组活动中的不同参与方式，并记录可见的行为。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

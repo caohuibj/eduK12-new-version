@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "texi_self_en/1.0.0/1.1.0-zh-cn-descriptive",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "青少年整理学习任务，借助外部提示回看下一步。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

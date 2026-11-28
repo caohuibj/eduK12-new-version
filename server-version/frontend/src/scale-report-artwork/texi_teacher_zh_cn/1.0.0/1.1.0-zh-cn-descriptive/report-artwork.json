@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "texi_teacher_zh_cn/1.0.0/1.1.0-zh-cn-descriptive",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "教师和学生在课堂里一起看任务的步骤和可用的提醒。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

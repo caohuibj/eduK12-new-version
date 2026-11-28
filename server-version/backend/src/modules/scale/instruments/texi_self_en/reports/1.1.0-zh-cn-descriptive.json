@@ -1,0 +1,113 @@
+{
+  "toolKey": "texi_self_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-zh-cn-descriptive",
+  "title": "英文题本｜青少年自评简中报告",
+  "report": {
+    "reportVersion": "1.1.0-zh-cn-descriptive",
+    "artworkKey": "texi_self_en/1.0.0/1.1.0-zh-cn-descriptive",
+    "primaryScoreKeys": [
+      "working_memory",
+      "inhibition"
+    ],
+    "scoreOrder": [
+      "working_memory",
+      "inhibition"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "working_memory",
+        "scoreLabel": "工作记忆均分",
+        "headline": "把手上的事拆成看得见的几步",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这 9 道题记录你在记住指令、安排顺序和计划活动时感受到的困难。均分在 1–5 分之间，越高表示你这次报告的困难越多。试着回想一次步骤很多的任务，看看是在听到要求、记住下一步，还是在动手时需要支持。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一件最近卡住的事，写下当时最容易漏掉的一步。回想有没有在哪种场合做得更顺。"
+          },
+          {
+            "category": "strategy",
+            "text": "给一项多步骤任务写一张短清单。先看眼前的一步，做完就划掉，再看下一步。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "inhibition",
+        "scoreLabel": "抑制与自我调节均分",
+        "headline": "从第一小步开始，给切换留一点时间",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这 11 道题记录你在停下喜欢的活动、开始不太想做的事和做完任务时的体验。均分越高，表示你在这些日常情境中感到的困难越多。任务太大、环境太吵或不知道先做什么，都可能让开始变得困难。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找一次原本打算做某件事，却被别的事情拉走注意力的经历。想一想哪个提醒对你可能合适。"
+          },
+          {
+            "category": "strategy",
+            "text": "开始前，给手机找一个固定位置，再把任务缩成一个两分钟能起步的动作。观察这样的安排用起来是否顺手。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "题本使用已登记的英文原文，报告提供简体中文解读。适用年龄依原研究为 13 至 19 岁。",
+      "按作者分表对 9 个工作记忆题和 11 个抑制题分别求 1–5 分均分。平台在对应题组完整作答后计算。",
+      "自评反映你自己的感受。家长、教师看到的是他们所在情境中的行为，分别保留各自的结果。",
+      "结果用于回顾此次填写或观察。正式诊断、分流和能力等级需要独立评估。作者暂未发布年龄常模或判定界值。"
+    ],
+    "disclaimer": "本报告基于本次青少年自评的原始均分，供回顾日常情境和选择可尝试的支持。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-zh-cn-descriptive",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "scoreDerivedLabels": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "scoreDerivedLabels": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "scoreDerivedLabels": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "scoreDerivedLabels": false,
+        "artwork": true
+      }
+    }
+  }
+}

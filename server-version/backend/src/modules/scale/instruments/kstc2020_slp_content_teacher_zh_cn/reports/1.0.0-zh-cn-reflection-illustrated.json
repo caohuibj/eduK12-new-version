@@ -1,0 +1,91 @@
+{
+  "toolKey": "kstc2020_slp_content_teacher_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.0.0-zh-cn-reflection-illustrated",
+  "title": "自我反思｜简中试用｜图文版",
+  "report": {
+    "reportVersion": "1.0.0-zh-cn-reflection-illustrated",
+    "primaryScoreKeys": [
+      "slp_content"
+    ],
+    "scoreOrder": [
+      "slp_content"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "slp_content",
+        "headline": "让活动对得上想学会的事",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "理清科学内容、探究技能和课程目标，能帮助备课时安排有联系的活动。你可以把这个结果当作自我回顾，看看哪些要求已经容易转成课堂任务，哪些还值得和同事一起琢磨。\n\n学生把实验做完是一条线索。他们能把观察和科学概念连起来时，教师才更容易看到理解发生在哪里。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "翻开最近一课的课程要求，哪些内容容易落实成学生的表现，哪些还停留在教案上的一个标题？"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一份近期活动，把任务说明与一份可能出现的学生作品并排看，圈出作品中能证明课堂目标的地方。"
+          }
+        ],
+        "scoreLabel": "备课｜理解科学教学内容（试用版，1–5 分）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "试用中文译本依据 Kang 等（2020）公开的附录 B 英文题文。原研究针对韩国 210 名小学、初中和高中教师，尚待本地译审与适用性验证。",
+      "采用本项目的单维度等权平均。1 表示很少，5 表示总是。中间档位保持数字，原论文只公布两个端点文字。答完本组全部题目后才计算，缺答不补分。",
+      "不同维度的平均分各自保留。结果供本人回顾教学实践，缺少用于教师比较或专业发展水平分级的本地依据。"
+    ],
+    "disclaimer": "本结果为试用版的自评记录，供科学教师自愿反思或研究。课程、资源和开展机会都会影响作答；教师绩效、职称评定和学生学习成效需要独立证据。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "kstc2020_slp_content_teacher_zh_cn/1.0.0/1.0.0-zh-cn-reflection-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-zh-cn-reflection-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      }
+    }
+  }
+}

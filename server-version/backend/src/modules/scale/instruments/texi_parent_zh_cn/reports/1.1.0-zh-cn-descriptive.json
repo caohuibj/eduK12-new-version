@@ -1,0 +1,125 @@
+{
+  "toolKey": "texi_parent_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-zh-cn-descriptive",
+  "title": "英文题本｜家长观察简中报告",
+  "report": {
+    "reportVersion": "1.1.0-zh-cn-descriptive",
+    "artworkKey": "texi_parent_zh_cn/1.0.0/1.1.0-zh-cn-descriptive",
+    "primaryScoreKeys": [
+      "working_memory",
+      "inhibition"
+    ],
+    "scoreOrder": [
+      "working_memory",
+      "inhibition",
+      "total_mean"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "working_memory",
+        "scoreLabel": "工作记忆均分",
+        "headline": "在家里的日常流程中找得到下一步",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这 9 道题记录您观察到的记住要求、做多步骤任务和安排活动的困难。均分在 1–5 分之间，越高表示本次家长观察到的困难越多。可回想一次收拾物品或完成家务的经过，区分孩子是漏掉某一步，还是需要先看一遍示范。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "与孩子一起回想一件熟悉的事情，问问在哪里容易卡住，哪种提醒曾经有帮助。"
+          },
+          {
+            "category": "strategy",
+            "text": "把一项常规任务分成几步，和孩子一起写在便签上。提醒时只指出眼前一步，适应后按约定逐渐减少提示。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "inhibition",
+        "scoreLabel": "抑制与自我调节均分",
+        "headline": "在活动转换前建立可预期的提示",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这 11 道题记录您观察到的停下当前活动、开始或继续完成任务等方面的表现。均分越高，表示本次在家庭情境中观察到的困难越多。可留意何种时间、环境或任务安排让转换特别费力。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "比较一次转换顺利和一次特别困难的情形，留意两次是否有提前约定，以及下一件事是否清楚。"
+          },
+          {
+            "category": "strategy",
+            "text": "与孩子约定一个简短的提前提醒，并商量活动结束后第一步做什么。先在一个日常环节试用，再讨论是否更容易完成转换。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "total_mean",
+        "scoreLabel": "全题辅助均分",
+        "headline": "先看两个维度，再回顾观察记录",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "旧版平台计算 20 道题的辅助均分，范围为 1–5 分。要理解哪些情境更容易遇到困难，可先分别看工作记忆和抑制与自我调节，再结合一件具体的事情。",
+        "bands": [],
+        "guidance": []
+      }
+    ],
+    "limitations": [
+      "题本使用已登记的英文原文，报告提供简体中文解读。适用年龄依原研究为 13 至 19 岁。",
+      "按作者分表对 9 个工作记忆题和 11 个抑制题分别求 1–5 分均分。平台在对应题组完整作答后计算。",
+      "家长观察依据您熟悉的日常场景。来自学校的观察和青少年的自评各自保留，了解不同情境时可分别核对。",
+      "结果用于回顾此次填写或观察。正式诊断、分流和能力等级需要独立评估。作者暂未发布年龄常模或判定界值。"
+    ],
+    "disclaimer": "本报告基于本次家长观察的原始均分，供回顾日常情境和选择可尝试的支持。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "PARENT_REPORT",
+      "audience": "parent",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-zh-cn-descriptive",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "scoreDerivedLabels": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "scoreDerivedLabels": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "scoreDerivedLabels": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "scoreDerivedLabels": false,
+        "artwork": true
+      }
+    }
+  }
+}
