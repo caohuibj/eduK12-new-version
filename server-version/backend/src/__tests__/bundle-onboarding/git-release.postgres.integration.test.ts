@@ -7,7 +7,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { hashDeclarativePackage, type DeclarativePackage } from '../../modules/assessment-bundle/onboarding/contract'
 import { writePackage } from '../../modules/assessment-bundle/onboarding/loader'
 import { scaffoldPackage } from '../../modules/assessment-bundle/onboarding/template'
-import { syncBundleGitReleases } from '../../modules/bundle-product/git-release'
+import { applyBundleGitReleases, prepareBundleGitReleases } from '../../modules/bundle-product/git-release'
 import { changePackageStatus, installPackage, publishPackage } from '../../modules/bundle-product/package-release'
 import { ensureGitScalePublisher } from '../../modules/scale/onboarding/git-release-actor'
 import { publishStaticMeasurementFixture } from '../fixtures/published-measurement'
@@ -31,7 +31,10 @@ suite('declared Bundle releases in an isolated PostgreSQL transaction', () => {
       ...(state === 'ONLINE' ? { review: { contentHash, claims: ['independent_summary'] } } : {}),
       ...(replaces ? { replaces } : {}) }
   }
-  const sync = (who = actor) => db.$transaction(tx => syncBundleGitReleases(root, tx, who, commit), { timeout: 30_000 })
+  const sync = async (who = actor) => {
+    const prepared = await prepareBundleGitReleases(root)
+    return db.$transaction(tx => applyBundleGitReleases(prepared, tx, who, commit), { timeout: 30_000 })
+  }
   const read = (bundleKey: string, version?: string) => db.bundlePackageRelease.findUniqueOrThrow({ where: releaseWhere(bundleKey, version) })
   beforeAll(async () => {
     requireIsolatedReleaseDatabase(url!)

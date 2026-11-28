@@ -10,7 +10,10 @@ import { publicDeclarationDependencies } from '../assessment-bundle/onboarding/p
 import { BUNDLE_KEY, EXACT_VERSION, HEX_HASH } from '../assessment-bundle/schema'
 import { gitReleaseManifestFields, gitReleaseSelectionFields, resolveGitReleaseStates } from '../measurement-content/git-release-manifest'
 import { BundleDefinitionProvider } from './definition-provider'
-import { applyGitBundleRelease, assertApprovedBundleClaims, gitBundleReviewSchema, lockBundleRelease, type GitBundleAction } from './package-release'
+import {
+  applyGitBundleRelease, assertApprovedBundleClaims, assertBundleInstallationIdentity,
+  gitBundleReviewSchema, lockBundleRelease, type GitBundleAction,
+} from './package-release'
 
 const keySchema = z.string().regex(BUNDLE_KEY).max(100)
 const versionSchema = z.string().regex(EXACT_VERSION).max(64)
@@ -136,33 +139,48 @@ export function checkBundleGitRelease(root: string, key: string): BundleGitCheck
   }) }
 }
 
-/** Consume repository declarations in the caller's single deployment transaction.
- * A missing control file performs no publication or withdrawal. */
-export async function syncBundleGitReleases(
-  root: string, tx: Prisma.TransactionClient, actorId: string, gitCommitSha: string
-): Promise<BundleGitSyncResult[]> {
+/** Resolve immutable inputs before the deployment transaction acquires locks. */
+export async function prepareBundleGitReleases(root: string) {
   const tools = entries(root).map(dir => {
     if (!dir.isDirectory()) throw new Error('BUNDLE_GIT_TOOL_DIRECTORY_REQUIRED:' + dir.name)
     return { key: dir.name, ...readBundle(root, dir.name, false) }
-  }).filter(tool => tool.releases.length > 0)
-  if (!tools.length) return []
+  }).filter(tool => tool.releases.length > 0).map(({ key, releases, packages }) => ({
+    key,
+    lockOrder: releases.map(release => release.releaseKey).sort((a, b) => a.localeCompare(b)),
+    releases: [...releases].sort((a, b) => Number(a.effectiveState === 'ONLINE') - Number(b.effectiveState === 'ONLINE'))
+      .map(release => ({ ...release, pack: packages.get(release.releaseKey)!.content })),
+  }))
+  const live = tools.flatMap(tool => tool.releases.filter(release => release.effectiveState === 'ONLINE'))
+  if (live.length) {
+    const { createCodeBundleDefinitionProvider } = await import('./code-catalog')
+    const catalog = createCodeBundleDefinitionProvider()
+    for (const { pack, contentHash } of live) assertBundleInstallationIdentity(catalog, pack, contentHash)
+  }
+  return tools
+}
+
+export async function applyBundleGitReleases(
+  prepared: Awaited<ReturnType<typeof prepareBundleGitReleases>>,
+  tx: Prisma.TransactionClient, actorId: string, gitCommitSha: string,
+): Promise<BundleGitSyncResult[]> {
+  if (!prepared.length) return []
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('bundle-git-release-sync'))`
   const results: BundleGitSyncResult[] = []
-  for (const { key, releases, packages } of tools) {
-    for (const { releaseKey } of [...releases].sort((a, b) => a.releaseKey.localeCompare(b.releaseKey))) {
+  for (const { key, lockOrder, releases } of prepared) {
+    for (const releaseKey of lockOrder) {
       await lockBundleRelease(tx, key, releaseKey)
     }
     // Withdrawal and publication share one transaction, including any publisher
     // validation that can reject the entire replacement.
-    for (const release of [...releases].sort((a, b) => Number(a.effectiveState === 'ONLINE') - Number(b.effectiveState === 'ONLINE'))) {
-      const { releaseKey, contentHash, allowedEntries, effectiveState, state, review, replaces } = release
+    for (const release of releases) {
+      const { releaseKey, contentHash, allowedEntries, effectiveState, state, review, replaces, pack } = release
       const selection = { key, releaseKey, contentHash, allowedEntries, state, effectiveState }
       if (effectiveState === 'HOLD') {
         results.push({ ...selection, action: 'UNCHANGED' })
         continue
       }
       const outcome = await applyGitBundleRelease(tx, {
-        actorId, gitCommitSha, pack: packages.get(releaseKey)!.content, contentHash, state, effectiveState, allowedEntries, review, replaces,
+        actorId, gitCommitSha, pack, contentHash, state, effectiveState, allowedEntries, review, replaces,
       })
       const operatorPaused = outcome.action === 'MANUAL_HOLD' || outcome.action === 'MANUAL_OVERRIDE'
       if (effectiveState === 'WITHDRAWN' && release.isPredecessor && operatorPaused) {
@@ -172,4 +190,11 @@ export async function syncBundleGitReleases(
     }
   }
   return results
+}
+
+/** Compatibility wrapper for callers that provide their own transaction. */
+export async function syncBundleGitReleases(
+  root: string, tx: Prisma.TransactionClient, actorId: string, gitCommitSha: string,
+): Promise<BundleGitSyncResult[]> {
+  return applyBundleGitReleases(await prepareBundleGitReleases(root), tx, actorId, gitCommitSha)
 }

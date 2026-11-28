@@ -1,11 +1,13 @@
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { hashDeclarativePackage } from '../../modules/assessment-bundle/onboarding/contract'
 import { discoverPackages, writePackage } from '../../modules/assessment-bundle/onboarding/loader'
 import { scaffoldPackage } from '../../modules/assessment-bundle/onboarding/template'
-import { checkBundleGitRelease, syncBundleGitReleases } from '../../modules/bundle-product/git-release'
+import {
+  applyBundleGitReleases, checkBundleGitRelease, prepareBundleGitReleases, syncBundleGitReleases,
+} from '../../modules/bundle-product/git-release'
 
 describe('Bundle Git release declarations', () => {
   const key = 'git_release_check_fixture'
@@ -62,6 +64,16 @@ describe('Bundle Git release declarations', () => {
     expect(checkBundleGitRelease(root, key).versions).toMatchObject([
       { releaseKey: '1.0.0', state: 'ONLINE', effectiveState: 'WITHDRAWN' },
       { releaseKey: '2.0.0', state: 'ONLINE', effectiveState: 'ONLINE' },
+    ])
+  })
+
+  it('applies a validated release without rereading repository files', async () => {
+    manifest([{ ...online('1.0.0', hash), state: 'HOLD' }])
+    const prepared = await prepareBundleGitReleases(root)
+    fs.rmSync(root, { recursive: true })
+    const tx = { $executeRaw: vi.fn().mockResolvedValue(0) }
+    await expect(applyBundleGitReleases(prepared, tx as never, 'unused', 'a'.repeat(40))).resolves.toMatchObject([
+      { key, releaseKey: '1.0.0', effectiveState: 'HOLD', action: 'UNCHANGED' },
     ])
   })
 

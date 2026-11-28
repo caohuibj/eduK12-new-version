@@ -11,7 +11,7 @@ type InstallPlan={action:'CREATE_DRAFT'|'ALREADY_PRESENT'|'BLOCKED'|'CREATED_DRA
 type InstallRow=Identity&InstallPlan
 type Operation={schemaVersion:1;mode:'PREVIEW'|'APPLY';rows:InstallRow[];hasBlocked:boolean}
 type Candidate=Identity&{name:string;reportVersion:string|null;
-  profiles:Array<{key:string;estimatedMinutes:[number,number]}>;reportMetrics:string[];plan:InstallPlan}
+  profiles:Array<{key:string;estimatedMinutes:[number,number]}>;reportMetrics:string[];plan:InstallPlan;profileOnly?:true}
 type Catalog={schemaVersion:1;registered:Candidate[];pending:Array<{testType:string;sourcePR:441;reasons:string[]}>}
 const root='/admin/permissions/cognitive-intake'
 const identity=(row:Identity):Identity=>({testType:row.testType,configVersion:row.configVersion,engineVersion:row.engineVersion,scoringVersion:row.scoringVersion})
@@ -47,7 +47,8 @@ function CognitiveIntakeWorkspace(){
   const pageSize=12
   const selectionPanel=useRef<HTMLElement>(null)
   const [catalog,setCatalog]=useState<Catalog|null>(null),[selectedKey,setSelectedKey]=useState<string|null>(null)
-  useEffect(()=>{if(selectedKey){selectionPanel.current?.focus({preventScroll:true});selectionPanel.current?.scrollIntoView?.({block:'start',behavior:'smooth'})}},[selectedKey])
+  const [profileSelection,setProfileSelection]=useState<Candidate|null>(null)
+  useEffect(()=>{if(selectedKey||profileSelection){selectionPanel.current?.focus({preventScroll:true});selectionPanel.current?.scrollIntoView?.({block:'start',behavior:'smooth'})}},[selectedKey,profileSelection])
   const filtered=catalog?.registered.filter(row=>[row.name,row.testType,row.configVersion,row.engineVersion,row.scoringVersion].join(' ').toLowerCase().includes(query.trim().toLowerCase()))
   const pages=Math.max(1,Math.ceil((filtered?.length??0)/pageSize))
   const visible=filtered?.slice((page-1)*pageSize,page*pageSize)
@@ -71,7 +72,7 @@ function CognitiveIntakeWorkspace(){
       if(!current(request))return
       if(response.code!==0||response.data?.schemaVersion!==1||!Array.isArray(response.data.registered)||!Array.isArray(response.data.pending))
         throw new Error(response.message||'候选列表响应不完整')
-      setCatalog(response.data);setPage(1);setSelectedKey(null);setNeedsRefresh(false)
+      setCatalog(response.data);setPage(1);setSelectedKey(null);setProfileSelection(null);setNeedsRefresh(false)
     }catch(caught){if(current(request)){setNeedsRefresh(true);setError(requestError(caught))}}
     finally{finish(request)}
   },[begin,current,finish])
@@ -79,8 +80,11 @@ function CognitiveIntakeWorkspace(){
     mounted.current=true;void refresh()
     return()=>{mounted.current=false;epoch.current++;locked.current=false}
   },[refresh])
-  const selected=catalog?.registered.find(row=>key(row)===selectedKey)
-  const updatePlan=(selected:Identity,plan:InstallRow)=>setCatalog(old=>old?{...old,registered:old.registered.map(row=>key(row)===key(selected)?{...row,plan}:row)}:old)
+  const selected=profileSelection??catalog?.registered.find(row=>key(row)===selectedKey)
+  const updatePlan=(selected:Identity,plan:InstallRow)=>{
+    setProfileSelection(old=>old&&key(old)===key(selected)?{...old,plan}:old)
+    setCatalog(old=>old?{...old,registered:old.registered.map(row=>key(row)===key(selected)?{...row,plan}:row)}:old)
+  }
   const inspect=async()=>{
     if(!selected||needsRefresh)return
     const request=begin();if(request===null)return
@@ -139,7 +143,7 @@ function CognitiveIntakeWorkspace(){
 
   const retireConfig = async () => {
     const configId = selected?.plan.configId
-    if (!selected || !configId || needsRefresh || selected.plan.status !== 'PUBLISHED') return
+    if (!selected || !configId || (needsRefresh&&!selected.profileOnly) || selected.plan.status !== 'PUBLISHED') return
     if (!window.confirm(`确认停用/退役 ${selected.name}（${selected.configVersion}）？停止新创建任务，已开始的作答与报告保持可读。`)) return
     const request = begin(); if (request === null) return
     const choice = identity(selected)
@@ -166,11 +170,13 @@ function CognitiveIntakeWorkspace(){
         `/cognitive/profile-configurations/system/${encodeURIComponent(configId)}/${encodeURIComponent(targetProfile)}`,
       )
       if (!current(request)) return
-      if (response.code !== 0 || !response.data) throw new Error(response.message || '读取 Profile 失败')
+      if (response.code !== 0 || response.data?.configId !== configId || response.data?.profile !== targetProfile
+        || !/^[0-9a-f]{64}$/.test(response.data.artifactHash)) throw new Error('Profile 摘要回执与所选配置不一致')
       const existing = response.data.approvedProducts ?? []
       setProfileKey(targetProfile)
       setProfilePreview(response.data)
-      setAllowedProducts(existing.length > 0 ? existing : response.data.hasPriorPolicy ? [] : ['SURVEY', 'TRAINING'])
+      setAllowedProducts(existing.length > 0 ? existing : response.data.hasPriorPolicy || selected.profileOnly ? [] : ['SURVEY', 'TRAINING'])
+      if(selected.profileOnly)setApprovalReason('')
     } catch (caught) {
       if (current(request)) setError(requestError(caught))
     } finally { finish(request) }
@@ -221,19 +227,17 @@ function CognitiveIntakeWorkspace(){
             {row.plan.reasons.length>0&&<ul>{row.plan.reasons.map((reason,index)=><li key={index}>{reason}</li>)}</ul>}
             <button type="button" disabled={busy||needsRefresh||selectedKey===key(row)} onClick={()=>{
               if(locked.current||needsRefresh)return
-              setSelectedKey(key(row));setPreview(null);setError('');setNotice('');setProfileKey(row.profiles[0]?.key??'standard');setProfilePreview(null);setProfileStatus('')
+              setSelectedKey(key(row));setProfileSelection(null);setPreview(null);setError('');setNotice('');setProfileKey(row.profiles[0]?.key??'standard');setProfilePreview(null);setProfileStatus('')
             }}>{selectedKey===key(row)?`已选择 ${row.name}`:`选择 ${row.name}`}</button>
             <details className="sys-technical"><summary>反馈指标与配置标识</summary><p>{row.reportMetrics.join('、')||'未声明反馈指标'}</p>{row.plan.configId&&<p>配置标识：{row.plan.configId}</p>}</details>
           </div></details></article>)}</div>
         {pages>1&&<nav className="system-actions" aria-label="认知候选分页"><button type="button" disabled={busy||page===1} onClick={()=>setPage(value=>value-1)}>上一页</button><span>第 {page} / {pages} 页</span><button type="button" disabled={busy||page===pages} onClick={()=>setPage(value=>value+1)}>下一页</button></nav>}
       </section>
       <CognitiveReportRevisionEditor onSelectForApproval={source=>{
-        if(!catalog||locked.current)return
-        const choice=identity(source)
-        const candidate:Candidate={...choice,name:source.name,reportVersion:source.configVersion,
-          profiles:source.profiles,reportMetrics:[],plan:{action:'ALREADY_PRESENT',status:'PUBLISHED',configId:source.id,reasons:[]}}
-        setCatalog(old=>old?{...old,registered:[candidate,...old.registered.filter(item=>key(item)!==key(choice))]}:old)
-        setSelectedKey(key(choice));setPreview(null);setProfilePreview(null);setProfileStatus('')
+        if(locked.current)return
+        setProfileSelection({...identity(source),name:source.name,reportVersion:source.configVersion,profileOnly:true,
+          profiles:source.profiles,reportMetrics:[],plan:{action:'ALREADY_PRESENT',status:'PUBLISHED',configId:source.id,reasons:[]}})
+        setSelectedKey(null);setPreview(null);setError('');setNotice('');setProfilePreview(null);setProfileStatus('')
         setProfileKey(source.profiles[0]?.key??'standard')
       }}/>
       <section className="sys-panel" aria-label="待审核认知候选"><h2>待审核候选</h2><p className="sys-muted">保留已开发内容与具体缺口，当前不能从这里安装。</p>
@@ -241,12 +245,12 @@ function CognitiveIntakeWorkspace(){
         <div className="sys-records">{catalog?.pending.map(row=><article className="sys-record" key={row.testType}><details><summary><span className="sys-record-heading"><strong>{row.testType}</strong><small>PR{row.sourcePR} · 待审核</small></span><ChevronDown size={17} aria-hidden="true"/></summary><div className="sys-record-body"><ul>{row.reasons.map((reason,index)=><li key={index}>{reason}</li>)}</ul></div></details></article>)}</div>
       </section>
     </div><aside className="sys-rail" aria-label="认知安装操作">
-      <section ref={selectionPanel} tabIndex={-1} aria-label="本次认知配置选择" className="sys-panel"><h2>本次选择</h2>{selected?<><p>{selected.name} · 配置 {selected.configVersion}</p><p>{planLabel(selected.plan)}</p>
+      <section ref={selectionPanel} tabIndex={-1} aria-label="本次认知配置选择" className="sys-panel"><h2>本次选择</h2>{selected?<><p>{selected.name} · 配置 {selected.configVersion}</p><p>{selected.profileOnly&&selected.plan.status==='PUBLISHED'?'报告已保存 · 入口准入独立审批':planLabel(selected.plan)}</p>
         {preview&&<div role="status"><p>预览结果：{planLabel(preview)}</p>{preview.reasons.length>0&&<ul>{preview.reasons.map((reason,index)=><li key={index}>{reason}</li>)}</ul>}</div>}
-        <button type="button" disabled={busy||needsRefresh} onClick={()=>void inspect()}>预览所选配置</button>
+        {!selected.profileOnly&&<button type="button" disabled={busy||needsRefresh} onClick={()=>void inspect()}>预览所选配置</button>}
         {preview?.action==='CREATE_DRAFT'&&!needsRefresh&&<button type="button" className="sys-primary" disabled={busy} onClick={()=>void install()}>安装为草稿</button>}
         {selected.plan.configId&&selected.plan.status==='DRAFT'&&!needsRefresh&&<button type="button" className="sys-primary" disabled={busy} onClick={()=>void publishConfig()}>发布此配置</button>}
-        {selected.plan.configId&&selected.plan.status==='PUBLISHED'&&!needsRefresh&&<>
+        {selected.plan.configId&&selected.plan.status==='PUBLISHED'&&(!needsRefresh||selected.profileOnly)&&<>
           <div className="sys-technical" aria-label="Profile 准入审批">
             <p>已发布配置可按 Profile 启用产品准入（需下方管理员双因素验证）：</p>
             <label>选择 Profile<select value={profileKey||selected.profiles[0]?.key||'standard'} disabled={busy} onChange={e=>{setProfileKey(e.target.value);setProfilePreview(null);setProfileStatus('')}}>
@@ -282,7 +286,7 @@ function CognitiveIntakeWorkspace(){
           <button type="button" disabled={busy} onClick={()=>void retireConfig()}>退役此配置</button>
         </>}
       </>:<p className="sys-muted">在已登记候选中选择一项，再核对安装状态。</p>}</section>
-      <details className="sys-panel sys-verification"><summary><ShieldCheck size={18} aria-hidden="true"/>安装操作验证</summary><p>安装前或批准 Profile 入口准入前使用现有管理员双因素验证，有效期五分钟；验证不会自动提交操作。</p>
+      <details className="sys-panel sys-verification"><summary><ShieldCheck size={18} aria-hidden="true"/>安装操作验证</summary><p>安装、保存报告或批准 Profile 入口准入前使用现有管理员双因素验证，有效期五分钟；验证不会自动提交操作。</p>
         <fieldset disabled={busy}><AdminStepUp onVerified={()=>{if(mounted.current)setNotice(needsRefresh?'身份验证已完成。请先刷新回读，再重新预览。':'身份验证已完成。请核对所选版本，再执行安装或审批。')}}/></fieldset></details>
       <section className="sys-panel sys-guide"><h2>安装与发布状态</h2><p>新配置先安装为 DRAFT 草稿（不授予产品权限）；点击“发布此配置”后可按 Profile 批准启用的产品入口；必要时可“退役此配置”，不影响历史作答与报告。</p><p>已存在配置保留原状态；未收到成功回执时，先刷新回读。</p></section>
     </aside></div>

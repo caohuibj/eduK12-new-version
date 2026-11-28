@@ -12,6 +12,9 @@ type Identity={id:string;name:string;testType:string;configVersion:string;engine
   profiles:Array<{key:string;estimatedMinutes:[number,number]}>}
 type SourceDisplay={id:string;title:string;instruction:string;introduction:string;disclaimer:string;
   practicalTips:string[];reportVisibility:Partial<Record<Audience,Partial<Record<Capability,boolean>>>>}
+type SaveReceipt={id:string;name:string;version:string;measurementReleaseId:string;
+  entryApproval:{status:'PENDING'|'CHECK_CURRENT';configId:string;profileKeys:string[]}}
+type SavedRevision={source:Identity;status:SaveReceipt['entryApproval']['status']}
 type Preview={previewHash:string;source:{id:string;name:string;version:string;measurementReleaseId:string};
   effectiveDisclosure:{audiences:SourceDisplay['reportVisibility']}}
 const emptyVisibility=Object.fromEntries(Object.keys(capabilities).map(key=>[key,false])) as Record<Capability,boolean>
@@ -26,7 +29,7 @@ export default function CognitiveReportRevisionEditor({onSelectForApproval}:{onS
   const [sources,setSources]=useState<Identity[]>([]),[page,setPage]=useState(0),[hasMore,setHasMore]=useState(true)
   const [selectedId,setSelectedId]=useState(''),[draft,setDraft]=useState(initialDraft),[visibility,setVisibility]=useState(initialVisibility)
   const [preview,setPreview]=useState<Preview|null>(null),[busy,setBusy]=useState(false),[failure,setFailure]=useState('')
-  const [created,setCreated]=useState<Identity|null>(null)
+  const [created,setCreated]=useState<SavedRevision|null>(null)
   const operation=useRef(false)
   const source=sources.find(row=>row.id===selectedId)
   function changeDraft(key:keyof typeof draft,value:string){setPreview(null);setCreated(null);setDraft(current=>({...current,[key]:value}))}
@@ -39,7 +42,7 @@ export default function CognitiveReportRevisionEditor({onSelectForApproval}:{onS
     if(operation.current)return
     operation.current=true;setBusy(true);setFailure('')
     try{await work()}catch(error){setFailure((error as {code?:unknown}|null)?.code==='ADMIN_KEY_STEP_UP_REQUIRED'
-      ?'请在“安装操作验证”完成管理员双因素验证，再发布这份预览。':apiErrorMessage(error))}
+      ?'请在“安装操作验证”完成管理员双因素验证，再保存这份预览。':apiErrorMessage(error))}
     finally{operation.current=false;setBusy(false)}
   }
   const load=()=>run(async()=>{
@@ -74,11 +77,17 @@ export default function CognitiveReportRevisionEditor({onSelectForApproval}:{onS
   })
   const publish=()=>run(async()=>{
     if(!preview||!source)return
-    const response=await api.post<{id:string;name:string;version:string;measurementReleaseId:string}>(
+    const response=await api.post<SaveReceipt>(
       root+'/'+encodeURIComponent(source.id)+'/publish',{release:release(),expectedPreviewHash:preview.previewHash})
-    if(response.code!==0||!response.data||response.data.measurementReleaseId!==preview.source.measurementReleaseId
-      ||response.data.version!==draft.version)throw Error(response.message||'报告发布回执与预览不一致')
-    setCreated({...source,id:response.data.id,name:response.data.name,configVersion:response.data.version})
+    const saved=response.data
+    const approval=saved?.entryApproval
+    if(response.code!==0||!saved||saved.measurementReleaseId!==preview.source.measurementReleaseId
+      ||saved.version!==draft.version||!saved.id||saved.id===source.id||approval?.configId!==saved.id
+      ||!['PENDING','CHECK_CURRENT'].includes(approval.status)||!Array.isArray(approval.profileKeys))
+      throw Error(response.message||'无法核对报告保存和入口审批回执')
+    const profiles=source.profiles.filter(profile=>approval.profileKeys.includes(profile.key))
+    if(!profiles.length||profiles.length!==approval.profileKeys.length)throw Error('无法核对新版本的 Profile 列表')
+    setCreated({source:{...source,id:saved.id,name:saved.name,configVersion:saved.version,profiles},status:approval.status})
     setPreview(null)
   })
 
@@ -117,10 +126,14 @@ export default function CognitiveReportRevisionEditor({onSelectForApproval}:{onS
         const allowed=(Object.keys(capabilities) as Capability[]).filter(capability=>preview.effectiveDisclosure.audiences[audience]?.[capability])
         return <div key={audience}><dt>{audiences[audience]}</dt><dd>{allowed.map(capability=>capabilities[capability]).join('、')||'无'}</dd></div>
       })}</dl>
-      <button type="button" className="sys-primary" disabled={busy} onClick={()=>void publish()}>发布报告新版本</button>
+      <button type="button" className="sys-primary" disabled={busy} onClick={()=>void publish()}>保存报告新版本</button>
     </section>}
-    {created&&<div role="status"><p>报告 {created.configVersion} 已发布，等待独立入口审批。</p>
-      <button type="button" onClick={()=>onSelectForApproval(created)}>去核对新版本的 Profile 准入</button>
+    {created&&<div>
+      <div role="status">
+        <p>报告 {created.source.configVersion} 已保存。{created.status==='PENDING'?'等待独立入口审批。':'请核对当前入口审批状态。'}</p>
+        <p>配置标识 {created.source.id}。选择需要启用的 Profile，预览摘要，勾选产品入口并填写批准说明。完成“安装操作验证”后提交审批。</p>
+      </div>
+      <button type="button" onClick={()=>onSelectForApproval(created.source)}>前往 Profile 准入审批</button>
     </div>}
   </section>
 }

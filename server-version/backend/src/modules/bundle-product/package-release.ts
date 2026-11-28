@@ -6,6 +6,7 @@ import { hashDeclarativePackage, parseDeclarativePackage } from '../assessment-b
 import { dependencyBlockers } from '../assessment-bundle/onboarding/dependencies'
 import { isProvisionedGitScalePublisher } from '../scale/onboarding/git-release-actor'
 import { GIT_RELEASE_ACTOR_ID } from '../../utils/gitReleaseIdentity'
+import type { BundleDefinitionProvider } from './definition-provider'
 const claimsSchema = z.array(z.enum(['independent_summary', 'cross_source_condition', 'joint_conclusion'])).max(3)
 type Package = ReturnType<typeof parseDeclarativePackage>
 export const gitBundleReviewSchema = z.object({
@@ -45,15 +46,19 @@ function packageWhere(bundleKey: string, bundleVersion: string) {
 export async function lockBundleRelease(db: Prisma.TransactionClient, key: string, version: string) {
   await db.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${key+'@'+version},0))`
 }
-async function prepareInstallation(raw: unknown) {
-  const pack = parseDeclarativePackage(raw)
-  const contentHash = hashDeclarativePackage(pack)
+export function assertBundleInstallationIdentity(catalog: BundleDefinitionProvider, pack: Package, contentHash: string) {
   const { bundleKey, bundleVersion } = pack.manifest.definition
-  const existing = (await import('./code-catalog')).createCodeBundleDefinitionProvider().exact(bundleKey, bundleVersion)
+  const existing = catalog.exact(bundleKey, bundleVersion)
   if (existing && !existing.declarativePackage) throw new Error('BUNDLE_LEGACY_IDENTITY_RESERVED')
   if (existing?.declarativePackage && hashDeclarativePackage(existing.declarativePackage) !== contentHash) {
     throw new Error('BUNDLE_VERSION_IMMUTABLE')
   }
+}
+async function prepareInstallation(raw: unknown) {
+  const pack = parseDeclarativePackage(raw)
+  const contentHash = hashDeclarativePackage(pack)
+  const { createCodeBundleDefinitionProvider } = await import('./code-catalog')
+  assertBundleInstallationIdentity(createCodeBundleDefinitionProvider(), pack, contentHash)
   verifyPackageFixtures(pack)
   const blockers = dependencyBlockers(pack)
   if (blockers.length) throw new Error(blockers.join('; '))
@@ -105,7 +110,7 @@ export function assertApprovedBundleClaims(pack: Package, claims: z.infer<typeof
   }
 }
 async function publishInstalledPackage(
-  tx: Prisma.TransactionClient, actorId: string, row: BundlePackageRelease, rawReview?: unknown, gitCommitSha?: string
+  tx: Prisma.TransactionClient, actorId: string, row: BundlePackageRelease, rawReview?: unknown
 ) {
   if (row.status === 'RETIRED') throw new Error('BUNDLE_RETIRED')
   if (row.status === 'PUBLISHED') return row
@@ -123,14 +128,20 @@ async function publishInstalledPackage(
   const blockers = dependencyBlockers(pack)
   if (blockers.length) throw new Error(blockers.join('; '))
   assertApprovedBundleClaims(pack, claims)
+  return publishPreparedPackage(tx, actorId, row, pack, { ...parsed, claims })
+}
+async function publishPreparedPackage(
+  tx: Prisma.TransactionClient, actorId: string, row: BundlePackageRelease, pack: Package,
+  review: ReturnType<typeof validateReview>, gitCommitSha?: string,
+) {
   await assertPublishedDependencies(tx, pack)
   if (gitCommitSha) {
     const { assertGitBundleDependencies } = await import('./git-release-dependencies')
     await assertGitBundleDependencies(tx, pack)
   }
   const releaseMeta = gitCommitSha
-    ? { ...parsed, source: 'SYSTEM_GIT_RELEASE', gitCommitSha, claims }
-    : { ...parsed, reviewerId: actorId, reviewedAt: new Date().toISOString(), claims }
+    ? { ...review, source: 'SYSTEM_GIT_RELEASE', gitCommitSha }
+    : { ...review, reviewerId: actorId, reviewedAt: new Date().toISOString() }
   return tx.bundlePackageRelease.update({
     where: packageWhere(row.bundleKey, row.bundleVersion),
     data: { status: 'PUBLISHED', review: releaseMeta as Prisma.InputJsonValue, publishedBy: actorId },
@@ -181,12 +192,7 @@ export async function applyGitBundleRelease(tx: Prisma.TransactionClient, input:
   if (!/^[a-f0-9]{40}$/.test(gitCommitSha) || !await isProvisionedGitScalePublisher(tx, actorId)) {
     throw new Error('BUNDLE_GIT_AUTHORITY_REQUIRED')
   }
-  if (hashDeclarativePackage(pack) !== contentHash) throw new Error('BUNDLE_CONTENT_HASH_MISMATCH')
-  const review = effectiveState === 'ONLINE' ? gitBundleReviewSchema.parse(input.review) : undefined
-  if (review) {
-    if (review.contentHash !== contentHash) throw new Error('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
-    assertApprovedBundleClaims(pack, review.claims)
-  }
+  const { review } = input
   await lockBundleRelease(tx, bundleKey, bundleVersion)
   const prior = await tx.bundlePackageRelease.findUnique({ where: packageWhere(bundleKey, bundleVersion) })
   if (prior && (prior.contentHash !== contentHash || hashDeclarativePackage(prior.content) !== contentHash)) {
@@ -196,7 +202,7 @@ export async function applyGitBundleRelease(tx: Prisma.TransactionClient, input:
 
   if (prior && prior.installedBy !== actorId) {
     if (effectiveState === 'ONLINE' && prior.status === 'PUBLISHED') {
-      await validatePackageAdmission(tx, pack, prior)
+      await validatePackageAdmission(tx, pack, prior, contentHash)
       const { assertGitBundleDependencies } = await import('./git-release-dependencies')
       await assertGitBundleDependencies(tx, pack)
       return { action: 'MANUAL', releaseId: prior.id }
@@ -213,7 +219,7 @@ export async function applyGitBundleRelease(tx: Prisma.TransactionClient, input:
     || receipt.rowUpdatedAt !== prior.updatedAt.toISOString())) {
     return { action: prior.status === 'PUBLISHED' ? 'MANUAL_OVERRIDE' : 'MANUAL_HOLD', releaseId: prior.id }
   }
-  if (review && prior?.review) {
+  if (effectiveState === 'ONLINE' && review && prior?.review) {
     const existing = validateReview(prior.review, contentHash)
     const claimKey = (claims: GitBundleReview['claims']) => [...claims].sort().join(',')
     if (typeof prior.review !== 'object' || !('source' in prior.review) || prior.review.source !== 'SYSTEM_GIT_RELEASE' ||
@@ -225,13 +231,17 @@ export async function applyGitBundleRelease(tx: Prisma.TransactionClient, input:
   let row: BundlePackageRelease, action: GitBundleAction
   if (effectiveState === 'ONLINE') {
     if (prior?.status === 'PUBLISHED') {
-      await validatePackageAdmission(tx, pack, prior)
+      await validatePackageAdmission(tx, pack, prior, contentHash)
       const { assertGitBundleDependencies } = await import('./git-release-dependencies')
       await assertGitBundleDependencies(tx, pack)
       return { action: 'UNCHANGED', releaseId: prior.id }
     }
-    const installed = prior ?? await installPreparedPackage(tx, actorId, await prepareInstallation(pack))
-    row = await publishInstalledPackage(tx, actorId, installed, review, gitCommitSha)
+    if (!review) throw new Error('BUNDLE_GIT_REVIEW_HASH_REQUIRED')
+    if (prior?.status === 'RETIRED') throw new Error('BUNDLE_RETIRED')
+    const installed = prior ?? await installPreparedPackage(tx, actorId, { pack, contentHash })
+    // A new insert must preserve the exact preflighted content across the JSONB round-trip.
+    if (!prior && hashDeclarativePackage(installed.content) !== contentHash) throw new Error('BUNDLE_CONTENT_HASH_MISMATCH')
+    row = await publishPreparedPackage(tx, actorId, installed, pack, review, gitCommitSha)
     action = prior ? 'RESTORED' : 'PUBLISHED'
   } else {
     if (!prior) return { action: 'ABSENT' }
@@ -257,11 +267,18 @@ export async function assertPackageAdmission(db:Prisma.TransactionClient,raw:unk
   const row=await db.bundlePackageRelease.findUnique({where:{bundleKey_bundleVersion:{bundleKey:d.bundleKey,bundleVersion:d.bundleVersion}}})
   return validatePackageAdmission(db,p,row)
 }
-async function validatePackageAdmission(db:Prisma.TransactionClient,p:ReturnType<typeof parseDeclarativePackage>,row:BundlePackageRelease|null){
-  if(!row||row.status!=='PUBLISHED'||row.contentHash!==hashDeclarativePackage(p))throw new Error('BUNDLE_PACKAGE_NOT_PUBLISHED')
-  const review=row.review?validateReview(row.review,row.contentHash):null
-  if(review&&p.schemaVersion===2&&!review.claims.includes('cross_source_condition'))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
-  const blockers = dependencyBlockers(p); if (blockers.length) throw new Error(blockers.join('; '))
+async function validatePackageAdmission(
+  db: Prisma.TransactionClient, p: Package, row: BundlePackageRelease | null, preparedContentHash?: string,
+) {
+  if (!row || row.status !== 'PUBLISHED' || row.contentHash !== (preparedContentHash ?? hashDeclarativePackage(p))) {
+    throw new Error('BUNDLE_PACKAGE_NOT_PUBLISHED')
+  }
+  const review = row.review ? validateReview(row.review, row.contentHash) : null
+  if (review && p.schemaVersion === 2 && !review.claims.includes('cross_source_condition')) throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
+  if (!preparedContentHash) {
+    const blockers = dependencyBlockers(p)
+    if (blockers.length) throw new Error(blockers.join('; '))
+  }
   await assertPublishedDependencies(db, p)
   return row
 }

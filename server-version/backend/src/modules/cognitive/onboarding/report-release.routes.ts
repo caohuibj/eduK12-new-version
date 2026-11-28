@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { Router, type Request, type Response, type NextFunction } from 'express'
-import { Prisma } from '@prisma/client'
+import { Prisma, type CognitiveTestConfig } from '@prisma/client'
 import { z } from 'zod'
 import { prisma } from '../../../config/database'
 import { success, error } from '../../../utils/response'
@@ -68,14 +68,20 @@ export async function prepareCognitiveReportRevision(tx:Prisma.TransactionClient
   }) as Prisma.InputJsonObject
   const previewHash=canonicalHash({sourceId:id,sourceVersion:source.configVersion,measurementReleaseId:measurement.releaseId,
     contentHash:measurement.contentHash,release,config})
-  return {source,measurement,config,effectiveDisclosure,previewHash}
+  return {source,measurement,config,effectiveDisclosure,previewHash,profileKeys:Object.keys(definition.profiles)}
+}
+
+function reportRevisionReceipt(row:Pick<CognitiveTestConfig,'id'|'name'|'configVersion'|'measurementReleaseId'>,profileKeys:string[],replayed:boolean) {
+  return {id:row.id,name:row.name,version:row.configVersion,measurementReleaseId:row.measurementReleaseId,replayed,
+    entryApproval:{status:replayed?'CHECK_CURRENT' as const:'PENDING' as const,configId:row.id,profileKeys},
+  }
 }
 
 export async function publishCognitiveReportRevision(tx:Prisma.TransactionClient,actorId:string,id:string,raw:unknown) {
   const {release,expectedPreviewHash}=commitSchema.parse(raw)
   const ready=await prepareCognitiveReportRevision(tx,id,release)
   if(ready.previewHash!==expectedPreviewHash)throw CONFLICT('报告预览已变化，请重新确认')
-  const {source,measurement,effectiveDisclosure,config,previewHash}=ready
+  const {source,measurement,effectiveDisclosure,config,previewHash,profileKeys}=ready
   const identity={testType:source.testType,configVersion:release.version}
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'cognitive-report-editor:'+source.testType+':'+release.version}))`
   const existing=await tx.cognitiveTestConfig.findUnique({where:{testType_configVersion:identity}})
@@ -84,7 +90,7 @@ export async function publishCognitiveReportRevision(tx:Prisma.TransactionClient
       actorId,resourceId:existing.id,action:'COGNITIVE_ADMIN_REPORT_PUBLISHED',
     }})
     if((operation?.metadata as {previewHash?:string}|null)?.previewHash===previewHash&&existing.status==='PUBLISHED')
-      return {id:existing.id,name:existing.name,version:existing.configVersion,measurementReleaseId:existing.measurementReleaseId,replayed:true}
+      return reportRevisionReceipt(existing,profileKeys,true)
     throw CONFLICT('配置或报告版本已经存在，请使用新的版本号')
   }
   const draft=await tx.cognitiveTestConfig.create({data:{
@@ -108,7 +114,7 @@ export async function publishCognitiveReportRevision(tx:Prisma.TransactionClient
     id:randomUUID(),actorId,resourceId:published.id,action:'COGNITIVE_ADMIN_REPORT_PUBLISHED',
     metadata:{sourceConfigId:id,previewHash,reportReleaseId:report.releaseId,measurementReleaseId:published.measurementReleaseId,entryApprovals:0},
   }})
-  return {id:published.id,name:published.name,version:published.configVersion,measurementReleaseId:published.measurementReleaseId,replayed:false}
+  return reportRevisionReceipt(published,profileKeys,false)
 }
 
 export const cognitiveReportReleaseRouter=Router()

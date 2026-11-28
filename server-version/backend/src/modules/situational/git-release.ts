@@ -2,8 +2,6 @@ import { lstatSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { assetReference } from '../measurement-content/release'
-import { assessmentAssetIdSchema } from '../assessment-media/assessment-asset-identity'
 import { reportTemplateSchema, validateReportTemplateBindings } from '../measurement-content/report-template'
 import { validateReferenceSetDefinition } from '../assessment-reference/reference'
 import { gitReleaseManifestFields, gitReleaseSelectionFields, resolveGitReleaseStates } from '../measurement-content/git-release-manifest'
@@ -44,23 +42,56 @@ export const sjtGitParameterSchema = z.object({
   scientific: scientificSchema,
 }).strict()
 
+const publishedSjtGitParameterSchema = sjtGitParameterSchema.extend({
+  scientific: scientificSchema.superRefine((science, ctx) => {
+    if (science.scientificMaturity !== 'PILOT') {
+      ctx.addIssue({ code: 'custom', path: ['scientificMaturity'], message: 'SJT_GIT_SCIENTIFIC_APPROVAL_NOT_SUPPORTED: active releases must be PILOT' })
+    }
+    if (science.review !== undefined) {
+      ctx.addIssue({ code: 'custom', path: ['review'], message: 'SJT_GIT_SCIENTIFIC_APPROVAL_NOT_SUPPORTED: active releases cannot include a scientific review' })
+    }
+  }),
+})
+
+const sjtGitReportVisibilitySchema = scaleReportVisibilitySchema.superRefine(({ audiences }, ctx) => {
+  for (const [audience, capabilities] of Object.entries(audiences)) {
+    if (audience !== 'researcher' && capabilities && Object.values(capabilities).some(Boolean)) {
+      ctx.addIssue({ code: 'custom', path: ['audiences', audience], message: 'SJT_GIT_SURVEY_DISCLOSURE_NOT_SUPPORTED: only researcher report visibility can be enabled' })
+    }
+  }
+})
+
+const sjtGitReportTemplateSchema = reportTemplateSchema.superRefine(({ blocks }, ctx) => {
+  blocks.forEach((block, index) => {
+    if (block.type === 'ASSET') {
+      ctx.addIssue({ code: 'custom', path: ['blocks', index, 'type'], message: 'SJT_GIT_REPORT_ASSET_BLOCK_UNSUPPORTED' })
+    }
+  })
+})
+
 export const sjtGitReportSchema = z.object({
   schemaVersion: z.literal(1),
   contentVersion: versionSchema,
   parameterVersion: versionSchema,
   version: versionSchema,
   report: situationDefinitionSchema.shape.report.strict(),
-  reportVisibility: scaleReportVisibilitySchema,
-  template: reportTemplateSchema.optional(),
-  assetRefs: z.array(assetReference.extend({ assetId: assessmentAssetIdSchema })).max(100).default([]),
+  reportVisibility: sjtGitReportVisibilitySchema,
+  template: sjtGitReportTemplateSchema.optional(),
+  assetRefs: z.array(z.unknown()).max(0, 'SJT_GIT_REPORT_ASSET_REFS_UNSUPPORTED').default([]),
 }).strict()
 
+const publishedSjtGitReportSchema = sjtGitReportSchema.refine(report => report.template !== undefined, {
+  path: ['template'], message: 'SJT_GIT_SURVEY_REQUIRES_A_SUPPORTED_REPORT_TEMPLATE',
+})
+
+const surveyEntryError = 'SJT_GIT_ONLY_NATIVE_SURVEY_ENTRY_SUPPORTED: allowedEntries must be ["SURVEY"]'
 export const sjtReleaseSelectionSchema = z.object({
   ...gitReleaseSelectionFields,
   releaseKey: releaseKeySchema,
   contentVersion: versionSchema,
   parameterVersion: versionSchema,
   reportVersion: versionSchema,
+  allowedEntries: z.array(z.literal('SURVEY', { error: surveyEntryError })).length(1, surveyEntryError),
   replaces: releaseKeySchema.optional(),
 }).strict()
 export const sjtGitReleasesSchema = z.object({
@@ -111,11 +142,11 @@ function checkPackage(source: z.infer<typeof instrumentSourceSchema>, requireAll
 
 export function prepareSjtReleaseAxes(toolKey: string, release: z.infer<typeof sjtReleaseSelectionSchema>, axesInput: {
   content: unknown; parameters: unknown; report: unknown
-}) {
+}, { activeGitRelease = false } = {}) {
   const { contentVersion, parameterVersion, reportVersion } = release
   const content = sjtGitContentSchema.parse(axesInput.content)
-  const parameters = sjtGitParameterSchema.parse(axesInput.parameters)
-  const report = sjtGitReportSchema.parse(axesInput.report)
+  const parameters = (activeGitRelease ? publishedSjtGitParameterSchema : sjtGitParameterSchema).parse(axesInput.parameters)
+  const report = (activeGitRelease ? publishedSjtGitReportSchema : sjtGitReportSchema).parse(axesInput.report)
   if (content.identity.instrumentKey !== toolKey || content.identity.instrumentVersion !== contentVersion ||
       parameters.contentVersion !== contentVersion || parameters.version !== parameterVersion ||
       report.contentVersion !== contentVersion || report.parameterVersion !== parameterVersion || report.version !== reportVersion) {
@@ -145,12 +176,13 @@ export function prepareSjtReleaseAxes(toolKey: string, release: z.infer<typeof s
   }
   const references = pkg.definition.scenes.flatMap(scene => situationalAssetReferences(scene.stimulus))
   const assets = new Map<string, { assetId: string; sha256: string; mediaType: string }>()
-  for (const ref of [...references.map(x => ({ assetId: x.assetId, sha256: x.contentHash, mediaType: x.mimeType })), ...report.assetRefs]) {
+  for (const asset of references) {
+    const ref = { assetId: asset.assetId, sha256: asset.contentHash, mediaType: asset.mimeType }
     const prior = assets.get(ref.assetId)
     if (prior && canonicalHash(prior) !== canonicalHash(ref)) throw new Error('SJT_GIT_ASSET_IDENTITY_CONFLICT')
     assets.set(ref.assetId, ref)
   }
-  if (report.template) validateReportTemplateBindings(report.template, metricKeys, report.assetRefs.map(ref => ref.assetId))
+  if (report.template) validateReportTemplateBindings(report.template, metricKeys, [])
   const disclosure = compileEffectiveDisclosure(content.dataCeiling, report.reportVisibility, undefined)
   return {
     release,
@@ -175,14 +207,18 @@ export function readSjtGitReleasePlan(root: string, key: string) {
   const manifest = sjtGitReleasesSchema.parse(json(toolRoot, ['releases.json']))
   if (manifest.toolKey !== toolKey) throw new Error('SJT_GIT_MANIFEST_IDENTITY_MISMATCH')
   const states = resolveGitReleaseStates(manifest.releases, { errorPrefix: 'SJT_GIT' })
-  const declarations = manifest.releases.map(release => prepareSjtReleaseAxes(toolKey, release, {
-    content: json(toolRoot, [release.contentVersion, 'content.json']),
-    parameters: json(toolRoot, ['parameters', release.parameterVersion + '.json']),
-    report: json(toolRoot, ['reports', release.reportVersion + '.json']),
-  }))
+  const declarations = manifest.releases.map(release => {
+    const effectiveState = states.get(release.releaseKey)!
+    const item = prepareSjtReleaseAxes(toolKey, release, {
+      content: json(toolRoot, [release.contentVersion, 'content.json']),
+      parameters: json(toolRoot, ['parameters', release.parameterVersion + '.json']),
+      report: json(toolRoot, ['reports', release.reportVersion + '.json']),
+    }, { activeGitRelease: effectiveState === 'ONLINE' })
+    return { ...item, effectiveState }
+  })
   const combinations = new Set(declarations.map(item => canonicalHash(item.axes)))
   if (combinations.size !== declarations.length) throw new Error('SJT_GIT_DUPLICATE_COMBINATION')
-  return { toolKey, declarations: declarations.map(item => ({ ...item, effectiveState: states.get(item.release.releaseKey)! })) }
+  return { toolKey, declarations }
 }
 
 /** CI-compatible structural and scientific check. Actual StoredAsset existence is
@@ -219,8 +255,8 @@ export function checkSjtGitRelease(root: string, key: string) {
 
 export type SjtGitDeclaration = NonNullable<ReturnType<typeof readSjtGitReleasePlan>>['declarations'][number]
 
-/** Fail closed on exposure or entry capabilities the native Survey consumer does
- * not implement. Other declared inputs can remain WITHDRAWN for authoring. */
+/** Check the runtime projection and the capabilities of the native Survey consumer.
+ * Git declarations also check the author-facing inputs before compiling them. */
 export function assertSjtSurveyPublicationSupported(item: SjtGitDeclaration) {
   const { effectiveDisclosure, parameters, pkg, report, release } = item
   if (release.allowedEntries.length !== 1 || release.allowedEntries[0] !== 'SURVEY') {

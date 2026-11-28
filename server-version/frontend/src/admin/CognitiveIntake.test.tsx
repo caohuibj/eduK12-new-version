@@ -194,3 +194,53 @@ it('pages a long candidate directory and resets paging after search',async()=>{
  expect(screen.queryByRole('navigation',{name:'认知候选分页'})).toBeNull()
  expect(mock.post).not.toHaveBeenCalled()
 })
+
+it('saves a report pending independent approval and opens the exact profile without enabling entries',async()=>{
+ const source={...choice,id:'report-source',name:'原认知报告',profiles:[{key:'experience',estimatedMinutes:[2,2]}]}
+ const display={id:source.id,title:source.name,introduction:'示例说明',instruction:'',disclaimer:'示例免责声明',practicalTips:[],reportVisibility:{}}
+ const hash='a'.repeat(64)
+ const profilePath='/cognitive/profile-configurations/system/saved-report/experience'
+ mock.get.mockImplementation(async(path:string)=>{
+  if(path===root)return response(catalog)
+  if(path===root+'/reports?page=1')return response({rows:[source],hasMore:false})
+  if(path===root+'/reports/'+source.id)return response(display)
+  if(path===profilePath)return response({configId:'saved-report',profile:'experience',title:'新版报告',artifactHash:hash,approvedProducts:[]})
+  throw new Error('Unexpected read: '+path)
+ })
+ mock.post.mockImplementation(async(path:string)=>{
+  if(path===root+'/reports/'+source.id+'/preview')return response({previewHash:hash,source:{id:source.id,name:source.name,
+    version:source.configVersion,measurementReleaseId:'same-C'},effectiveDisclosure:{audiences:{}}})
+  if(path===root+'/reports/'+source.id+'/publish')return response({id:'saved-report',name:'新版报告',version:'r2',measurementReleaseId:'same-C',
+    entryApproval:{status:'PENDING',configId:'saved-report',profileKeys:['experience']}})
+  if(path===profilePath+'/approve')return response({artifactHash:hash,allowedProducts:['SCHOOL']})
+  throw new Error('Unexpected write: '+path)
+ })
+ render(<CognitiveIntake/>)
+ await screen.findByText('数字线估计',{selector:'strong'})
+ fireEvent.click(screen.getByRole('button',{name:'读取已发布配置'}))
+ const original=await screen.findByRole('combobox',{name:'原始认知配置'})
+ fireEvent.change(original,{target:{value:source.id}})
+ fireEvent.change(await screen.findByRole('textbox',{name:'新报告版本'}),{target:{value:'r2'}})
+ fireEvent.click(screen.getByRole('button',{name:'预览报告修订'}))
+ fireEvent.click(await screen.findByRole('button',{name:'保存报告新版本'}))
+ await screen.findByText(/报告 r2 已保存。等待独立入口审批/)
+ expect(screen.getByText(/配置标识 saved-report/)).toBeVisible()
+ expect(mock.post.mock.calls.map(call=>call[0])).toEqual([root+'/reports/'+source.id+'/preview',root+'/reports/'+source.id+'/publish'])
+ fireEvent.click(screen.getByRole('button',{name:'前往 Profile 准入审批'}))
+ expect(screen.getByRole('region',{name:'本次认知配置选择'})).toHaveFocus()
+ expect(screen.queryByRole('button',{name:'预览所选配置'})).toBeNull()
+ fireEvent.click(screen.getByRole('button',{name:'预览 Profile 摘要'}))
+ await screen.findByText(/当前已启用入口：暂无/)
+ expect(mock.get).toHaveBeenLastCalledWith(profilePath)
+ for(const entry of ['SURVEY','TRAINING','SCHOOL','TEACHER'])expect(screen.getByRole('checkbox',{name:entry})).not.toBeChecked()
+ const approve=screen.getByRole('button',{name:'批准并启用此 Profile'})
+ expect(approve).toBeDisabled()
+ fireEvent.click(screen.getByRole('checkbox',{name:'SCHOOL'}))
+ expect(approve).toBeDisabled()
+ fireEvent.change(screen.getByRole('textbox',{name:'批准说明'}),{target:{value:'审核通过'}})
+ fireEvent.click(approve)
+ await screen.findByText(/已批准 .*：准入产品 SCHOOL/)
+ expect(mock.post).toHaveBeenLastCalledWith(profilePath+'/approve',{
+  requestId:expect.any(String),expectedArtifactHash:hash,allowedProducts:['SCHOOL'],reason:'审核通过',
+ })
+})

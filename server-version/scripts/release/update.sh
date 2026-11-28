@@ -99,7 +99,12 @@ sync_git_releases() (
   chmod 0755 "$path"
   scale_path="$path"
   if [[ "$git_sync" = content ]]; then scale_path="$path/scale"; fi
-  frontends="$("$entry" ps --status running -q frontend)"
+  local scale_controls=("$scale_path"/*/releases.json)
+  frontends=
+  # Older ops images use the original Scale-only artwork collection contract.
+  if [[ "$git_sync" = scale || -f "${scale_controls[0]:-}" ]]; then
+    frontends="$("$entry" ps --status running -q frontend)"
+  fi
   while IFS= read -r container; do
     [[ -n "$container" ]] || continue
     [[ "$container" =~ ^[a-f0-9]{12,64}$ ]] || die 'Unexpected running frontend container identity'

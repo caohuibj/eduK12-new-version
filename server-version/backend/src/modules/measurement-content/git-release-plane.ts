@@ -65,6 +65,45 @@ export async function checkContentRelease(repoRoot: string, selector: string) {
   return { family, toolKey, releases: (await checkBundleGitRelease(root, toolKey)).versions }
 }
 
+const releaseToolNames: Record<Family, RegExp> = {
+  scale: /^[a-z][a-z0-9_]*$/,
+  bundle: /^[a-z][a-z0-9_]*$/,
+  cognitive: /^[a-z][a-z0-9_-]{0,79}$/,
+  sjt: /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/,
+  form: /^[a-z][a-z0-9_-]{0,100}$/,
+}
+
+function selectedFamilyRoot(inputRoot: string, family: Family) {
+  const root = join(inputRoot, family)
+  const directory = lstatSync(root, { throwIfNoEntry: false })
+  if (!directory) return undefined
+  if (!directory.isDirectory()) throw new Error('Expected a real content family directory: ' + root)
+
+  let selected = false
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    if (!releaseToolNames[family].test(entry.name)) continue
+    const toolRoot = join(root, entry.name)
+    if (entry.isSymbolicLink()) throw new Error('Expected a real declaration directory: ' + toolRoot)
+    if (!entry.isDirectory()) continue
+    const control = join(toolRoot, 'releases.json')
+    const stat = lstatSync(control, { throwIfNoEntry: false })
+    if (!stat) continue
+    if (!stat.isFile()) throw new Error('Expected a regular release control file: ' + control)
+    selected = true
+  }
+  return selected ? root : undefined
+}
+
+function contentTransactionTimeout() {
+  const value = process.env.CONTENT_RELEASE_TRANSACTION_TIMEOUT_MS
+  if (value === undefined) return 120_000
+  const milliseconds = Number(value)
+  if (!/^[1-9][0-9]*$/.test(value) || milliseconds > 2_147_483_647) {
+    throw new Error('CONTENT_RELEASE_TRANSACTION_TIMEOUT_MS must be a positive number of milliseconds (up to 2147483647)')
+  }
+  return milliseconds
+}
+
 export async function syncContentReleases(
   db: PrismaClient,
   inputRoot: string,
@@ -74,34 +113,43 @@ export async function syncContentReleases(
   if (actorId !== GIT_RELEASE_ACTOR_ID || !/^[0-9a-f]{40}$/.test(gitCommitSha)) {
     throw new Error('Content sync requires the reserved deployment identity and an exact main SHA')
   }
+  const timeout = contentTransactionTimeout()
   requireDirectory(inputRoot)
-  const scaleRoot = requireDirectory(join(inputRoot, 'scale'))
-  const hasScaleControl = readdirSync(scaleRoot, { withFileTypes: true }).some(entry =>
-    /^[a-z][a-z0-9_]*$/.test(entry.name) && entry.isDirectory() &&
-    lstatSync(join(scaleRoot, entry.name, 'releases.json'), { throwIfNoEntry: false })?.isFile())
-  if (!hasScaleControl) throw new Error('The committed snapshot must contain a Scale release control file')
-  const bundleRoot = requireDirectory(join(inputRoot, 'bundle'))
-  const cognitiveRoot = requireDirectory(join(inputRoot, 'cognitive'))
-  const sjtRoot = requireDirectory(join(inputRoot, 'sjt'))
-  const formRoot = requireDirectory(join(inputRoot, 'form'))
-  const { loadDeclaredScaleReleases } = await import('../scale/declarative/load')
-  const { assertLiveScaleReportArtwork } = await import('../scale/declarative/live-artwork')
-  const releases = loadDeclaredScaleReleases(scaleRoot)
-  assertLiveScaleReportArtwork(scaleRoot, releases)
-  const { syncGitScaleReleasesInTransaction } = await import('../scale/onboarding/git-release-publication')
-  const { syncCognitiveGitReleases } = await import('../cognitive/git-release')
-  const { syncSjtGitReleases } = await import('../situational/git-publish')
-  const { syncFormGitReleases } = await import('../form/git-release')
-  const { syncBundleGitReleases } = await import('../bundle-product/git-release')
+  const scaleRoot = selectedFamilyRoot(inputRoot, 'scale')
+  const cognitiveRoot = selectedFamilyRoot(inputRoot, 'cognitive')
+  const sjtRoot = selectedFamilyRoot(inputRoot, 'sjt')
+  const formRoot = selectedFamilyRoot(inputRoot, 'form')
+  const bundleRoot = selectedFamilyRoot(inputRoot, 'bundle')
+  if (!scaleRoot && !cognitiveRoot && !sjtRoot && !formRoot && !bundleRoot) {
+    throw new Error('The committed snapshot must contain a supported content release control file')
+  }
+
+  const { prepareGitScaleReleases, lockGitReleaseSnapshot, applyGitScaleReleases } = await import('../scale/onboarding/git-release-publication')
+  const { prepareCognitiveGitReleases, applyCognitiveGitReleases } = await import('../cognitive/git-release')
+  const { prepareSjtGitReleases, applySjtGitReleases } = await import('../situational/git-publish')
+  const { prepareFormGitReleases, applyFormGitReleases } = await import('../form/git-release')
+  const { prepareBundleGitReleases, applyBundleGitReleases } = await import('../bundle-product/git-release')
+
+  let scalePlan: ReturnType<typeof prepareGitScaleReleases> | undefined
+  if (scaleRoot) {
+    const { loadDeclaredScaleReleases } = await import('../scale/declarative/load')
+    const { assertLiveScaleReportArtwork } = await import('../scale/declarative/live-artwork')
+    const releases = loadDeclaredScaleReleases(scaleRoot)
+    assertLiveScaleReportArtwork(scaleRoot, releases)
+    scalePlan = prepareGitScaleReleases(releases)
+  }
+  const cognitivePlan = cognitiveRoot ? prepareCognitiveGitReleases(cognitiveRoot) : undefined
+  const sjtPlan = sjtRoot ? prepareSjtGitReleases(sjtRoot) : undefined
+  const formPlan = formRoot ? await prepareFormGitReleases(formRoot) : undefined
+  const bundlePlan = bundleRoot ? await prepareBundleGitReleases(bundleRoot) : undefined
 
   return db.$transaction(async (tx: Prisma.TransactionClient) => {
-    // Hold the existing Scale sync lock to serialize this entire snapshot
-    // against another content sync or a legacy Scale-only deployment.
-    const scale = await syncGitScaleReleasesInTransaction(tx, { actorId, gitCommitSha, releases })
-    const cognitive = await syncCognitiveGitReleases(cognitiveRoot, tx, actorId, gitCommitSha)
-    const sjt = await syncSjtGitReleases(sjtRoot, tx, actorId, gitCommitSha)
-    const form = await syncFormGitReleases(formRoot, tx, actorId, gitCommitSha)
-    const bundle = await syncBundleGitReleases(bundleRoot, tx, actorId, gitCommitSha)
+    await lockGitReleaseSnapshot(tx, actorId)
+    const scale = scalePlan ? await applyGitScaleReleases(scalePlan, tx, actorId, gitCommitSha) : []
+    const cognitive = cognitivePlan ? await applyCognitiveGitReleases(cognitivePlan, tx, actorId, gitCommitSha) : []
+    const sjt = sjtPlan ? await applySjtGitReleases(sjtPlan, tx, actorId, gitCommitSha) : []
+    const form = formPlan ? await applyFormGitReleases(formPlan, tx, actorId, gitCommitSha) : []
+    const bundle = bundlePlan ? await applyBundleGitReleases(bundlePlan, tx, actorId, gitCommitSha) : []
     return { gitCommitSha, scale, cognitive, sjt, form, bundle }
-  }, { timeout: 120_000 })
+  }, { timeout })
 }

@@ -2,11 +2,14 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSyn
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
+import { GIT_RELEASE_ACTOR_ID } from '../../utils/gitReleaseIdentity'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
-import { checkFormGitRelease, syncFormGitReleases } from '../../modules/form/git-release'
+import { applyFormGitReleases, checkFormGitRelease, prepareFormGitReleases, syncFormGitReleases } from '../../modules/form/git-release'
 
 const { publish } = vi.hoisted(() => ({ publish: vi.fn() }))
-vi.mock('../../modules/form/publication', () => ({ publishFormGitRelease: publish }))
+vi.mock(import('../../modules/form/publication'), async importOriginal => ({
+  ...await importOriginal(), publishFormGitRelease: publish,
+}))
 
 const key = 'synthetic_form'
 
@@ -125,6 +128,49 @@ describe('Form Git release declaration', () => {
       index.releases = [{ ...legacy, allowedProducts: ['SURVEY'] }]
       writeFileSync(files.index, JSON.stringify(index))
       expect(() => checkFormGitRelease(root, key)).toThrow()
+    })
+  })
+
+  it('applies the prepared Form artifact without reading declaration files again', async () => {
+    publish.mockClear()
+    await withRelease(async (root, files) => {
+      const index = JSON.parse(readFileSync(files.index, 'utf8'))
+      index.releases[0].state = 'ONLINE'
+      writeFileSync(files.index, JSON.stringify(index))
+      const prepared = prepareFormGitReleases(root)
+      expect(prepared).toMatchObject([{ toolKey: key, releaseKey: '1.0.1', artifact: {
+        version: '1.0.1', unit: { ref: { sourceVersion: '1.0.0' }, provenance: { submittedBy: GIT_RELEASE_ACTOR_ID } },
+        report: { version: '2.0.0' },
+      } }])
+      expect(publish).not.toHaveBeenCalled()
+      rmSync(join(root, key), { recursive: true })
+      const tx = {} as import('@prisma/client').Prisma.TransactionClient
+      const sha = 'a'.repeat(40)
+      await applyFormGitReleases(prepared, tx, GIT_RELEASE_ACTOR_ID, sha)
+      expect(publish).toHaveBeenCalledExactlyOnceWith(tx, GIT_RELEASE_ACTOR_ID, prepared[0], sha)
+    })
+  })
+
+  it('ignores unselected sibling drafts and rejects invalid controls and symlinks during discovery', async () => {
+    await withRelease((root, files) => {
+      const index = JSON.parse(readFileSync(files.index, 'utf8'))
+      index.releases[0].state = 'ONLINE'
+      writeFileSync(files.index, JSON.stringify(index))
+      const draft = join(root, 'draft_form')
+      mkdirSync(draft)
+      writeFileSync(join(draft, '1.0.0.json'), '{unvalidated draft}')
+      expect(prepareFormGitReleases(root)).toMatchObject([{ toolKey: key, effectiveState: 'ONLINE' }])
+      expect(() => checkFormGitRelease(root, 'draft_form')).toThrow('ENOENT')
+
+      const control = join(draft, 'releases.json')
+      writeFileSync(control, '{invalid JSON}')
+      expect(() => prepareFormGitReleases(root)).toThrow(SyntaxError)
+      rmSync(control)
+      symlinkSync(files.index, control)
+      expect(() => prepareFormGitReleases(root)).toThrow('FORM_RELEASE_REGULAR_JSON_REQUIRED')
+      rmSync(control)
+      symlinkSync(draft, join(root, 'linked_form'))
+      expect(() => prepareFormGitReleases(root)).toThrow('FORM_RELEASE_DIRECTORY_REQUIRED')
     })
   })
 

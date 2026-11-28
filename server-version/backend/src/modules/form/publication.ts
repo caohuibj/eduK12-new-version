@@ -3,23 +3,19 @@ import { governedFormRelease } from './disclosure'
 import type { Prisma } from '@prisma/client'
 import { governedFail, originalFormArtifact, reconcileGitGovernedArtifact } from '../survey/governed-tool.service'
 import type { GovernedArtifact } from '../survey/governed-tool.model'
-import {
-  prepareFormRelease, type FormTemplateContent, type FormTemplateReport,
-} from './release'
-import type { checkFormGitRelease } from './git-release'
+import type { FormTemplateContent, FormTemplateReport, prepareFormRelease } from './release'
+import type { prepareFormGitReleases } from './git-release'
 
-type GitFormRelease = ReturnType<typeof checkFormGitRelease>['releases'][number]
+type GitFormRelease = ReturnType<typeof prepareFormGitReleases>[number]
 
 export function buildGovernedFormRelease(actorId: string, input: {
   requestId: string
   releaseKey: string
   content: FormTemplateContent
   report: FormTemplateReport
-  contentHash: string
-  reportHash: string
+  prepared: ReturnType<typeof prepareFormRelease>
 }): GovernedArtifact {
-  const { content, report } = input
-  const { provenance, definition } = prepareFormRelease(content, report, input.contentHash, input.reportHash)
+  const { content, report, prepared: { provenance, definition } } = input
   const artifact = originalFormArtifact(actorId, {
     requestId: input.requestId, toolKey: content.toolKey, version: content.version, title: content.title,
     statement: content.statement, definition, classificationTags: content.classificationTags, reference: content.reference,
@@ -56,16 +52,14 @@ export async function assertFormReleaseAxesUnchanged(tx: Prisma.TransactionClien
 }
 
 export async function publishFormGitRelease(tx: Prisma.TransactionClient, actorId: string, release: GitFormRelease, gitCommitSha: string) {
-  const artifact = buildGovernedFormRelease(actorId, {
-    ...release, requestId: '00000000-0000-4000-8000-000000000001',
-  })
-  const online = release.effectiveState === 'ONLINE'
+  const { artifact, toolKey, releaseKey, effectiveState, allowedEntries } = release
+  const online = effectiveState === 'ONLINE'
   if (online) {
-    await lockFormReleaseAxes(tx, release.content.toolKey)
+    await lockFormReleaseAxes(tx, toolKey)
     await assertFormReleaseAxesUnchanged(tx, artifact)
   }
   const result = await reconcileGitGovernedArtifact(tx, actorId, artifact, {
-    gitCommitSha, allowedProducts: release.allowedEntries, online,
+    gitCommitSha, allowedProducts: allowedEntries, online,
   })
-  return { toolKey: release.content.toolKey, releaseKey: release.releaseKey, ...result }
+  return { toolKey, releaseKey, ...result }
 }

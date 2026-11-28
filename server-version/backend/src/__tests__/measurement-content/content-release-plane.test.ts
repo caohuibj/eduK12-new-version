@@ -1,9 +1,11 @@
 import { execFileSync } from 'node:child_process'
-import { cpSync, mkdtempSync, mkdirSync, rmSync } from 'node:fs'
+import { cpSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
-import { expect, it } from 'vitest'
-import { checkContentRelease } from '../../modules/measurement-content/git-release-plane'
+import type { PrismaClient } from '@prisma/client'
+import { expect, it, vi } from 'vitest'
+import { checkContentRelease, syncContentReleases } from '../../modules/measurement-content/git-release-plane'
+import { GIT_RELEASE_ACTOR_ID } from '../../utils/gitReleaseIdentity'
 import { cognitiveDeclarationFixture } from '../cognitive/git-release.fixture'
 import { writeSjtDeclaration } from '../situational/git-release.fixture'
 
@@ -38,5 +40,53 @@ it('checks Git SJT and Cognitive selections alongside the checked-in legacy SJT 
   } finally {
     rmSync(repo, { recursive: true, force: true })
     rmSync(cognitive.root, { recursive: true, force: true })
+  }
+}, 60_000)
+
+it('recognizes actual family controls and finishes static validation before opening a transaction', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'content-preflight-'))
+  const transaction = vi.fn()
+  const db = { $transaction: transaction } as unknown as PrismaClient
+  const options = { actorId: GIT_RELEASE_ACTOR_ID, gitCommitSha: 'a'.repeat(40) }
+  const key = 'demographics_v1'
+  const form = join(root, 'form', key)
+  try {
+    mkdirSync(join(form, 'reports'), { recursive: true })
+    writeFileSync(join(form, 'reports/releases.json'), '{}')
+    await expect(syncContentReleases(db, root, options)).rejects.toThrow('supported content release control file')
+    expect(transaction).not.toHaveBeenCalled()
+
+    cpSync(resolve(__dirname, '../../modules/form/templates', key), form, { recursive: true })
+    writeFileSync(join(form, '1.0.0.json'), '{}')
+    await expect(syncContentReleases(db, root, options)).rejects.toThrow('FORM_RELEASE_AXIS_HASH_MISMATCH')
+    expect(transaction).not.toHaveBeenCalled()
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
+}, 60_000)
+
+it('applies the optional transaction timeout from the ops environment', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'content-timeout-'))
+  const transaction = vi.fn()
+  const db = { $transaction: transaction } as unknown as PrismaClient
+  const options = { actorId: GIT_RELEASE_ACTOR_ID, gitCommitSha: 'a'.repeat(40) }
+  const key = 'demographics_v1'
+  try {
+    mkdirSync(join(root, 'form'))
+    cpSync(resolve(__dirname, '../../modules/form/templates', key), join(root, 'form', key), { recursive: true })
+    vi.stubEnv('CONTENT_RELEASE_TRANSACTION_TIMEOUT_MS', '')
+    await expect(syncContentReleases(db, root, options)).rejects.toThrow('CONTENT_RELEASE_TRANSACTION_TIMEOUT_MS')
+    expect(transaction).not.toHaveBeenCalled()
+
+    vi.stubEnv('CONTENT_RELEASE_TRANSACTION_TIMEOUT_MS', undefined)
+    await syncContentReleases(db, root, options)
+    expect(transaction).toHaveBeenLastCalledWith(expect.any(Function), { timeout: 120_000 })
+
+    vi.stubEnv('CONTENT_RELEASE_TRANSACTION_TIMEOUT_MS', '180000')
+    await syncContentReleases(db, root, options)
+    expect(transaction).toHaveBeenLastCalledWith(expect.any(Function), { timeout: 180_000 })
+  } finally {
+    vi.unstubAllEnvs()
+    rmSync(root, { recursive: true, force: true })
   }
 }, 60_000)

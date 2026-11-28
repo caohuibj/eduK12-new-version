@@ -62,7 +62,7 @@ def export_releases(repo: str, commit: str, output: Path, profile: str) -> None:
         directory.mkdir(exist_ok=True)
     roots = [root for root, _, _ in families]
     artwork_inventory = {}
-    scale_control_present = False
+    control_present = False
     for record in git('ls-tree', '-rz', commit, '--', *roots, ARTWORK_ROOT).split(b'\0'):
         if not record:
             continue
@@ -85,12 +85,12 @@ def export_releases(repo: str, commit: str, output: Path, profile: str) -> None:
                 destination = directory / relative
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 destination.write_bytes(git('cat-file', 'blob', oid.decode('ascii')))
-                if root == SCALE_ROOT and destination.name == 'releases.json':
-                    scale_control_present = True
+                if relative.count('/') == 1 and destination.name == 'releases.json':
+                    control_present = True
             break
 
-    if profile == 'content' and not scale_control_present:
-        raise ValueError('The committed snapshot must contain a Scale release control file')
+    if profile == 'content' and not control_present:
+        raise ValueError('The committed snapshot must contain a supported release control file')
 
     artwork = scale / '.artwork'
     artwork.mkdir()

@@ -4,7 +4,9 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { checkSjtGitRelease, readSjtGitReleasePlan } from '../../modules/situational/git-release'
-import { c, p, r, entry, contentVersion, ceiling, visibility, writeSjtDeclaration } from './git-release.fixture'
+import { c, p, r, entry, contentVersion, visibility, writeSjtDeclaration } from './git-release.fixture'
+import { declareScience } from './fixtures/scientific-source'
+import { instrumentSourceSchema } from '../../modules/situational/onboarding/schema'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { prepareGovernedSjtWorkbook, governedSjtWorkbookMeasurementInput } from '../../modules/situational/authoring/governed-workbook'
 
@@ -74,15 +76,68 @@ describe('SJT declarative content releases', () => {
     expect(() => checkSjtGitRelease(root!, toolKey)).toThrow('SJT_GIT_PACKAGE_INVALID')
   })
 
-  it('blocks an entry or audience whose current Survey adapter cannot enforce', async () => {
+  it('rejects unsupported entry and audience declarations when reading the release plan', () => {
     sample()
-    manifest({ ...entry, allowedEntries: ['SURVEY', 'TRAINING'] })
-    expect(() => checkSjtGitRelease(root!, toolKey)).toThrow('SJT_GIT_ONLY_NATIVE_SURVEY_ENTRY_SUPPORTED')
+    manifest({ ...entry, state: 'HOLD', allowedEntries: ['SURVEY', 'TRAINING'] })
+    expect(() => readSjtGitReleasePlan(root!, toolKey)).toThrow('SJT_GIT_ONLY_NATIVE_SURVEY_ENTRY_SUPPORTED')
     manifest(entry)
-    write('reports/1.0.0.json', { ...r, reportVisibility: {
-      ...visibility, audiences: { ...visibility.audiences, respondent: { ...visibility.audiences.researcher } },
+    const disabled = { ...visibility.audiences.researcher, numericScores: false }
+    const inputVisibility = { ...visibility,
+      audiences: { ...visibility.audiences, respondent: disabled, subject: disabled, teacher: disabled },
+    }
+    write('reports/1.0.0.json', { ...r, reportVisibility: inputVisibility })
+    expect(checkSjtGitRelease(root!, toolKey).releases[0].effectiveState).toBe('ONLINE')
+    for (const audience of ['respondent', 'subject', 'teacher']) {
+      write('reports/1.0.0.json', { ...r, reportVisibility: { ...inputVisibility,
+        audiences: { ...inputVisibility.audiences, [audience]: { ...disabled, artwork: true } } },
+      })
+      expect(() => readSjtGitReleasePlan(root!, toolKey)).toThrow(/SJT_GIT_SURVEY_DISCLOSURE_NOT_SUPPORTED/)
+    }
+  })
+
+  it('rejects report attachments while retaining static StoredAsset scene images', () => {
+    sample()
+    const asset = { assetId: randomUUID(), contentHash: 'a'.repeat(64), mimeType: 'image/png' }
+    const ref = { assetId: asset.assetId, sha256: asset.contentHash, mediaType: asset.mimeType }
+    write('reports/1.0.0.json', { ...r, assetRefs: [ref] })
+    expect(() => readSjtGitReleasePlan(root!, toolKey)).toThrow('SJT_GIT_REPORT_ASSET_REFS_UNSUPPORTED')
+    write('reports/1.0.0.json', { ...r,
+      template: { ...r.template, blocks: [{ type: 'ASSET', assetId: asset.assetId, alt: 'Report attachment' }] },
+    })
+    expect(() => readSjtGitReleasePlan(root!, toolKey)).toThrow('SJT_GIT_REPORT_ASSET_BLOCK_UNSUPPORTED')
+    write('reports/1.0.0.json', { ...r, assetRefs: [], template: { ...r.template, illustrationKey: 'report-fixture' } })
+    const [first, ...scenes] = c.definition.scenes
+    write(contentVersion + '/content.json', { ...c, definition: { ...c.definition,
+      scenes: [{ ...first, stimulus: { type: 'IMAGE', text: first.stimulus.text, altText: 'A fictional scene', asset } }, ...scenes],
     } })
-    expect(() => checkSjtGitRelease(root!, toolKey)).toThrow('SJT_GIT_SURVEY_DISCLOSURE_NOT_SUPPORTED')
+    expect(checkSjtGitRelease(root!, toolKey).releases[0].assetReferences).toBe(1)
+    expect(readSjtGitReleasePlan(root!, toolKey)!.declarations[0].assetRefs).toEqual([ref])
+  })
+
+  it('applies the PILOT and template constraints to active publication', () => {
+    sample()
+    const source = instrumentSourceSchema.parse({
+      content: { schemaVersion: 1, identity: c.identity, goldenCases: p.goldenCases, definition: { ...c.definition,
+        scoring: { ...p.scoring, scoringVersion: c.scorer.scoringVersion },
+        report: r.report, referencePolicy: { type: 'none' },
+      } },
+      publication: { releaseStatus: 'DRAFT' },
+      scientific: p.scientific,
+    })
+    const advanced = declareScience(source, 'RESEARCH_READY').scientific
+    write('parameters/1.0.0.json', { ...p, scientific: advanced })
+    manifest({ ...entry, state: 'HOLD' })
+    expect(readSjtGitReleasePlan(root!, toolKey)!.declarations[0].effectiveState).toBe('HOLD')
+    manifest(entry)
+    expect(() => readSjtGitReleasePlan(root!, toolKey)).toThrow('active releases must be PILOT')
+    write('parameters/1.0.0.json', { ...p, scientific: { ...advanced, scientificMaturity: 'PILOT' } })
+    expect(() => readSjtGitReleasePlan(root!, toolKey)).toThrow('active releases cannot include a scientific review')
+    write('parameters/1.0.0.json', p)
+    write('reports/1.0.0.json', { ...r, template: undefined })
+    expect(() => readSjtGitReleasePlan(root!, toolKey)).toThrow('SJT_GIT_SURVEY_REQUIRES_A_SUPPORTED_REPORT_TEMPLATE')
+  })
+
+  it('keeps the Git SJT report ineligible for participants', async () => {
     const { evaluateSurveyUnitReportEligibility } = await import('../../modules/assessment-policy/tool-report-eligibility')
     expect(evaluateSurveyUnitReportEligibility({
       kind: 'SJT', executionProtocol: 'SITUATIONAL_NATIVE_V1',

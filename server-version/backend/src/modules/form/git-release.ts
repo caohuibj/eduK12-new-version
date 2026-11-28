@@ -2,10 +2,12 @@ import { lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Prisma } from '@prisma/client'
 import { z } from 'zod'
+import { GIT_RELEASE_ACTOR_ID } from '../../utils/gitReleaseIdentity'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import {
   gitReleaseManifestFields, gitReleaseSelectionFields, resolveGitReleaseStates,
 } from '../measurement-content/git-release-manifest'
+import { buildGovernedFormRelease, publishFormGitRelease } from './publication'
 import {
   formGitContentSchema, formReleaseToolKey, formReleaseVersion, formTemplateReportSchema, prepareFormRelease,
   verifyFormRepresentativeCase,
@@ -44,6 +46,10 @@ function readJson(path: string): unknown {
 export function checkFormGitRelease(root: string, key: string) {
   const toolKey = formReleaseToolKey.parse(key)
   const directory = checkedDirectory(join(realpathSync(root), toolKey))
+  return readFormGitRelease(directory, toolKey)
+}
+
+function readFormGitRelease(directory: string, toolKey: string) {
   const index = releaseIndex.parse(readJson(join(directory, 'releases.json')))
   if (index.toolKey !== toolKey) throw new Error('FORM_RELEASE_TOOL_IDENTITY_MISMATCH: ' + toolKey)
   const effectiveStates = resolveGitReleaseStates(index.releases, { errorPrefix: 'FORM_RELEASE' })
@@ -73,15 +79,36 @@ export function checkFormGitRelease(root: string, key: string) {
   }
 }
 
-export async function syncFormGitReleases(root: string, tx: Prisma.TransactionClient, actorId: string, gitCommitSha: string) {
-  const keys = readdirSync(realpathSync(root), { withFileTypes: true })
+export function prepareFormGitReleases(root: string) {
+  const directory = realpathSync(root)
+  const keys = readdirSync(directory, { withFileTypes: true })
     .filter(entry => entry.isDirectory() || entry.isSymbolicLink())
-    .map(entry => formReleaseToolKey.parse(entry.name)).sort()
-  const selected = keys.flatMap(key => checkFormGitRelease(root, key).releases).filter(release => release.effectiveState !== 'HOLD')
-  if (!selected.length) return []
-  const { publishFormGitRelease } = await import('./publication')
+    .map(entry => entry.name).sort()
+  return keys.flatMap(key => {
+    const toolDirectory = checkedDirectory(join(directory, key))
+    if (!lstatSync(join(toolDirectory, 'releases.json'), { throwIfNoEntry: false })) return []
+    const { toolKey, releases } = readFormGitRelease(toolDirectory, formReleaseToolKey.parse(key))
+    return releases.filter(release => release.effectiveState !== 'HOLD').map(release => ({
+      toolKey,
+      releaseKey: release.releaseKey,
+      state: release.state,
+      effectiveState: release.effectiveState,
+      allowedEntries: release.allowedEntries,
+      artifact: buildGovernedFormRelease(GIT_RELEASE_ACTOR_ID, {
+        ...release, requestId: '00000000-0000-4000-8000-000000000001',
+      }),
+    }))
+  })
+}
+
+export async function applyFormGitReleases(prepared: ReturnType<typeof prepareFormGitReleases>,
+  tx: Prisma.TransactionClient, actorId: string, gitCommitSha: string) {
   const changes = []
-  for (const release of selected)
+  for (const release of prepared)
     changes.push(await publishFormGitRelease(tx, actorId, release, gitCommitSha))
   return changes
+}
+
+export async function syncFormGitReleases(root: string, tx: Prisma.TransactionClient, actorId: string, gitCommitSha: string) {
+  return applyFormGitReleases(prepareFormGitReleases(root), tx, actorId, gitCommitSha)
 }

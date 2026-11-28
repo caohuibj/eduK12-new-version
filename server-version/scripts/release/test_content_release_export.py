@@ -144,18 +144,44 @@ class ContentReleaseExport(unittest.TestCase):
             set(included),
         )
 
-    def test_missing_scale_controls_fail_only_for_generalized_sync(self):
+    def test_supported_family_control_does_not_require_scale(self):
         (self.repo / (SCALE + '/releases.json')).unlink()
+        controls = [
+            ('bundle', BUNDLE + '/releases.json', 'bedtime_sleep'),
+            ('cognitive', MODULES + '/cognitive/tasks/gonogo/releases.json', 'gonogo'),
+            ('sjt', MODULES + '/situational/instruments/example-sjt/releases.json', 'example-sjt'),
+            ('form', MODULES + '/form/templates/demographics_v1/releases.json', 'demographics_v1'),
+        ]
+        for family, source, tool in controls:
+            with self.subTest(family=family):
+                path = self.write(source, '{}')
+                self.commit()
+                output = self.repo / ('exported-' + family)
+                output.mkdir()
+                result = self.export(output, 'content')
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertTrue((output / family / tool / 'releases.json').is_file())
+                self.assertTrue((output / 'scale/.artwork/approved.json').is_file())
+                self.assertFalse((output / 'scale/who5/releases.json').exists())
+                shutil.rmtree(output)
+                path.unlink()
+
+    def test_snapshot_without_supported_controls_is_refused_only_for_generalized_sync(self):
+        (self.repo / (SCALE + '/releases.json')).unlink()
+        (self.repo / (BUNDLE + '/releases.json')).unlink()
+        self.write(SCALE + '/reports/releases.json', '{}')
+        self.write(MODULES + '/unsupported/example/releases.json', '{}')
         self.commit()
         content = self.repo / 'exported'
         content.mkdir()
         result = self.export(content, 'content')
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn('must contain a Scale release control file', result.stderr)
+        self.assertIn('must contain a supported release control file', result.stderr)
         legacy = self.repo / 'legacy'
         legacy.mkdir()
         result = self.export(legacy, 'scale')
         self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue((legacy / '.artwork/approved.json').is_file())
 
     def test_ref_and_file_type_are_enforced(self):
         destination = self.repo / 'exported'
@@ -190,8 +216,13 @@ class ContentReleaseExport(unittest.TestCase):
         self.assertIn('selects its own synchronizer', result.stderr)
 
     def test_apply_mounts_verified_data_read_only_without_restarting(self):
-        for family in ('content', 'scale'):
-            with self.subTest(family=family):
+        for family, has_scale_control in (('content', True), ('content', False), ('scale', False)):
+            with self.subTest(family=family, has_scale_control=has_scale_control):
+                scale_control = self.repo / (SCALE + '/releases.json')
+                if not has_scale_control and scale_control.exists():
+                    scale_control.unlink()
+                    self.commit()
+                fetch_artwork = family == 'scale' or has_scale_control
                 profile = json.dumps({'services': {'migrate': {
                     'image': IMAGE_ID,
                     'environment': {'DATABASE_URL': 'fixture-only', 'SYSTEM_GIT_RELEASE_ACTOR_ID': ACTOR_ID},
@@ -202,6 +233,7 @@ import sys
 from pathlib import Path
 args = sys.argv[1:]
 if args == ['ps', '--status', 'running', '-q', 'frontend']:
+    assert {fetch_artwork!r}, 'This profile has no frontend'
     print('0123456789ab')
 elif args[-3:] == ['config', '--format', 'json']:
     print({profile!r})
@@ -214,8 +246,9 @@ else:
     exported = Path(host)
     scale = exported / 'scale' if '{family}' == 'content' else exported
     assert (exported / 'bundle').exists() is ('{family}' == 'content')
-    assert json.loads((scale / 'who5/releases.json').read_text()) == {{'scale': True}}
-    assert (scale / '.artwork/live-0123456789ab.json').is_file()
+    assert (scale / 'who5/releases.json').is_file() is {has_scale_control!r}
+    assert (scale / '.artwork/approved.json').is_file()
+    assert (scale / '.artwork/live-0123456789ab.json').is_file() is {fetch_artwork!r}
     print('SYNCED', host)
 """)
                 entry.chmod(0o755)

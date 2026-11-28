@@ -140,6 +140,8 @@ function loadCognitiveGitTool(root: string, rawKey: string) {
     const config = definition.configSchema.parse({
       ...parameter.config, report: {
         reportVersion: report.version,
+        // Declared P references bind to the separate Survey REFERENCE release.
+        // Native Cognitive reports keep runtime reference lookup disabled.
         referenceMode: 'none',
         declaredRelease: {parameterVersion:parameter.version,title:report.name,introduction:report.introduction,
           practicalTips:report.practicalTips,disclaimer:report.disclaimer,effectiveDisclosure},
@@ -211,15 +213,22 @@ function manifests(root: string) {
     return item.isDirectory()
   }).map(item=>item.name).sort().filter(key=>hasManifest(root,key))
 }
-type Candidate=ReturnType<typeof loadCognitiveGitTool>[number]
+export function prepareCognitiveGitReleases(root:string) {
+  return manifests(root).flatMap(key=>loadCognitiveGitTool(root,key)).map(candidate=>{
+    const {runtimeIdentity,parameter,report,selection}=candidate
+    const intentHash=canonicalHash({source:'SYSTEM_GIT_RELEASE',runtimeIdentity,parameter,report,profile:selection.profile,
+      ...(selection.replaces?{replaces:selection.replaces}:{})})
+    return {...candidate,intentHash}
+  })
+}
+
+type Candidate=ReturnType<typeof prepareCognitiveGitReleases>[number]
 
 async function syncCandidate(tx:Prisma.TransactionClient,actorId:string,gitCommitSha:string,candidate:Candidate){
-  const {key,selection,state,parameter,report,config,runtimeIdentity,measurement,effectiveDisclosure,references,metricKeys}=candidate
+  const {key,selection,state,parameter,report,config,runtimeIdentity,measurement,effectiveDisclosure,references,metricKeys,intentHash}=candidate
   const result = {toolKey:key,releaseKey:selection.releaseKey,version:selection.releaseKey}
   if (state==='HOLD') return {...result,action:'HOLD'}
   const selector={testType:key,configVersion:selection.releaseKey}
-  const intentHash=canonicalHash({source:'SYSTEM_GIT_RELEASE',runtimeIdentity,parameter,report,profile:selection.profile,
-    ...(selection.replaces?{replaces:selection.replaces}:{})})
   let stored=await tx.cognitiveTestConfig.findUnique({where:{testType_configVersion:selector}})
   const online=state==='ONLINE'
   if(!stored&&!online)return {...result,action:'ABSENT'}
@@ -301,12 +310,15 @@ async function syncCandidate(tx:Prisma.TransactionClient,actorId:string,gitCommi
   return {...result,action:created?'PUBLISHED':approved.action}
 }
 
-export async function syncCognitiveGitReleases(root:string,tx:Prisma.TransactionClient,actorId:string,gitCommitSha:string) {
+export async function applyCognitiveGitReleases(plan:readonly Candidate[],tx:Prisma.TransactionClient,actorId:string,gitCommitSha:string) {
   await assertGitScalePublisher(tx,actorId)
   if (!/^[0-9a-f]{40}$/.test(gitCommitSha)) throw Error('Invalid Cognitive release Git commit')
-  const plan=manifests(root).flatMap(key=>loadCognitiveGitTool(root,key))
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('cognitive-git-release-sync'))`
   const result=[]
   for(const candidate of plan)result.push(await syncCandidate(tx,actorId,gitCommitSha,candidate))
   return result
+}
+
+export async function syncCognitiveGitReleases(root:string,tx:Prisma.TransactionClient,actorId:string,gitCommitSha:string) {
+  return applyCognitiveGitReleases(prepareCognitiveGitReleases(root),tx,actorId,gitCommitSha)
 }

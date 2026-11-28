@@ -6,7 +6,7 @@ import { artifactBlockers } from '../survey/governed-tool.model'
 import { governedFormRelease } from './disclosure'
 import { assertFormReleaseAxesUnchanged, buildGovernedFormRelease, lockFormReleaseAxes } from './publication'
 import {
-  formReleaseVersion, formTemplateContentSchema, formTemplateReportSchema, type FormTemplateContent,
+  formReleaseVersion, formTemplateContentSchema, formTemplateReportSchema, prepareFormRelease, type FormTemplateContent,
 } from './release'
 
 const hash = z.string().regex(/^[a-f0-9]{64}$/)
@@ -46,9 +46,10 @@ async function prepareAdminFormTemplate(db: Prisma.TransactionClient, actorId: s
     if (same && previous) contentHash = previous.contentHash
   }
   const report = formTemplateReportSchema.parse({ ...input.report, contentHash })
+  const prepared = prepareFormRelease(input.content, report, contentHash, canonicalHash(report))
   const artifact = buildGovernedFormRelease(actorId, {
     requestId: input.requestId, releaseKey: input.releaseKey, content: input.content, report,
-    contentHash, reportHash: canonicalHash(report),
+    prepared,
   })
   const blockers = artifactBlockers(artifact)
   return {
