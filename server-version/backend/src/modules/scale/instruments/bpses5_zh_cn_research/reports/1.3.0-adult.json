@@ -1,0 +1,100 @@
+{
+  "toolKey": "bpses5_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "照护者对自己育儿做法的把握｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对 Woolgar 等 2023 在线发表的 Table 1 加粗最终五题（原 1／4／5／8／9）、五级同意度与单一总和。保留平台现有工作译稿。"
+      }
+    },
+    "primaryScoreKeys": [
+      "total"
+    ],
+    "scoreOrder": [
+      "total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "total",
+        "scoreLabel": "育儿自我效能合计分（5–25）",
+        "headline": "说清自己知道什么，还需要练哪一步",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这五题问成人照护者如何看待自己支持和引导孩子行为的能力，既涉及知不知道做法，也涉及是否相信自己的行动有影响。加总为 5–25 分，较大数值表示本次较认同这些效能信念。实际互动会受到孩子状态、家庭资源和当时情境影响。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想起一个常发生的家庭场景，说出你当时能把握的一步，以及哪一刻容易犹豫。"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一件短小的互动练习，用一句清晰且适龄的说明，并记录孩子实际如何回应。"
+          },
+          {
+            "category": "support",
+            "text": "如果照护安排不一致，可以先和另一位照护者商量一个都能持续的做法；必要时向可信的育儿支持询问具体场景。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "五题为成人照护者自评。涉及孩子的描述只提供情境。分数反映成人的信念，实际亲子互动还需观察。",
+      "采用已登记中文工作译稿及原计分。数值用于理解本次自陈，当前版本以描述分呈现。",
+      "各分数按原来的完整作答规则计算，漏答保留为缺失。"
+    ],
+    "disclaimer": "适用于既有成人试用研究与自我回顾。临床诊断及其他高风险决定需要相应的专门方法。",
+    "artworkKey": "bpses5_zh_cn_research/1.0.0/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
