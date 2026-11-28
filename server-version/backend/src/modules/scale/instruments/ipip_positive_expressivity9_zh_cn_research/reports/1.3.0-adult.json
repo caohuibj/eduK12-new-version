@@ -1,0 +1,100 @@
+{
+  "toolKey": "ipip_positive_expressivity9_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "开心时怎样表达｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对 IPIP 官方逐题与正反向键、冻结中文工作译稿和原 P 的 score-only 解释。当前证据适用于成人试用描述。"
+      }
+    },
+    "primaryScoreKeys": [
+      "ipip_positive_expressivity9"
+    ],
+    "scoreOrder": [
+      "ipip_positive_expressivity9"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "ipip_positive_expressivity9",
+        "scoreLabel": "积极情绪表达合计分（9–45）",
+        "headline": "让高兴用适合自己的方式被看见",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "听到好消息，有人会立刻笑出来，有人会用一句祝贺或一个动作回应，也有人喜欢安静享受。九题记录你自述显露、分享开心或以动作表达亲近的倾向。加总为 9–45 分，较大数值表示更认同外向表达积极情绪的描述。表达方式会随文化习惯、熟悉程度和场合变化。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次真实的开心，看看笑、说出来、行动、安静分享，哪种表达最贴近当时的你。"
+          },
+          {
+            "category": "strategy",
+            "text": "如果想让别人知道你很开心，可以试一句具体的话，指出哪件事值得一起庆祝。"
+          },
+          {
+            "category": "support",
+            "text": "打算用拥抱等身体动作之前先留意对方是否愿意；语言或短信同样能把心意说清楚。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "本报告使用项目中文工作译稿，面向其现有成人自评研究及自我回顾范围。当前证据支持对本次作答做描述。",
+      "原题和计分可按 IPIP 官方公有领域声明使用。由于本译稿尚无适配常模，报告仅显示实得分。",
+      "各结果按相应题组完整作答后计算，漏答保留为缺失。请结合近期情境和具体经历理解。"
+    ],
+    "disclaimer": "适用于成人试用研究及自我回顾。诊断、人员筛选、排名与个体高风险决定需要相应的专门方法。",
+    "artworkKey": "ipip_positive_expressivity9_zh_cn_research/1.0.1/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
