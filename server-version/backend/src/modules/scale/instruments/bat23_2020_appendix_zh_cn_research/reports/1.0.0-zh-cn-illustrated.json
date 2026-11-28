@@ -1,0 +1,209 @@
+{
+  "toolKey": "bat23_2020_appendix_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.0.0-zh-cn-illustrated",
+  "title": "工作太满的时候，给自己留个逗号",
+  "report": {
+    "reportVersion": "1.0.0-zh-cn-illustrated",
+    "primaryScoreKeys": [
+      "burnout_core"
+    ],
+    "scoreOrder": [
+      "burnout_core",
+      "exhaustion",
+      "mental_distance",
+      "cognitive_impairment",
+      "emotional_impairment"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "burnout_core",
+        "headline": "工作太满的时候，给自己留个逗号",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一天里同时要跟进好几件事，有时连准备开始下一项的力气都不够。把这段经历想具体，才能分清哪里最消耗，也更容易找到合适的支持。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一个想了解的工作片段，想想当时的要求、手边的支持，以及可以先调整的一件事。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "exhaustion",
+        "headline": "把恢复时间留出来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "连续处理任务、休息后仍难缓过来，都可以是值得留意的信号。工作量、睡眠、身体状态和照护责任也会影响精力。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找出一段特别耗力的时间，想想能否暂停片刻、调整安排，或与人分担一项任务。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "mental_distance",
+        "headline": "看见自己和工作的距离",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "事情照样做完，却很难再提起兴致，很多人也有过这种体验。任务的意义、工作安排和得到的支持，都值得放在一起回顾。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "对比一件容易投入的事与一件容易走神的事。挑一个有机会改变的条件先聊。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "cognitive_impairment",
+        "headline": "让下一步看得见",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "被打断几次后接不上思路，或者一忙就忘了手里的事，可以从精力、干扰和指令是否清楚来回看。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "试着把手头任务的下一步写在显眼处，有条件时给自己留一小段连续处理的时间。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional_impairment",
+        "headline": "留一点时间，想清楚怎么回应",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "遇到不顺，反应可能比平时更强。事情的紧迫程度、他人的对待和手头的支持，都关系到当下能怎么应对。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "遇到不急的事情，可以先停一停，想清楚希望得到什么支持，再选择合适的人沟通。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "各分项按本组题目求均分，整体为 23 题等权均分。分数越高，表示这次自述的这些工作体验出现越频繁。",
+      "题本为研究工作译版，暂无本地常模和风险分档。"
+    ],
+    "disclaimer": "供在职成年人非商业研究与个人回顾。分数不能决定诊断、能力评级或人事选择。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "bat23_2020_appendix_zh_cn_research/1.0.0/1.0.0-zh-cn-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-zh-cn-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  },
+  "template": {
+    "title": "工作太满的时候，给自己留个逗号",
+    "artworkKey": "bat23_2020_appendix_zh_cn_research/1.0.0/1.0.0-zh-cn-illustrated",
+    "blocks": [
+      {
+        "type": "TEXT",
+        "text": "工作太满的时候，给自己留个逗号\n\n一天里同时要跟进好几件事，有时连准备开始下一项的力气都不够。把这段经历想具体，才能分清哪里最消耗，也更容易找到合适的支持。\n\n选一个想了解的工作片段，想想当时的要求、手边的支持，以及可以先调整的一件事。"
+      },
+      {
+        "type": "METRIC",
+        "metricKey": "burnout_core",
+        "label": "整体工作体验",
+        "display": "RAW"
+      },
+      {
+        "type": "TEXT",
+        "text": "把恢复时间留出来\n\n连续处理任务、休息后仍难缓过来，都可以是值得留意的信号。工作量、睡眠、身体状态和照护责任也会影响精力。\n\n找出一段特别耗力的时间，想想能否暂停片刻、调整安排，或与人分担一项任务。"
+      },
+      {
+        "type": "METRIC",
+        "metricKey": "exhaustion",
+        "label": "工作中的耗竭体验",
+        "display": "RAW"
+      },
+      {
+        "type": "TEXT",
+        "text": "看见自己和工作的距离\n\n事情照样做完，却很难再提起兴致，很多人也有过这种体验。任务的意义、工作安排和得到的支持，都值得放在一起回顾。\n\n对比一件容易投入的事与一件容易走神的事。挑一个有机会改变的条件先聊。"
+      },
+      {
+        "type": "METRIC",
+        "metricKey": "mental_distance",
+        "label": "与工作的距离感",
+        "display": "RAW"
+      },
+      {
+        "type": "TEXT",
+        "text": "让下一步看得见\n\n被打断几次后接不上思路，或者一忙就忘了手里的事，可以从精力、干扰和指令是否清楚来回看。\n\n试着把手头任务的下一步写在显眼处，有条件时给自己留一小段连续处理的时间。"
+      },
+      {
+        "type": "METRIC",
+        "metricKey": "cognitive_impairment",
+        "label": "工作中的注意与思路",
+        "display": "RAW"
+      },
+      {
+        "type": "TEXT",
+        "text": "留一点时间，想清楚怎么回应\n\n遇到不顺，反应可能比平时更强。事情的紧迫程度、他人的对待和手头的支持，都关系到当下能怎么应对。\n\n遇到不急的事情，可以先停一停，想清楚希望得到什么支持，再选择合适的人沟通。"
+      },
+      {
+        "type": "METRIC",
+        "metricKey": "emotional_impairment",
+        "label": "工作中的情绪体验",
+        "display": "RAW"
+      }
+    ],
+    "limitations": [
+      "各分项按本组题目求均分，整体为 23 题等权均分。分数越高，表示这次自述的这些工作体验出现越频繁。",
+      "题本为研究工作译版，暂无本地常模和风险分档。"
+    ],
+    "disclaimer": "供在职成年人非商业研究与个人回顾。分数不能决定诊断、能力评级或人事选择。"
+  }
+}

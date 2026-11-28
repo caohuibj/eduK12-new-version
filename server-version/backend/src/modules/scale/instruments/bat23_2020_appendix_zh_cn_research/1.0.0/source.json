@@ -1,0 +1,2036 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "bat23_2020_appendix_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "工作体验问卷（BAT 工作相关核心 23 题｜2020 论文简体译版）",
+      "abbreviation": "BAT-C-23",
+      "instrumentFamily": "Burnout Assessment Tool, work-related Core Symptoms 23 (2020 Appendix B Table A2)"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [
+        "SELF_REGULATION"
+      ],
+      "constructDefinition": "工作情境中耗竭、与工作拉开距离，以及认知和情绪调节困难的自述频率。四个相互关联方面构成核心工作体验；不是原因、能力、人格或临床诊断的直接测量。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "工作体验",
+        "职业健康",
+        "成人自评",
+        "非商业研究",
+        "耗竭体验",
+        "与工作的距离",
+        "注意与思路",
+        "情绪体验",
+        "domain:occupational_well_being",
+        "construct:burnout_core_symptoms",
+        "source:bat2020_appendix_b_table_a2",
+        "locale:zh_cn",
+        "evidence:working_translation",
+        "reference:descriptive"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "供 18 岁及以上在职成年人非商业研究及个人回顾。原开发证据来自 1500 名佛兰德斯在职员工。中文直译版暂无本地常模、认知访谈或等值证据。"
+    },
+    "administration": {
+      "itemCount": 23,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "一般工作体验，原版未指定固定回顾天数。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留 2020 论文附录 B 表 A2 的 23 题逐题顺序与五级频次。",
+        "四个方面各求均分，整体取 23 题等权均分。没有反向题。",
+        "完整作答才计算相应均分，缺答不估算。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "一对一移植论文附表，供探索性非商业研究。未建立简中版本测量等值证据。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "用于本人结合处境回顾工作体验，不能诊断、员工排名或人事筛选。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "bat-schaufeli2020-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "佛兰德斯在职员工代表性在线面板；非中国样本，非英文题本独立语言验证",
+        "ageRange": "均值41岁SD12，未报告完整年龄范围",
+        "locale": "nl",
+        "territory": "BE",
+        "sampleSize": 1500,
+        "studyDesign": "1500员工随机分750/750进行EFA/CFA，支持四个相关核心维度及二阶因子；不是独立英语/中文施测研究。",
+        "rating": "MIXED",
+        "citation": "Schaufeli, W. B., Desart, S., & De Witte, H. (2020). Burnout Assessment Tool (BAT)—Development, Validity, and Reliability. International Journal of Environmental Research and Public Health, 17(24), 9495. doi:10.3390/ijerph17249495.",
+        "doi": "10.3390/ijerph17249495",
+        "url": "https://www.wilmarschaufeli.nl/publications/Schaufeli/551.pdf",
+        "notes": "科学手册描述开发来自比利时荷兰语工作人群；英文为作者论文正式题表，不能据此迁移常模或声称独立英语/中文验证。"
+      },
+      {
+        "evidenceId": "bat-schaufeli2020-reliability",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "佛兰德斯在职员工代表性在线面板；非中国样本，非英文题本独立语言验证",
+        "ageRange": "均值41岁SD12，未报告完整年龄范围",
+        "locale": "nl",
+        "territory": "BE",
+        "sampleSize": 1500,
+        "studyDesign": "同一1500名员工：核心总分alpha=.95，耗竭.92、精神疏离.91、认知.92、情绪.90；不是重测、临床准确性或中国参数。",
+        "rating": "MIXED",
+        "citation": "Schaufeli, W. B., Desart, S., & De Witte, H. (2020). Burnout Assessment Tool (BAT)—Development, Validity, and Reliability. International Journal of Environmental Research and Public Health, 17(24), 9495. doi:10.3390/ijerph17249495.",
+        "doi": "10.3390/ijerph17249495",
+        "url": "https://www.wilmarschaufeli.nl/publications/Schaufeli/551.pdf",
+        "notes": "科学手册描述开发来自比利时荷兰语工作人群；英文为作者论文正式题表，不能据此迁移常模或声称独立英语/中文验证。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Schaufeli、Desart 和 De Witte 2020，附录 B 表 A2 公开英文题本：https://www.mdpi.com/1660-4601/17/24/9495",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "基于 CC BY 4.0 英文题表的项目直接翻译。AI 辅助对照英文检查题意和五档，未声称作者认可、专业译审或跨文化效度验证。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "bat23_2020_appendix_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "bat23_2020_appendix_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "bat23_2020_appendix_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Schaufeli WB, Desart S, De Witte H. Burnout Assessment Tool (BAT)—Development, Validity, and Reliability. IJERPH 2020;17(24):9495. doi:10.3390/ijerph17249495. © 2020 The Authors, licensed by MDPI under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). 本题本为附录 B 表 A2 的平台简体中文直译，变更仅为中文译文及呈现标点和格式。保留作者署名、原题序和计分；不引用独立手册或官网另行翻译的题文。https://www.mdpi.com/1660-4601/17/24/9495",
+      "本候选供在职成年人非商业研究或个人回顾。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "SELF",
+      "source": {
+        "title": "Burnout Assessment Tool 工作核心23｜2020 论文表A2简体直译",
+        "citation": "Schaufeli, W. B., Desart, S., & De Witte, H. (2020). Burnout Assessment Tool (BAT)—Development, Validity, and Reliability. International Journal of Environmental Research and Public Health, 17(24), 9495. doi:10.3390/ijerph17249495.",
+        "url": "https://www.mdpi.com/1660-4601/17/24/9495",
+        "publicationYear": 2020
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Schaufeli WB, Desart S, De Witte H. Burnout Assessment Tool (BAT)—Development, Validity, and Reliability. IJERPH 2020;17(24):9495. doi:10.3390/ijerph17249495. © 2020 The Authors, licensed by MDPI under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). 本题本为附录 B 表 A2 的平台简体中文直译，变更仅为中文译文及呈现标点和格式。保留作者署名、原题序和计分；不引用独立手册或官网另行翻译的题文。https://www.mdpi.com/1660-4601/17/24/9495"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "bat_frequency_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "从不",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "很少",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有时",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "经常",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "总是",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "BAT_01",
+          "content": "工作时，我感到精神上很疲惫。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_02",
+          "content": "工作中的每件事都要我花很大的力气。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_03",
+          "content": "工作一天后，我觉得很难恢复精力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_04",
+          "content": "工作时，我感到身体很疲惫。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_05",
+          "content": "早上起床时，我没有精力开始新一天的工作。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_06",
+          "content": "我想在工作中积极起来，却不知怎么就是做不到。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_07",
+          "content": "工作时，只要一使劲，我就很快感到累。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_08",
+          "content": "一天工作结束时，我觉得精神疲惫，精力也耗尽了。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_09",
+          "content": "我很难对自己的工作提起热情。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_10",
+          "content": "工作时，我不怎么想自己在做什么，就像开了自动驾驶一样。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_11",
+          "content": "我对自己的工作感到强烈反感。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_12",
+          "content": "我对自己的工作感到无所谓。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_13",
+          "content": "我怀疑自己的工作对别人究竟有什么意义。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_14",
+          "content": "工作时，我很难一直保持专注。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_15",
+          "content": "工作时，我很难把事情想清楚。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_16",
+          "content": "工作时，我容易忘事，也容易分心。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_17",
+          "content": "我工作时很难集中注意力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 16,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_18",
+          "content": "我会因为想着别的事而在工作中出错。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 17,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_19",
+          "content": "工作时，我觉得自己控制不住情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 18,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_20",
+          "content": "我在工作中的情绪反应让我觉得自己不像平时的自己。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 19,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_21",
+          "content": "工作中事情不如意时，我会变得烦躁。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 20,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_22",
+          "content": "在工作中，我会心烦或难过，却不知道为什么。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 21,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BAT_23",
+          "content": "工作时，我可能会不自觉地反应过度。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 22,
+          "responseSetKey": "bat_frequency_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "BAT_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_22",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BAT_23",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "exhaustion",
+            "type": "dimension",
+            "label": "工作中的耗竭体验",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "BAT_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_08",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "mental_distance",
+            "type": "dimension",
+            "label": "与工作的距离感",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "BAT_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_13",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "cognitive_impairment",
+            "type": "dimension",
+            "label": "工作中的注意与思路",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "BAT_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_18",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "emotional_impairment",
+            "type": "dimension",
+            "label": "工作中的情绪体验",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "BAT_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_23",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "burnout_core",
+            "type": "total",
+            "label": "整体工作体验",
+            "description": "全部23题等权均分1–5；不是四维均分的简单平均。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "BAT_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BAT_23",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "burnout_core"
+        ],
+        "scoreOrder": [
+          "burnout_core",
+          "exhaustion",
+          "mental_distance",
+          "cognitive_impairment",
+          "emotional_impairment"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "burnout_core",
+            "headline": "工作太满的时候，给自己留个逗号",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一天里同时要跟进好几件事，有时连准备开始下一项的力气都不够。把这段经历想具体，才能分清哪里最消耗，也更容易找到合适的支持。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "选一个想了解的工作片段，想想当时的要求、手边的支持，以及可以先调整的一件事。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "exhaustion",
+            "headline": "把恢复时间留出来",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "连续处理任务、休息后仍难缓过来，都可以是值得留意的信号。工作量、睡眠、身体状态和照护责任也会影响精力。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "找出一段特别耗力的时间，想想能否暂停片刻、调整安排，或与人分担一项任务。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "mental_distance",
+            "headline": "看见自己和工作的距离",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "事情照样做完，却很难再提起兴致，很多人也有过这种体验。任务的意义、工作安排和得到的支持，都值得放在一起回顾。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "对比一件容易投入的事与一件容易走神的事。挑一个有机会改变的条件先聊。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "cognitive_impairment",
+            "headline": "让下一步看得见",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "被打断几次后接不上思路，或者一忙就忘了手里的事，可以从精力、干扰和指令是否清楚来回看。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "试着把手头任务的下一步写在显眼处，有条件时给自己留一小段连续处理的时间。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "emotional_impairment",
+            "headline": "留一点时间，想清楚怎么回应",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "遇到不顺，反应可能比平时更强。事情的紧迫程度、他人的对待和手头的支持，都关系到当下能怎么应对。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "遇到不急的事情，可以先停一停，想清楚希望得到什么支持，再选择合适的人沟通。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "各分项按本组题目求均分，整体为 23 题等权均分。分数越高，表示这次自述的这些工作体验出现越频繁。",
+          "题本为研究工作译版，暂无本地常模和风险分档。"
+        ],
+        "disclaimer": "供在职成年人非商业研究与个人回顾。分数不能决定诊断、能力评级或人事选择。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "bat23_2020_work_core",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "BAT_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_23",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "exhaustion": 1,
+            "mental_distance": 1,
+            "cognitive_impairment": 1,
+            "emotional_impairment": 1,
+            "burnout_core": 1
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "mental_distance",
+            "cognitive_impairment",
+            "emotional_impairment",
+            "burnout_core"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "BAT_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_22",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_23",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "exhaustion": 5,
+            "mental_distance": 5,
+            "cognitive_impairment": 5,
+            "emotional_impairment": 5,
+            "burnout_core": 5
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "mental_distance",
+            "cognitive_impairment",
+            "emotional_impairment",
+            "burnout_core"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "BAT_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_23",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "exhaustion": 3,
+            "mental_distance": 3,
+            "cognitive_impairment": 3,
+            "emotional_impairment": 3,
+            "burnout_core": 3
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "mental_distance",
+            "cognitive_impairment",
+            "emotional_impairment",
+            "burnout_core"
+          ]
+        }
+      },
+      {
+        "name": "exhaustion_high_only",
+        "answers": [
+          {
+            "itemCode": "BAT_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_23",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "exhaustion": 5,
+            "mental_distance": 1,
+            "cognitive_impairment": 1,
+            "emotional_impairment": 1,
+            "burnout_core": 2.391304347826087
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "mental_distance",
+            "cognitive_impairment",
+            "emotional_impairment",
+            "burnout_core"
+          ]
+        }
+      },
+      {
+        "name": "mental_distance_high_only",
+        "answers": [
+          {
+            "itemCode": "BAT_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_23",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "exhaustion": 1,
+            "mental_distance": 5,
+            "cognitive_impairment": 1,
+            "emotional_impairment": 1,
+            "burnout_core": 1.8695652173913044
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "mental_distance",
+            "cognitive_impairment",
+            "emotional_impairment",
+            "burnout_core"
+          ]
+        }
+      },
+      {
+        "name": "cognitive_impairment_high_only",
+        "answers": [
+          {
+            "itemCode": "BAT_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_23",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "exhaustion": 1,
+            "mental_distance": 1,
+            "cognitive_impairment": 5,
+            "emotional_impairment": 1,
+            "burnout_core": 1.8695652173913044
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "mental_distance",
+            "cognitive_impairment",
+            "emotional_impairment",
+            "burnout_core"
+          ]
+        }
+      },
+      {
+        "name": "emotional_impairment_high_only",
+        "answers": [
+          {
+            "itemCode": "BAT_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_22",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_23",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "exhaustion": 1,
+            "mental_distance": 1,
+            "cognitive_impairment": 1,
+            "emotional_impairment": 5,
+            "burnout_core": 1.8695652173913044
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "mental_distance",
+            "cognitive_impairment",
+            "emotional_impairment",
+            "burnout_core"
+          ]
+        }
+      },
+      {
+        "name": "mixed_cyclic",
+        "answers": [
+          {
+            "itemCode": "BAT_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "BAT_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "BAT_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "BAT_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "BAT_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "BAT_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "BAT_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "BAT_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "BAT_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BAT_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BAT_22",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "BAT_23",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "exhaustion": 2.625,
+            "mental_distance": 3,
+            "cognitive_impairment": 3,
+            "emotional_impairment": 3,
+            "burnout_core": 2.869565217391304
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "mental_distance",
+            "cognitive_impairment",
+            "emotional_impairment",
+            "burnout_core"
+          ]
+        }
+      },
+      {
+        "name": "missing_one",
+        "answers": [
+          {
+            "itemCode": "BAT_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BAT_23",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "exhaustion": null,
+            "mental_distance": 3,
+            "cognitive_impairment": 3,
+            "emotional_impairment": 3,
+            "burnout_core": null
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "mental_distance",
+            "cognitive_impairment",
+            "emotional_impairment",
+            "burnout_core"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "exhaustion": null,
+            "mental_distance": null,
+            "cognitive_impairment": null,
+            "emotional_impairment": null,
+            "burnout_core": null
+          },
+          "totalScoreKeys": [
+            "exhaustion",
+            "mental_distance",
+            "cognitive_impairment",
+            "emotional_impairment",
+            "burnout_core"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面的说法涉及你的工作情况，以及你在工作中的感受。请根据自己的情况，选择每一种体验出现的频率。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "Schaufeli、Desart 和 De Witte 2020，Table A2 前的 B 部说明，项目直接翻译"
+  }
+}
