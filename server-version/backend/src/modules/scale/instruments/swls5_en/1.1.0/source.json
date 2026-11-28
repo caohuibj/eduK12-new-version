@@ -1,0 +1,527 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "swls5_en",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "生活满意度量表（SWLS，英文原版 5 题）",
+      "abbreviation": "SWLS5_EN",
+      "instrumentFamily": "Satisfaction With Life Scale original English 5-item"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructDefinition": "以个人标准综合评价整体生活状况的自我报告。",
+      "constructOverlapTags": [
+        "swls5_en",
+        "domain:life_satisfaction",
+        "population:adult",
+        "response:self",
+        "locale:en",
+        "use:noncommercial_research"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "限能读懂英文的成人非商业研究。本版本不采用中国当地常模或儿童青少年解释。"
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 1,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "整体生活满意度。原工具未设置过去一周或一月的固定回溯期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留作者原英文题干、题序和七档一致性锚点。",
+        "5 题全部有效后等权相加，范围 5–35。缺答暂不生成得分。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "以个人标准进行总体生活状况自评，仅用于成人非商业研究。不同文化、样本和量尺的常模不能迁用。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "https://labs.psychology.illinois.edu/~ediener/Documents/Pavot-Diener_1993.pdf",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "沿用论文附录公开的英文原卷。中文只用于独立解释报告。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-en-research",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-descriptive-no-raw-feedback",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-credited-noncommercial-adult",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "The authors explicitly placed the exact original English SWLS in the public domain in the 1993 appendix and author laboratory materials. The foundation’s current page describes the scale as copyrighted and expressly allows attributed non-commercial research. This package uses the previously released exact English version and limits delivery to credited non-commercial adult research; no other translations or commercial rights are assumed.",
+      "https://labs.psychology.illinois.edu/~ediener/Documents/Pavot-Diener_1993.pdf",
+      "https://labs.psychology.illinois.edu/~ediener/Documents/SWLS.html",
+      "https://eddiener.com/satisfaction-with-life-scale-swls/"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "en",
+    "version": "1.1.0",
+    "text": "Below are five statements with which you may agree or disagree. Using the 1–7 scale below, indicate your agreement with each item by placing the appropriate number on the line preceding that item. Please be open and honest in your responding.",
+    "source": "https://labs.psychology.illinois.edu/~ediener/Documents/Pavot-Diener_1993.pdf"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Satisfaction With Life Scale original English 5-item",
+        "citation": "Diener, E., Emmons, R. A., Larsen, R. J., & Griffin, S. (1985). The Satisfaction With Life Scale. Journal of Personality Assessment, 49(1), 71–75. https://doi.org/10.1207/s15327752jpa4901_13. Exact English wording and response order from Pavot & Diener (1993), Psychological Assessment, 5(2), 164–172, Appendix.",
+        "url": "https://labs.psychology.illinois.edu/~ediener/Documents/Pavot-Diener_1993.pdf",
+        "publicationYear": 1985
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "The authors explicitly placed the exact original English SWLS in the public domain in the 1993 appendix and author laboratory materials. The foundation’s current page describes the scale as copyrighted and expressly allows attributed non-commercial research. This package uses the previously released exact English version and limits delivery to credited non-commercial adult research; no other translations or commercial rights are assumed. https://labs.psychology.illinois.edu/~ediener/Documents/SWLS.html https://eddiener.com/satisfaction-with-life-scale-swls/"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "swls5_en",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "agreement_1_7",
+          "options": [
+            {
+              "value": "option_1",
+              "label": "Strongly disagree",
+              "score": 1
+            },
+            {
+              "value": "option_2",
+              "label": "Disagree",
+              "score": 2
+            },
+            {
+              "value": "option_3",
+              "label": "Slightly disagree",
+              "score": 3
+            },
+            {
+              "value": "option_4",
+              "label": "Neither agree nor disagree",
+              "score": 4
+            },
+            {
+              "value": "option_5",
+              "label": "Slightly agree",
+              "score": 5
+            },
+            {
+              "value": "option_6",
+              "label": "Agree",
+              "score": 6
+            },
+            {
+              "value": "option_7",
+              "label": "Strongly agree",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "SWLS1",
+          "content": "In most ways my life is close to my ideal.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SWLS2",
+          "content": "The conditions of my life are excellent.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SWLS3",
+          "content": "I am satisfied with my life.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SWLS4",
+          "content": "So far I have gotten the important things I want in life.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SWLS5",
+          "content": "If I could live my life over, I would change almost nothing.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "agreement_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "life_satisfaction",
+            "type": "dimension",
+            "label": "生活满意度",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "source": {
+              "type": "items",
+              "aggregation": "sum",
+              "items": [
+                {
+                  "itemCode": "SWLS1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SWLS2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SWLS3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SWLS4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SWLS5",
+                  "weight": 1
+                }
+              ]
+            }
+          }
+        ],
+        "itemRules": [
+          {
+            "itemCode": "SWLS1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SWLS2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SWLS3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SWLS4",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SWLS5",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ]
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "life_satisfaction"
+        ],
+        "scoreOrder": [
+          "life_satisfaction"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "life_satisfaction",
+            "headline": "Life satisfaction",
+            "scoreLabel": "Life satisfaction (raw total 5–35)",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "The five responses describe an overall appraisal of your life using your own standards.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Think of a part of life you would like to keep and one small change you would like to try."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "答全 5 项时，将每项的 1–7 分直接相加，范围 5–35 分；漏答时不出分。分数更高表示这次对整体生活更满意。",
+          "本报告没有本地分档、诊断切点或跨人排名。具体生活领域各自如何，以及此刻的情绪，都需要另外了解。"
+        ],
+        "disclaimer": "供能读懂英文的成年人进行非商业研究与自我回顾，不用于健康诊断、资格判断或学校排名。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "en"
+        }
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "SWLS1",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "SWLS2",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "SWLS3",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "SWLS4",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "SWLS5",
+            "responseValue": "option_1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "life_satisfaction": 5
+          },
+          "totalScoreKeys": [
+            "life_satisfaction"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "SWLS1",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "SWLS2",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "SWLS3",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "SWLS4",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "SWLS5",
+            "responseValue": "option_4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "life_satisfaction": 20
+          },
+          "totalScoreKeys": [
+            "life_satisfaction"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "SWLS1",
+            "responseValue": "option_7"
+          },
+          {
+            "itemCode": "SWLS2",
+            "responseValue": "option_7"
+          },
+          {
+            "itemCode": "SWLS3",
+            "responseValue": "option_7"
+          },
+          {
+            "itemCode": "SWLS4",
+            "responseValue": "option_7"
+          },
+          {
+            "itemCode": "SWLS5",
+            "responseValue": "option_7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "life_satisfaction": 35
+          },
+          "totalScoreKeys": [
+            "life_satisfaction"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "SWLS1",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "SWLS2",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "SWLS3",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "SWLS4",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "SWLS5",
+            "responseValue": "option_7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "life_satisfaction": 21
+          },
+          "totalScoreKeys": [
+            "life_satisfaction"
+          ]
+        }
+      }
+    ]
+  }
+}

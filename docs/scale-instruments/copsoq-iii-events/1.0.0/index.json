@@ -1,0 +1,210 @@
+[
+  {
+    "code": "GS",
+    "title": "流言与诽谤",
+    "englishTitle": "Gossip and Slander",
+    "catalogKey": "copsoq3_gs_en@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 16,
+    "originalOptionsPage": 20,
+    "sourceUrl": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "sourceSha256": "27e460070e160265ad4351d49bdc6078e5460b99db04d95f93d672b755bb9d41",
+    "formFiles": [
+      "gs/copsoq3_gs_frequency.form.json",
+      "gs/copsoq3_gs_source.form.json"
+    ],
+    "flowFile": "gs/flow.json",
+    "reviewFile": "gs/review.md",
+    "illustrationKey": "copsoq-iii-gs-event-v1",
+    "artPrompt": "窗边一张安静的工作桌，笔记本上抽象的几根线分别通向信息、事实与影响三个小图示，用留白保护私密感，无可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "gs1",
+      "sourceItemKey": "gs2",
+      "independentItemKey": null
+    }
+  },
+  {
+    "code": "CQ",
+    "title": "冲突与争吵",
+    "englishTitle": "Conflicts and Quarrels",
+    "catalogKey": "copsoq3_cq_en@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 16,
+    "originalOptionsPage": 20,
+    "sourceUrl": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "sourceSha256": "27e460070e160265ad4351d49bdc6078e5460b99db04d95f93d672b755bb9d41",
+    "formFiles": [
+      "cq/copsoq3_cq_frequency.form.json"
+    ],
+    "flowFile": "cq/flow.json",
+    "reviewFile": "cq/review.md",
+    "illustrationKey": "copsoq-iii-cq-event-v1",
+    "artPrompt": "两位同事隔桌对照两份不同的工作计划，第三位中立主持人把便笺整理成可共享议程，无可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "cq1",
+      "sourceItemKey": null,
+      "independentItemKey": null
+    }
+  },
+  {
+    "code": "UT",
+    "title": "令人不快的取笑",
+    "englishTitle": "Unpleasant Teasing",
+    "catalogKey": "copsoq3_ut_en@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 16,
+    "originalOptionsPage": 20,
+    "sourceUrl": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "sourceSha256": "27e460070e160265ad4351d49bdc6078e5460b99db04d95f93d672b755bb9d41",
+    "formFiles": [
+      "ut/copsoq3_ut_frequency.form.json",
+      "ut/copsoq3_ut_source.form.json"
+    ],
+    "flowFile": "ut/flow.json",
+    "reviewFile": "ut/review.md",
+    "illustrationKey": "copsoq-iii-ut-event-v1",
+    "artPrompt": "明亮安静的走廊，两位同事保持舒适距离用平静的手势交谈，旁边有一扇开放的办公室门，无可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "ut1",
+      "sourceItemKey": "ut2",
+      "independentItemKey": null
+    }
+  },
+  {
+    "code": "HSM",
+    "title": "工作相关网络骚扰",
+    "englishTitle": "Cyber Bullying",
+    "catalogKey": "copsoq3_hsm_en@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 16,
+    "originalOptionsPage": 20,
+    "sourceUrl": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "sourceSha256": "27e460070e160265ad4351d49bdc6078e5460b99db04d95f93d672b755bb9d41",
+    "formFiles": [
+      "hsm/copsoq3_hsm_frequency.form.json",
+      "hsm/copsoq3_hsm_source.form.json"
+    ],
+    "flowFile": "hsm/flow.json",
+    "reviewFile": "hsm/review.md",
+    "illustrationKey": "copsoq-iii-hsm-event-v1",
+    "artPrompt": "桌上一支正面朝下的手机、合起的笔记簿和柔和台灯，窗旁有两位同事在安静的地方交谈，无手机屏幕内容和可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "hsm1",
+      "sourceItemKey": "hsm2",
+      "independentItemKey": null
+    }
+  },
+  {
+    "code": "SH",
+    "title": "不受欢迎的性关注",
+    "englishTitle": "Sexual Harassment",
+    "catalogKey": "copsoq3_sh_en@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 16,
+    "originalOptionsPage": 20,
+    "sourceUrl": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "sourceSha256": "27e460070e160265ad4351d49bdc6078e5460b99db04d95f93d672b755bb9d41",
+    "formFiles": [
+      "sh/copsoq3_sh_frequency.form.json",
+      "sh/copsoq3_sh_source.form.json"
+    ],
+    "flowFile": "sh/flow.json",
+    "reviewFile": "sh/review.md",
+    "illustrationKey": "copsoq-iii-sh-event-v1",
+    "artPrompt": "光线温和的私密支持室，空椅和水杯旁保留清晰的出口方向，构图克制，无人物受害情节，无可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "sh1",
+      "sourceItemKey": "sh2",
+      "independentItemKey": null
+    }
+  },
+  {
+    "code": "TV",
+    "title": "暴力威胁",
+    "englishTitle": "Threats of Violence",
+    "catalogKey": "copsoq3_tv_en@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 16,
+    "originalOptionsPage": 20,
+    "sourceUrl": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "sourceSha256": "27e460070e160265ad4351d49bdc6078e5460b99db04d95f93d672b755bb9d41",
+    "formFiles": [
+      "tv/copsoq3_tv_frequency.form.json",
+      "tv/copsoq3_tv_source.form.json"
+    ],
+    "flowFile": "tv/flow.json",
+    "reviewFile": "tv/review.md",
+    "illustrationKey": "copsoq-iii-tv-event-v1",
+    "artPrompt": "开阔办公室走廊里一处清楚可辨的出口，远处是有人值守的安全帮助台，以暖冷配光表现方向，无威胁场面和可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "tv1",
+      "sourceItemKey": "tv2",
+      "independentItemKey": null
+    }
+  },
+  {
+    "code": "PV",
+    "title": "身体暴力",
+    "englishTitle": "Physical Violence",
+    "catalogKey": "copsoq3_pv_en@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 16,
+    "originalOptionsPage": 20,
+    "sourceUrl": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "sourceSha256": "27e460070e160265ad4351d49bdc6078e5460b99db04d95f93d672b755bb9d41",
+    "formFiles": [
+      "pv/copsoq3_pv_frequency.form.json",
+      "pv/copsoq3_pv_source.form.json"
+    ],
+    "flowFile": "pv/flow.json",
+    "reviewFile": "pv/review.md",
+    "illustrationKey": "copsoq-iii-pv-event-v1",
+    "artPrompt": "工作场所中安静安全的出口与附近可求助的服务站，前景一杯温水和一把空椅表示事后支持，不出现冲突、伤害或可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "pv1",
+      "sourceItemKey": "pv2",
+      "independentItemKey": null
+    }
+  },
+  {
+    "code": "BU",
+    "title": "欺凌经历",
+    "englishTitle": "Bullying",
+    "catalogKey": "copsoq3_bu_en@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 17,
+    "originalOptionsPage": 20,
+    "sourceUrl": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "sourceSha256": "27e460070e160265ad4351d49bdc6078e5460b99db04d95f93d672b755bb9d41",
+    "formFiles": [
+      "bu/copsoq3_bu_frequency.form.json",
+      "bu/copsoq3_bu_source.form.json",
+      "bu/copsoq3_bu_independent.form.json"
+    ],
+    "flowFile": "bu/flow.json",
+    "reviewFile": "bu/review.md",
+    "illustrationKey": "copsoq-iii-bu-event-v1",
+    "artPrompt": "几张不带日期字样的日历页与一叠放入文件夹的匿名便笺，一束安静光线表现持续记录的时间感，无可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "bu1",
+      "sourceItemKey": "bu3",
+      "independentItemKey": "bu2"
+    }
+  }
+]

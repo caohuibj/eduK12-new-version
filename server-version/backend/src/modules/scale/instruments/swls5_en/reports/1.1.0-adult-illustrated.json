@@ -1,0 +1,85 @@
+{
+  "toolKey": "swls5_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "把镜头拉远一点，看看生活整体怎样",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "life_satisfaction"
+    ],
+    "scoreOrder": [
+      "life_satisfaction"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "life_satisfaction",
+        "headline": "把镜头拉远一点，看看生活整体怎样",
+        "scoreLabel": "生活满意度 · 5–35 分（原始总分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有时某件事正困扰着你，但回看整体，仍有一些部分让你觉得值得。这份英文原版问卷记录你依据自己的标准，对整体生活所作的评价。五项答案合成一个原始总分，反映你作答时对整体生活的看法。\n\nThe five responses describe an overall appraisal of your life using your own standards. The score reflects how you view life as a whole at the time of completion.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "给自己留两分钟，想一件近来你想保留的事，再想一件你愿意调整的小事。条件改变后，可以用同一版问卷回看和比较自己的回答。\n\nThink of a part of life you would like to keep and one small change you would like to try."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "答全 5 项时，将每项的 1–7 分直接相加，范围 5–35 分；漏答时不出分。分数更高表示这次对整体生活更满意。",
+      "本报告没有本地分档、诊断切点或跨人排名。具体生活领域各自如何，以及此刻的情绪，都需要另外了解。"
+    ],
+    "disclaimer": "供能读懂英文的成年人进行非商业研究与自我回顾，不用于健康诊断、资格判断或学校排名。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "swls5_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

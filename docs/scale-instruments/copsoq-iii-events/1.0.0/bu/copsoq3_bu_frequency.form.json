@@ -1,0 +1,76 @@
+{
+  "requestId": "998cedda-9b58-52dc-b21f-7aa3b8e0520d",
+  "toolKey": "copsoq3_bu_frequency",
+  "version": "1.0.0",
+  "title": "COPSOQ III Annex 1 — Bullying (frequency)",
+  "statement": "Exact English COPSOQ III Annex 1 items and response labels, used with attribution for non-commercial adult workplace research. This submission is one Survey Flow unit of an independently authored, category-only report candidate. It carries neither scoring parameters nor a participant report.",
+  "classificationTags": [
+    "language_validation:content_en",
+    "use:not_diagnostic"
+  ],
+  "reference": {
+    "catalogKey": "copsoq3_bu_en@1.0.0",
+    "originalItemPage": 17,
+    "originalOptionsPage": 20,
+    "reportLanguage": "zh-CN",
+    "reportSource": "Independent contextual descriptions, separate from the original COPSOQ questionnaire",
+    "annexItemIds": [
+      "BU1"
+    ],
+    "annexResponseTypes": [
+      "4"
+    ],
+    "sourceTitle": "COPSOQ III. Guidelines and questionnaire. Annex 1. Conflicts and offensive behaviours",
+    "author": "COPSOQ International Network",
+    "sourceUrl": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "documentSha256": "27e460070e160265ad4351d49bdc6078e5460b99db04d95f93d672b755bb9d41",
+    "license": "CC BY-NC-ND 4.0, subject to guidelines",
+    "licenseUrl": "https://www.copsoq-network.org/licence-guidelines-and-questionnaire",
+    "titleLanguage": "en",
+    "questionnaireLanguage": "en",
+    "scorePolicy": "NONE",
+    "edition": "International English long version, exact relevant Annex items; 18 August 2021 PDF",
+    "thirdPartyEndorsement": false
+  },
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "annex_original",
+        "title": "Conflicts and offensive behaviours",
+        "questions": [
+          {
+            "itemKey": "bu1",
+            "type": "SINGLE",
+            "prompt": "Bullying means that a person repeatedly is exposed to unpleasant or degrading treatment, and that the person finds it difficult to defend himself or herself against it. Have you been exposed to bullying at your workplace during the last 12 months?",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "yes_daily",
+                "label": "Yes, daily"
+              },
+              {
+                "optionKey": "yes_weekly",
+                "label": "Yes, weekly"
+              },
+              {
+                "optionKey": "yes_monthly",
+                "label": "Yes, monthly"
+              },
+              {
+                "optionKey": "yes_few_times",
+                "label": "Yes, a few times"
+              },
+              {
+                "optionKey": "no",
+                "label": "No"
+              }
+            ],
+            "rows": []
+          }
+        ]
+      }
+    ]
+  }
+}

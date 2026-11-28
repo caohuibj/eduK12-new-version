@@ -1,0 +1,72 @@
+{
+  "requestId": "21ee8372-6cda-52ed-944e-b2cc8427f3fb",
+  "toolKey": "copsoq3_gs_source",
+  "version": "1.0.0",
+  "title": "COPSOQ III Annex 1 — Gossip and Slander (sources)",
+  "statement": "Exact English COPSOQ III Annex 1 items and response labels, used with attribution for non-commercial adult workplace research. This submission is one Survey Flow unit of an independently authored, category-only report candidate. It carries neither scoring parameters nor a participant report.",
+  "classificationTags": [
+    "language_validation:content_en",
+    "use:not_diagnostic"
+  ],
+  "reference": {
+    "catalogKey": "copsoq3_gs_en@1.0.0",
+    "originalItemPage": 16,
+    "originalOptionsPage": 20,
+    "reportLanguage": "zh-CN",
+    "reportSource": "Independent contextual descriptions, separate from the original COPSOQ questionnaire",
+    "annexItemIds": [
+      "GS2"
+    ],
+    "annexResponseTypes": [
+      "5M"
+    ],
+    "sourceTitle": "COPSOQ III. Guidelines and questionnaire. Annex 1. Conflicts and offensive behaviours",
+    "author": "COPSOQ International Network",
+    "sourceUrl": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "documentSha256": "27e460070e160265ad4351d49bdc6078e5460b99db04d95f93d672b755bb9d41",
+    "license": "CC BY-NC-ND 4.0, subject to guidelines",
+    "licenseUrl": "https://www.copsoq-network.org/licence-guidelines-and-questionnaire",
+    "titleLanguage": "en",
+    "questionnaireLanguage": "en",
+    "scorePolicy": "NONE",
+    "edition": "International English long version, exact relevant Annex items; 18 August 2021 PDF",
+    "thirdPartyEndorsement": false
+  },
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "annex_original",
+        "title": "Conflicts and offensive behaviours",
+        "questions": [
+          {
+            "itemKey": "gs2",
+            "type": "MULTIPLE",
+            "prompt": "If yes, from whom? (You may tick off more than one)",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "colleagues",
+                "label": "Colleagues"
+              },
+              {
+                "optionKey": "manager",
+                "label": "Manager/superior"
+              },
+              {
+                "optionKey": "subordinates",
+                "label": "Subordinates"
+              },
+              {
+                "optionKey": "clients",
+                "label": "Clients/customers/patients"
+              }
+            ],
+            "rows": []
+          }
+        ]
+      }
+    ]
+  }
+}

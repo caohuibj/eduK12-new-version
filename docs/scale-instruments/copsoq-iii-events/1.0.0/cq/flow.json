@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "embeddedData": [],
+  "blocks": [
+    {
+      "blockKey": "copsoq3_cq_frequency",
+      "kind": "INSTRUMENT",
+      "instrumentKey": "copsoq3_cq_frequency"
+    }
+  ]
+}
