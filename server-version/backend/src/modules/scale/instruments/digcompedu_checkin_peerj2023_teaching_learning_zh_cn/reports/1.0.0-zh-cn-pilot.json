@@ -1,0 +1,94 @@
+{
+  "toolKey": "digcompedu_checkin_peerj2023_teaching_learning_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.0.0-zh-cn-pilot",
+  "title": "教学与学习｜高校教师自评报告（试用版）",
+  "report": {
+    "reportVersion": "1.0.0-zh-cn-pilot",
+    "primaryScoreKeys": [
+      "teaching_learning"
+    ],
+    "scoreOrder": [
+      "teaching_learning"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "teaching_learning",
+        "headline": "让数字工具留下看得见的学习证据",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一部分问的是数字工具怎样进入教学活动、支持小组协作，以及学生怎样用它们规划和回顾自己的学习。评价一次尝试时，可以看看学生能否更清楚地说出自己改了什么、为何要改。可回看的讨论、证据记录和版本变化，都能帮助你判断这项设计有没有用。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "小组作业增加一项简短要求：提交一条证据、来源和小组为什么采用它。用一份共享记录保留讨论和修改。"
+          },
+          {
+            "category": "strategy",
+            "text": "下课前请学生写两句：今天我弄明白了什么，下次我要先做什么。下次课再给他们一分钟回看。"
+          },
+          {
+            "category": "environment",
+            "text": "挑一个在线讨论贴，在学生卡住时补一个提示性问题。观察这条提示是否引出了不同的思路。"
+          }
+        ],
+        "scoreLabel": "教学与学习合计分（试用版，0–16 分）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "所得分数是这一部分的原始合计分。现有证据不足以据此给出分档、判定 A1–C2 等级，或和其他教师作比较。",
+      "本报告供高校教师回顾个人教学实践。工作职责、技术条件和学生需求都可能影响选项。",
+      "中文为 EDUK12 根据 PeerJ 2024 高校教师英文问卷所做的试译。尚无中文版或分区单独施测的本地验证数据。"
+    ],
+    "disclaimer": "结果可用于个人教学反思。请勿将其用于诊断、教师绩效、学校排名或跨群体比较。缺答时本题区没有合计分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-zh-cn-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

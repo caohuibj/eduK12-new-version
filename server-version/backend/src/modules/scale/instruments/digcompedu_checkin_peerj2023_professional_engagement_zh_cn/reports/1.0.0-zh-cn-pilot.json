@@ -1,0 +1,94 @@
+{
+  "toolKey": "digcompedu_checkin_peerj2023_professional_engagement_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.0.0-zh-cn-pilot",
+  "title": "专业参与｜高校教师自评报告（试用版）",
+  "report": {
+    "reportVersion": "1.0.0-zh-cn-pilot",
+    "primaryScoreKeys": [
+      "professional_engagement"
+    ],
+    "scoreOrder": [
+      "professional_engagement"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "professional_engagement",
+        "headline": "让常用的沟通渠道各有用处",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一部分问的是你怎样和学生、同事沟通，怎样一起工作，又怎样学习新的数字教法。渠道多不一定更省心。学生清楚去哪里找通知、同事知道在哪里接着改同一份材料，才说明工具发挥了作用。试着回想最近一次教学协作，看看哪一步因为用了数字工具而更顺畅。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "给一门课约定一个固定的通知渠道，再明确一个适合提问和讨论的地方。一周后问问学生，重要消息好不好找。"
+          },
+          {
+            "category": "strategy",
+            "text": "和一位同事共改一小段讲义，在同一份文档里留下修改理由。再决定这种合作方式值不值得保留。"
+          },
+          {
+            "category": "environment",
+            "text": "选一项与当前课程直接相关的在线培训。学完先试用一个方法，再记下对学生有什么具体帮助。"
+          }
+        ],
+        "scoreLabel": "专业参与合计分（试用版，0–16 分）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "所得分数是这一部分的原始合计分。现有证据不足以据此给出分档、判定 A1–C2 等级，或和其他教师作比较。",
+      "本报告供高校教师回顾个人教学实践。工作职责、技术条件和学生需求都可能影响选项。",
+      "中文为 EDUK12 根据 PeerJ 2024 高校教师英文问卷所做的试译。尚无中文版或分区单独施测的本地验证数据。"
+    ],
+    "disclaimer": "结果可用于个人教学反思。请勿将其用于诊断、教师绩效、学校排名或跨群体比较。缺答时本题区没有合计分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-zh-cn-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
