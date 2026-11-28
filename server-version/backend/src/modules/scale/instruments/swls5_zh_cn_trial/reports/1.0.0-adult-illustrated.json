@@ -1,0 +1,85 @@
+{
+  "toolKey": "swls5_zh_cn_trial",
+  "contentVersion": "1.0.0",
+  "version": "1.0.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "生活满意度｜中文试用图文报告",
+  "report": {
+    "reportVersion": "1.0.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "life_satisfaction"
+    ],
+    "scoreOrder": [
+      "life_satisfaction"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "life_satisfaction",
+        "headline": "给生活拍一张全景照",
+        "scoreLabel": "生活满意度｜5–35 分（原始总分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "给生活拍一张全景照。最近的一件事有时占满镜头，退后一步，你可能还看见身边的人、手头的事，以及想留住的日常。生活满意度关心的是，你用自己的标准看，整体过得怎么样。这五个回答记录的是你此刻的看法。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "花两分钟写下两件事：一件是你想留在画面里的小事，一件是你想挪动一点的位置。给后一件找个十分钟能做的动作，今天就试一次。比如给久未联系的人发条消息，或者替自己留出一段没人打扰的时间。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "五项每项 1–7 分，答全后直接相加，范围 5–35 分。分数更高，表示这次对整体生活的评价更满意。",
+      "简体中文题本为试用译本。报告用原始分记录个人回顾，没有本地分档或人群排名。想知道日常里哪里最想改变，可以再回想一两个具体场景。"
+    ],
+    "disclaimer": "供成年人非商业研究与自我回顾使用。报告采用描述性原始分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "swls5_zh_cn_trial/1.0.0/1.0.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}
