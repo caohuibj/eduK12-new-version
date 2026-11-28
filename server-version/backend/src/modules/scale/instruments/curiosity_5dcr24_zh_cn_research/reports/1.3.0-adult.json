@@ -1,0 +1,233 @@
+{
+  "toolKey": "curiosity_5dcr24_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "好奇心五维修订量表 5DCR-24",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "https://access.gesis.org/zis/1217 作者与 GESIS ZIS 题本手册均列出 24 题、七级锚点及计分说明。通用和隐蔽社会好奇分别计分。"
+      }
+    },
+    "primaryScoreKeys": [
+      "joyous_exploration",
+      "deprivation_sensitivity",
+      "stress_tolerance",
+      "social_curiosity_general",
+      "social_curiosity_covert",
+      "thrill_seeking"
+    ],
+    "scoreOrder": [
+      "joyous_exploration",
+      "deprivation_sensitivity",
+      "stress_tolerance",
+      "social_curiosity_general",
+      "social_curiosity_covert",
+      "thrill_seeking"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "joyous_exploration",
+        "scoreLabel": "愉悦探索",
+        "headline": "遇到新东西，想往前多走一步",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组描述学习陌生东西、研究新问题带来的乐趣。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "闲下来时，什么问题能让你忘记时间？"
+          },
+          {
+            "category": "strategy",
+            "text": "从一个低成本的新鲜体验挑起头，例如用十分钟试一种新做法。"
+          },
+          {
+            "category": "support",
+            "text": "兴趣会随主题和所处阶段变化，给日常留一点可选的探索空间即可。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "deprivation_sensitivity",
+        "scoreLabel": "匮乏敏感性",
+        "headline": "缺的那块拼图总惦记",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组描述卡在未知细节时想把答案找齐的冲动，伴随的也可能是烦躁。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近哪个未解细节一直牵着你的注意力？"
+          },
+          {
+            "category": "strategy",
+            "text": "把缺的证据列出来，先设一个短时限找最关键的一条。"
+          },
+          {
+            "category": "support",
+            "text": "当问题暂时没答案时，可以留条记录约定下次再看。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "stress_tolerance",
+        "scoreLabel": "面对不确定性的耐受",
+        "headline": "答案还没来，也能动起来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组描述在困难、陌生或结局未明的情况下，靠近和探索的自在程度。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "面对一个没把握的问题，你希望先拿到哪种支持？"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一个后果小而走得回去的尝试，先尝试一小步并约好暂停点。"
+          },
+          {
+            "category": "support",
+            "text": "真实风险值得谨慎，遇到风险可以先了解条件再决定。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "social_curiosity_general",
+        "scoreLabel": "一般社会好奇心",
+        "headline": "想了解一个人，先问一句好问题",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组描述通过直接提问、交谈和倾听了解别人想法与经历的兴趣。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "上次哪一句开放问题带来了一段意料之外的回答？"
+          },
+          {
+            "category": "strategy",
+            "text": "在合适时机问「你当时是怎么考虑的」，听完再核对自己的理解。"
+          },
+          {
+            "category": "support",
+            "text": "对方有选择分享多少的空间，沉默也可以被尊重。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "social_curiosity_covert",
+        "scoreLabel": "间接了解他人的好奇心",
+        "headline": "听见故事的边角，难免想知道后来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组描述想知道旁人互动、冲突或私下经历的程度。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "有些事是为了理解情境，有些是因为热闹，你会怎样区分？"
+          },
+          {
+            "category": "strategy",
+            "text": "如果信息会影响共同事务，优先找公开线索或征得当事人同意。"
+          },
+          {
+            "category": "support",
+            "text": "涉及他人隐私时，在分享或追问之前先停一停。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "thrill_seeking",
+        "scoreLabel": "寻求新鲜与刺激",
+        "headline": "给新鲜感找一个安全位置",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组描述对自发决定、带挑战或刺激的新体验的兴趣。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "什么体验可以有一点心跳加快，同时风险清楚、自己能退出？"
+          },
+          {
+            "category": "strategy",
+            "text": "试一次有明确安全规则的新活动，给费用、时间和退出方式划个界限。"
+          },
+          {
+            "category": "support",
+            "text": "做选择时可同时考虑自己和伴侣或同行者的安全与意愿。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "六方面各自取四题均值 1–7，压力耐受四题反向。报告使用同一版六项参数，无总分。"
+    ],
+    "disclaimer": "这是成年人好奇心倾向的研究试用稿。分数记录你当前认同哪些说法，各方面可分别阅读，暂无用于本工作译本的分级常模。",
+    "artworkKey": "curiosity_5dcr24_zh_cn_research/1.0.0/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
