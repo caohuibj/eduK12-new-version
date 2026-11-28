@@ -1,0 +1,92 @@
+{
+  "toolKey": "rses10_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-pilot",
+  "title": "重新看一眼对自己的感受｜成人研究试用",
+  "report": {
+    "reportVersion": "1.3.0-pilot",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 来源、计分和内容复核",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "按 PhenX 英文施测和 0–30 计分口径核对当前独立中文译稿、5 道反向以及成人范围。"
+      }
+    },
+    "primaryScoreKeys": [
+      "rses10"
+    ],
+    "scoreOrder": [
+      "rses10"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "rses10",
+        "scoreLabel": "总体自尊自述（0–30 合计）",
+        "headline": "一次难熬的事和对自己的整体看法",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一次会议说错话，你也许一直在想这个片段，同时也知道自己还有其他做得好的地方。总体自尊问的是你平时怎样看自己。统一正反方向后 10 题合计，数值越大表示本次更认同积极看待自己的描述。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把最近想到的一句自我评价写下来，再记一个更具体的版本，例如自己哪里还有空间改进、哪里已经做到了。用可观察的经历来谈。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "每题按 0–3 计分，5 道反向题统一方向后合计。当前工作译稿依据英文项目原件，PhenX 中文表是另一个可查的版本。",
+      "此分数只描述本次自述，独立中文版本仍属研究试用。",
+      "Morris Rosenberg（1989），Society and the Adolescent Self-Image，修订版。PhenX 180901 提供英文原题与 0–30 计分说明，https://www.phenxtoolkit.org/protocols/view/180901 。现用中文为平台独立工作译稿。"
+    ],
+    "disclaimer": "用于成人研究试用与自我了解。",
+    "artworkKey": "rses10_zh_cn_research/1.0.0/1.3.0-pilot"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
