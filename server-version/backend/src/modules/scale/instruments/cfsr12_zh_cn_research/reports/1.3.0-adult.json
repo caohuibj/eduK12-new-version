@@ -1,0 +1,154 @@
+{
+  "toolKey": "cfsr12_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "应对办法的停止、替换和回看｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对 Kato 2020 原论文 12 道英文条目、四级选项与 4／4／4 分组。分量表按每题 0–3 的真实累加范围 0–12。"
+      }
+    },
+    "primaryScoreKeys": [
+      "abandonment",
+      "recoping",
+      "metacoping"
+    ],
+    "scoreOrder": [
+      "abandonment",
+      "recoping",
+      "metacoping"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "abandonment",
+        "scoreLabel": "停止无效办法合计分（0–12）",
+        "headline": "知道什么时候适合停下来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "四题加总，表示你是否更认可在办法无效、影响变差或重复失败时停止使用当前应对。停止一时无效的方法，可以腾出空间评估别的选项。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想最近反复用过的一种做法，找出一条显示情况没有改善的具体迹象。"
+          },
+          {
+            "category": "strategy",
+            "text": "预先约定一个复看点，到了就检查这项做法是否值得继续。"
+          },
+          {
+            "category": "support",
+            "text": "与了解情况的人核对你看到的证据，避免只按当时的挫败感作判断。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "recoping",
+        "scoreLabel": "转用其他办法合计分（0–12）",
+        "headline": "停下之后，给自己留一条备用路",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "四题加总，较大值表示你更认同在原有应对未能奏效时想出和尝试别的做法。可用的支援、时间和权限决定哪些替换真能发生。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一件卡住的事，想想有什么可借力的人、工具或调整顺序的空间。"
+          },
+          {
+            "category": "strategy",
+            "text": "准备一个足够小的新做法，先试一次，再观察和原来有何不同。"
+          },
+          {
+            "category": "support",
+            "text": "可以请有类似经验的人讲一个真实做法，然后选择适合自己情境的部分。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "metacoping",
+        "scoreLabel": "观察和回顾效果合计分（0–12）",
+        "headline": "先说清想改善什么，再看做法有没有帮上忙",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "四题加总，较大值表示你更认同设定目标和判断应对是否有效。分数反映自评倾向，具体效果需要对照当时的目标与后来的变化。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "给当前想处理的事情写下一个能看到的小结果。"
+          },
+          {
+            "category": "strategy",
+            "text": "用同一个观察条目记录一次尝试前后，再决定保留、调整或停止。"
+          },
+          {
+            "category": "support",
+            "text": "如果效果难分辨，找可信的同伴一起核对一条变化证据。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "当前版本使用三项各自的 0–12 分合计。原始日语研究与本中文工作译稿的证据分开。",
+      "采用已登记中文工作译稿及原计分。数值用于理解本次自陈，当前版本以描述分呈现。",
+      "各分数按原来的完整作答规则计算，漏答保留为缺失。"
+    ],
+    "disclaimer": "适用于既有成人试用研究与自我回顾。临床诊断及其他高风险决定需要相应的专门方法。",
+    "artworkKey": "cfsr12_zh_cn_research/1.0.1/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
