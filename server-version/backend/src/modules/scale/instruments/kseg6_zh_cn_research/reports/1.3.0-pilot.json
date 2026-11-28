@@ -1,0 +1,111 @@
+{
+  "toolKey": "kseg6_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-pilot",
+  "title": "怎样把自己写进问卷｜成人研究试用",
+  "report": {
+    "reportVersion": "1.3.0-pilot",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 来源、计分和内容复核",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对英文改编和现用中文版六题，核定两组三题、完整作答取均值，以及负面承认保留原方向。"
+      }
+    },
+    "primaryScoreKeys": [
+      "positive_endorsement",
+      "negative_admission_raw"
+    ],
+    "scoreOrder": [
+      "positive_endorsement",
+      "negative_admission_raw"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "positive_endorsement",
+        "scoreLabel": "认同正面表现（1–5 均分）",
+        "headline": "想到的是平常做法，还是最理想的一次？",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一场争论里，你把事情说得很客观。可换到赶时间、被误会的时候，做法也可能不同。这一部分由三道正面描述取均分，数值越高，表示本次更认同这些描述。理解时可以同时想起做得到和没做到的例子。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "任选一个自己比较认同的描述，各找一个有把握的实际例子和一个例外，看看情境带来的差别。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "negative_admission_raw",
+        "scoreLabel": "承认不理想行为（1–5 原均分）",
+        "headline": "把普通的失误放回当时的情境",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "偶尔忘了约定、在压力下说了不妥的话，都有各自的经过。这一部分保留三道不理想行为题的原方向，数值越高表示本次更愿意认可这些描述符合自己。对于问卷里和同事、亲友一起回答的情境，也可以留意私密性和被评价的感受。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找一个最近的例子，写下事情、当时你想到的解释和下一回可能采用的动作，把注意力放在经历本身。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "两个三题均分均为 1–5。第二组保留承认方向，数值越大表示本次越认同相关行为符合自己，两组并列阅读。",
+      "本次回答可能受记忆、情境和表达习惯影响。解读限于成人研究或自我了解，选拔与诚信判断需要独立、适用的证据。",
+      "Nießen、Partsch、Kemper 和 Rammstedt（2019），Social Desirability–Gamma Short Scale 英文改编，https://doi.org/10.1186/s42409-018-0005-1 ，CC BY 4.0 https://creativecommons.org/licenses/by/4.0/ 。平台中文工作译稿与报告为独立改编。"
+    ],
+    "disclaimer": "这一研究试用报告用于回看自述中的表达方式。",
+    "artworkKey": "kseg6_zh_cn_research/1.0.1/1.3.0-pilot"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
