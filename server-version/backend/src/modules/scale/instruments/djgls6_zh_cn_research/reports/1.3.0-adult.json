@@ -1,0 +1,152 @@
+{
+  "toolKey": "djgls6_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "亲近感与可依靠的联结｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "对照 De Jong Gierveld 与 Van Tilburg 2010 文章六题、三选项和中间档恒计 1 的二元映射。平台按两维和总和描述。"
+      }
+    },
+    "primaryScoreKeys": [
+      "loneliness"
+    ],
+    "scoreOrder": [
+      "loneliness",
+      "emotional",
+      "social"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "loneliness",
+        "scoreLabel": "联结不足感受合计分（0–6）",
+        "headline": "把想要的陪伴和实际能得到的支持分别看",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "六条回答汇总亲近感和可依靠关系。三个选项按原表二元方式映射，分值范围 0–6。较大值表示本次有较多联结不足线索。它描述现在的体验，也有可能随着近况和关系变化。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "在日常里找一个最想有人陪的时刻，以及一个最想有人帮忙的时刻。"
+          },
+          {
+            "category": "strategy",
+            "text": "从这两类需求中选一项，在合适时段尝试主动联系一个人或参加容易退出的活动。"
+          },
+          {
+            "category": "support",
+            "text": "如联结感长期影响日常，可以和可信的人谈谈具体困扰，或了解适合当地的支持渠道。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "emotional",
+        "scoreLabel": "亲近感不足合计分（0–3）",
+        "headline": "看看哪一种陪伴是你正在想念的",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这三题关注空落感、想有人在身边和感到被拒绝。较大值描述本次报告的亲近不足线索较多。有联系对象的情况下也可能想念更深入的陪伴。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想一件你希望有人听你讲的近况，辨认你最想得到的是理解、陪伴，还是仅仅想说出来。"
+          },
+          {
+            "category": "strategy",
+            "text": "找一个适合谈话的时段，试着对可信的对象提出一件小而清楚的邀请。"
+          },
+          {
+            "category": "support",
+            "text": "如果暂时找不到合适的陪伴，可以选择一个可持续的社区或专业支持入口。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "social",
+        "scoreLabel": "可依靠关系不足合计分（0–3）",
+        "headline": "找一张可以用得上的支持地图",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这三题关注遇到问题时能不能找到人、信赖关系是否够用，以及有没有亲近的人。较大值表示较少认同自己拥有这些联结资源。结果反映你对关系可用性的感受。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "写下一件实际的小困难，看看可能向谁询问信息、一起做事或获得陪伴。"
+          },
+          {
+            "category": "strategy",
+            "text": "先试一次低负担的接触，例如约一场短散步或请人核对一条路线。"
+          },
+          {
+            "category": "support",
+            "text": "有时公共服务、活动组织和熟人也能承担某一种支持，把它们分别记下来。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "三选项按已核对的固定规则转换，中间答案在两类题均计为该类联结不足线索。使用范围为成人非商业研究。",
+      "采用已登记中文工作译稿及原计分。数值用于理解本次自陈，当前版本以描述分呈现。",
+      "各分数按原来的完整作答规则计算，漏答保留为缺失。"
+    ],
+    "disclaimer": "适用于既有成人试用研究与自我回顾。临床诊断及其他高风险决定需要相应的专门方法。",
+    "artworkKey": "djgls6_zh_cn_research/1.0.1/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
