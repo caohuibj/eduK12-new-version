@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "cbi_personal_zh_cn/1.0.0/1.2.0-teacher",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "忙完一天后，一个人在家放下包、坐下来休息。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

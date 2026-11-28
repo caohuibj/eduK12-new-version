@@ -1,0 +1,91 @@
+{
+  "toolKey": "cbi_personal_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-teacher",
+  "title": "个人整体疲惫（CBI-P 中文试用报告）",
+  "report": {
+    "reportVersion": "1.2.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "primaryScoreKeys": [
+      "personal_burnout"
+    ],
+    "scoreOrder": [
+      "personal_burnout"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "personal_burnout",
+        "scoreLabel": "整体疲惫（个人分）",
+        "headline": "从一个普通时段看整体疲惫",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "周末原本准备买菜、洗衣，做完第一件事就只想坐一会儿。另一个早晨，同样的事情却能慢慢做完。六题的 0–100 均分描述这类整体身体与情绪疲惫出现得有多常，分数越高表示你本次自述的疲惫更常出现。工作日和休息日的体验都能帮助你理解这个分数。",
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选近期一个忙完仍觉得累的时刻，也选一个休息后比较轻松的时刻。各写一句当时的安排、休息条件和自己最明显的感受。"
+          },
+          {
+            "category": "environment",
+            "text": "给一件能缓一缓的事务重新排时间，或者和家人商量分担一个晚上的家务。留意空出的时间能不能让你真正歇一会儿。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "六题里至少回答三题才计算本项。达到最低题数但有漏答时，用已答题计平均；漏答不当作零分。",
+      "题本是依据英文原版独立翻译的简体中文工作稿，仍待人工译审和本地验证。分数没有本地常模、百分位或等级，请结合答题时的实际情况阅读。",
+      "量表来源与使用署名：Borritz M et al. Burnout among employees in human service work: design and baseline findings of the PUMA study. Scandinavian Journal of Public Health. 2006;34:49–58。工具发展文献：Kristensen TS 等（2005），https://doi.org/10.1080/02678370500297720。"
+    ],
+    "disclaimer": "供成人教师和相关工作者回顾本次自述体验。请勿将结果用于诊断、录用、绩效考核或学校排名。",
+    "artworkKey": "cbi_personal_zh_cn/1.0.0/1.2.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
