@@ -1,0 +1,342 @@
+{
+  "schemaVersion": 1,
+  "artifactType": "ordinary-composition-draft-preparation",
+  "status": "VALIDATED_CONTENT_AND_DRAFT_CONTRACT",
+  "title": "SELFIEforTEACHERS｜2022 Toolkit 中文试用版",
+  "entry": "TEACHER",
+  "apiBase": "/api/huiteacher",
+  "motherKey": "selfie4t_2022tk_32_en_teacher_self",
+  "source": "https://publications.jrc.ec.europa.eu/repository/handle/JRC129699",
+  "license": "CC BY 4.0",
+  "administration": {
+    "population": "TEACHER",
+    "responseMode": "SELF"
+  },
+  "assessmentItemCount": 32,
+  "requiredContextFields": [
+    {
+      "contextKey": "birthYearMonth",
+      "formType": "year_month",
+      "formLabel": "出生年月",
+      "formOptions": []
+    }
+  ],
+  "afterSourcesAuthorized": {
+    "catalogPath": "/api/huiteacher/organizations/{organizationId}/private-tools/public-sources",
+    "createPath": "/api/huiteacher/organizations/{organizationId}/private-tools",
+    "savePath": "/api/huiteacher/organizations/{organizationId}/private-tools/{draftId}"
+  },
+  "combinedScore": "NONE",
+  "createDraft": {
+    "kind": "COMPOSITION",
+    "title": "SELFIEforTEACHERS｜2022 Toolkit 中文试用版"
+  },
+  "instruction": "请回想你当前在教学中使用数字技术的做法。每题只选一条最符合现状的描述。A1 到 C2 是这项实践的不同阶段。如果此前不了解这项能力，请选「我不了解这项能力」。结果用于个人专业学习与反思。",
+  "components": [
+    {
+      "toolKey": "selfie4t_2022tk_professional_engagement_zh_cn_teacher_self",
+      "title": "SELFIEforTEACHERS｜专业参与（9项）｜教师自评｜2022 工具包中文试用版 · SELFIEforTEACHERS｜让技术用在日常协作里｜中文试用版｜图文版",
+      "originalItemOrder": [
+        "1.1",
+        "1.2",
+        "1.3",
+        "1.4",
+        "1.5",
+        "1.6",
+        "1.7",
+        "1.8",
+        "1.9"
+      ],
+      "itemKeys": [
+        "S4T_1_1",
+        "S4T_1_2",
+        "S4T_1_3",
+        "S4T_1_4",
+        "S4T_1_5",
+        "S4T_1_6",
+        "S4T_1_7",
+        "S4T_1_8",
+        "S4T_1_9"
+      ],
+      "scoreKeys": [
+        "competence_1_1",
+        "competence_1_2",
+        "competence_1_3",
+        "competence_1_4",
+        "competence_1_5",
+        "competence_1_6",
+        "competence_1_7",
+        "competence_1_8",
+        "competence_1_9"
+      ],
+      "contentHash": "1aded7a6196b485c340a22f1a268ddf26ced04d62f7866a720eff0c7428e69a5",
+      "contentAxisHash": "6d0af3a03744d59163abf8f4013a926ba794d1e389110da5cc55302f696d4bf4",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "653245d3614aba4e413b1facdab46ad4f2e5fed9a08fa8062db2a2954520fa29",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/selfie4t_2022tk_professional_engagement_zh_cn_teacher_self/reports/1.1.0-teacher-illustrated.json",
+      "artworkKey": "selfie4t_2022tk_professional_engagement_zh_cn_teacher_self/1.0.0/1.1.0-teacher-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "SELFIEforTEACHERS｜专业参与（9项）｜教师自评｜2022 工具包中文试用版 · SELFIEforTEACHERS｜让技术用在日常协作里｜中文试用版｜图文版"
+      }
+    },
+    {
+      "toolKey": "selfie4t_2022tk_digital_resources_zh_cn_teacher_self",
+      "title": "SELFIEforTEACHERS｜数字资源（5项）｜教师自评｜2022 工具包中文试用版 · SELFIEforTEACHERS｜怎样挑到能帮上忙的数字资源｜中文试用版｜图文版",
+      "originalItemOrder": [
+        "2.1",
+        "2.2",
+        "2.3",
+        "2.4",
+        "2.5"
+      ],
+      "itemKeys": [
+        "S4T_2_1",
+        "S4T_2_2",
+        "S4T_2_3",
+        "S4T_2_4",
+        "S4T_2_5"
+      ],
+      "scoreKeys": [
+        "competence_2_1",
+        "competence_2_2",
+        "competence_2_3",
+        "competence_2_4",
+        "competence_2_5"
+      ],
+      "contentHash": "dfcba7ef0bf1399326751d72b4eafc76f11ed515a5a9e87bff4a3b62ebe119fd",
+      "contentAxisHash": "2e413998b946670d0bc54caf0285e5b2c1b0bd154ad1e7542461301e6d22c19a",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "6ba737b7b9910d009b99be376825959ef2bc05311b728625dc65bb7308e08003",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/selfie4t_2022tk_digital_resources_zh_cn_teacher_self/reports/1.1.0-teacher-illustrated.json",
+      "artworkKey": "selfie4t_2022tk_digital_resources_zh_cn_teacher_self/1.0.0/1.1.0-teacher-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "SELFIEforTEACHERS｜数字资源（5项）｜教师自评｜2022 工具包中文试用版 · SELFIEforTEACHERS｜怎样挑到能帮上忙的数字资源｜中文试用版｜图文版"
+      }
+    },
+    {
+      "toolKey": "selfie4t_2022tk_teaching_learning_zh_cn_teacher_self",
+      "title": "SELFIEforTEACHERS｜教学与学习（5项）｜教师自评｜2022 工具包中文试用版 · SELFIEforTEACHERS｜让学生动手试、说清楚｜中文试用版｜图文版",
+      "originalItemOrder": [
+        "3.1",
+        "3.2",
+        "3.3",
+        "3.4",
+        "3.5"
+      ],
+      "itemKeys": [
+        "S4T_3_1",
+        "S4T_3_2",
+        "S4T_3_3",
+        "S4T_3_4",
+        "S4T_3_5"
+      ],
+      "scoreKeys": [
+        "competence_3_1",
+        "competence_3_2",
+        "competence_3_3",
+        "competence_3_4",
+        "competence_3_5"
+      ],
+      "contentHash": "cb3f315fe78f6a552b005c53bb2a0cdb5af813086e56aabea0d476bb31e4f749",
+      "contentAxisHash": "b308fc1bdc1e25c64278b556b2ff6ff06a73f9f416ca2e2f21e4ad6fbc0b3f3f",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "a89b8a2e00cccc6f5646b2dd2422eeec55a7b19803a50b4a961e3eb19706e141",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/selfie4t_2022tk_teaching_learning_zh_cn_teacher_self/reports/1.1.0-teacher-illustrated.json",
+      "artworkKey": "selfie4t_2022tk_teaching_learning_zh_cn_teacher_self/1.0.0/1.1.0-teacher-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "SELFIEforTEACHERS｜教学与学习（5项）｜教师自评｜2022 工具包中文试用版 · SELFIEforTEACHERS｜让学生动手试、说清楚｜中文试用版｜图文版"
+      }
+    },
+    {
+      "toolKey": "selfie4t_2022tk_assessment_zh_cn_teacher_self",
+      "title": "SELFIEforTEACHERS｜学习评价（3项）｜教师自评｜2022 工具包中文试用版 · SELFIEforTEACHERS｜让反馈赶得上下一次尝试｜中文试用版｜图文版",
+      "originalItemOrder": [
+        "4.1",
+        "4.2",
+        "4.3"
+      ],
+      "itemKeys": [
+        "S4T_4_1",
+        "S4T_4_2",
+        "S4T_4_3"
+      ],
+      "scoreKeys": [
+        "competence_4_1",
+        "competence_4_2",
+        "competence_4_3"
+      ],
+      "contentHash": "91f668e6a74c6aa53aecc72c82c001b41622486a856dca7a92c613ddab2cdef2",
+      "contentAxisHash": "8fee2adfc0c6b4ccbd43a1a85b2c1386b1d512c1df9c310515347248aa1cfe0c",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "665e65161e14b08b5d4a9a304d1f415e270aefe8a20a49a93e1a9d26335e1276",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/selfie4t_2022tk_assessment_zh_cn_teacher_self/reports/1.1.0-teacher-illustrated.json",
+      "artworkKey": "selfie4t_2022tk_assessment_zh_cn_teacher_self/1.0.0/1.1.0-teacher-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "SELFIEforTEACHERS｜学习评价（3项）｜教师自评｜2022 工具包中文试用版 · SELFIEforTEACHERS｜让反馈赶得上下一次尝试｜中文试用版｜图文版"
+      }
+    },
+    {
+      "toolKey": "selfie4t_2022tk_empowering_learners_zh_cn_teacher_self",
+      "title": "SELFIEforTEACHERS｜支持学生自主学习与参与（4项）｜教师自评｜2022 工具包中文试用版 · SELFIEforTEACHERS｜给学生多几种参与方式｜中文试用版｜图文版",
+      "originalItemOrder": [
+        "5.1",
+        "5.2",
+        "5.3",
+        "5.4"
+      ],
+      "itemKeys": [
+        "S4T_5_1",
+        "S4T_5_2",
+        "S4T_5_3",
+        "S4T_5_4"
+      ],
+      "scoreKeys": [
+        "competence_5_1",
+        "competence_5_2",
+        "competence_5_3",
+        "competence_5_4"
+      ],
+      "contentHash": "47e84c70403d44e5091bf49baaaf4ee34d45365c0e123914d0602fc625f9a809",
+      "contentAxisHash": "d055fb48e951e7334b1c018c4f01158925c8f076386939759268b6b12326ef03",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "da972c05084842a6cb31b59faaa108109d58d13f68a8c1ffbb1e1d97a88233b0",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/selfie4t_2022tk_empowering_learners_zh_cn_teacher_self/reports/1.1.0-teacher-illustrated.json",
+      "artworkKey": "selfie4t_2022tk_empowering_learners_zh_cn_teacher_self/1.0.0/1.1.0-teacher-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "SELFIEforTEACHERS｜支持学生自主学习与参与（4项）｜教师自评｜2022 工具包中文试用版 · SELFIEforTEACHERS｜给学生多几种参与方式｜中文试用版｜图文版"
+      }
+    },
+    {
+      "toolKey": "selfie4t_2022tk_learners_digital_competence_zh_cn_teacher_self",
+      "title": "SELFIEforTEACHERS｜促进学生数字能力发展（6项）｜教师自评｜2022 工具包中文试用版 · SELFIEforTEACHERS｜带学生在数字世界里练一遍｜中文试用版｜图文版",
+      "originalItemOrder": [
+        "6.1",
+        "6.2",
+        "6.3",
+        "6.4",
+        "6.5",
+        "6.6"
+      ],
+      "itemKeys": [
+        "S4T_6_1",
+        "S4T_6_2",
+        "S4T_6_3",
+        "S4T_6_4",
+        "S4T_6_5",
+        "S4T_6_6"
+      ],
+      "scoreKeys": [
+        "competence_6_1",
+        "competence_6_2",
+        "competence_6_3",
+        "competence_6_4",
+        "competence_6_5",
+        "competence_6_6"
+      ],
+      "contentHash": "fb7d72559b30a6c9f6b78c97588082ff5fb0611b0a7df6210cdaad5a1678542b",
+      "contentAxisHash": "144e8f015b769dbb134408c923bf68cb0ea85c383da1e72625814b2294240651",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "07505abbd8097779e15e3b48f34e8959a6a81390d7ec932bef1f7438dded2441",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-teacher-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/selfie4t_2022tk_learners_digital_competence_zh_cn_teacher_self/reports/1.1.0-teacher-illustrated.json",
+      "artworkKey": "selfie4t_2022tk_learners_digital_competence_zh_cn_teacher_self/1.0.0/1.1.0-teacher-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "SELFIEforTEACHERS｜促进学生数字能力发展（6项）｜教师自评｜2022 工具包中文试用版 · SELFIEforTEACHERS｜带学生在数字世界里练一遍｜中文试用版｜图文版"
+      }
+    }
+  ],
+  "reportGuide": "illustrated-composition-review-zh-cn.md",
+  "coverArtwork": "illustrated-composition-cover.webp",
+  "editionKey": "selfie4t_2022tk_32_zh_cn_working_translation",
+  "locale": "zh-CN",
+  "translationStatus": "WORKING_TRANSLATION"
+}

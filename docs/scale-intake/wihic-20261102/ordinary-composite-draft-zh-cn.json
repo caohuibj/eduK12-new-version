@@ -1,0 +1,425 @@
+{
+  "schemaVersion": 1,
+  "artifactType": "ordinary-composition-draft-preparation",
+  "status": "VALIDATED_CONTENT_AND_DRAFT_CONTRACT",
+  "title": "课堂体验 WIHIC｜56 题中文试用版",
+  "entry": "SCHOOL",
+  "apiBase": "/api/campus",
+  "motherKey": "wihic56_actual_en_lower_secondary_student",
+  "source": "https://doi.org/10.3390/educsci13030257",
+  "license": "CC BY 4.0",
+  "administration": {
+    "population": "STUDENT",
+    "responseMode": "SELF"
+  },
+  "assessmentItemCount": 56,
+  "requiredContextFields": [
+    {
+      "contextKey": "birthYearMonth",
+      "formType": "year_month",
+      "formLabel": "出生年月",
+      "formOptions": []
+    },
+    {
+      "contextKey": "gradeLevel",
+      "formType": "single_choice",
+      "formLabel": "所在年级",
+      "formOptions": [
+        {
+          "value": "7",
+          "label": "Grade 7"
+        },
+        {
+          "value": "8",
+          "label": "Grade 8"
+        },
+        {
+          "value": "9",
+          "label": "Grade 9"
+        }
+      ]
+    }
+  ],
+  "afterSourcesAuthorized": {
+    "catalogPath": "/api/campus/organizations/{organizationId}/private-tools/public-sources",
+    "createPath": "/api/campus/organizations/{organizationId}/private-tools",
+    "savePath": "/api/campus/organizations/{organizationId}/private-tools/{draftId}"
+  },
+  "combinedScore": "NONE",
+  "createDraft": {
+    "kind": "COMPOSITION",
+    "title": "课堂体验 WIHIC｜56 题中文试用版"
+  },
+  "instruction": "请想一想你现在评价的这门课里实际发生过什么。每题请选择最符合自己经历的一个频率，从「几乎从不」到「几乎总是」。答案没有对错，请根据自己的经历作答。",
+  "components": [
+    {
+      "toolKey": "wihic_student_cohesiveness_actual_zh_cn_lower_secondary_student",
+      "title": "WIHIC｜同学凝聚（实际·中文8题）｜初中｜学生填答 · WIHIC｜和同学慢慢熟起来｜中文试用版｜图文版",
+      "originalItemOrder": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "itemKeys": [
+        "WIHIC01",
+        "WIHIC02",
+        "WIHIC03",
+        "WIHIC04",
+        "WIHIC05",
+        "WIHIC06",
+        "WIHIC07",
+        "WIHIC08"
+      ],
+      "scoreKeys": [
+        "student_cohesiveness"
+      ],
+      "contentHash": "4e0b21733672d86fe85efe1e22a318353b219ac5bc655d2ee5dc5bb9e0d85962",
+      "contentAxisHash": "dbcda42044fd0b1032f3e12f61aaf7b6cb688ff97d9905d56b27b04bf7d13f9c",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "541b1a415729de9038c6be46adf1d9bbeeb94ad38ef051449a953ad8e06c83a6",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/wihic_student_cohesiveness_actual_zh_cn_lower_secondary_student/reports/1.1.0-student-illustrated.json",
+      "artworkKey": "wihic_student_cohesiveness_actual_zh_cn_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth",
+        "gradeLevel"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "WIHIC｜同学凝聚（实际·中文8题）｜初中｜学生填答 · WIHIC｜和同学慢慢熟起来｜中文试用版｜图文版"
+      }
+    },
+    {
+      "toolKey": "wihic_teacher_support_actual_zh_cn_lower_secondary_student",
+      "title": "WIHIC｜教师支持（实际·中文8题）｜初中｜学生填答 · WIHIC｜遇到难处时，知道怎么开口｜中文试用版｜图文版",
+      "originalItemOrder": [
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16"
+      ],
+      "itemKeys": [
+        "WIHIC09",
+        "WIHIC10",
+        "WIHIC11",
+        "WIHIC12",
+        "WIHIC13",
+        "WIHIC14",
+        "WIHIC15",
+        "WIHIC16"
+      ],
+      "scoreKeys": [
+        "teacher_support"
+      ],
+      "contentHash": "92920f344dc2e1209199abbdd855b8321457a9ae7a105b4a51ec266295116f5d",
+      "contentAxisHash": "5acc65151aa1cf0d2e19fe5ccbd5c8f0b5f3ba5fda0cc808b0f2532941e2ce6d",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "05d3f82197101dd29b0f0eb15b7a2cca8470e0a8307ce620e9c385ab0b4c5ee1",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/wihic_teacher_support_actual_zh_cn_lower_secondary_student/reports/1.1.0-student-illustrated.json",
+      "artworkKey": "wihic_teacher_support_actual_zh_cn_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth",
+        "gradeLevel"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "WIHIC｜教师支持（实际·中文8题）｜初中｜学生填答 · WIHIC｜遇到难处时，知道怎么开口｜中文试用版｜图文版"
+      }
+    },
+    {
+      "toolKey": "wihic_involvement_actual_zh_cn_lower_secondary_student",
+      "title": "WIHIC｜课堂参与（实际·中文8题）｜初中｜学生填答 · WIHIC｜想法可以用不止一种方式参与｜中文试用版｜图文版",
+      "originalItemOrder": [
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24"
+      ],
+      "itemKeys": [
+        "WIHIC17",
+        "WIHIC18",
+        "WIHIC19",
+        "WIHIC20",
+        "WIHIC21",
+        "WIHIC22",
+        "WIHIC23",
+        "WIHIC24"
+      ],
+      "scoreKeys": [
+        "involvement"
+      ],
+      "contentHash": "25c441242fbc4a52c89b5373175e843d62f48547a7d9f75414ff70382e659c91",
+      "contentAxisHash": "27b82bffa764535b88930dad7184288b93731923b2827673205a4dc08e97b6c7",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "2115636f5599c960e4efd5bf167fb2e2b71391f30e2ccf156b30e13a7dd1f233",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/wihic_involvement_actual_zh_cn_lower_secondary_student/reports/1.1.0-student-illustrated.json",
+      "artworkKey": "wihic_involvement_actual_zh_cn_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth",
+        "gradeLevel"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "WIHIC｜课堂参与（实际·中文8题）｜初中｜学生填答 · WIHIC｜想法可以用不止一种方式参与｜中文试用版｜图文版"
+      }
+    },
+    {
+      "toolKey": "wihic_investigation_actual_zh_cn_lower_secondary_student",
+      "title": "WIHIC｜探究活动（实际·中文8题）｜初中｜学生填答 · WIHIC｜从“我觉得”走到“我有依据”｜中文试用版｜图文版",
+      "originalItemOrder": [
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32"
+      ],
+      "itemKeys": [
+        "WIHIC25",
+        "WIHIC26",
+        "WIHIC27",
+        "WIHIC28",
+        "WIHIC29",
+        "WIHIC30",
+        "WIHIC31",
+        "WIHIC32"
+      ],
+      "scoreKeys": [
+        "investigation"
+      ],
+      "contentHash": "3cb5c5578c421a76ff2453ccd45ba866500586424a82f572dd967a2945c62f43",
+      "contentAxisHash": "b8075b11e6890444beaf091a19995f878c55e4fb71a81757c91a04b2d252b93e",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "1ccd9a77d570bb4722b9c5af18ee148b1ed9c7ca748eb2ecc74137d65ec60004",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/wihic_investigation_actual_zh_cn_lower_secondary_student/reports/1.1.0-student-illustrated.json",
+      "artworkKey": "wihic_investigation_actual_zh_cn_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth",
+        "gradeLevel"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "WIHIC｜探究活动（实际·中文8题）｜初中｜学生填答 · WIHIC｜从“我觉得”走到“我有依据”｜中文试用版｜图文版"
+      }
+    },
+    {
+      "toolKey": "wihic_task_orientation_actual_zh_cn_lower_secondary_student",
+      "title": "WIHIC｜任务导向（实际·中文8题）｜初中｜学生填答 · WIHIC｜任务多的时候，先找到下一步｜中文试用版｜图文版",
+      "originalItemOrder": [
+        "33",
+        "34",
+        "35",
+        "36",
+        "37",
+        "38",
+        "39",
+        "40"
+      ],
+      "itemKeys": [
+        "WIHIC33",
+        "WIHIC34",
+        "WIHIC35",
+        "WIHIC36",
+        "WIHIC37",
+        "WIHIC38",
+        "WIHIC39",
+        "WIHIC40"
+      ],
+      "scoreKeys": [
+        "task_orientation"
+      ],
+      "contentHash": "5f7d64026306400a5879157fed6bd0e2691796d0280a6f26969e78dd636e10e4",
+      "contentAxisHash": "02951f83fd921d96a4e7342b212478f8faf2a002f1b9f690a9025b16d26b4020",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "37430156ae42c36e6121b9ae1174c04afcb025f3e2997576962fb028a359da67",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/wihic_task_orientation_actual_zh_cn_lower_secondary_student/reports/1.1.0-student-illustrated.json",
+      "artworkKey": "wihic_task_orientation_actual_zh_cn_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth",
+        "gradeLevel"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "WIHIC｜任务导向（实际·中文8题）｜初中｜学生填答 · WIHIC｜任务多的时候，先找到下一步｜中文试用版｜图文版"
+      }
+    },
+    {
+      "toolKey": "wihic_cooperation_actual_zh_cn_lower_secondary_student",
+      "title": "WIHIC｜同伴合作（实际·中文8题）｜初中｜学生填答 · WIHIC｜把不同的做法放到一张桌上｜中文试用版｜图文版",
+      "originalItemOrder": [
+        "41",
+        "42",
+        "43",
+        "44",
+        "45",
+        "46",
+        "47",
+        "48"
+      ],
+      "itemKeys": [
+        "WIHIC41",
+        "WIHIC42",
+        "WIHIC43",
+        "WIHIC44",
+        "WIHIC45",
+        "WIHIC46",
+        "WIHIC47",
+        "WIHIC48"
+      ],
+      "scoreKeys": [
+        "cooperation"
+      ],
+      "contentHash": "8712a1e3a566e25152d6ee49651d49ad2a57945ccfe4324f1b7c7faa1ebeed15",
+      "contentAxisHash": "3366be39b6aa8bb04de9f625bf62f2683683ca9fc5cdc978ea060cd36c39796b",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "717950156e0a43681c6b63ba16454d6a7b8e7c28bd80dfd4a529de0fdfabbf81",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/wihic_cooperation_actual_zh_cn_lower_secondary_student/reports/1.1.0-student-illustrated.json",
+      "artworkKey": "wihic_cooperation_actual_zh_cn_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth",
+        "gradeLevel"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "WIHIC｜同伴合作（实际·中文8题）｜初中｜学生填答 · WIHIC｜把不同的做法放到一张桌上｜中文试用版｜图文版"
+      }
+    },
+    {
+      "toolKey": "wihic_equity_actual_zh_cn_lower_secondary_student",
+      "title": "WIHIC｜课堂公平（实际·中文8题）｜初中｜学生填答 · WIHIC｜观察每个人有没有机会发声｜中文试用版｜图文版",
+      "originalItemOrder": [
+        "49",
+        "50",
+        "51",
+        "52",
+        "53",
+        "54",
+        "55",
+        "56"
+      ],
+      "itemKeys": [
+        "WIHIC49",
+        "WIHIC50",
+        "WIHIC51",
+        "WIHIC52",
+        "WIHIC53",
+        "WIHIC54",
+        "WIHIC55",
+        "WIHIC56"
+      ],
+      "scoreKeys": [
+        "equity"
+      ],
+      "contentHash": "ed4a2d05751581f19aa58b30fb0c5c5a1603091b44321c3ed6575bab09ca28da",
+      "contentAxisHash": "b8c35bcf5d1ada5241ee0e14239bfae57c71e4cd389041b75de78e5d6e86572e",
+      "parametersAxisHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+      "reportAxisHash": "29ab4bd7e174527c0e90ee413e6049b8d3408d863d64fe926f428c940a47315c",
+      "versions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "catalogVersions": {
+        "content": "1.0.0:1.0.0",
+        "parameters": "none-v1",
+        "report": "1.1.0-student-illustrated"
+      },
+      "reportArtifact": "server-version/backend/src/modules/scale/instruments/wihic_equity_actual_zh_cn_lower_secondary_student/reports/1.1.0-student-illustrated.json",
+      "artworkKey": "wihic_equity_actual_zh_cn_lower_secondary_student/1.0.0/1.1.0-student-illustrated",
+      "requiredContextKeys": [
+        "birthYearMonth",
+        "gradeLevel"
+      ],
+      "sourceQuery": {
+        "kind": "SCALE",
+        "responseMode": "SELF",
+        "q": "WIHIC｜课堂公平（实际·中文8题）｜初中｜学生填答 · WIHIC｜观察每个人有没有机会发声｜中文试用版｜图文版"
+      }
+    }
+  ],
+  "reportGuide": "illustrated-composition-review-zh-cn.md",
+  "coverArtwork": "illustrated-composition-cover.webp",
+  "editionKey": "wihic56_actual_zh_cn_working_translation",
+  "locale": "zh-CN",
+  "translationStatus": "WORKING_TRANSLATION"
+}
