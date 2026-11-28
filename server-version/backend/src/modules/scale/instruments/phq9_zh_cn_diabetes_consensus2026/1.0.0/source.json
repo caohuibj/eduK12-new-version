@@ -1,0 +1,716 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "phq9_zh_cn_diabetes_consensus2026",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "PHQ-9 患者健康问卷｜糖尿病共患抑郁共识简体中文版",
+      "abbreviation": "PHQ-9",
+      "instrumentFamily": "Patient Health Questionnaire"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "自评过去两周九项抑郁相关体验的出现频率。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "mental_health",
+        "depression",
+        "diabetes",
+        "source:diabetes_consensus2026",
+        "locale:zh_cn",
+        "use:supervised_adult_research"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "仅供医务人员参与的成人糖尿病非商业研究或专业复核。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 9,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "过去 2 周",
+      "requiredTraining": true,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "九题均以 0–3 计分，按原分相加，完整作答的分数为 0–27。缺题不估分。",
+        "如需了解问卷内容涉及的个人安全问题，由项目专业团队按现有流程复核。线上页面无实时人员值守。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅供医务人员参与的成人糖尿病非商业研究或专业复核。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "phq9-kroenke-2001-original-english",
+        "evidenceType": "CRITERION",
+        "population": "US adult primary-care / obstetrics-gynecology clinical samples; not this translation",
+        "locale": "en",
+        "territory": "US",
+        "sampleSize": 6000,
+        "studyDesign": "Original English development study; criterion interview subgroup n=580. No exact-version Chinese translation validation.",
+        "rating": "UNKNOWN",
+        "citation": "Kroenke K, Spitzer RL, Williams JBW. The PHQ-9: Validity of a Brief Depression Severity Measure. Journal of General Internal Medicine. 2001;16(9):606–613.",
+        "doi": "10.1046/j.1525-1497.2001.016009606.x",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/11556941/",
+        "notes": "英文原版验证研究。此研究未验证共识表3的具体措辞，也未建立该版本在本平台投放群体的常模。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "中华医学会心身医学分会心身内分泌协作学组，中华预防医学会糖尿病预防与控制专业委员会. 糖尿病共患抑郁诊疗中国专家共识. 中国全科医学, 2026, 29(03):273–292. 表3. DOI:10.12114/j.issn.1007-9572.2025.0216. https://www.chinagp.net/CN/10.12114/j.issn.1007-9572.2025.0216",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "直接录入已发布表3简体中文，不采用其他中文版、深圳历史版或电子作答自制译文。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "phq9_zh_cn_diabetes_consensus2026-scope",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "phq9_zh_cn_diabetes_consensus2026-ceiling",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "phq9_zh_cn_diabetes_consensus2026-base-report",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false,
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false,
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false,
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true,
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false
+      }
+    }
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "phq9_zh_cn_diabetes_consensus2026-use",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "PHQ-9 由 Robert L. Spitzer、Janet B. W. Williams、Kurt Kroenke 等在 Pfizer 教育资助下开发。NIH Common Data Elements 收录原题许可，可复制、翻译、显示或分发。https://cde.nlm.nih.gov/formView?tinyId=myG8MkTbwg。简体措辞见上述共识表3，保留独立出处；本文件只收录 PHQ-9 问卷本身。",
+      "仅供医务人员参与的成人糖尿病非商业研究或专业复核。"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "version": "1.0.0",
+    "language": "zh-CN",
+    "source": "中国全科医学 2026 年第 29 卷第 3 期，共识表 3",
+    "text": "近2周内，您以下症状出现的频率如何？请每题选择一个选项。"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "PHQ-9 患者健康问卷｜糖尿病共患抑郁共识表3",
+        "citation": "中华医学会心身医学分会心身内分泌协作学组，中华预防医学会糖尿病预防与控制专业委员会. 糖尿病共患抑郁诊疗中国专家共识. 中国全科医学, 2026, 29(03):273–292. 表3. DOI:10.12114/j.issn.1007-9572.2025.0216.",
+        "url": "https://www.chinagp.net/CN/10.12114/j.issn.1007-9572.2025.0216"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "PHQ-9 由 Robert L. Spitzer、Janet B. W. Williams、Kurt Kroenke 等在 Pfizer 教育资助下开发。NIH Common Data Elements 收录原题许可，可复制、翻译、显示或分发。https://cde.nlm.nih.gov/formView?tinyId=myG8MkTbwg。简体措辞见上述共识表3，保留独立出处；本文件只收录 PHQ-9 问卷本身。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "frequency",
+          "options": [
+            {
+              "value": "0",
+              "label": "没有",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "有几天",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "一半以上的时间",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "几乎每天",
+              "score": 3
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "PHQ9_1",
+          "content": "做事时提不起劲或没有兴趣",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_2",
+          "content": "感到心情低落、沮丧或绝望",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_3",
+          "content": "入睡困难、睡不安或睡得过多",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_4",
+          "content": "感觉疲劳或没有活力",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_5",
+          "content": "食欲不振或吃得太多",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_6",
+          "content": "觉得自己很糟或觉得自己很失败，或让自己、家人失望",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_7",
+          "content": "对事物专注有困难，如看报纸或看电视时",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_8",
+          "content": "行动或说话速度缓慢到别人已经察觉的程度或刚好相反，变得比平日更烦躁或坐立不安，动来动去",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_9",
+          "content": "有不如死掉或用某种方式伤害自己的念头",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "PHQ9_1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_4",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_5",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_6",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_7",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_8",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_9",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "phq9_total",
+            "type": "total",
+            "label": "PHQ-9 九题总分",
+            "description": "九题均以 0–3 计分，按原分相加，完整作答的分数为 0–27。缺题不估分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "source": {
+              "type": "items",
+              "aggregation": "sum",
+              "items": [
+                {
+                  "itemCode": "PHQ9_1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_5",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_6",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_7",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_8",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_9",
+                  "weight": 1
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "phq9_total"
+        ],
+        "scoreOrder": [
+          "phq9_total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "phq9_total",
+            "headline": "从一件影响日常的小事说起",
+            "source": {
+              "type": "score_only"
+            },
+            "bands": [],
+            "summary": "照顾血糖，也给心情留一点位置。回想最近两周，有没有一件平时能做、现在却更费力的事？睡不好、没力气或对平时喜欢的事没了兴致，都可以从发生次数和生活场景谈起。问卷把这些体验记下来，帮助你和专业人员找到一个具体的话题。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想一件最想和医务人员谈的变化。可以记下它什么时候开始、哪几天更明显，以及对吃饭、睡觉、工作或照顾自己有什么影响。"
+              },
+              {
+                "category": "strategy",
+                "text": "回顾时也可以带上近期用药、血糖或生活作息变化，由专业人员结合你的情况一起了解。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "九题均以 0–3 计分，按原分相加，完整作答的分数为 0–27。缺题不估分。",
+          "糖尿病、血糖波动和生活变化也可能影响精力、食欲或睡眠。原分只表示问卷所记录的体验频率，需结合临床情况理解。",
+          "如需了解问卷内容涉及的个人安全问题，由项目专业团队按现有流程复核。线上页面无实时人员值守。"
+        ],
+        "disclaimer": "仅供医务人员参与的成人糖尿病非商业研究或专业复核。问卷结果不足以判断是否患有抑郁症。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "mental_health",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "references": [],
+    "goldenCases": [
+      {
+        "name": "all_zero",
+        "answers": [
+          {
+            "itemCode": "PHQ9_1",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_2",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_3",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_4",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_5",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_6",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_7",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_8",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_9",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phq9_total": 0
+          },
+          "totalScoreKeys": [
+            "phq9_total"
+          ]
+        }
+      },
+      {
+        "name": "mixed_frequency",
+        "answers": [
+          {
+            "itemCode": "PHQ9_1",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_3",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PHQ9_4",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_5",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_6",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_7",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PHQ9_8",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_9",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phq9_total": 12
+          },
+          "totalScoreKeys": [
+            "phq9_total"
+          ]
+        }
+      },
+      {
+        "name": "all_three",
+        "answers": [
+          {
+            "itemCode": "PHQ9_1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_3",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_4",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_5",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_6",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_7",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_8",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_9",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phq9_total": 27
+          },
+          "totalScoreKeys": [
+            "phq9_total"
+          ]
+        }
+      },
+      {
+        "name": "one_missing_no_estimate",
+        "answers": [
+          {
+            "itemCode": "PHQ9_1",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PHQ9_2",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PHQ9_3",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PHQ9_4",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PHQ9_5",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PHQ9_6",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PHQ9_7",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PHQ9_8",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "phq9_total": null
+          },
+          "totalScoreKeys": [
+            "phq9_total"
+          ]
+        }
+      }
+    ]
+  }
+}

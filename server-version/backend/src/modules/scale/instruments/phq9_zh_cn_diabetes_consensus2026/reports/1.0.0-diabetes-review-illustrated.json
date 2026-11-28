@@ -1,0 +1,114 @@
+{
+  "toolKey": "phq9_zh_cn_diabetes_consensus2026",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.0.0-diabetes-review-illustrated",
+  "title": "最近两周，哪些变化需要被看见",
+  "report": {
+    "reportVersion": "1.0.0-diabetes-review-illustrated",
+    "primaryScoreKeys": [
+      "phq9_total"
+    ],
+    "scoreOrder": [
+      "phq9_total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "phq9_total",
+        "headline": "从一件影响日常的小事说起",
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "summary": "照顾血糖，也给心情留一点位置。回想最近两周，有没有一件平时能做、现在却更费力的事？睡不好、没力气或对平时喜欢的事没了兴致，都可以从发生次数和生活场景谈起。问卷把这些体验记下来，帮助你和专业人员找到一个具体的话题。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想一件最想和医务人员谈的变化。可以记下它什么时候开始、哪几天更明显，以及对吃饭、睡觉、工作或照顾自己有什么影响。"
+          },
+          {
+            "category": "strategy",
+            "text": "回顾时也可以带上近期用药、血糖或生活作息变化，由专业人员结合你的情况一起了解。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "九题均以 0–3 计分，按原分相加，完整作答的分数为 0–27。缺题不估分。",
+      "糖尿病、血糖波动和生活变化也可能影响精力、食欲或睡眠。原分只表示问卷所记录的体验频率，需结合临床情况理解。",
+      "如需了解问卷内容涉及的个人安全问题，由项目专业团队按现有流程复核。线上页面无实时人员值守。"
+    ],
+    "disclaimer": "仅供医务人员参与的成人糖尿病非商业研究或专业复核。问卷结果不足以判断是否患有抑郁症。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "phq9_zh_cn_diabetes_consensus2026/1.0.0/1.0.0-diabetes-review-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-diabetes-review-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": true,
+        "artwork": true
+      }
+    }
+  },
+  "template": {
+    "title": "最近两周，哪些变化需要被看见",
+    "artworkKey": "phq9_zh_cn_diabetes_consensus2026/1.0.0/1.0.0-diabetes-review-illustrated",
+    "blocks": [
+      {
+        "type": "TEXT",
+        "text": "照顾血糖，也给心情留一点位置。回想最近两周，有没有一件平时能做、现在却更费力的事？睡不好、没力气或对平时喜欢的事没了兴致，都可以从发生次数和生活场景谈起。问卷把这些体验记下来，帮助你和专业人员找到一个具体的话题。"
+      },
+      {
+        "type": "TEXT",
+        "text": "想一件最想和医务人员谈的变化。可以记下它什么时候开始、哪几天更明显，以及对吃饭、睡觉、工作或照顾自己有什么影响。\n\n回顾时也可以带上近期用药、血糖或生活作息变化，由专业人员结合你的情况一起了解。"
+      },
+      {
+        "type": "TEXT",
+        "text": "糖尿病、血糖波动和生活变化也可能影响精力、食欲或睡眠。原分只表示问卷所记录的体验频率，需结合临床情况理解。\n\n仅供医务人员参与的成人糖尿病非商业研究或专业复核。问卷结果不足以判断是否患有抑郁症。\n\n如需了解问卷内容涉及的个人安全问题，由项目专业团队按现有流程复核。线上页面无实时人员值守。"
+      },
+      {
+        "type": "METRIC",
+        "metricKey": "phq9_total",
+        "label": "PHQ-9 九题原始总分",
+        "display": "RAW"
+      }
+    ],
+    "limitations": []
+  }
+}
