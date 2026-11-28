@@ -1,0 +1,128 @@
+{
+  "toolKey": "tutoring_necessity_chemistry_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.1-student-illustrated",
+  "title": "化学补习必要性信念｜学生反思版",
+  "report": {
+    "reportVersion": "1.2.1-student-illustrated",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目自编三题、六点选项、无反向计分、至少两题与均分规则；沿用初中和高中各自的历史便利样本分档。报告只解释补习必要性信念，不把分数写成补习效果、客观需要或购买建议。"
+      }
+    },
+    "primaryScoreKeys": [
+      "tutoring_necessity"
+    ],
+    "scoreOrder": [
+      "tutoring_necessity"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "tutoring_necessity",
+        "headline": "先弄清卡在哪里，再选择帮助",
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "一道化学题做了三遍，小岚还是卡住。她脱口而出：“是不是只有补习才行？”老师没有马上回答，而是请她把问题写具体。小岚发现，自己不是整章都不会，而是没看懂反应式里的条件，也不知道第一步该找哪条信息。她先在课堂上问清条件，又照着例题做了一道同类题。原来“需要什么帮助”和“要不要补习”，可以先拆开来想。\n\n补习必要性信念，记录的是你怎样看课外补习对化学成绩的帮助、自己是否需要补习，以及补习是不是取得好成绩的基础。它不是对补习真实效果的检验，也不能替你判断某个课程是否值得购买。均分高或低都没有统一的好坏：重要的是把具体困难、可获得的支持和独立完成的结果放在一起看。\n\n课外补习可以是支持方式之一，课堂提问、作业反馈、同伴讨论、示例、答疑和自主练习也可能解决不同问题。先把“我需要补习”改写成“我需要哪一种帮助来完成哪一步”，再用一次真实任务检查帮助是否有效，选择会更有依据。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "先检查现有支持是否真的够用",
+            "summary": "这次结果在同学科、同学段历史参考组中相对较低，只表示你较少认同“补习是必要基础”，不证明当前支持一定足够。挑一道最近卡住的化学题，先写出具体卡点，再使用一种校内或自学支持。得到提示后，换一道同类题独立完成，并记录哪一步仍需帮助。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "画一张自己的支持地图",
+            "summary": "这次结果在历史参考组中相对偏低。把最近一个学习问题放在纸中央，四周写上可用支持，例如课堂提问、同伴讨论、例题、答疑或课外补习。每种支持旁只写它能解决的一个具体问题。先试最容易获得的一种，再用同类任务核对效果。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "把三个判断分开来看",
+            "summary": "这次结果在历史参考组中相对居中，不表示你态度摇摆。回看三句话：补习“很有帮助”、自己“需要补习”、补习是好成绩的“基础”，它们并不是一回事。为差异最大的一题写一个真实例子，再问自己：我缺的是讲解、反馈、练习安排，还是持续督促？",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "先写清支持目标和检查办法",
+            "summary": "这次结果在历史参考组中相对偏高，表示你更认同补习的重要性，但不等于某种补习已经有效。若准备增加支持，先约定一个可观察目标，例如“能独立解释两道同类题的思路”。一周后用没有提示的新题检查，并同时记录时间投入和是否还需要同样帮助。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "让帮助最终回到独立完成",
+            "summary": "这次结果在历史参考组中相对较高，表示你很认同补习是学好化学的重要条件。这不是错误，也不是必须照做的结论。若正在接受或考虑课外帮助，可以连续记录三次：原来卡点、获得的提示、之后独立完成的部分。带着记录与老师或家长讨论，看看支持是否正在变成自己的方法。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把“我需要补习”改写成一句更具体的话：“我在___任务的___步骤需要___帮助。”"
+          },
+          {
+            "category": "strategy",
+            "text": "选一道近期题目，记录“卡点—获得的帮助—同类题独立完成结果”，再决定下一步需要哪种支持。"
+          }
+        ],
+        "scoreLabel": "化学补习必要性信念均分（历史参考试用）（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "均分来自三道正向题；至少回答两题才计算。相同均分可能来自不同回答组合，缺失作答不记作低分。",
+      "分档来自项目历史便利样本：初中七百三十六人、高中七百零二人。它只提供同学科、同学段的相对位置，不是全国常模；初中与高中的分界不同，不能直接横向比较。",
+      "这份结果测量的是对课外补习必要性的信念，不是补习实际效果、家庭教育选择、客观学习困难、焦虑程度或未来成绩。",
+      "报告不推荐或反对任何付费安排。具体支持选择应结合任务、现有资源、时间与家庭情况，由学生与可信赖的成人共同讨论。"
+    ],
+    "disclaimer": "这是一份帮助中学生梳理化学学习支持选择的反思报告，不用于诊断、排名、升学分流、教师评价或替代真实学习表现。",
+    "artworkKey": "tutoring_necessity_chemistry_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.1-student-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

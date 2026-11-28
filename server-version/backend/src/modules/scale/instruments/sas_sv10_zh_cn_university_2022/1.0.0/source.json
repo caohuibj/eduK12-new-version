@@ -1,0 +1,791 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "sas_sv10_zh_cn_university_2022",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "智能手机成瘾量表中文简版（SAS-CSV，2022 大学生版）",
+      "abbreviation": "SAS-CSV",
+      "instrumentFamily": "Smartphone Addiction Scale—Chinese Short Version (Zhao et al., 2022)"
+    },
+    "construct": {
+      "primaryDomain": "BEHAVIORAL_DIFFICULTIES",
+      "secondaryDomains": [
+        "SELF_REGULATION"
+      ],
+      "constructDefinition": "大学生自述智能手机使用对学习、生活安排、身体感受和关系的影响。本站采用十题合计原分。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "数字使用",
+        "智能手机",
+        "大学生自评",
+        "研究试用",
+        "非诊断",
+        "中文原版",
+        "10题",
+        "domain:digital_behavior",
+        "construct:smartphone_use_difficulties",
+        "population:university_students",
+        "response:self",
+        "use:non_commercial_research",
+        "license:cc_by_4_0"
+      ]
+    },
+    "population": {
+      "minAge": 17,
+      "maxAge": 24,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "populationNotes": "限 17–24 岁在校大学生自评，证据来自山东女子学院与山东师范大学 557 名学生；投放方按研究项目选取适用对象。"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "作者 S1 中文原表未指定回顾期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "逐字复用附表十题、中文六级选项和前置说明。",
+        "同意度 1–6，十题合计 10–60；完整作答才计分。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "SUPPORTED",
+          "notes": "限定于非商业大学生研究，个人只得到描述性观察。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "zhao-2022-china-college-cfa",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "中国山东两所高校在校生",
+        "ageRange": "17–24",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "sampleSize": 557,
+        "studyDesign": "两校 16 个班在线施测，557 份答卷随机分为探索组 279 和验证组 278。",
+        "rating": "SUFFICIENT",
+        "citation": "Zhao H, Rafik-Galea S, Fitriana M, Song T-J (2022). Translation and psychometric evaluation of Smartphone Addiction Scale—Short Version (SAS-SV) among Chinese college students. PLoS ONE 17(11): e0278092.",
+        "doi": "10.1371/journal.pone.0278092",
+        "url": "https://doi.org/10.1371/journal.pone.0278092",
+        "notes": "证据支持该样本的研究使用；不能外推普通成年人、中学生或诊断性界值。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Zhao 等作者定稿 S1 附表 https://doi.org/10.1371/journal.pone.0278092.s001; SHA-256 0a4ca692a0aa6185c8bebbf5cf91ec635078b04ceb897f10021b9a94807ad746。",
+    "adaptationMethod": "BACK_TRANSLATION_VERIFIED",
+    "expertReviewStatus": "COMPLETED",
+    "cognitiveDebriefStatus": "COMPLETED",
+    "localEvidenceRefs": [
+      "zhao-2022-china-college-cfa"
+    ],
+    "reviewStatus": "PENDING",
+    "notes": "完成记录依据原作者论文方法中的正反译、专家讨论和 41 名大学生项目认知访谈。本站逐字数字化，不新增翻译、不宣称本站人工审核通过。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "sas_sv10_zh_cn_university_2022-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 204,
+        "maxExclusive": 300
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "sas_sv10_zh_cn_university_2022-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": false,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "sas_sv10_zh_cn_university_2022-1.0.0",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "sas_sv10_zh_cn_university_2022-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "© 2022 Zhao et al.，S1 中文原表与指导语见 Zhao H, Rafik-Galea S, Fitriana M, Song T-J (2022). Translation and psychometric evaluation of Smartphone Addiction Scale—Short Version (SAS-SV) among Chinese college students. PLoS ONE 17(11): e0278092. https://doi.org/10.1371/journal.pone.0278092，附表 https://doi.org/10.1371/journal.pone.0278092.s001。原英文量表：Kwon M, Kim D-J, Cho H, Yang S (2013). The Smartphone Addiction Scale: Development and Validation of a Short Version for Adolescents. PLoS ONE 8(12): e83558. https://doi.org/10.1371/journal.pone.0083558。PLOS 开放访问署名许可 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。数字呈现沿用 10 题、原选项及顺序；范围说明、报告与界面为本站新增。本站投放限定非商业研究，由管理员审核。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Smartphone Addiction Scale—Chinese Short Version, Zhao et al. (2022), S1",
+        "citation": "Zhao H, Rafik-Galea S, Fitriana M, Song T-J (2022). Translation and psychometric evaluation of Smartphone Addiction Scale—Short Version (SAS-SV) among Chinese college students. PLoS ONE 17(11): e0278092.",
+        "url": "https://doi.org/10.1371/journal.pone.0278092",
+        "publicationYear": 2022
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2022 Zhao et al.，S1 中文原表与指导语见 Zhao H, Rafik-Galea S, Fitriana M, Song T-J (2022). Translation and psychometric evaluation of Smartphone Addiction Scale—Short Version (SAS-SV) among Chinese college students. PLoS ONE 17(11): e0278092. https://doi.org/10.1371/journal.pone.0278092，附表 https://doi.org/10.1371/journal.pone.0278092.s001。原英文量表：Kwon M, Kim D-J, Cho H, Yang S (2013). The Smartphone Addiction Scale: Development and Validation of a Short Version for Adolescents. PLoS ONE 8(12): e83558. https://doi.org/10.1371/journal.pone.0083558。PLOS 开放访问署名许可 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。数字呈现沿用 10 题、原选项及顺序；范围说明、报告与界面为本站新增。本站投放限定非商业研究，由管理员审核。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "sas_csv_agreement_1_6",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有点不同意",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "有点同意",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "同意",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "非常同意",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "SAS_CSV_01",
+          "content": "由于使用智能手机，错过了计划的工作。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "sas_csv_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_CSV_02",
+          "content": "由于使用智能手机，上课、做作业或工作时很难集中注意力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "sas_csv_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_CSV_03",
+          "content": "使用智能手机时感到手腕或脖子后面疼痛。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "sas_csv_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_CSV_04",
+          "content": "无法忍受没有智能手机。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "sas_csv_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_CSV_05",
+          "content": "当我没拿智能手机时，我感到不耐烦和烦躁。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "sas_csv_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_CSV_06",
+          "content": "即使我不使用智能手机，心里也会想着它。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "sas_csv_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_CSV_07",
+          "content": "即使我的日常生活已经受到智能手机的极大影响，我也绝不会放弃使用智能手机。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "sas_csv_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_CSV_08",
+          "content": "我会不断检查我的智能手机，以免错过其他人在微信或QQ上的对话。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "sas_csv_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_CSV_09",
+          "content": "我使用智能手机的时间会超出预期。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "sas_csv_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_CSV_10",
+          "content": "周围的人告诉我，我使用智能手机太过度了。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "sas_csv_agreement_1_6",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "SAS_CSV_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_CSV_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_CSV_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_CSV_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_CSV_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_CSV_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_CSV_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_CSV_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_CSV_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_CSV_10",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "phone_use_difficulties",
+            "type": "total",
+            "label": "手机使用相关困扰",
+            "description": "十道题各按 1–6 计分，均为正向。总分越高，表示自述的手机使用相关困扰越多。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SAS_CSV_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_CSV_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_CSV_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_CSV_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_CSV_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_CSV_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_CSV_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_CSV_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_CSV_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_CSV_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "phone_use_difficulties"
+        ],
+        "scoreOrder": [
+          "phone_use_difficulties"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "phone_use_difficulties",
+            "scoreLabel": "手机使用相关困扰",
+            "headline": "把手机用回自己想做的事",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这次问卷记录手机使用与你的学习、计划、身体感受和人际联系之间的关系。十题按同意程度计分，总分是 10–60。分数越高，表示你更认同问卷描述的困扰。看结果时，可以先选一个最近受影响的片段，例如想查资料，却顺着消息看了很久。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一次本来有明确目的、后来用得比预期久的经历。开始时你想做什么？当时哪件事被挤到了后面？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一段想留给学习或休息的时间，试着关掉不紧急的提醒，或把手机放远一点。保留必要的联络和学习功能，过几天再看这个安排适不适合你。"
+              },
+              {
+                "category": "support",
+                "text": "如果问题反复影响学习、休息或与你在意的人相处，可以从最近一次情境说起，与信任的人或学校支持人员一起想办法。"
+              }
+            ],
+            "provisional": true
+          }
+        ],
+        "limitations": [
+          "本版研究样本为山东两所高校 17–24 岁学生。现用十题合计原分，便于阅读；论文也探索了三个维度，本报告未提供分维判断。暂无供此用途采用的分界或等级，缺答不补零。"
+        ],
+        "disclaimer": "这份问卷用于非商业研究及个人观察，一次自评只能反映当时的回答。分数不可用于临床诊断、纪律处分、学生筛选或排名。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "Codex 内容初核",
+            "reviewedAt": "2026-11-28T02:00:00Z",
+            "basis": "作者原始 S1 中文 10 题、指导语、锚点及论文年龄范围核对；本站为新报告试用内容。https://doi.org/10.1371/journal.pone.0278092.s001"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "sas_csv_zhao2022",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "SAS_CSV_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_CSV_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_CSV_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_CSV_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_CSV_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_CSV_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_CSV_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_CSV_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_CSV_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_CSV_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phone_use_difficulties": 10
+          },
+          "totalScoreKeys": [
+            "phone_use_difficulties"
+          ]
+        }
+      },
+      {
+        "name": "middle",
+        "answers": [
+          {
+            "itemCode": "SAS_CSV_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_CSV_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_CSV_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_CSV_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_CSV_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_CSV_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_CSV_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_CSV_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_CSV_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_CSV_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phone_use_difficulties": 30
+          },
+          "totalScoreKeys": [
+            "phone_use_difficulties"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "SAS_CSV_01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_CSV_02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_CSV_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_CSV_04",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_CSV_05",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_CSV_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_CSV_07",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_CSV_08",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_CSV_09",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_CSV_10",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phone_use_difficulties": 60
+          },
+          "totalScoreKeys": [
+            "phone_use_difficulties"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "SAS_CSV_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_CSV_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SAS_CSV_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_CSV_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SAS_CSV_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SAS_CSV_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_CSV_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_CSV_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SAS_CSV_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_CSV_10",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phone_use_difficulties": 31
+          },
+          "totalScoreKeys": [
+            "phone_use_difficulties"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "为了调查大学生智能手机的使用状况，现需要您填写下面的调查问卷。以下问卷中的问题是您熟悉的内容，一共有6个选项: 1为非常不同意；2为不同意；3为有点不同意；4为有点同意；5为同意，6为非常同意，请勾选相应的选项。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "作者附表 https://doi.org/10.1371/journal.pone.0278092.s001 · SHA-256 0a4ca692a0aa6185c8bebbf5cf91ec635078b04ceb897f10021b9a94807ad746。"
+  }
+}

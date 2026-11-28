@@ -1,0 +1,661 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "digcompedu_checkin_peerj2023_professional_engagement_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "DigCompEdu Check-In｜专业参与｜高校教师自评（简体中文试用版）",
+      "abbreviation": "DCE-CI",
+      "instrumentFamily": "DigCompEdu Check-In｜PeerJ 2024 高校教师问卷（2023-06-02 版）"
+    },
+    "construct": {
+      "primaryDomain": "ENGAGEMENT",
+      "secondaryDomains": [],
+      "constructDefinition": "记录高校教师对自己在专业参与方面的数字化实践的描述。使用本题区原始合计分，解读限于个人反思。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:zh-cn",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:professional_engagement",
+        "localization:direct_translation"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "供高校及成人继续教育中的任课教师自评。英文来源研究以高校健康科学学科教师为样本。当前中文版本尚未完成独立译审和本地验证，分区单独使用亦缺少效度证据。"
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "以目前的教学实践为准。原问卷未指定回顾天数。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "按原问卷题号展示，每题提供五个情境选项，顺序与原版一致。",
+        "完整作答才计算本题区原始合计分，缺答不估分。",
+        "若组合展示六个题区，宜按原问卷 22 题的顺序展示；平台当前仅计算各题区分数。",
+        "答题用时是平台估计。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "适合教师回顾自身实践，并选择一个可在课程中尝试的改进方向。"
+        },
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "可供高校自评方法的探索性研究；独立分区和中文题本尚未验证。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_professional_engagement_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_professional_engagement_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_professional_engagement_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Ersoy 等（2024），PeerJ 12:e18456，https://doi.org/10.7717/peerj.18456。附件 1 收录日期为 2023-06-02 的高校教师英文问卷，见 https://doi.org/10.7717/peerj.18456/supp-1。附件首页注明 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。原始框架由 Redecker, C.（2017）撰写、Punie, Y. 编辑，欧洲委员会联合研究中心（JRC），doi:10.2760/159770。此处为 EDUK12 的简体中文直译和分区改编。EDUK12 对译文负责。欧洲委员会及原作者未审定或认可此译本。",
+      "沿用原题项和评分选项的次序。教育情境说明、拆分后的分数用法、缺答处理和报告由 EDUK12 补写。本项目使用范围为非商业。入口及具体使用授权由平台管理员决定。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "teacher_self_report",
+      "source": {
+        "title": "DigCompEdu Check-In｜专业参与｜PeerJ 高校英文题区简体中文试译",
+        "citation": "Ersoy et al. (2024). Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects. PeerJ 12:e18456. https://doi.org/10.7717/peerj.18456 ; Supplemental Information 1, Digital Competency Assessment Questionnaire for Academicians, form timestamp 2023-06-02.",
+        "url": "https://doi.org/10.7717/peerj.18456/supp-1",
+        "publicationYear": 2024
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Ersoy 等（2024），PeerJ 12:e18456，https://doi.org/10.7717/peerj.18456。附件 1 收录日期为 2023-06-02 的高校教师英文问卷，见 https://doi.org/10.7717/peerj.18456/supp-1。附件首页注明 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。原始框架由 Redecker, C.（2017）撰写、Punie, Y. 编辑，欧洲委员会联合研究中心（JRC），doi:10.2760/159770。此处为 EDUK12 的简体中文直译和分区改编。EDUK12 对译文负责。欧洲委员会及原作者未审定或认可此译本。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "item_01",
+          "options": [
+            {
+              "value": "0",
+              "label": "我很少使用数字渠道沟通。",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "我使用电子邮件等基本的数字沟通渠道。",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "我搭配使用不同的沟通渠道，例如电子邮件加课程博客或院系网站。",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "为了更有效地沟通，我会有计划地选用、调整和组合不同的数字工具。",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "我会回顾并和同事讨论自己的沟通方式，主动改进沟通策略。",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "key": "item_02",
+          "options": [
+            {
+              "value": "0",
+              "label": "我很少有机会与其他高校同行合作。",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "我有时会和同事交换材料，例如通过电子邮件。",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "我和同事在协作平台上一起工作，或使用共享存储空间。",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "我也会和本单位以外的高校同行交流想法、分享材料，例如通过线上专业社群。",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "我会和其他高校同行在网上共同编写或制作材料。",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "key": "item_03",
+          "options": [
+            {
+              "value": "0",
+              "label": "我很少有时间提升自己的数字化教学能力。",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "我通过回顾教学和亲自尝试来提升能力。",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "我利用多种资源提升自己的数字化教学能力。",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "我与同行讨论怎样利用数字工具改进教学、尝试新的教法。",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "我帮助同事形成适合他们的数字化教学策略。",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "key": "item_04",
+          "options": [
+            {
+              "value": "0",
+              "label": "这对我来说是个新领域，我还没有考虑过。",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "我还没有参加过，但确实感兴趣。",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "我参加过一两次在线培训。",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "我尝试过多种不同形式的在线培训。",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "我经常参加各种形式的在线培训。",
+              "score": 4
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "DCE_CI_01",
+          "content": "我有计划地使用不同的数字渠道，加强与学生和高校同事的沟通，例如电子邮件、博客、院系网站和应用程序。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "item_01",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCE_CI_02",
+          "content": "我使用数字工具与本单位和其他教育机构的同事合作。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "item_02",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCE_CI_03",
+          "content": "我主动提升自己的数字化教学能力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "item_03",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCE_CI_04",
+          "content": "我参加在线培训，例如在线课程、慕课（MOOC）、网络研讨会或线上会议。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "item_04",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "DCE_CI_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCE_CI_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCE_CI_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCE_CI_04",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "professional_engagement",
+            "type": "dimension",
+            "label": "专业参与合计分",
+            "description": "4 题各按 0–4 分计，直接相加，范围为 0–16 分。得分越高，表示本次选择的做法涉及更多数字技术使用。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DCE_CI_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCE_CI_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCE_CI_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCE_CI_04",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "professional_engagement"
+        ],
+        "scoreOrder": [
+          "professional_engagement"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "professional_engagement",
+            "headline": "让常用的沟通渠道各有用处",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一部分问的是你怎样和学生、同事沟通，怎样一起工作，又怎样学习新的数字教法。渠道多不一定更省心。学生清楚去哪里找通知、同事知道在哪里接着改同一份材料，才说明工具发挥了作用。试着回想最近一次教学协作，看看哪一步因为用了数字工具而更顺畅。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "给一门课约定一个固定的通知渠道，再明确一个适合提问和讨论的地方。一周后问问学生，重要消息好不好找。"
+              },
+              {
+                "category": "strategy",
+                "text": "和一位同事共改一小段讲义，在同一份文档里留下修改理由。再决定这种合作方式值不值得保留。"
+              },
+              {
+                "category": "environment",
+                "text": "选一项与当前课程直接相关的在线培训。学完先试用一个方法，再记下对学生有什么具体帮助。"
+              }
+            ],
+            "scoreLabel": "专业参与合计分（试用版，0–16 分）",
+            "provisional": true
+          }
+        ],
+        "limitations": [
+          "所得分数是这一部分的原始合计分。现有证据不足以据此给出分档、判定 A1–C2 等级，或和其他教师作比较。",
+          "本报告供高校教师回顾个人教学实践。工作职责、技术条件和学生需求都可能影响选项。",
+          "中文为 EDUK12 根据 PeerJ 2024 高校教师英文问卷所做的试译。尚无中文版或分区单独施测的本地验证数据。"
+        ],
+        "disclaimer": "结果可用于个人教学反思。请勿将其用于诊断、教师绩效、学校排名或跨群体比较。缺答时本题区没有合计分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "digcompedu_checkin_peerj2023_professional_engagement_zh_cn",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_04",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "professional_engagement": 0
+          },
+          "totalScoreKeys": [
+            "professional_engagement"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCE_CI_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCE_CI_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCE_CI_04",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "professional_engagement": 16
+          },
+          "totalScoreKeys": [
+            "professional_engagement"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCE_CI_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DCE_CI_04",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "professional_engagement": 6
+          },
+          "totalScoreKeys": [
+            "professional_engagement"
+          ]
+        }
+      },
+      {
+        "name": "missing_one",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DCE_CI_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DCE_CI_03",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "professional_engagement": null
+          },
+          "totalScoreKeys": [
+            "professional_engagement"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "professional_engagement": null
+          },
+          "totalScoreKeys": [
+            "professional_engagement"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请回顾你目前在高校教学中与专业参与有关的做法，并考虑这些做法可以怎样发展。每题有五种情境，从较少到较多使用数字技术依次排列。请选最接近你目前做法的一项。完成全部 4 题后可获得本题区的描述分和反思建议。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "参照该英文题区的作答说明翻译；完整作答和结果用途为平台说明。https://doi.org/10.7717/peerj.18456/supp-1"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "https://doi.org/10.7717/peerj.18456/supp-1；沿用 PeerJ 附件英文题区和题目顺序，由 EDUK12 直接翻译。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "按已发表英文题区逐题顺译，保留题干、五个情境选项、选项顺序及评分语义；尚未做独立专家复核、认知访谈或本地样本验证。"
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_professional_engagement_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "resultQualityDetails": true,
+        "methods": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "resultQualityDetails": true,
+        "methods": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "resultQualityDetails": true,
+        "methods": true
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "resultQualityDetails": true,
+        "methods": true
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

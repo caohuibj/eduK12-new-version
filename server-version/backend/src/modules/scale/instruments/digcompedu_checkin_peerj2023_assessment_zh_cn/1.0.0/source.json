@@ -1,0 +1,596 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "digcompedu_checkin_peerj2023_assessment_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "DigCompEdu Check-In｜评价与反馈｜高校教师自评（简体中文试用版）",
+      "abbreviation": "DCE-CI",
+      "instrumentFamily": "DigCompEdu Check-In｜PeerJ 2024 高校教师问卷（2023-06-02 版）"
+    },
+    "construct": {
+      "primaryDomain": "ENGAGEMENT",
+      "secondaryDomains": [],
+      "constructDefinition": "记录高校教师对自己在评价与反馈方面的数字化实践的描述。使用本题区原始合计分，解读限于个人反思。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:zh-cn",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:assessment",
+        "localization:direct_translation"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "供高校及成人继续教育中的任课教师自评。英文来源研究以高校健康科学学科教师为样本。当前中文版本尚未完成独立译审和本地验证，分区单独使用亦缺少效度证据。"
+    },
+    "administration": {
+      "itemCount": 3,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "以目前的教学实践为准。原问卷未指定回顾天数。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "按原问卷题号展示，每题提供五个情境选项，顺序与原版一致。",
+        "完整作答才计算本题区原始合计分，缺答不估分。",
+        "若组合展示六个题区，宜按原问卷 22 题的顺序展示；平台当前仅计算各题区分数。",
+        "答题用时是平台估计。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "适合教师回顾自身实践，并选择一个可在课程中尝试的改进方向。"
+        },
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "可供高校自评方法的探索性研究；独立分区和中文题本尚未验证。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_assessment_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_assessment_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_assessment_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Ersoy 等（2024），PeerJ 12:e18456，https://doi.org/10.7717/peerj.18456。附件 1 收录日期为 2023-06-02 的高校教师英文问卷，见 https://doi.org/10.7717/peerj.18456/supp-1。附件首页注明 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。原始框架由 Redecker, C.（2017）撰写、Punie, Y. 编辑，欧洲委员会联合研究中心（JRC），doi:10.2760/159770。此处为 EDUK12 的简体中文直译和分区改编。EDUK12 对译文负责。欧洲委员会及原作者未审定或认可此译本。",
+      "沿用原题项和评分选项的次序。教育情境说明、拆分后的分数用法、缺答处理和报告由 EDUK12 补写。本项目使用范围为非商业。入口及具体使用授权由平台管理员决定。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "teacher_self_report",
+      "source": {
+        "title": "DigCompEdu Check-In｜评价与反馈｜PeerJ 高校英文题区简体中文试译",
+        "citation": "Ersoy et al. (2024). Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects. PeerJ 12:e18456. https://doi.org/10.7717/peerj.18456 ; Supplemental Information 1, Digital Competency Assessment Questionnaire for Academicians, form timestamp 2023-06-02.",
+        "url": "https://doi.org/10.7717/peerj.18456/supp-1",
+        "publicationYear": 2024
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Ersoy 等（2024），PeerJ 12:e18456，https://doi.org/10.7717/peerj.18456。附件 1 收录日期为 2023-06-02 的高校教师英文问卷，见 https://doi.org/10.7717/peerj.18456/supp-1。附件首页注明 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。原始框架由 Redecker, C.（2017）撰写、Punie, Y. 编辑，欧洲委员会联合研究中心（JRC），doi:10.2760/159770。此处为 EDUK12 的简体中文直译和分区改编。EDUK12 对译文负责。欧洲委员会及原作者未审定或认可此译本。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "item_12",
+          "options": [
+            {
+              "value": "0",
+              "label": "我不跟踪学生的学习进展。",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "我定期了解学生的学习进展，但不使用数字方式。",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "我有时会用数字工具了解学生的学习进展，例如线上小测验。",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "我使用多种数字工具跟踪学生的学习进展。",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "我有计划地使用多种数字工具，持续跟踪学生的学习进展。",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "key": "item_13",
+          "options": [
+            {
+              "value": "0",
+              "label": "我无法获取这些数据，或分析这些数据不属于我的职责。",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "我只分析与学业直接相关的数据，例如学习表现和成绩。",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "我也会考虑学生的活动和行为数据，发现可能需要额外支持的学生。",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "我定期查看所有可获得的资料，发现可能需要额外支持的学生。",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "我有计划地分析数据，并及时采取支持措施。",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "key": "item_14",
+          "options": [
+            {
+              "value": "0",
+              "label": "我所在的工作环境不需要提供反馈。",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "我会给学生反馈，但不使用数字形式。",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "我有时会用数字方式反馈，例如在线小测验自动显示分数，或在线上留言、点赞。",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "我使用多种数字方式提供反馈。",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "我有计划地使用数字方式提供反馈。",
+              "score": 4
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "DCE_CI_12",
+          "content": "我用数字化评价方式了解学生的学习进展。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "item_12",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCE_CI_13",
+          "content": "我分析能获取的数据，及时发现可能需要额外支持的学生。数据包括参与、表现、成绩、出勤，以及在线等学习环境中的活动和互动。可能需要支持的学生包括有辍学或学业表现不佳风险的学生、有学习障碍或特定学习需求的学生，以及社交、表达或学习方法等通用能力需要支持的学生。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "item_13",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCE_CI_14",
+          "content": "我使用数字技术提供有效的反馈。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "item_14",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "DCE_CI_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCE_CI_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCE_CI_14",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "assessment",
+            "type": "dimension",
+            "label": "评价与反馈合计分",
+            "description": "3 题各按 0–4 分计，直接相加，范围为 0–12 分。得分越高，表示本次选择的做法涉及更多数字技术使用。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DCE_CI_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCE_CI_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCE_CI_14",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "assessment"
+        ],
+        "scoreOrder": [
+          "assessment"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "assessment",
+            "headline": "让评价接上下一步教学",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一部分问的是你如何用数字方式了解进展、发现可能需要帮助的学生，并给出可执行的反馈。一次小测能提示哪里值得追问，单次得分、出勤或在线活动记录都只能提供部分线索。结合学生的解释和实际困难，再决定要补讲、提供练习，还是单独沟通。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "用两道小题查看学生是否掌握本节课最重要的概念。若错在同一步，下节课先补一个例子，再做一次短练习。"
+              },
+              {
+                "category": "strategy",
+                "text": "把一句“还不够好”改成“你的结论已经清楚，下一版请补一条证据并注明来源”。给学生留出实际修改的时间。"
+              },
+              {
+                "category": "environment",
+                "text": "发现学习活动突然变化时，先和学生核实原因。只查看教学所需的信息，避免让系统记录代替沟通。"
+              }
+            ],
+            "scoreLabel": "评价与反馈合计分（试用版，0–12 分）",
+            "provisional": true
+          }
+        ],
+        "limitations": [
+          "所得分数是这一部分的原始合计分。现有证据不足以据此给出分档、判定 A1–C2 等级，或和其他教师作比较。",
+          "本报告供高校教师回顾个人教学实践。工作职责、技术条件和学生需求都可能影响选项。",
+          "中文为 EDUK12 根据 PeerJ 2024 高校教师英文问卷所做的试译。尚无中文版或分区单独施测的本地验证数据。"
+        ],
+        "disclaimer": "结果可用于个人教学反思。请勿将其用于诊断、教师绩效、学校排名或跨群体比较。缺答时本题区没有合计分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "digcompedu_checkin_peerj2023_assessment_zh_cn",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_12",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_13",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_14",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "assessment": 0
+          },
+          "totalScoreKeys": [
+            "assessment"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCE_CI_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCE_CI_14",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "assessment": 12
+          },
+          "totalScoreKeys": [
+            "assessment"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_12",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCE_CI_14",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "assessment": 3
+          },
+          "totalScoreKeys": [
+            "assessment"
+          ]
+        }
+      },
+      {
+        "name": "missing_one",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DCE_CI_13",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "assessment": null
+          },
+          "totalScoreKeys": [
+            "assessment"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "assessment": null
+          },
+          "totalScoreKeys": [
+            "assessment"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请回顾你目前在高校教学中与评价与反馈有关的做法，并考虑这些做法可以怎样发展。每题有五种情境，从较少到较多使用数字技术依次排列。请选最接近你目前做法的一项。完成全部 3 题后可获得本题区的描述分和反思建议。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "参照该英文题区的作答说明翻译；完整作答和结果用途为平台说明。https://doi.org/10.7717/peerj.18456/supp-1"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "https://doi.org/10.7717/peerj.18456/supp-1；沿用 PeerJ 附件英文题区和题目顺序，由 EDUK12 直接翻译。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "按已发表英文题区逐题顺译，保留题干、五个情境选项、选项顺序及评分语义；尚未做独立专家复核、认知访谈或本地样本验证。"
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_assessment_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "resultQualityDetails": true,
+        "methods": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "resultQualityDetails": true,
+        "methods": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "resultQualityDetails": true,
+        "methods": true
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "resultQualityDetails": true,
+        "methods": true
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "toolKey": "rpq2024_work_satisfaction4_teacher_self_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.0.0-zh-cn-pilot",
+  "title": "RPQ｜工作满意感自评报告（试用版）",
+  "report": {
+    "reportVersion": "1.0.0-zh-cn-pilot",
+    "primaryScoreKeys": [
+      "work_satisfaction4"
+    ],
+    "scoreOrder": [
+      "work_satisfaction4"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "work_satisfaction4",
+        "headline": "找出哪些工作时刻让你觉得值得",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "工作满意感包括工作带来的充实、意义、乐趣，以及做完一件事感到有收获。它可能随工作安排和环境变化。回看最近让你觉得值得的一小段时间，想想当时在做什么、和谁一起做、哪些安排帮了忙，能给接下来的工作留下一条线索。",
+        "provisional": true,
+        "scoreLabel": "工作满意感平均分（试用版，1–6 分）",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "记下一件最近让你觉得“这件事做得值”的工作小事，再写下当时真正让你觉得有收获的那个细节。"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一个能自己安排的小环节，让喜欢的工作内容多出现一次。例如和同事共备一段，让彼此展示一个奏效的方法。"
+          },
+          {
+            "category": "support",
+            "text": "如果耗费时间的流程反复挤掉你重视的工作，可以带着具体例子与同事讨论有没有简化或分担的可能。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这里的分数是 4 道题的平均值，范围为 1–6 分。分数越高，表示本次自述更常感到工作充实、有意义或令人愉快。",
+      "中文版目前用于试用，缺少本地常模和独立施测验证。报告提供个人反思建议，分数没有划分等级。",
+      "近期工作安排、时间资源和获得的支持，都会影响本次作答。请结合自己的实际处境理解结果。"
+    ],
+    "disclaimer": "供教师个人回顾工作体验。请勿将此结果用于临床判断、教师绩效、学校排名或跨群体比较。缺答时不计算平均分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-zh-cn-pilot",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

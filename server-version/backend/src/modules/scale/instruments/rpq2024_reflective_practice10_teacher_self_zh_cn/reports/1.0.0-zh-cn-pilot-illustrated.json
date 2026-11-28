@@ -1,0 +1,95 @@
+{
+  "toolKey": "rpq2024_reflective_practice10_teacher_self_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.0.0-zh-cn-pilot-illustrated",
+  "title": "RPQ｜专业反思自评报告（试用版）｜图文版",
+  "report": {
+    "reportVersion": "1.0.0-zh-cn-pilot-illustrated",
+    "primaryScoreKeys": [
+      "reflective_practice10"
+    ],
+    "scoreOrder": [
+      "reflective_practice10"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "reflective_practice10",
+        "headline": "把课堂小意外写成下一次尝试",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "你在上课或沟通时，可能会同时留意两件事：自己的想法怎样影响了互动，学生又是怎样理解当时的情况。事后再回看，可以帮你区分发生了什么、自己怎样解释、还有哪些信息没掌握。反思的价值，在于给下一次行动留出一个可试的改动。\n\n课后回想时，顺手把看到的事实和你的推测分开写。同一个沉默，可能来自没听懂、来不及想，或不知道该从哪说起。",
+        "provisional": true,
+        "scoreLabel": "专业反思平均分（试用版，1–6 分）",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一段没按预想进行的课堂交流。分别写下一件实际发生的事和一种可能的解释，然后问自己还缺什么信息。"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一个你当时没预料到的回应。记录自己的第一反应和学生随后做的事，下次只改一个提问方式再观察。"
+          },
+          {
+            "category": "support",
+            "text": "如果需要另一个视角，可以请同事回看一段去标识化的课堂记录，一起分清观察和推测。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这里的分数是 10 道题的平均值，范围为 1–6 分。分数越高，表示本次自述在与学生互动中或互动后反思得更频繁。",
+      "中文版目前用于试用，缺少本地常模和独立施测验证。报告提供个人反思建议，分数没有划分等级。",
+      "近期工作安排、时间资源和获得的支持，都会影响本次作答。请结合自己的实际处境理解结果。"
+    ],
+    "disclaimer": "供教师个人回顾工作体验。请勿将此结果用于临床判断、教师绩效、学校排名或跨群体比较。缺答时不计算平均分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "rpq2024_reflective_practice10_teacher_self_zh_cn/1.0.0/1.0.0-zh-cn-pilot-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-zh-cn-pilot-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

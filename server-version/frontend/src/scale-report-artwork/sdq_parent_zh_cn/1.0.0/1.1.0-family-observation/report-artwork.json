@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "sdq_parent_zh_cn/1.0.0/1.1.0-family-observation",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "家长坐在孩子身边，一起看日常活动的画，听孩子说自己的经历。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

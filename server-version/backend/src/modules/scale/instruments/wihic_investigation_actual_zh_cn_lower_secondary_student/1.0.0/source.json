@@ -1,0 +1,695 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "wihic_investigation_actual_zh_cn_lower_secondary_student",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "WIHIC｜探究活动（实际·中文8题）｜初中｜学生填答",
+      "abbreviation": "WIHIC-INVESTIGATION",
+      "instrumentFamily": "WIHIC《这门课上发生了什么？》（Fraser 2023 附录 A 56 项实际课堂版，项目直译）"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "学生对实际课堂体验中“探究活动”相关情形发生频率的自我报告。来自 Fraser 2023 附录 A 56 项实际课堂版的原维度。",
+      "constructLevel": "FACET",
+      "constructOverlapTags": [
+        "family:wihic",
+        "学生评教",
+        "评价对象:课堂",
+        "评价对象:课堂互动",
+        "population:lower_secondary_student",
+        "age:12_15_project_scope",
+        "response:student_self_perception",
+        "locale:zh_cn",
+        "form:actual",
+        "source:fraser2023_appendix_a",
+        "license:cc_by_4_0",
+        "maturity:pilot",
+        "standalone_validation:not_established",
+        "scoring:project_complete_raw_mean"
+      ]
+    },
+    "population": {
+      "minAge": 12,
+      "maxAge": 15,
+      "gradeRange": {
+        "minGrade": 7,
+        "maxGrade": 9
+      },
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "项目试用范围为理解简体中文的七至九年级学生、12 至 15 岁。年龄界限来自施测范围设定。单独使用八题和本地语言等值性均尚待验证。"
+    },
+    "administration": {
+      "itemCount": 8,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "正在评价的这门课。附录 A 无固定回顾时段。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留附录 A 原有题目顺序。按原序装配七个分册可覆盖 56 题，各维独立。",
+        "坚持使用附录 A 五级频率选项及 1 至 5 分。最高档 Almost Always 译为“几乎总是”。",
+        "分开施测、数字化说明和完整作答均分均为平台改造，中文版尚待验证。",
+        "填写时间为项目估计。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "用于积累中文译稿试用资料，八题单独施测和本地效度尚待验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "用于学生个人反思本门课的课堂经历。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Fraser, B. J. (2023). The Evolution of the Field of Learning Environments Research. Education Sciences, 13(3), 257. https://doi.org/10.3390/educsci13030257. Appendix A, Table A1, pp. 7–8.",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "以 Fraser 2023 附录 A 原英文 56 题为基准的简体中文直译。保留原位置与频率选项。中国学生 52 项验证版仍是另一版本，完整正式题本尚缺。专家审校、理解访谈和本地验证待完成。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "wihic_investigation_actual_zh_cn_lower_secondary_student-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 144,
+        "maxExclusive": 192
+      },
+      "grades": [
+        "7",
+        "8",
+        "9"
+      ]
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "wihic_investigation_actual_zh_cn_lower_secondary_student-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": false,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": false,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "wihic_investigation_actual_zh_cn_lower_secondary_student-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "© Barry J. Fraser 2023。原题及五级频率选项来自 2023 年论文附录 A 表 A1（第 7–8 页）。采用 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。来源：https://doi.org/10.3390/educsci13030257。项目改动包括简体中文直译、依原有七维分开呈现、独立作答说明、完整作答时算术均分以及供学生反思的反馈。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "WIHIC 实际课堂版（Fraser 2023 附录 A 表 A1，项目简体中文直译）",
+        "citation": "Fraser, B. J. (2023). The Evolution of the Field of Learning Environments Research. Education Sciences, 13(3), 257. https://doi.org/10.3390/educsci13030257. Appendix A, Table A1, pp. 7–8.",
+        "url": "https://www.mdpi.com/2227-7102/13/3/257",
+        "publicationYear": 2023
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© Barry J. Fraser 2023。原题及五级频率选项来自 2023 年论文附录 A 表 A1（第 7–8 页）。采用 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。来源：https://doi.org/10.3390/educsci13030257。项目改动包括简体中文直译、依原有七维分开呈现、独立作答说明、完整作答时算术均分以及供学生反思的反馈。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "appendix_a_frequency",
+          "options": [
+            {
+              "value": "1",
+              "label": "几乎从不",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "很少",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有时",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "经常",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "几乎总是",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "WIHIC25",
+          "content": "我通过探究来检验自己的想法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIHIC26",
+          "content": "有人会请我想一想，有哪些证据支持某种说法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIHIC27",
+          "content": "我通过探究回答讨论中出现的问题。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIHIC28",
+          "content": "我解释不同说法、示意图和图表的含义。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIHIC29",
+          "content": "我通过探究回答自己感到困惑的问题。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIHIC30",
+          "content": "我通过探究回答老师提出的问题。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIHIC31",
+          "content": "我通过开展探究找出问题的答案。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIHIC32",
+          "content": "我用自己在探究中获得的信息解决问题。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "WIHIC25",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIHIC26",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIHIC27",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIHIC28",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIHIC29",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIHIC30",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIHIC31",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIHIC32",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "investigation",
+            "type": "dimension",
+            "label": "探究活动（八题平均）",
+            "description": "八题等权计分，范围 1 到 5。分数表示所述课堂体验的频率，需答全八题才计算。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "WIHIC25",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIHIC26",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIHIC27",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIHIC28",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIHIC29",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIHIC30",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIHIC31",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIHIC32",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "investigation"
+        ],
+        "scoreOrder": [
+          "investigation"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "investigation",
+            "headline": "回顾这门课的探究活动",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这组回答关注这门课是否常给你机会提出问题、检查证据、解释图表和动手验证。课堂主题和任务安排会影响这些机会的多少。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "挑一个自己好奇的问题，用手边可得的信息试一次。记下原来的猜想、你找到的证据和后来有没有改主意。"
+              },
+              {
+                "category": "support",
+                "text": "如果需要材料或不知道可以怎么查，先和同伴或老师讨论一条在现有条件下可行的验证办法。"
+              }
+            ],
+            "scoreLabel": "探究活动（1–5 平均）",
+            "provisional": true
+          }
+        ],
+        "limitations": [
+          "© Barry J. Fraser 2023。原题及五级频率选项来自 2023 年论文附录 A 表 A1（第 7–8 页）。采用 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。来源：https://doi.org/10.3390/educsci13030257。项目改动包括简体中文直译、依原有七维分开呈现、独立作答说明、完整作答时算术均分以及供学生反思的反馈。",
+          "这一组分数是你对同一门课八道题的平均回答，范围是 1 到 5。需答全八题才会计算分数。",
+          "请结合自己的课堂经历来理解。每个分册单独显示结果，供个人反思，没有常模、分档或跨分册总分。",
+          "本译稿供能理解简体中文的初中七至九年级、12 至 15 岁学生试用。使用范围来自项目设定。译校、理解访谈和本地验证尚待开展。",
+          "这套题直接译自 Fraser 2023 附录 A 的 56 项实际课堂版。请与 2026 年发表的中国学生 52 项修订版分别识别。"
+        ],
+        "disclaimer": "中文试用版。记录你在这门课的体验，供个人反思。遇到困扰时，无论分数是多少，都可以向信任的成年人求助。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "wihic_investigation_actual_zh_cn_lower_secondary_student",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "WIHIC25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC27",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC28",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC30",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC31",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC32",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "investigation": 1
+          },
+          "totalScoreKeys": [
+            "investigation"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "WIHIC25",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC26",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC27",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC28",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC29",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC30",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC31",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC32",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "investigation": 5
+          },
+          "totalScoreKeys": [
+            "investigation"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "WIHIC25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC26",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC27",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIHIC28",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "WIHIC29",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC30",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC31",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC32",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "investigation": 2.625
+          },
+          "totalScoreKeys": [
+            "investigation"
+          ]
+        }
+      },
+      {
+        "name": "missing_one",
+        "answers": [
+          {
+            "itemCode": "WIHIC25",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC26",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC27",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC28",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC29",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC30",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC31",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "investigation": null
+          },
+          "totalScoreKeys": [
+            "investigation"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "investigation": null
+          },
+          "totalScoreKeys": [
+            "investigation"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请想一想你正在评价的这门课里实际发生了什么。每道题请选择一种最符合自己经历的频率：几乎从不、很少、有时、经常、几乎总是。这八道题是 WIHIC 的一部分。答案没有对错，请根据自己的实际体验作答。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "项目编写，频率选项取自 Fraser 2023 附录 A 表 A1。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "STUDENT",
+        "responseMode": "SELF"
+      }
+    ]
+  }
+}

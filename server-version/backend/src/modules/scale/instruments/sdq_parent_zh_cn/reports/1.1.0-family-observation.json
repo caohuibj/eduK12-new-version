@@ -1,0 +1,176 @@
+{
+  "toolKey": "sdq_parent_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-family-observation",
+  "title": "家庭观察和下一步支持",
+  "report": {
+    "reportVersion": "1.1.0-family-observation",
+    "primaryScoreKeys": [
+      "total_difficulties",
+      "emotional",
+      "conduct",
+      "hyperactivity",
+      "peer",
+      "prosocial"
+    ],
+    "scoreOrder": [
+      "total_difficulties",
+      "emotional",
+      "conduct",
+      "hyperactivity",
+      "peer",
+      "prosocial"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "total_difficulties",
+        "headline": "先比较两个成长场景",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "过去六个月或本学年，家长观察到的情绪、日常行为、注意或活动及同伴相处四方面合成困难总分。分数越高，表示这些困难在这次家庭观察中报告得越多。助人、分享等长处单独查看。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一个近来反复遇到的场景，写下发生前在做什么、孩子如何回应、什么帮助他恢复。再找一个相似却比较顺利的场景，比较两次的安排或支持。"
+          }
+        ],
+        "scoreLabel": "家庭观察｜困难总分（0–40）"
+      },
+      {
+        "scoreKey": "emotional",
+        "headline": "留意变化出现的时点",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项反映照顾者看见的担心、低落或紧张等表现。分数越高，表示这些表现被观察得越多。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想想孩子在哪些场合最容易紧张，哪些人或活动能让他安心。挑一个轻松时段，问他当时最希望得到什么帮助。"
+          }
+        ],
+        "scoreLabel": "情绪体验（0–10）"
+      },
+      {
+        "scoreKey": "conduct",
+        "headline": "从最近一次冲突回看",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项整理家中遇到的冲突和规则相关行为，分数越高，表示这类困难在本次观察中较多。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "从一次具体事件入手，区分孩子当时理解的要求、情绪状态和后续发生的事。下一次可以先把安排说清楚，再观察反应。"
+          }
+        ],
+        "scoreLabel": "日常行为与冲突（0–10）"
+      },
+      {
+        "scoreKey": "hyperactivity",
+        "headline": "看任务怎样影响专注",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项描述维持注意和调节活动时的表现。结果会随任务难度、时间安排和周边环境变化。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "比较一段孩子偏爱的活动和一段需要久坐的任务。任选一种支持试一周，例如缩短第一步、在两步之间安排短暂停顿。"
+          }
+        ],
+        "scoreLabel": "注意与活动（0–10）"
+      },
+      {
+        "scoreKey": "peer",
+        "headline": "识别较顺利的交往机会",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项是在家庭能够观察到的范围内记录同伴相处困难。孩子独处时的感受、联系同伴的机会以及是否安全，也值得一并问清。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "从孩子愿意说起的一次同伴相处入手，问他什么时候感觉被接纳，什么时候需要大人帮忙。"
+          }
+        ],
+        "scoreLabel": "同伴相处（0–10）"
+      },
+      {
+        "scoreKey": "prosocial",
+        "headline": "把看见的长处说出来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项单独记录关心、分享和助人的表现。分数越高，表示家长观察到的这类积极行为越多。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找一次具体的积极互动，告诉孩子你看见了什么。再想想怎样提供类似的机会，例如与家人共做一件小事。"
+          }
+        ],
+        "scoreLabel": "关心与助人（0–10）"
+      }
+    ],
+    "limitations": [
+      "适用于此简体单页 25 题家长观察版本。原题观察窗口为过去六个月或本学年；家长只根据亲眼见过、能够判断的场景回答。",
+      "分数为本次原始观测，采用现有实现的完整计分策略，缺少所属题项时不给该部分结果。无影响补充页，也无影响分。没有配置大陆常模，未套用英国阈值。",
+      "不同观察者和场景的回答应各自阅读。涉及孩子长期明显不适或日常受影响时，可以将观察记录带给合适的专业人员讨论。"
+    ],
+    "disclaimer": "这份报告帮助照顾者理解一次观察，并从具体场景中寻找支持。结果仅供沟通和后续评估参考。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "PARENT_REPORT",
+      "audience": "parent",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "sdq_parent_zh_cn/1.0.0/1.1.0-family-observation"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-family-observation",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": true
+      }
+    }
+  }
+}

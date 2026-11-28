@@ -1,0 +1,93 @@
+{
+  "toolKey": "sas_sv10_zh_cn_context_pilot",
+  "contentVersion": "1.1.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-context-pilot",
+  "title": "中文情境试用报告",
+  "report": {
+    "reportVersion": "1.3.0-context-pilot",
+    "primaryScoreKeys": [
+      "phone_use_difficulties"
+    ],
+    "scoreOrder": [
+      "phone_use_difficulties"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "phone_use_difficulties",
+        "headline": "手机在什么时候打断了你？",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "看消息、找资料、跟朋友聊几句，手机能帮上不少忙。它也可能在你本来想专心的时候，把注意力拉到屏幕上。这份问卷请你回想这类体验。10 题总分为 10–60 分。分数越高，说明你这次越认同与手机使用有关的困扰。真正值得留意的是具体情境：什么时候你想看一下，又是什么让你继续看下去？",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "从最近一次分心想起：你本来在做什么？那时是在等一条重要消息，还是习惯性地解锁了手机？"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一个短时段试试，比如做作业的前十分钟。把不着急看的消息留到休息时，再看看这段时间能不能接着做原来的事。"
+          },
+          {
+            "category": "support",
+            "text": "如果使用习惯经常影响休息、学习或相处，可以和信任的人商量一个自己也愿意尝试的调整办法。"
+          }
+        ],
+        "provisional": true,
+        "scoreLabel": "手机使用相关困扰总分（试用）"
+      }
+    ],
+    "limitations": [
+      "本次给出八年级情境试用版的原始总分。尚无本中文版的本地常模或界值。",
+      "只有 10 个有效答案时才计算总分。分数用于了解自报体验，不能用于成瘾诊断、纪律处分或学生排名。"
+    ],
+    "disclaimer": "这份报告帮你观察手机使用如何影响日常生活。中文情境版仍处于试用阶段。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-context-pilot",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

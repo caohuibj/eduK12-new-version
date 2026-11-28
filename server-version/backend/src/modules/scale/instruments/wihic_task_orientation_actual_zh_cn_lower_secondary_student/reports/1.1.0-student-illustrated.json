@@ -1,0 +1,93 @@
+{
+  "toolKey": "wihic_task_orientation_actual_zh_cn_lower_secondary_student",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student-illustrated",
+  "title": "WIHIC｜任务多的时候，先找到下一步｜中文试用版｜图文版",
+  "report": {
+    "reportVersion": "1.1.0-student-illustrated",
+    "primaryScoreKeys": [
+      "task_orientation"
+    ],
+    "scoreOrder": [
+      "task_orientation"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "task_orientation",
+        "headline": "从认得出的第一步开始",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "翻开作业页面时，全部要求混在一起，容易不知道从哪开始。给自己写下“先读一遍材料，再圈出题目要求”这样的第一步，任务就变得更容易着手。\n\n这组回答关注你在这门课里是否常知道目标和任务量，能否做好准备、集中注意并按计划完成。遇到陌生内容或要求不清时，感受也会变化。\n\n清楚自己该做到哪里，开始就会容易一点。有时困难来自题目的要求太多，也可能来自活动时间不够。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "把近期一个任务分成“先做、再做、交前检查”三步，如果仍不确定，给老师看你写下的第一步并请对方确认。"
+          },
+          {
+            "category": "support",
+            "text": "如果经常不清楚要求，带一个具体例子向老师确认第一步和提交前要检查的地方。"
+          }
+        ],
+        "scoreLabel": "任务导向（1–5 平均）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "© Barry J. Fraser 2023。原题及五级频率选项来自 2023 年论文附录 A 表 A1（第 7–8 页）。采用 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。来源：https://doi.org/10.3390/educsci13030257。项目改动包括简体中文直译、依原有七维分开呈现、独立作答说明、完整作答时算术均分以及供学生反思的反馈。",
+      "这一组分数是你对同一门课八道题的平均回答，范围是 1 到 5。需答全八题才会计算分数。",
+      "请结合自己的课堂经历来理解。每个分册单独显示结果，供个人反思，没有常模、分档或跨分册总分。",
+      "本译稿供能理解简体中文的初中七至九年级、12 至 15 岁学生试用。使用范围来自项目设定。译校、理解访谈和本地验证尚待开展。",
+      "这套题直接译自 Fraser 2023 附录 A 的 56 项实际课堂版。请与 2026 年发表的中国学生 52 项修订版分别识别。"
+    ],
+    "disclaimer": "中文试用版。记录你在这门课的体验，供个人反思。遇到困扰时，无论分数是多少，都可以向信任的成年人求助。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "wihic_task_orientation_actual_zh_cn_lower_secondary_student/1.0.0/1.1.0-student-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

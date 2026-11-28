@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "sas_sv10_zh_cn_university_2022/1.0.0/1.1.0-student-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位大学生在图书馆自习，把手机屏幕朝下放到一旁，准备回到讲义上。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

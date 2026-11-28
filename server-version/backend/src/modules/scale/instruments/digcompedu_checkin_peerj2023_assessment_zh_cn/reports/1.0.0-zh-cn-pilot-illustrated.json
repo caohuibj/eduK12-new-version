@@ -1,0 +1,95 @@
+{
+  "toolKey": "digcompedu_checkin_peerj2023_assessment_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.0.0-zh-cn-pilot-illustrated",
+  "title": "评价与反馈｜高校教师自评报告（试用版）｜图文版",
+  "report": {
+    "reportVersion": "1.0.0-zh-cn-pilot-illustrated",
+    "primaryScoreKeys": [
+      "assessment"
+    ],
+    "scoreOrder": [
+      "assessment"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "assessment",
+        "headline": "把一份反馈变成学生的下一步",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一部分问的是你如何用数字方式了解进展、发现可能需要帮助的学生，并给出可执行的反馈。一次小测能提示哪里值得追问，单次得分、出勤或在线活动记录都只能提供部分线索。结合学生的解释和实际困难，再决定要补讲、提供练习，还是单独沟通。\n\n一条分数提醒只有变成看得懂的改动方向，学生才知道该怎样继续。教师也能用学生下一次的尝试，判断反馈是否说到点上。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "用两道小题查看学生是否掌握本节课最重要的概念。若错在同一步，下节课先补一个例子，再做一次短练习。"
+          },
+          {
+            "category": "strategy",
+            "text": "选一份小作业，把反馈写成“我看到的证据”和“你可以试的一步”两行，下次先看学生有没有做出那个改动。"
+          },
+          {
+            "category": "environment",
+            "text": "发现学习活动突然变化时，先和学生核实原因。只查看教学所需的信息，避免让系统记录代替沟通。"
+          }
+        ],
+        "scoreLabel": "评价与反馈合计分（试用版，0–12 分）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "所得分数是这一部分的原始合计分。现有证据不足以据此给出分档、判定 A1–C2 等级，或和其他教师作比较。",
+      "本报告供高校教师回顾个人教学实践。工作职责、技术条件和学生需求都可能影响选项。",
+      "中文为 EDUK12 根据 PeerJ 2024 高校教师英文问卷所做的试译。尚无中文版或分区单独施测的本地验证数据。"
+    ],
+    "disclaimer": "结果可用于个人教学反思。请勿将其用于诊断、教师绩效、学校排名或跨群体比较。缺答时本题区没有合计分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "digcompedu_checkin_peerj2023_assessment_zh_cn/1.0.0/1.0.0-zh-cn-pilot-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-zh-cn-pilot-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": true
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

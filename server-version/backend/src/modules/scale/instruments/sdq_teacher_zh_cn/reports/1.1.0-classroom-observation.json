@@ -1,0 +1,194 @@
+{
+  "toolKey": "sdq_teacher_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-classroom-observation",
+  "title": "教师课堂观察中文报告（英文 T4–10 题本）",
+  "report": {
+    "reportVersion": "1.1.0-classroom-observation",
+    "primaryScoreKeys": [
+      "total_difficulties",
+      "emotional",
+      "conduct",
+      "hyperactivity",
+      "peer",
+      "prosocial",
+      "impact"
+    ],
+    "scoreOrder": [
+      "total_difficulties",
+      "emotional",
+      "conduct",
+      "hyperactivity",
+      "peer",
+      "prosocial",
+      "impact"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "total_difficulties",
+        "headline": "先找到可以调整的一点",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "课堂观察中的情绪、日常行为、注意或活动、同伴相处四项合成困难总分。分数越高，表示本次教师观察中报告的困难较多。亲社会长处及课堂影响分别查看。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选择一个近期遇到的课堂场景，再找一个相似但更顺利的场景。比较任务长度、同伴安排和教师提示，选一项容易重复的小调整。"
+          }
+        ],
+        "scoreLabel": "课堂观察｜困难总分（0–40）"
+      },
+      {
+        "scoreKey": "emotional",
+        "headline": "看见紧张和恢复的过程",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项记录教师可见的担心、低落、紧张等表现。分数随可观察机会与课堂情境变化。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看一次学生面对新任务或公开回答的情况。留意事前如何准备、何时可放松，以及低压力的参与准备用过什么方式。"
+          }
+        ],
+        "scoreLabel": "课堂中的情绪体验（0–10）"
+      },
+      {
+        "scoreKey": "conduct",
+        "headline": "把规则和情境写具体",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项反映课堂或学校活动中观察到的冲突、规则相关行为及其他日常困难。分数越高，表示本次记录中这类困难较多。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一次事件，只记任务、可以看见的行为和后续变化。课前提供清楚的一步提示，再观察具体行为是否有变化。"
+          }
+        ],
+        "scoreLabel": "课堂行为与冲突（0–10）"
+      },
+      {
+        "scoreKey": "hyperactivity",
+        "headline": "观察哪一种提示能帮忙",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项描述不同任务中维持注意和调节活动的表现。分数越高，表示教师观察到的相关困难越多。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "比较独立作业、小组讨论或活动切换。试着在最常遇到困难的一个环节给出简短的可视化提示。"
+          }
+        ],
+        "scoreLabel": "课堂注意与活动（0–10）"
+      },
+      {
+        "scoreKey": "peer",
+        "headline": "弄清哪些合作条件有效",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项记录教师在校内看见的同伴相处困难。课间、同伴自选小组和教师分组提供的机会各有不同。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看一个学生参与较顺利的组合。试着明确小组角色，给每人一次可预期的参与机会，然后留意同伴互动是否更顺畅。"
+          }
+        ],
+        "scoreLabel": "课堂同伴相处（0–10）"
+      },
+      {
+        "scoreKey": "prosocial",
+        "headline": "把可见的积极行为留下",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项描述课内课外关心、分享和协助的表现。分数越高，表示教师记录到的这类行为越多。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "记下一次学生主动帮助或分享的具体经过。把这个行为告诉学生，让他知道哪一点对他人有帮助。"
+          }
+        ],
+        "scoreLabel": "课堂中的关心与助人（0–10）"
+      },
+      {
+        "scoreKey": "impact",
+        "headline": "区分困难出现与实际影响",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项合计所报告困难带来的不适、同伴交往和课堂学习受影响程度。若教师回答整体上无困难，此项记 0。既有题本未采集持续时长和班级负担。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "若某一场合受影响特别明显，可先和其他了解孩子的人核对观察背景，再决定在哪个具体活动中提供支持。"
+          }
+        ],
+        "scoreLabel": "教师观察｜日常影响分（0–6）"
+      }
+    ],
+    "limitations": [
+      "观察年龄为 4–10 岁。题本沿用既有美式英文 T4–10 冻结版本，并保留其对过去六个月或当前学年的观察口径。",
+      "采用现有实现的完整计分策略，保留整体无困难时的影响分结构性记 0。各维度和影响分仅作描述，无本地常模或分档。",
+      "表中为单个教师的观察。不同教师或家庭的结果各自阅读；如需进一步了解，可和其他照顾者或专业人员核对具体情境。"
+    ],
+    "disclaimer": "这份中文报告用于教师梳理课堂观察和支持线索。英文题本身份及其分数解释仍适用。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "TEACHER_REPORT",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "sdq_teacher_zh_cn/1.0.0/1.1.0-classroom-observation"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-classroom-observation",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": true
+      }
+    }
+  }
+}

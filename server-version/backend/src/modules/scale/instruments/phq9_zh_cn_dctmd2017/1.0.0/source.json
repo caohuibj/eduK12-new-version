@@ -1,0 +1,782 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "phq9_zh_cn_dctmd2017",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "PHQ-9 患者健康问卷｜DC/TMD 简体中文版｜成人候审",
+      "abbreviation": "PHQ-9",
+      "instrumentFamily": "Patient Health Questionnaire"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "自评近两周抑郁相关症状的出现频率，并记录日常功能困难。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "mental_health",
+        "depression",
+        "source:dctmd",
+        "locale:zh_cn",
+        "use:supervised_adult_research"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "供有专业支持的成人非商业研究项目候审。平台目标人群的常模和具体应用范围待核。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "过去 2 周",
+      "requiredTraining": true,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "原版九个计分题和一个不计分的功能困难补充题。数字版使用单选框，补充题可跳过。",
+        "九道症状题分别按 0–3 计分，完整作答时直接相加，范围为 0–27。答满六题、未答满九题时，按已答题均分推算九题总分并标为估算。少于六题时不计算。最后的功能困难题单独保留。",
+        "研究项目应在采用本问卷前安排专业人员独立查看第 9 题并按当地流程跟进。单个题目或总分不足以判断风险程度。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅供后台审定成人非商业研究用途，具体项目适用范围由专业人员审核。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "phq9-kroenke-2001-original-english",
+        "evidenceType": "CRITERION",
+        "population": "US adult primary-care / obstetrics-gynecology clinical samples; not this translation",
+        "locale": "en",
+        "territory": "US",
+        "sampleSize": 6000,
+        "studyDesign": "Original English development study; criterion interview subgroup n=580. No exact-version Chinese translation validation.",
+        "rating": "UNKNOWN",
+        "citation": "Kroenke K, Spitzer RL, Williams JBW. The PHQ-9: Validity of a Brief Depression Severity Measure. Journal of General Internal Medicine. 2001;16(9):606–613.",
+        "doi": "10.1046/j.1525-1497.2001.016009606.x",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/11556941/",
+        "notes": "Original English evidence only. Does not approve this translation, diagnose a participant, or establish Chinese norms."
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "DC/TMD 2017 年 11 月 18 日修订档案第 50 页，傅开元、Adrian Yap 等译。https://inform-iadr.com/wp-content/uploads/2024/03/DC-TMD-Chinese-Assessment-Instruments_revised-2017_11_18.pdf",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "录入已公开的简体中文表单。项目未自行转译题目和作答选项。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "phq9_zh_cn_dctmd2017-scope",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "phq9_zh_cn_dctmd2017-ceiling",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "phq9_zh_cn_dctmd2017-base-report",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false,
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false,
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false,
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true,
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false
+      }
+    }
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "phq9_zh_cn_dctmd2017-use",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "© Pfizer Inc. Simplified Chinese translation by Fu KY, Yap AU, Lei J, Liu MQ and Fan XF. The questionnaire page permits reproduction, translation, display and distribution without permission. https://inform-iadr.com/wp-content/uploads/2024/03/DC-TMD-Chinese-Assessment-Instruments_revised-2017_11_18.pdf",
+      "平台拟定用途为有专业支持的成人非商业研究，候审稿不发放入口。"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "version": "1.0.0",
+    "language": "zh-CN",
+    "source": "DC/TMD 2017 修订档案第 50 页",
+    "text": "过去 2 周内，下列问题是如何困扰你的？请在选定答案的方框内画勾。"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "PHQ-9 患者健康问卷（DC/TMD 简中表，第 50 页）",
+        "citation": "Ohrbach R, ed. Diagnostic Criteria for Temporomandibular Disorders: Assessment Instruments. Chinese by Fu KY, Yap AU, Lei J, Liu MQ, Fan XF et al., 18 Nov 2017 revision, p. 50. Original PHQ-9 Kroenke, Spitzer and Williams (2001).",
+        "url": "https://inform-iadr.com/wp-content/uploads/2024/03/DC-TMD-Chinese-Assessment-Instruments_revised-2017_11_18.pdf"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© Pfizer Inc. Simplified Chinese translation by Fu KY, Yap AU, Lei J, Liu MQ and Fan XF. The questionnaire page permits reproduction, translation, display and distribution without permission. https://inform-iadr.com/wp-content/uploads/2024/03/DC-TMD-Chinese-Assessment-Instruments_revised-2017_11_18.pdf"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "frequency",
+          "options": [
+            {
+              "value": "0",
+              "label": "根本没有",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "有几天",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "一半以上的时间",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "几乎每天",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "key": "function",
+          "options": [
+            {
+              "value": "0",
+              "label": "一点也不困难",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "有点困难",
+              "score": 0
+            },
+            {
+              "value": "2",
+              "label": "非常困难",
+              "score": 0
+            },
+            {
+              "value": "3",
+              "label": "极度困难",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "PHQ9_1",
+          "content": "做事没有兴趣或愉悦感",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_2",
+          "content": "感觉低落、郁闷或没有希望",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_3",
+          "content": "很难入睡或容易醒，或睡眠过多",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_4",
+          "content": "感觉疲劳或没有精力",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_5",
+          "content": "食欲不佳或饮食过量",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_6",
+          "content": "自我感觉差——或觉得自己很失败，或令自己或家人失望",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_7",
+          "content": "做事很难集中注意力，比如阅读报纸或看电视",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_8",
+          "content": "行动或说话过于迟缓，以致他人能够觉察到了，或正好相反——过于多动或不安分以致活动比平常要多得多",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_9",
+          "content": "觉得自己死掉会更好，或想以某种方式伤害自己",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "PHQ9_FUNCTION",
+          "content": "如果你对以上任一问题打钩，该问题对你完成工作、照料家事或与他人相处造成了多大困难？",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "function",
+          "randomizeOptions": false,
+          "purpose": "UNSCORED"
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "PHQ9_1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_4",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_5",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_6",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_7",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_8",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "PHQ9_9",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "prorate_if_min_answered",
+          "minimumAnswered": 6
+        },
+        "scores": [
+          {
+            "key": "phq9_total",
+            "type": "total",
+            "label": "PHQ-9 九题总分",
+            "description": "九道症状题分别按 0–3 计分，完整作答时直接相加，范围为 0–27。答满六题、未答满九题时，按已答题均分推算九题总分并标为估算。少于六题时不计算。最后的功能困难题单独保留。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "aggregation": "sum",
+              "items": [
+                {
+                  "itemCode": "PHQ9_1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_5",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_6",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_7",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_8",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "PHQ9_9",
+                  "weight": 1
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "phq9_total"
+        ],
+        "scoreOrder": [
+          "phq9_total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "phq9_total",
+            "headline": "回顾近两周的记录",
+            "source": {
+              "type": "score_only"
+            },
+            "bands": [],
+            "summary": "九道题记录近两周出现过哪些感受、出现得多频繁。生活功能补充题进一步了解这些感受对工作、家务或与人相处的影响。负责专业人员可把结果和当事人的日常经历放在一起理解。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "在有人提供专业支持的场合，可以从最近最影响日常生活的一件变化谈起。这能帮助双方具体了解当前需要的支持。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "九道症状题分别按 0–3 计分，完整作答时直接相加，范围为 0–27。答满六题、未答满九题时，按已答题均分推算九题总分并标为估算。少于六题时不计算。最后的功能困难题单独保留。",
+          "DC/TMD 评分手册中的 5、10、15、20 为专业参考点。本研究候审核心为连续分，无本地常模或自动个人分档。",
+          "研究项目应在采用本问卷前安排专业人员独立查看第 9 题并按当地流程跟进。单个题目或总分不足以判断风险程度。"
+        ],
+        "disclaimer": "供有专业支持的研究后台审阅。页面无实时人员值守。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "mental_health",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "references": [],
+    "goldenCases": [
+      {
+        "name": "zero_function_skipped",
+        "answers": [
+          {
+            "itemCode": "PHQ9_1",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_2",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_3",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_4",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_5",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_6",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_7",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_8",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "PHQ9_9",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phq9_total": 0
+          },
+          "totalScoreKeys": [
+            "phq9_total"
+          ]
+        }
+      },
+      {
+        "name": "one_function_high",
+        "answers": [
+          {
+            "itemCode": "PHQ9_1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_3",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_4",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_5",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_6",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_7",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_8",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_9",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_FUNCTION",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phq9_total": 9
+          },
+          "totalScoreKeys": [
+            "phq9_total"
+          ]
+        }
+      },
+      {
+        "name": "three_function_low",
+        "answers": [
+          {
+            "itemCode": "PHQ9_1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_3",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_4",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_5",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_6",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_7",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_8",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_9",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "PHQ9_FUNCTION",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phq9_total": 27
+          },
+          "totalScoreKeys": [
+            "phq9_total"
+          ]
+        }
+      },
+      {
+        "name": "three_missing_prorate",
+        "answers": [
+          {
+            "itemCode": "PHQ9_1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_3",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_4",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PHQ9_5",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "PHQ9_6",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "limited",
+          "scores": {
+            "phq9_total": 13.5
+          },
+          "totalScoreKeys": [
+            "phq9_total"
+          ]
+        }
+      },
+      {
+        "name": "four_missing_no_score",
+        "answers": [
+          {
+            "itemCode": "PHQ9_1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_3",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_4",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "PHQ9_5",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "phq9_total": null
+          },
+          "totalScoreKeys": [
+            "phq9_total"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,195 @@
+{
+  "toolKey": "hse_msit_zh_cn",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.1-adult-illustrated",
+  "title": "把工作条件放在桌面上",
+  "report": {
+    "reportVersion": "1.3.1-adult-illustrated",
+    "primaryScoreKeys": [
+      "demands",
+      "control",
+      "managerial_support",
+      "peer_support",
+      "relationships",
+      "role",
+      "change"
+    ],
+    "scoreOrder": [
+      "demands",
+      "control",
+      "managerial_support",
+      "peer_support",
+      "relationships",
+      "role",
+      "change"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "demands",
+        "headline": "工作量要和可用时间放在一起看",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "任务数量、速度、休息时机和不易兼顾的要求，都可能让工作显得拥挤。这个维度越高，表示你在回顾期内报告这些困难相对较少。\n\n比如，同一天多了两件急事，原计划中的工作仍要求按时交付，连休息都被挤掉。回顾是哪几个要求同时出现，往往比只记录“今天很累”更有信息。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "environment",
+            "text": "找一个经常重叠的任务组合，记录各自时限和可用时间。条件允许时，与能安排工作的人核对优先次序，看看哪一项可以延后或分担。"
+          }
+        ],
+        "scoreLabel": "工作要求（1–5 分均分）"
+      },
+      {
+        "scoreKey": "control",
+        "headline": "在现有安排里找得到的选择",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这个维度关注你在速度、方法、顺序和休息等方面能否作一些实际选择。较高分数表示报告较多有选择的空间。\n\n同样是一项限时工作，有时可以决定先做哪一部分，也可能需要全程遵循固定步骤。两种场景的任务相同，可协商的空间并不一样。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "environment",
+            "text": "标出一件你可以自行安排的事和一件需要协商的事。先从可以明确边界的那一步着手，例如争取一段少被打断的工作时间。"
+          }
+        ],
+        "scoreLabel": "工作自主空间（1–5 分均分）"
+      },
+      {
+        "scoreKey": "managerial_support",
+        "headline": "需要的支持能不能及时到位",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这里记录能否得到有用的反馈、鼓励以及处理棘手问题时的帮助。结果描述你接触到的支持条件和体验。\n\n当两项要求约在同一时间，协调优先次序可能就是当下最需要的帮助。具体反馈与安排资源也分别解决不同的问题。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "把需要说具体，例如某项决定、一次反馈或谁负责协调何事。选择合适渠道；担心后果时，可以先向可信的支持者了解可行选项。"
+          }
+        ],
+        "scoreLabel": "管理者支持（1–5 分均分）"
+      },
+      {
+        "scoreKey": "peer_support",
+        "headline": "遇到难处，手边有没有可以接力的人",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这里回顾同事是否会帮忙、倾听和尊重彼此。较高均分表示比较常感到有同事支持；轮班、人员和分工也会影响互助机会。\n\n一位同事愿意听你梳理一个难题，另一位帮你接过一项限时任务。这些支持的形式不一样，都值得准确说出来。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "找一个边界清楚、双方都可以说不的小协作，例如约定忙时的交接办法。若限制来自持续的人手不足，可以把安排问题交给有权协调的人处理。"
+          }
+        ],
+        "scoreLabel": "同事支持（1–5 分均分）"
+      },
+      {
+        "scoreKey": "relationships",
+        "headline": "问卷平均分只能记录一部分经历",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "关系分记录你报告的紧张、冲突、不当对待等体验。较高均分表示这些经历在作答中相对较少；一次严重经历仍值得认真对待。\n\n多数日子相处顺畅，也可能有一件让人感到不安全的事。一个均分无法说明事件怎样发生，也无法决定需要什么支持。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "如果发生不当对待，优先考虑安全，选择可信或合适的组织支持渠道。可以先了解对方如何处理保密和后续，再决定愿意分享哪些信息。"
+          }
+        ],
+        "scoreLabel": "工作人际关系（1–5 分均分）"
+      },
+      {
+        "scoreKey": "role",
+        "headline": "把职责、目标和优先顺序说清楚",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这里看工作要求和职责分工是否清楚，也包括你能否了解自己的工作和所在团队目标有什么关系。\n\n两个负责人都把各自的任务列为最优先时，关键往往是缺一个明确的定夺渠道。问题写清楚之后，才知道应该请谁澄清。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "environment",
+            "text": "对一件容易说不清的任务确认四个信息：交付内容、期限、负责人和需求冲突时的决策者。必要时请相关人确认同一版安排。"
+          }
+        ],
+        "scoreLabel": "角色清晰（1–5 分均分）"
+      },
+      {
+        "scoreKey": "change",
+        "headline": "变化怎样发生，有没有地方问清楚",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这个维度关注工作变化发生时，能否提问、能否参与讨论，以及能否了解怎么落实。题目反映的是沟通与参与条件。\n\n知道“下周流程会变”和知道“从哪天起由谁负责、遇到情况找谁”提供的信息不同。前者是通知，后者才让安排可以落实。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "environment",
+            "text": "记下最影响工作的一个具体问题，可从时间、分工或过渡方式中选择。通过合适渠道确认，保留暂时说不清的部分。"
+          }
+        ],
+        "scoreLabel": "变动沟通（1–5 分均分）"
+      }
+    ],
+    "limitations": [
+      "七项分别取 1–5 分均分，越高表示自述的条件相对有利。每项题组答全才计算该项，回顾范围是过去六个月。七项各自呈现。",
+      "这份报告供本人整理经历。HSE 原组织流程使用匿名组级结果，并结合员工讨论和其他证据评估工作场所条件。",
+      "简体中文题本为工作译稿，专家译审与本地效度仍待完成。",
+      "来源为英国健康与安全执行局 HSE 的公开量表材料，遵从 Open Government Licence 的署名要求。"
+    ],
+    "disclaimer": "用于回顾自己的工作条件。同事之间可以有不同经历，个人均分无法代表部门、单位或学校。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "hse_msit_zh_cn/1.0.1/1.3.1-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.1-adult-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

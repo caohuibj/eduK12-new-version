@@ -1,0 +1,86 @@
+{
+  "toolKey": "hse_peer_support_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.1-adult-illustrated",
+  "title": "遇到难处，手边有没有可以接力的人",
+  "report": {
+    "reportVersion": "1.3.1-adult-illustrated",
+    "primaryScoreKeys": [
+      "peer_support"
+    ],
+    "scoreOrder": [
+      "peer_support"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "peer_support",
+        "headline": "遇到难处，手边有没有可以接力的人",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这里回顾同事是否会帮忙、倾听和尊重彼此。较高均分表示比较常感到有同事支持；轮班、人员和分工也会影响互助机会。\n\n一位同事愿意听你梳理一个难题，另一位帮你接过一项限时任务。这些支持的形式不一样，都值得准确说出来。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "找一个边界清楚、双方都可以说不的小协作，例如约定忙时的交接办法。若限制来自持续的人手不足，可以把安排问题交给有权协调的人处理。"
+          }
+        ],
+        "scoreLabel": "同事支持（1–5 分均分）"
+      }
+    ],
+    "limitations": [
+      "回顾范围为过去六个月。该组共 4 题，答全才计算 1–5 分均分。较高分数表示自述条件相对更有利。",
+      "这组题可单独用于个人回顾。HSE 组织级风险评估基于匿名组级结果、员工讨论和其他资料。",
+      "简体中文为工作译稿。来源为英国健康与安全执行局 HSE 的公开量表材料，遵从 Open Government Licence 的署名要求。"
+    ],
+    "disclaimer": "用于回顾工作条件和讨论支持需要。个人均分无法代表部门或学校，也不能用于个人绩效评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "hse_peer_support_zh_cn/1.0.0/1.3.1-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.1-adult-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

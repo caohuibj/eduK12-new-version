@@ -1,0 +1,93 @@
+{
+  "toolKey": "wihic_cooperation_actual_zh_cn_lower_secondary_student",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student-illustrated",
+  "title": "WIHIC｜把不同的做法放到一张桌上｜中文试用版｜图文版",
+  "report": {
+    "reportVersion": "1.1.0-student-illustrated",
+    "primaryScoreKeys": [
+      "cooperation"
+    ],
+    "scoreOrder": [
+      "cooperation"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "cooperation",
+        "headline": "分工以后，记得把想法拼起来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "小组里一个人查资料、一个人画图、另一个人想到了反例。等每个人都说清楚自己的发现，作品就有机会融合不同的思路。\n\n这组回答描述你在作业、课堂活动和项目里与同学一起做事、分享资源、互相学习的经历。分到一组只是开始，大家能否一起解决问题，还受任务设计和角色安排影响。\n\n小组中有人的草图、有人的观察和别人的反例。互相说一遍各自为什么这样做，作品才更容易把几个人的发现连起来。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "下次小组活动留一分钟，请每个人说一句自己的发现和一句仍想问的问题，然后再决定怎样合到一起。"
+          },
+          {
+            "category": "support",
+            "text": "如果分工容易落在一两个人身上，可以请老师帮助换一种分配角色或交流的方式。"
+          }
+        ],
+        "scoreLabel": "同伴合作（1–5 平均）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "© Barry J. Fraser 2023。原题及五级频率选项来自 2023 年论文附录 A 表 A1（第 7–8 页）。采用 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。来源：https://doi.org/10.3390/educsci13030257。项目改动包括简体中文直译、依原有七维分开呈现、独立作答说明、完整作答时算术均分以及供学生反思的反馈。",
+      "这一组分数是你对同一门课八道题的平均回答，范围是 1 到 5。需答全八题才会计算分数。",
+      "请结合自己的课堂经历来理解。每个分册单独显示结果，供个人反思，没有常模、分档或跨分册总分。",
+      "本译稿供能理解简体中文的初中七至九年级、12 至 15 岁学生试用。使用范围来自项目设定。译校、理解访谈和本地验证尚待开展。",
+      "这套题直接译自 Fraser 2023 附录 A 的 56 项实际课堂版。请与 2026 年发表的中国学生 52 项修订版分别识别。"
+    ],
+    "disclaimer": "中文试用版。记录你在这门课的体验，供个人反思。遇到困扰时，无论分数是多少，都可以向信任的成年人求助。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "wihic_cooperation_actual_zh_cn_lower_secondary_student/1.0.0/1.1.0-student-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

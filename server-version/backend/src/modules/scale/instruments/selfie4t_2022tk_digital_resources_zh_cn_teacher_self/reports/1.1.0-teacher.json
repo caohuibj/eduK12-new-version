@@ -1,0 +1,163 @@
+{
+  "toolKey": "selfie4t_2022tk_digital_resources_zh_cn_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "SELFIEforTEACHERS｜怎样挑到能帮上忙的数字资源｜中文试用版",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "primaryScoreKeys": [
+      "competence_2_1",
+      "competence_2_2",
+      "competence_2_3",
+      "competence_2_4",
+      "competence_2_5"
+    ],
+    "scoreOrder": [
+      "competence_2_1",
+      "competence_2_2",
+      "competence_2_3",
+      "competence_2_4",
+      "competence_2_5"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_2_1",
+        "headline": "先写用途，再搜索",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "好用的资源经常藏在第二轮搜索里。第一轮帮你看见有什么，第二轮才根据学生和课堂目标缩小范围。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "课前写下一个资源用途、两个筛选标准，比较两个来源后记录选择理由。"
+          }
+        ],
+        "scoreLabel": "查找和选择资源（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_2_2",
+        "headline": "学生用过一次，才知道设计是否顺手",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一个交互漂亮的材料，也可能让学生花太多时间找按键。制作数字资源时，先做够一小段，上手试用就能得到改版线索。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "完成一个短活动，请同事或几位学生试一遍，观察他们在哪一步停留最久。"
+          }
+        ],
+        "scoreLabel": "制作资源（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_2_3",
+        "headline": "改编时问两件事：能不能改，改来做什么",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "给资源换个版式很快。真正值得改的是那些会改变学生理解和参与方式的部分，并且要清楚来源和许可。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "选一份明确允许改编的资源，只改一处与课堂目标有关的内容，保留作者、来源与许可标注。"
+          }
+        ],
+        "scoreLabel": "改编资源（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_2_4",
+        "headline": "资料找得到，也要只让该看的人看到",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "整理规则、访问权限和备份方式是同一件事的三个部分。目录安排得再好，权限开错了，资料也无法放心使用。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "请一位合适的同事按权限测试一次你的资料目录，核对命名、查看权限和恢复备份的方式。"
+          }
+        ],
+        "scoreLabel": "管理和保护资源（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_2_5",
+        "headline": "让收到资源的人知道怎么接着用",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一份共享材料加上作者、适用场景和许可，比孤零零一个附件更方便接力。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "分享下一份材料时附上作者和来源、准许的使用方式，以及你在哪种课堂里用过。"
+          }
+        ],
+        "scoreLabel": "共享资源（自评描述，0–6）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "© European Union 2022（Toolkit JRC129699）及 2023（计分说明 JRC131282），作者 Anastasia Economou。欧盟拥有版权的原文按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）改编。本项目改动为简体中文直译、拆分六个领域、自编作答说明与反馈，并采用整领域缺答处理。各题的 A1 至 C2 均来自 2022 年工具包，含 2023 年报告第 4 章未列的第 6.5 题 B2。材料不包含欧盟标识、徽章、截图、第三方图片或软件。欧盟未对本译稿背书。",
+      "每项能力分别报告。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。 未选择任何选项保留为缺答，整份未完成时不生成解读。本工具不提供领域总分、常模、百分位或达标判定。",
+      "适用于理解简体中文的成年中小学教师。本文是 2022 年固定工具包的项目试用译稿。尚未完成专家译校、理解访谈或本地测量验证，六个拆分领域也未单独验证。",
+      "结果反映教师对当前实践的自我描述。请结合任教情境反思，不用于教学能力评定、教师考核或群体比较。"
+    ],
+    "disclaimer": "中文试用版。结果帮助教师回看做法、选定下一步专业学习，不用于考核、认定或证书。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

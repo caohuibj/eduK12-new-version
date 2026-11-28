@@ -1,0 +1,183 @@
+{
+  "toolKey": "selfie4t_2022tk_learners_digital_competence_zh_cn_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher-illustrated",
+  "title": "SELFIEforTEACHERS｜带学生在数字世界里练一遍｜中文试用版｜图文版",
+  "report": {
+    "reportVersion": "1.1.0-teacher-illustrated",
+    "primaryScoreKeys": [
+      "competence_6_1",
+      "competence_6_2",
+      "competence_6_3",
+      "competence_6_4",
+      "competence_6_5",
+      "competence_6_6"
+    ],
+    "scoreOrder": [
+      "competence_6_1",
+      "competence_6_2",
+      "competence_6_3",
+      "competence_6_4",
+      "competence_6_5",
+      "competence_6_6"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_6_1",
+        "headline": "给一个网上说法找证据",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "搜索结果的第一条往往只是最先看见的。学生能说清来源、比较证据，才有依据决定该相信到什么程度。\n\n内容做得好看，很容易被记住。说清来源、核对日期和判断证据适用范围，能帮学生决定是否继续传播。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "让学生为同一说法寻找相互独立的来源，在并排展示旁边写出“现在能确定什么”和“还差什么”。"
+          }
+        ],
+        "scoreLabel": "信息与数据素养（试用版，自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_6_2",
+        "headline": "让线上互动有一套大家知道的做法",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "在线留言少了语气和表情，团队里的小误会可能很快放大。简单、共同认可的沟通约定，可以让讨论继续。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "让学生一起定四条合作规则，包括怎样提出异议、怎样回应同伴和怎样在文档里留下自己的贡献。"
+          }
+        ],
+        "scoreLabel": "数字沟通与协作（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_6_3",
+        "headline": "做出作品，也说清哪些材料来自别人",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "数字创作很适合试错和共创。公开展示时，学生也能练习说明自己的创意和来源，尊重已有作品。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "让每份作品附一项“制作说明”，请学生写出自己做的部分、引用材料和署名许可。"
+          }
+        ],
+        "scoreLabel": "数字内容创作（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_6_4",
+        "headline": "先练习怎么求助，人遇到风险时才用得上",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "学生知道一个风险的名字，遇上它时仍可能手足无措。预先练习停止互动、保存必要信息和向可信的人求助，更便于行动。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "用一个适龄的虚构情境，让学生练习保护隐私、退出互动和选择合适的求助途径。"
+          }
+        ],
+        "scoreLabel": "安全与身心福祉（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_6_5",
+        "headline": "为公开发布多留一道思考",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一条内容会留下足迹，也可能被放到你没想到的场合。思考观众是谁、别人的信息能否发布，是管理数字身份的一部分。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "让学生用虚构账号练习检查一条帖子，明确受众、隐私、署名和分享后可能产生的影响。"
+          }
+        ],
+        "scoreLabel": "负责任地使用数字技术（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_6_6",
+        "headline": "让学生看见两种解法可以怎么比",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "选工具有时比用工具更难。学生先说清问题、列出试法和比较规则，数字工具才能帮助他们看出结果有什么差别。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "给一个贴近学校生活的小问题，让小组选两种方案实验，并按共同的标准说明取舍。"
+          }
+        ],
+        "scoreLabel": "解决问题（自评描述，0–6）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "© European Union 2022（Toolkit JRC129699）及 2023（计分说明 JRC131282），作者 Anastasia Economou。欧盟拥有版权的原文按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）改编。本项目改动为简体中文直译、拆分六个领域、自编作答说明与反馈，并采用整领域缺答处理。各题的 A1 至 C2 均来自 2022 年工具包，含 2023 年报告第 4 章未列的第 6.5 题 B2。材料不包含欧盟标识、徽章、截图、第三方图片或软件。欧盟未对本译稿背书。",
+      "每项能力分别报告。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。 未选择任何选项保留为缺答，整份未完成时不生成解读。本工具不提供领域总分、常模、百分位或达标判定。",
+      "适用于理解简体中文的成年中小学教师。本文是 2022 年固定工具包的项目试用译稿。尚未完成专家译校、理解访谈或本地测量验证，六个拆分领域也未单独验证。",
+      "结果反映教师对当前实践的自我描述。请结合任教情境反思，不用于教学能力评定、教师考核或群体比较。"
+    ],
+    "disclaimer": "中文试用版。结果帮助教师回看做法、选定下一步专业学习，不用于考核、认定或证书。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "selfie4t_2022tk_learners_digital_competence_zh_cn_teacher_self/1.0.0/1.1.0-teacher-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

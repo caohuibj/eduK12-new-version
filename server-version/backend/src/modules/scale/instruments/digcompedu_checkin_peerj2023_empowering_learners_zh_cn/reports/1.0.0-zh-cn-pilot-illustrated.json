@@ -1,0 +1,95 @@
+{
+  "toolKey": "digcompedu_checkin_peerj2023_empowering_learners_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.0.0-zh-cn-pilot-illustrated",
+  "title": "支持学生学习｜高校教师自评报告（试用版）｜图文版",
+  "report": {
+    "reportVersion": "1.0.0-zh-cn-pilot-illustrated",
+    "primaryScoreKeys": [
+      "empowering_learners"
+    ],
+    "scoreOrder": [
+      "empowering_learners"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "empowering_learners",
+        "headline": "给同一个任务留几种入口",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一部分关注学生面对数字任务时能否顺利入手，是否有适合自己的学习机会，以及他们有没有参与讨论和探索的空间。同一个任务可以有不同的参与方式。看一项设计是否有效，可以问学生怎样理解要求、在哪里遇到困难、用哪种方式更能展示自己的理解。\n\n把需要学习的内容说清楚，同时允许用提纲、语音或图示呈现，学生更有机会把真实理解带进来。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "发布数字作业前，试一遍学生用手机能否打开和提交。若任务允许，可同时提供清楚的文字版和一种低带宽的完成方式。"
+          },
+          {
+            "category": "strategy",
+            "text": "让两名学生分别用不同设备走一遍同一个任务；先修进入任务或提交成果时卡住的一步。"
+          },
+          {
+            "category": "environment",
+            "text": "给课堂视频留一个暂停讨论点。先请学生自己写下看法，再比较彼此使用了哪些证据。"
+          }
+        ],
+        "scoreLabel": "支持学生学习合计分（试用版，0–12 分）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "所得分数是这一部分的原始合计分。现有证据不足以据此给出分档、判定 A1–C2 等级，或和其他教师作比较。",
+      "本报告供高校教师回顾个人教学实践。工作职责、技术条件和学生需求都可能影响选项。",
+      "中文为 EDUK12 根据 PeerJ 2024 高校教师英文问卷所做的试译。尚无中文版或分区单独施测的本地验证数据。"
+    ],
+    "disclaimer": "结果可用于个人教学反思。请勿将其用于诊断、教师绩效、学校排名或跨群体比较。缺答时本题区没有合计分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "digcompedu_checkin_peerj2023_empowering_learners_zh_cn/1.0.0/1.0.0-zh-cn-pilot-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-zh-cn-pilot-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": true
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

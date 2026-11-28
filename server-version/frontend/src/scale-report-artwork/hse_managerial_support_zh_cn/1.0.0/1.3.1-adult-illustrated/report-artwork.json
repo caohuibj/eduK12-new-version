@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "hse_managerial_support_zh_cn/1.0.0/1.3.1-adult-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "两位成人在工作桌旁，一边看材料一边商量下一步。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

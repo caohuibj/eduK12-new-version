@@ -1,0 +1,86 @@
+{
+  "toolKey": "wibps7_adolescent_zh_cn_context_pilot",
+  "contentVersion": "1.1.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-context-pilot-illustrated",
+  "title": "中文情境试用报告｜图文版",
+  "report": {
+    "reportVersion": "1.3.0-context-pilot-illustrated",
+    "primaryScoreKeys": [
+      "while_in_bed_procrastination"
+    ],
+    "scoreOrder": [
+      "while_in_bed_procrastination"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "while_in_bed_procrastination",
+        "headline": "上了床，给今天找个舒服的结束点",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "上床后，也许你想看一会儿视频、听一首歌，或者回完一条消息再睡。7 题总分为 7–35 分，分数越高，表示你报告这些活动发生得越频繁。这个分数记录的是活动频率。听歌有时能让人放松，回消息也可能有现实需要。想知道什么真的影响了自己的作息，可以从最常做、又经常比预想结束得晚的一件事开始观察。\n\n上床后的活动频率可以提醒你观察习惯。真正在睡前发生了什么，还要看这些活动持续多久、当晚是否原本就难以收尾。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想想最近一次上床后的安排。哪件事有清楚的结束点？哪件事常常再接上一轮？"
+          },
+          {
+            "category": "strategy",
+            "text": "选一个常让你晚一点合眼的情境，只试一项改变，例如看完当前这集就退出或把聊天留到第二天，并回看两三晚的体验。"
+          },
+          {
+            "category": "support",
+            "text": "如果功课、排班或照顾家人的安排经常挤占休息，可以和相关的人一起找一段更可行的休息时间。"
+          }
+        ],
+        "provisional": true,
+        "scoreLabel": "上床后活动频率总分（试用）"
+      }
+    ],
+    "limitations": [
+      "本次给出 15–20 岁情境试用版原始总分。尚无本中文版的本地常模或界值。",
+      "总分不记录实际晚睡的分钟数、睡眠质量或入睡困难，不能用于诊断。7 题齐答才计算总分。"
+    ],
+    "disclaimer": "这份报告用来回顾入睡前的习惯，适合和实际作息一起理解。中文情境版仍处于试用阶段。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "wibps7_adolescent_zh_cn_context_pilot/1.1.0/1.3.0-context-pilot-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-context-pilot-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      }
+    }
+  }
+}

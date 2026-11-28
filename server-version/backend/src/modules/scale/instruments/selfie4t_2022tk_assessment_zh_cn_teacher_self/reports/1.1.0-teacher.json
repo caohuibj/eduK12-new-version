@@ -1,0 +1,125 @@
+{
+  "toolKey": "selfie4t_2022tk_assessment_zh_cn_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "SELFIEforTEACHERS｜让反馈赶得上下一次尝试｜中文试用版",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "primaryScoreKeys": [
+      "competence_4_1",
+      "competence_4_2",
+      "competence_4_3"
+    ],
+    "scoreOrder": [
+      "competence_4_1",
+      "competence_4_2",
+      "competence_4_3"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_4_1",
+        "headline": "想看见学生推理，就给他们说理由的机会",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "同一道在线选择题，只有选项可以统计对错，补上一句“你用了哪条线索”就多了一份能指导备课的证据。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "先写一句“我需要知道学生是否会……”，再决定要收集的证据和看完结果后怎么做。"
+          }
+        ],
+        "scoreLabel": "评价策略（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_4_2",
+        "headline": "图表指出哪里值得看，作品帮助解释原因",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "提交偏少可能和网络有关，错误答案有时能显示学生正卡在哪个想法上。具体作业能帮助你判断图表里的模式从何而来。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "选一个数字结果里的模式，看看有不同表现的几份学生作品，再决定下一步教学。"
+          }
+        ],
+        "scoreLabel": "分析学习证据（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_4_3",
+        "headline": "给学生一次用上反馈的机会",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "写得清楚的反馈也可能沉入通知列表。学生能看到它针对哪一处、可以怎么动手、何时有机会重试，才有可能产生改变。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "指出作品里的一个具体问题，约出第二次尝试的时间，回看反馈在哪一处发挥了作用。"
+          }
+        ],
+        "scoreLabel": "反馈和后续计划（自评描述，0–6）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "© European Union 2022（Toolkit JRC129699）及 2023（计分说明 JRC131282），作者 Anastasia Economou。欧盟拥有版权的原文按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）改编。本项目改动为简体中文直译、拆分六个领域、自编作答说明与反馈，并采用整领域缺答处理。各题的 A1 至 C2 均来自 2022 年工具包，含 2023 年报告第 4 章未列的第 6.5 题 B2。材料不包含欧盟标识、徽章、截图、第三方图片或软件。欧盟未对本译稿背书。",
+      "每项能力分别报告。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。 未选择任何选项保留为缺答，整份未完成时不生成解读。本工具不提供领域总分、常模、百分位或达标判定。",
+      "适用于理解简体中文的成年中小学教师。本文是 2022 年固定工具包的项目试用译稿。尚未完成专家译校、理解访谈或本地测量验证，六个拆分领域也未单独验证。",
+      "结果反映教师对当前实践的自我描述。请结合任教情境反思，不用于教学能力评定、教师考核或群体比较。"
+    ],
+    "disclaimer": "中文试用版。结果帮助教师回看做法、选定下一步专业学习，不用于考核、认定或证书。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

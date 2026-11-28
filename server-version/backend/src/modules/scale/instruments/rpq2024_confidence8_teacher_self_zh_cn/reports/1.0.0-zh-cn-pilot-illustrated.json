@@ -1,0 +1,95 @@
+{
+  "toolKey": "rpq2024_confidence8_teacher_self_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.0.0-zh-cn-pilot-illustrated",
+  "title": "RPQ｜专业自信自评报告（试用版）｜图文版",
+  "report": {
+    "reportVersion": "1.0.0-zh-cn-pilot-illustrated",
+    "primaryScoreKeys": [
+      "confidence8"
+    ],
+    "scoreOrder": [
+      "confidence8"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "confidence8",
+        "headline": "把讲清楚这件事交给听者验证",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一部分关注与学生交流时，你多常感到自己有经验、技能和知识，能够把意思讲清楚。熟悉的情境和新任务带来的感受可能不同。自信可以让人更愿意尝试。再借助学生的复述或几份真实作业，你也能知道哪里已经讲清楚，哪里还需要换种说法。\n\n面对熟悉的课堂有把握，遇到新课程或很少碰到的沟通场景也可能需要准备。自评保留的是当时的感受。",
+        "provisional": true,
+        "scoreLabel": "专业自信平均分（试用版，1–6 分）",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一项容易被误解的要求，准备一个符合要求和一个容易出错的例子。先请学生说说两者差在哪儿。"
+          },
+          {
+            "category": "strategy",
+            "text": "选一次关键说明，请一位学生用自己的话复述要求。根据漏掉的一点，替换原来的一个例子或一句指令。"
+          },
+          {
+            "category": "support",
+            "text": "遇到陌生情境时，先列出自己已经掌握的做法，以及希望同事帮你确认的一件事。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这里的分数是 8 道题的平均值，范围为 1–6 分。分数越高，表示本次自述更常感到准备充分或对沟通有信心。",
+      "中文版目前用于试用，缺少本地常模和独立施测验证。报告提供个人反思建议，分数没有划分等级。",
+      "近期工作安排、时间资源和获得的支持，都会影响本次作答。请结合自己的实际处境理解结果。"
+    ],
+    "disclaimer": "供教师个人回顾工作体验。请勿将此结果用于临床判断、教师绩效、学校排名或跨群体比较。缺答时不计算平均分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "rpq2024_confidence8_teacher_self_zh_cn/1.0.0/1.0.0-zh-cn-pilot-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-zh-cn-pilot-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

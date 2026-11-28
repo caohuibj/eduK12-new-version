@@ -1,0 +1,94 @@
+{
+  "toolKey": "digcompedu_checkin_peerj2023_digital_resources_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.0.0-zh-cn-pilot",
+  "title": "数字资源｜高校教师自评报告（试用版）",
+  "report": {
+    "reportVersion": "1.0.0-zh-cn-pilot",
+    "primaryScoreKeys": [
+      "digital_resources"
+    ],
+    "scoreOrder": [
+      "digital_resources"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "digital_resources",
+        "headline": "好资源要经得起三问",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一部分问的是你如何找资源、改资源、保护敏感内容。判断一份材料能不能用，可以问三个问题：它从哪里来？学生能顺利使用吗？分享它会不会把不该公开的信息一起带出去？一份朴素、清楚又合适的材料，常比功能复杂的资源更有用。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "下次挑材料时，先看发布者和更新时间，再用学生最常用的设备打开一次。需要登录、字号太小或加载很慢，都可能让学生中途放弃。"
+          },
+          {
+            "category": "strategy",
+            "text": "改编一份讲义，从学生最容易卡住的一处入手，例如给操作步骤补一张示例。保留原作者和来源信息。"
+          },
+          {
+            "category": "environment",
+            "text": "把示例资料和真实数据分开。试卷、成绩和含个人信息的文件，存放在学校认可的受控位置，分享前核对权限。"
+          }
+        ],
+        "scoreLabel": "数字资源合计分（试用版，0–12 分）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "所得分数是这一部分的原始合计分。现有证据不足以据此给出分档、判定 A1–C2 等级，或和其他教师作比较。",
+      "本报告供高校教师回顾个人教学实践。工作职责、技术条件和学生需求都可能影响选项。",
+      "中文为 EDUK12 根据 PeerJ 2024 高校教师英文问卷所做的试译。尚无中文版或分区单独施测的本地验证数据。"
+    ],
+    "disclaimer": "结果可用于个人教学反思。请勿将其用于诊断、教师绩效、学校排名或跨群体比较。缺答时本题区没有合计分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-zh-cn-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

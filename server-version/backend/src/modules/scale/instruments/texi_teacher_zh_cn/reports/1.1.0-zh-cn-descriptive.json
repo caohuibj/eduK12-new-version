@@ -1,0 +1,125 @@
+{
+  "toolKey": "texi_teacher_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-zh-cn-descriptive",
+  "title": "英文题本｜教师观察简中报告",
+  "report": {
+    "reportVersion": "1.1.0-zh-cn-descriptive",
+    "artworkKey": "texi_teacher_zh_cn/1.0.0/1.1.0-zh-cn-descriptive",
+    "primaryScoreKeys": [
+      "working_memory",
+      "inhibition"
+    ],
+    "scoreOrder": [
+      "working_memory",
+      "inhibition",
+      "total_mean"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "working_memory",
+        "scoreLabel": "工作记忆均分",
+        "headline": "让课堂指令和任务顺序随时可回看",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这 9 道题记录您观察到的记住要求、安排多步任务和计划活动的困难。均分在 1–5 分之间，越高表示本次教师观察到的困难越多。比较口头说明、板书步骤和示范后独立做三种情境，可以为调整教学提供线索。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一项近期任务，观察学生是还没理解要求，还是已经开始却难以接上下一步。"
+          },
+          {
+            "category": "strategy",
+            "text": "把关键步骤留在板书或任务卡上，先演示第一步，再请学生指认下一步。保留几次课堂观察，了解这种支持在什么条件下方便。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "inhibition",
+        "scoreLabel": "抑制与自我调节均分",
+        "headline": "给课堂切换和开始任务一个清晰信号",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这 11 道题记录您观察到的活动切换、启动、收尾和其他日常自我调节表现。均分越高，表示本次在学校场景中观察到的困难越多。活动结构、环境和支持方式都可能影响学生在不同课堂中的表现。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看一次从小组讨论切换到独立任务的经过，留意开始信号、转换时间和第一步是否足够明确。"
+          },
+          {
+            "category": "environment",
+            "text": "在预告切换时说明下一项任务的首个动作，并指向可见提示。用具体行为变化记录效果。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "total_mean",
+        "scoreLabel": "全题辅助均分",
+        "headline": "先看两个维度，再回顾观察记录",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "旧版平台计算 20 道题的辅助均分，范围为 1–5 分。要理解哪些情境更容易遇到困难，可先分别看工作记忆和抑制与自我调节，再结合一件具体的事情。",
+        "bands": [],
+        "guidance": []
+      }
+    ],
+    "limitations": [
+      "题本使用已登记的英文原文，报告提供简体中文解读。适用年龄依原研究为 13 至 19 岁。",
+      "按作者分表对 9 个工作记忆题和 11 个抑制题分别求 1–5 分均分。平台在对应题组完整作答后计算。",
+      "教师记录只代表您观察到的学校场景。2020 年原始研究采集了青少年和家长报告，教师版结果按本次观察作描述性解释。",
+      "结果用于回顾此次填写或观察。正式诊断、分流和能力等级需要独立评估。作者暂未发布年龄常模或判定界值。"
+    ],
+    "disclaimer": "本报告基于本次教师观察的原始均分，供回顾日常情境和选择可尝试的支持。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "TEACHER_REPORT",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-zh-cn-descriptive",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "scoreDerivedLabels": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "scoreDerivedLabels": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "scoreDerivedLabels": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "scoreDerivedLabels": false,
+        "artwork": true
+      }
+    }
+  }
+}

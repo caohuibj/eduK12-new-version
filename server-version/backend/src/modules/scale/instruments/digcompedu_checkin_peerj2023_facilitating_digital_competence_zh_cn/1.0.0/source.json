@@ -1,0 +1,726 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "digcompedu_checkin_peerj2023_facilitating_digital_competence_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "DigCompEdu Check-In｜培养学生的数字能力｜高校教师自评（简体中文试用版）",
+      "abbreviation": "DCE-CI",
+      "instrumentFamily": "DigCompEdu Check-In｜PeerJ 2024 高校教师问卷（2023-06-02 版）"
+    },
+    "construct": {
+      "primaryDomain": "ENGAGEMENT",
+      "secondaryDomains": [],
+      "constructDefinition": "记录高校教师对自己在培养学生的数字能力方面的数字化实践的描述。使用本题区原始合计分，解读限于个人反思。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:zh-cn",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:facilitating_digital_competence",
+        "localization:direct_translation"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "供高校及成人继续教育中的任课教师自评。英文来源研究以高校健康科学学科教师为样本。当前中文版本尚未完成独立译审和本地验证，分区单独使用亦缺少效度证据。"
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "以目前的教学实践为准。原问卷未指定回顾天数。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "按原问卷题号展示，每题提供五个情境选项，顺序与原版一致。",
+        "完整作答才计算本题区原始合计分，缺答不估分。",
+        "若组合展示六个题区，宜按原问卷 22 题的顺序展示；平台当前仅计算各题区分数。",
+        "答题用时是平台估计。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "适合教师回顾自身实践，并选择一个可在课程中尝试的改进方向。"
+        },
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "可供高校自评方法的探索性研究；独立分区和中文题本尚未验证。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_facilitating_digital_competence_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_facilitating_digital_competence_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_facilitating_digital_competence_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Ersoy 等（2024），PeerJ 12:e18456，https://doi.org/10.7717/peerj.18456。附件 1 收录日期为 2023-06-02 的高校教师英文问卷，见 https://doi.org/10.7717/peerj.18456/supp-1。附件首页注明 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。原始框架由 Redecker, C.（2017）撰写、Punie, Y. 编辑，欧洲委员会联合研究中心（JRC），doi:10.2760/159770。此处为 EDUK12 的简体中文直译和分区改编。EDUK12 对译文负责。欧洲委员会及原作者未审定或认可此译本。",
+      "沿用原题项和评分选项的次序。教育情境说明、拆分后的分数用法、缺答处理和报告由 EDUK12 补写。本项目使用范围为非商业。入口及具体使用授权由平台管理员决定。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "teacher_self_report",
+      "source": {
+        "title": "DigCompEdu Check-In｜培养学生的数字能力｜PeerJ 高校英文题区简体中文试译",
+        "citation": "Ersoy et al. (2024). Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects. PeerJ 12:e18456. https://doi.org/10.7717/peerj.18456 ; Supplemental Information 1, Digital Competency Assessment Questionnaire for Academicians, form timestamp 2023-06-02.",
+        "url": "https://doi.org/10.7717/peerj.18456/supp-1",
+        "publicationYear": 2024
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Ersoy 等（2024），PeerJ 12:e18456，https://doi.org/10.7717/peerj.18456。附件 1 收录日期为 2023-06-02 的高校教师英文问卷，见 https://doi.org/10.7717/peerj.18456/supp-1。附件首页注明 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）。原始框架由 Redecker, C.（2017）撰写、Punie, Y. 编辑，欧洲委员会联合研究中心（JRC），doi:10.2760/159770。此处为 EDUK12 的简体中文直译和分区改编。EDUK12 对译文负责。欧洲委员会及原作者未审定或认可此译本。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "item_18",
+          "options": [
+            {
+              "value": "0",
+              "label": "在我的学科或工作环境中，无法开展这项教学。",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "我偶尔提醒学生，网上的信息并非都可靠。",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "我教学生辨别可靠和不可靠的信息来源。",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "我和学生讨论如何核实信息是否准确。",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "我们会全面讨论信息是怎样产生的，又可能如何被歪曲。",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "key": "item_19",
+          "options": [
+            {
+              "value": "0",
+              "label": "在我的学科或工作环境中，无法这样做。",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "我很少要求学生在线交流或合作。",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "学生主要在同学之间使用数字渠道交流合作。",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "学生既通过数字渠道在同学之间交流合作，也会与课堂之外的受众交流合作。",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "我有计划地设计这类作业，帮助学生逐步拓展交流合作能力。",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "key": "item_20",
+          "options": [
+            {
+              "value": "0",
+              "label": "在我的学科或工作环境中，无法这样做。",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "对我所教的学生来说，这样做较难落实。",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "我偶尔安排这类任务，让课堂更有变化，也让学生更有兴趣。",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "制作数字内容是学生日常学习的一部分。",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "制作数字内容是学习的有机组成部分，我会有计划地提高任务难度，帮助学生继续发展这项能力。",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "key": "item_21",
+          "options": [
+            {
+              "value": "0",
+              "label": "在我的学科或工作环境中，无法开展这项教学。",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "我提醒学生，在网上转发或透露个人信息时要谨慎。",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "我讲解在网络环境中安全、负责地行动所需的基本规则。",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "我们会一起讨论并约定网络行为规则。",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "我有计划地培养学生在我们使用的不同数字环境中遵守交往规则的能力。",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "key": "item_22",
+          "options": [
+            {
+              "value": "0",
+              "label": "在我所教的学生和工作环境中，无法这样做。",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "我很少有机会培养学生用数字工具解决问题的能力。",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "有机会时，我偶尔会这样做。",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "我们经常试验用技术解决问题的不同办法。",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "我有计划地在教学中安排机会，让学生创造性地使用数字工具解决问题。",
+              "score": 4
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "DCE_CI_18",
+          "content": "我教学生评估信息是否可靠，并辨别不实信息和偏见。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "item_18",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCE_CI_19",
+          "content": "我会设计作业，要求学生通过数字渠道彼此交流合作，或与课堂以外的受众交流合作。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "item_19",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCE_CI_20",
+          "content": "我会设计作业，要求学生制作数字内容，例如视频、音频、照片、数字演示文稿、博客或维基页面。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "item_20",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCE_CI_21",
+          "content": "我教学生怎样在网上安全、负责地行动。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "item_21",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCE_CI_22",
+          "content": "我鼓励学生创造性地使用数字技术解决具体问题，例如应对学习过程中遇到的障碍或挑战。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "item_22",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "DCE_CI_18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCE_CI_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCE_CI_20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCE_CI_21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCE_CI_22",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "facilitating_digital_competence",
+            "type": "dimension",
+            "label": "培养学生的数字能力合计分",
+            "description": "5 题各按 0–4 分计，直接相加，范围为 0–20 分。得分越高，表示本次选择的做法涉及更多数字技术使用。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DCE_CI_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCE_CI_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCE_CI_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCE_CI_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCE_CI_22",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "facilitating_digital_competence"
+        ],
+        "scoreOrder": [
+          "facilitating_digital_competence"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "facilitating_digital_competence",
+            "headline": "给学生一次练习判断、协作和创作的机会",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一部分问的是你是否给学生机会核实信息、用数字渠道合作、制作内容、安全地参与网络活动，以及尝试用技术解决问题。学生会点击按钮只是起点。通过一次贴近专业的任务，让他们解释为什么相信某条信息、怎样和别人合作、选择的工具解决了什么问题，这些能力才更容易看见。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "找两则对同一事实表述不同的公开材料。让学生标注作者、证据和原始出处，并说明还有哪一点需要核实。"
+              },
+              {
+                "category": "strategy",
+                "text": "请学生用小组作品向一个明确的受众解释专业问题，提前约定署名、隐私和材料使用规则。"
+              },
+              {
+                "category": "environment",
+                "text": "给出一个真实的小难题，例如如何让文件在手机端更好读。请学生试两种做法，记录结果，并说明为什么选其中一种。"
+              }
+            ],
+            "scoreLabel": "培养学生的数字能力合计分（试用版，0–20 分）",
+            "provisional": true
+          }
+        ],
+        "limitations": [
+          "所得分数是这一部分的原始合计分。现有证据不足以据此给出分档、判定 A1–C2 等级，或和其他教师作比较。",
+          "本报告供高校教师回顾个人教学实践。工作职责、技术条件和学生需求都可能影响选项。",
+          "中文为 EDUK12 根据 PeerJ 2024 高校教师英文问卷所做的试译。尚无中文版或分区单独施测的本地验证数据。"
+        ],
+        "disclaimer": "结果可用于个人教学反思。请勿将其用于诊断、教师绩效、学校排名或跨群体比较。缺答时本题区没有合计分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "digcompedu_checkin_peerj2023_facilitating_digital_competence_zh_cn",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_18",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_19",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_20",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_21",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_22",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "facilitating_digital_competence": 0
+          },
+          "totalScoreKeys": [
+            "facilitating_digital_competence"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCE_CI_19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCE_CI_20",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCE_CI_21",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCE_CI_22",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "facilitating_digital_competence": 20
+          },
+          "totalScoreKeys": [
+            "facilitating_digital_competence"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_18",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCE_CI_20",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DCE_CI_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DCE_CI_22",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "facilitating_digital_competence": 10
+          },
+          "totalScoreKeys": [
+            "facilitating_digital_competence"
+          ]
+        }
+      },
+      {
+        "name": "missing_one",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_18",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DCE_CI_19",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DCE_CI_20",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DCE_CI_21",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "facilitating_digital_competence": null
+          },
+          "totalScoreKeys": [
+            "facilitating_digital_competence"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "facilitating_digital_competence": null
+          },
+          "totalScoreKeys": [
+            "facilitating_digital_competence"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请回顾你目前在高校教学中与培养学生的数字能力有关的做法，并考虑这些做法可以怎样发展。每题有五种情境，从较少到较多使用数字技术依次排列。请选最接近你目前做法的一项。完成全部 5 题后可获得本题区的描述分和反思建议。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "参照该英文题区的作答说明翻译；完整作答和结果用途为平台说明。https://doi.org/10.7717/peerj.18456/supp-1"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "https://doi.org/10.7717/peerj.18456/supp-1；沿用 PeerJ 附件英文题区和题目顺序，由 EDUK12 直接翻译。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "按已发表英文题区逐题顺译，保留题干、五个情境选项、选项顺序及评分语义；尚未做独立专家复核、认知访谈或本地样本验证。"
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_facilitating_digital_competence_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "resultQualityDetails": true,
+        "methods": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "resultQualityDetails": true,
+        "methods": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "resultQualityDetails": true,
+        "methods": true
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "resultQualityDetails": true,
+        "methods": true
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

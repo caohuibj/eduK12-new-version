@@ -1,0 +1,886 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "wibps7_adolescent_zh_cn_context_pilot",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 3,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "上床后活动问卷（WIBPS，15–20 岁中文情境试用版）",
+      "abbreviation": "WIBPS-7-ZH",
+      "instrumentFamily": "While-in-Bed Procrastination Scale (7-item 2020 adolescent version)"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "WELL_BEING"
+      ],
+      "constructDefinition": "青少年上床后、入睡前从事七类活动的自报频率，探索上床后推迟睡眠的行为；不直接测量入睡困难、活动耗时或睡眠疾病。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "wibps7_adolescent_zh_cn_research",
+        "domain:self_regulation",
+        "domain:sleep_behavior",
+        "domain:digital_daily_life",
+        "construct:while_in_bed_procrastination",
+        "construct:pre_sleep_activities",
+        "construct:in_bed_media_use",
+        "orientation:behavioral_sleep_procrastination",
+        "orientation:not_therapy_specific",
+        "population:adolescent_15_to_20",
+        "population:source_portuguese_high_school",
+        "population:not_china_validated",
+        "response:7_items",
+        "response:no_reverse_items",
+        "response:shared_stem_expanded_per_item",
+        "response:neutral_midpoint_from_author_table",
+        "use:sleep_habit_reflection",
+        "use:not_insomnia_screen",
+        "language_validation:source_administration_pt",
+        "language_validation:author_published_english_table",
+        "上床后拖延",
+        "入睡前活动",
+        "睡前用手机",
+        "睡前视频",
+        "睡前音乐",
+        "睡前沟通",
+        "青少年自评",
+        "population:self_report",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "response:fixed_order",
+        "response:five_point_frequency",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:not_high_stakes_selection",
+        "use:not_school_ranking",
+        "use:no_validated_cutoff",
+        "license:cc_by_4_0",
+        "license:attribution_required",
+        "license:changes_indicated",
+        "license:source_allows_redistribution",
+        "license:source_allows_adaptation",
+        "license:source_allows_commercial_use",
+        "language_validation:zh_cn_working_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:china_validation_not_established",
+        "中文工作译稿",
+        "个人反思",
+        "非诊断",
+        "可署名再分发",
+        "中文情境试用版",
+        "本地示例",
+        "原始总分"
+      ]
+    },
+    "population": {
+      "minAge": 15,
+      "maxAge": 20,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "葡萄牙高中生400人，15–20岁，原研究葡萄牙语；属于探索性来源研究，不推定中国青少年验证。本平台年龄是暂设使用边界，不是已验证中文版声明。 本次情境改编也没有独立心理测量验证。"
+    },
+    "administration": {
+      "itemCount": 7,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "一般平时习惯；原来源未指定最近7天或30天",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "作者将WIBPS7与BPS8作为两份工具，本包独立保留WIBPS7，不生成两工具混合总分。",
+        "Table2共享句首在每题中完整展开，保留“上床后、入睡前”的情境；没有只塞进第一题或丢掉共享情境。",
+        "原Table2中间频率锚点为Neutral，中文保留“中立”，不擅自替换为“有时”。其在频率问卷中的可理解性待译审/认知访谈。",
+        "原文明确总分7–35，本包7题等权求和。论文另以题均分呈现描述统计，不把2.9当分档界值。",
+        "原来源未给缺失插补规则，本平台保守要求7题齐答；15–20岁范围来自原样本，21岁起不自动放行。",
+        "活动频率不能单独证明每项活动妨碍睡眠，也不能据此诊断失眠或网络使用问题。",
+        "独立指导语通过顶层instruction字段提供，保留七题各自完整的“上床后、入睡前”情境，不拼入第一题。",
+        "完成时间为平台估计，非原作者实测。",
+        "沿用 C1.0.0 的中文工作译稿。第 1 题把原文 YouTube 改为视频平台，保留上床后、入睡前的情境和看视频活动。原始来源是 Magalhães 等（2020）Table 2，https://doi.org/10.3390/ijerph17165892。",
+        "其余题干、选项、题序和计分沿用 C1.0.0。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原研究可追溯；当前中文稿不自动继承原语言研究结论。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "用于回顾睡前习惯，结合实际处境理解，不贴自律或疾病标签。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "wibps7-original-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "葡萄牙高中生400人，15–20岁，原研究葡萄牙语；属于探索性来源研究，不推定中国青少年验证",
+        "ageRange": "15–20岁",
+        "locale": "pt",
+        "territory": "PT",
+        "sampleSize": 400,
+        "studyDesign": "原始开发横断自报研究；来源样本不作为中国常模，不把探索性结构证据当中文验证。",
+        "rating": "MIXED",
+        "citation": "Magalhães, P., Cruz, V., Teixeira, S., Fuentes, S., & Rosário, P. (2020). An Exploratory Study on Sleep Procrastination: Bedtime vs. While-in-Bed Procrastination. International Journal of Environmental Research and Public Health, 17(16), 5892. https://doi.org/10.3390/ijerph17165892.",
+        "doi": "10.3390/ijerph17165892",
+        "url": "https://www.mdpi.com/1660-4601/17/16/5892",
+        "notes": "与原工具保留来源联系；平台中文工作稿有独立内容/本地化/报告版本。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.1.0",
+    "translationSource": "沿用 C1.0.0 的中文工作译稿。第 1 题把原文 YouTube 改为视频平台，保留上床后、入睡前的情境和看视频活动。原始来源是 Magalhães 等（2020）Table 2，https://doi.org/10.3390/ijerph17165892。",
+    "adaptationMethod": "CULTURAL_ADAPTATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "独立中文情境试用版，尚无本地效度或常模。原研究和现有译稿均不等同于本版本。人工译审和认知访谈待完成。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "wibps7_adolescent_zh_cn_research-1.1.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 180,
+        "maxExclusive": 252
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "wibps7_adolescent_zh_cn_research-1.1.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "wibps7_adolescent_zh_cn_research-1.1.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "© 2020 Magalhães, Cruz, Teixeira, Fuentes and Rosário. Magalhães, P., Cruz, V., Teixeira, S., Fuentes, S., & Rosário, P. (2020). An Exploratory Study on Sleep Procrastination: Bedtime vs. While-in-Bed Procrastination. International Journal of Environmental Research and Public Health, 17(16), 5892. https://doi.org/10.3390/ijerph17165892. 复制源：2020作者论文2.2节与Table 2（PDF第7页），完整独立7题；不是同文BPS8。CC BY 4.0（https://creativecommons.org/licenses/by/4.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：b97dc2837fa71dfb785fe1b17ca8cb29308960c96c5915676ed55bc3ac0a542f。",
+      "许可和人群标签用于分类检索，不自动授予系统权限；本包不激活或授权任何产品入口。",
+      "沿用 C1.0.0 的中文工作译稿。第 1 题把原文 YouTube 改为视频平台，保留上床后、入睡前的情境和看视频活动。原始来源是 Magalhães 等（2020）Table 2，https://doi.org/10.3390/ijerph17165892。",
+      "本交付使用范围为非商业研究试用。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "SELF",
+      "source": {
+        "title": "While-in-Bed Procrastination Scale (7-item 2020 adolescent version); independently prepared Chinese working version",
+        "citation": "Magalhães, P., Cruz, V., Teixeira, S., Fuentes, S., & Rosário, P. (2020). An Exploratory Study on Sleep Procrastination: Bedtime vs. While-in-Bed Procrastination. International Journal of Environmental Research and Public Health, 17(16), 5892. https://doi.org/10.3390/ijerph17165892.",
+        "url": "https://www.mdpi.com/1660-4601/17/16/5892",
+        "publicationYear": 2020
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2020 Magalhães, Cruz, Teixeira, Fuentes and Rosário. Magalhães, P., Cruz, V., Teixeira, S., Fuentes, S., & Rosário, P. (2020). An Exploratory Study on Sleep Procrastination: Bedtime vs. While-in-Bed Procrastination. International Journal of Environmental Research and Public Health, 17(16), 5892. https://doi.org/10.3390/ijerph17165892. 复制源：2020作者论文2.2节与Table 2（PDF第7页），完整独立7题；不是同文BPS8。CC BY 4.0（https://creativecommons.org/licenses/by/4.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：b97dc2837fa71dfb785fe1b17ca8cb29308960c96c5915676ed55bc3ac0a542f。 沿用 C1.0.0 的中文工作译稿。第 1 题把原文 YouTube 改为视频平台，保留上床后、入睡前的情境和看视频活动。原始来源是 Magalhães 等（2020）Table 2，https://doi.org/10.3390/ijerph17165892。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "wibps7_frequency_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "几乎从不",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "很少",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "中立",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "经常",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "几乎总是",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "WIBPS_01",
+          "content": "上床后、入睡前，我会在视频平台上看视频。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "wibps7_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIBPS_02",
+          "content": "上床后、入睡前，我会看电视。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "wibps7_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIBPS_03",
+          "content": "上床后、入睡前，我会看电影或连续剧。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "wibps7_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIBPS_04",
+          "content": "上床后、入睡前，我会听音乐。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "wibps7_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIBPS_05",
+          "content": "上床后、入睡前，我会发信息、打视频电话或打电话。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "wibps7_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIBPS_06",
+          "content": "上床后、入睡前，我会玩游戏（用平板、电脑或手机）。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "wibps7_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIBPS_07",
+          "content": "上床后、入睡前，我会吃点心（饼干、谷物食品、牛奶、薯片、巧克力）。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "wibps7_frequency_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "WIBPS_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIBPS_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIBPS_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIBPS_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIBPS_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIBPS_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIBPS_07",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "while_in_bed_procrastination",
+            "type": "total",
+            "label": "上床后，还在做些什么",
+            "description": "7题等权求和7–35，更多表示自述更常在上床后、入睡前进行所列活动，不代表每种活动都妨碍睡眠。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "WIBPS_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIBPS_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIBPS_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIBPS_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIBPS_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIBPS_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIBPS_07",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.3.0-context-base",
+        "primaryScoreKeys": [
+          "while_in_bed_procrastination"
+        ],
+        "scoreOrder": [
+          "while_in_bed_procrastination"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "while_in_bed_procrastination",
+            "headline": "上床以后，你通常怎样收尾？",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "上床后，也许你想看一会儿视频、听一首歌，或者回完一条消息再睡。7 题总分为 7–35 分，分数越高，表示你报告这些活动发生得越频繁。这个分数记录的是活动频率。听歌有时能让人放松，回消息也可能有现实需要。想知道什么真的影响了自己的作息，可以从最常做、又经常比预想结束得晚的一件事开始观察。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次上床后的安排。哪件事有清楚的结束点？哪件事常常再接上一轮？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个小改动试两晚。可以关闭视频自动连播，或把想继续看的内容留到第二天。留意自己收尾时有没有更从容。"
+              },
+              {
+                "category": "support",
+                "text": "如果功课、排班或照顾家人的安排经常挤占休息，可以和相关的人一起找一段更可行的休息时间。"
+              }
+            ],
+            "provisional": true,
+            "scoreLabel": "上床后活动频率总分（试用）"
+          }
+        ],
+        "limitations": [
+          "本次给出 15–20 岁情境试用版原始总分。尚无本中文版的本地常模或界值。",
+          "总分不记录实际晚睡的分钟数、睡眠质量或入睡困难，不能用于诊断。7 题齐答才计算总分。"
+        ],
+        "disclaimer": "这份报告用来回顾入睡前的习惯，适合和实际作息一起理解。中文情境版仍处于试用阶段。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "wibps7",
+        "locale": "zh-CN",
+        "localizationVersion": "1.1.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "WIBPS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_07",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "while_in_bed_procrastination": 7
+          },
+          "totalScoreKeys": [
+            "while_in_bed_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "WIBPS_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIBPS_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIBPS_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIBPS_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIBPS_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIBPS_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIBPS_07",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "while_in_bed_procrastination": 35
+          },
+          "totalScoreKeys": [
+            "while_in_bed_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "WIBPS_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_07",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "while_in_bed_procrastination": 21
+          },
+          "totalScoreKeys": [
+            "while_in_bed_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "mixed_independent",
+        "answers": [
+          {
+            "itemCode": "WIBPS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIBPS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "WIBPS_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIBPS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_07",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "while_in_bed_procrastination": 18
+          },
+          "totalScoreKeys": [
+            "while_in_bed_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "only_video_higher",
+        "answers": [
+          {
+            "itemCode": "WIBPS_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIBPS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_07",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "while_in_bed_procrastination": 11
+          },
+          "totalScoreKeys": [
+            "while_in_bed_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "only_snack_higher",
+        "answers": [
+          {
+            "itemCode": "WIBPS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIBPS_07",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "while_in_bed_procrastination": 11
+          },
+          "totalScoreKeys": [
+            "while_in_bed_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "missing_first",
+        "answers": [
+          {
+            "itemCode": "WIBPS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_07",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "while_in_bed_procrastination": null
+          },
+          "totalScoreKeys": [
+            "while_in_bed_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "missing_last",
+        "answers": [
+          {
+            "itemCode": "WIBPS_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIBPS_06",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "while_in_bed_procrastination": null
+          },
+          "totalScoreKeys": [
+            "while_in_bed_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "while_in_bed_procrastination": null
+          },
+          "totalScoreKeys": [
+            "while_in_bed_procrastination"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请根据平时的情况，选择自己上床后、入睡前进行下列活动的频率。没有对错，请按实际情况选择。选项从几乎从不到几乎总是；中间选项“中立”保留原论文Neutral的表述，不等于漏答。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/wibps7/1.0.0/instruction.for-pr356.json#/instruction/text @ b92c69aefa2472775fa7ee86b9c208366886c908（既有PREPARED项目工作指导语；保留原Neutral锚点）"
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "wibps7_adolescent_zh_cn_research-1.1.0",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "resultQualityDetails": true
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
