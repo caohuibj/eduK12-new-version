@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "copsoq3_pd_en/1.1.0/1.1.0-adult-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位同事向另一位演示如何使用新工具。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

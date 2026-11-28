@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_mw_en",
+  "contentVersion": "1.1.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-adult-illustrated",
+  "title": "哪件小事最能提醒你，这份工作为什么值得做？",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "meaning_of_work"
+    ],
+    "scoreOrder": [
+      "meaning_of_work"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "meaning_of_work",
+        "headline": "哪件小事最能提醒你，这份工作为什么值得做？",
+        "scoreLabel": "工作意义（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "意义感常藏在具体的工作里。例如，花时间把交接说明写清楚，能让下一位同事少走弯路。看见这种作用，可以帮助你辨认哪些工作值得多投入一点。\n\nSmall tasks can matter. A clear handover may save the next worker time and uncertainty. The two items ask whether you experience your work as meaningful and important.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看最近一项工作带来的具体变化。可以记下谁获得了帮助、有什么证据，以及今后希望给哪类任务多留一点时间。\n\nChoose one recent task and note what changed because of it, who benefited, and what you would like to give more time to."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本维度由 2 个附录原项构成。各题按 0、25、50、75 或 100 计分，同权求均分。系统仅在答全时计算，未完成的答卷没有该分数。",
+      "得分越高，表示作答者越能感到工作有意义，觉得自己做的事重要。结果描述本次作答。可用证据限于该维度相关国际中版研究，项目不套用地方常模、风险分级和个人能力评级。",
+      "English items and the five response options come unchanged from Annex 1. This descriptive score is the mean of completed items when all items are answered. Higher scores indicate more of the characteristic named by the scale. Formal risk assessment and clinical interpretation require separate information."
+    ],
+    "disclaimer": "用于成年工作人群的非商业研究和自我回顾。请结合具体情境理解。 For non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_mw_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

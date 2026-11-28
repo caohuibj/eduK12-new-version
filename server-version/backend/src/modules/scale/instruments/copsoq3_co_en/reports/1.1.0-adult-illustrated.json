@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_co_en",
+  "contentVersion": "1.1.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-adult-illustrated",
+  "title": "当两条要求相冲突，先让冲突本身变得可见",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "role_conflicts"
+    ],
+    "scoreOrder": [
+      "role_conflicts"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "role_conflicts",
+        "headline": "当两条要求相冲突，先让冲突本身变得可见",
+        "scoreLabel": "角色冲突（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一个任务可能同时被要求加快进度和增加核对。如果两项标准都不能调整，冲突就需要靠澄清安排解决，而不是留给个人独自取舍。\n\nA task may come with demands for faster delivery and more checks. This result describes how often expectations clash or the required way of doing things feels unsuitable.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把一对相互打架的要求写成两行。请有权决定的人一起确认先后顺序，以及放弃其中一项意味着什么。\n\nWrite down two expectations that are in tension and ask the decision-maker which comes first. Name the trade-off so the team can act on the same information."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本维度由 2 个附录原项构成。各题按 0、25、50、75 或 100 计分，同权求均分。系统仅在答全时计算，未完成的答卷没有该分数。",
+      "得分越高，表示作答者更常遇到相互矛盾的要求，或难以按自己认为合适的办法完成工作。结果描述本次作答。可用证据限于该维度相关国际中版研究，项目不套用地方常模、风险分级和个人能力评级。",
+      "English items and the five response options come unchanged from Annex 1. This descriptive score is the mean of completed items when all items are answered. Higher scores indicate more of the characteristic named by the scale. Formal risk assessment and clinical interpretation require separate information."
+    ],
+    "disclaimer": "用于成年工作人群的非商业研究和自我回顾。请结合具体情境理解。 For non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_co_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

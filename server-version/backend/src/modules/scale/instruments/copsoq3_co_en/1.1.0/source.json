@@ -1,0 +1,394 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "copsoq3_co_en",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "COPSOQ III Role Conflicts（国际英文分量表）",
+      "abbreviation": "COPSOQ3-CO",
+      "instrumentFamily": "COPSOQ III international English Annex 1, full original dimension"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "互相矛盾的要求或难以按合适办法完成工作的情形更多。国际英文附录完整维度，面向成人非商业研究。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "copsoq3_co_en",
+        "domain:workplace_psychosocial",
+        "population:adult",
+        "response:self",
+        "use:research",
+        "source:copsoq_iii_annex_1",
+        "evidence:international_middle_subscale",
+        "norms:none"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "能阅读英文的成年工作人群，用于相关工作条件的非商业研究。中文原创反馈独立配套。"
+    },
+    "administration": {
+      "itemCount": 2,
+      "estimatedMinutes": 1,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "当前工作情境。此维度没有附录单独规定的回顾时间窗。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留原题本题号、英文题文、响应锚点和计分。",
+        "仅完整作答后展示 0–100 原量尺分。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Burr et al. (2019) Table 4 reports the international Middle score for the matching dimension (FR, DE, SE, TR and CA); the Annex's wording and scoring are retained. Evidence is for the instrument as administered in context rather than local independent calibration."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "COPSOQ International Network Annex 1 original English, PDF 12; https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "英文题本与附录一致。中文为独立原创报告，另含配套英文说明。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_co_en-1.1.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_co_en-1.1.0",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_co_en-1.1.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Unmodified COPSOQ International Network English item wording and response categories with source attribution. The Network publishes CC BY-NC-ND 4.0 and linked use guidelines. This package contains one complete original dimension for non-commercial adult research, limited to that research purpose. For country/translation applicability use the Network's current guidance. Independent bilingual feedback, without endorsement. A single dimension does not cover organizational risk assessment.",
+      "https://www.copsoq-network.org/licence-guidelines-and-questionnaire"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "en",
+    "version": "1.1.0",
+    "text": "These items are the Role Conflicts dimension from the English COPSOQ III Annex 1. Please consider your work as you answer.",
+    "source": "Platform orientation. Annex 1 does not provide a separate instruction for this dimension. Item wording and response categories are unchanged. https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "COPSOQ III Annex 1 — Role Conflicts",
+        "citation": "COPSOQ International Network. COPSOQ III: Guidelines and questionnaire, Annex 1, English original items and response category 2. See the 18 August 2021 version of the Network-linked document.",
+        "url": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "Unmodified COPSOQ International Network English item wording and response categories with source attribution. The Network publishes CC BY-NC-ND 4.0 and linked use guidelines. This package contains one complete original dimension for non-commercial adult research, limited to that research purpose. For country/translation applicability use the Network's current guidance. Independent bilingual feedback, without endorsement. A single dimension does not cover organizational risk assessment. https://www.copsoq-network.org/licence-guidelines-and-questionnaire"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "copsoq3_co_en",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "copsoq_iii_extent_type_2",
+          "options": [
+            {
+              "value": "extent_very_large",
+              "label": "To a very large extent",
+              "score": 100
+            },
+            {
+              "value": "extent_large",
+              "label": "To a large extent",
+              "score": 75
+            },
+            {
+              "value": "extent_somewhat",
+              "label": "Somewhat",
+              "score": 50
+            },
+            {
+              "value": "extent_small",
+              "label": "To a small extent",
+              "score": 25
+            },
+            {
+              "value": "extent_very_small",
+              "label": "To a very small extent",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "CO2",
+          "content": "Are contradictory demands placed on you at work?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "copsoq_iii_extent_type_2",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CO3",
+          "content": "Do you sometimes have to do things which ought to have been done in a different way?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "copsoq_iii_extent_type_2",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "CO2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CO3",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "role_conflicts",
+            "label": "Role Conflicts",
+            "type": "dimension",
+            "description": "互相矛盾的要求或难以按合适办法完成工作的情形更多",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CO2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CO3",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "role_conflicts"
+        ],
+        "scoreOrder": [
+          "role_conflicts"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "role_conflicts",
+            "headline": "When expectations pull in different directions",
+            "scoreLabel": "Role Conflicts (0–100 mean)",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "A task may come with demands for faster delivery and more checks. This result describes how often expectations clash or the required way of doing things feels unsuitable.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Write down two expectations that are in tension and ask the decision-maker which comes first. Name the trade-off so the team can act on the same information."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本维度由 2 个附录原项构成。各题按 0、25、50、75 或 100 计分，同权求均分。系统仅在答全时计算，未完成的答卷没有该分数。",
+          "互相矛盾的要求或难以按合适办法完成工作的情形更多。结果描述本次作答。可用证据限于该维度相关国际中版研究，项目不套用地方常模、风险分级和个人能力评级。",
+          "English items and the five response options come unchanged from Annex 1. This descriptive score is the mean of completed items when all items are answered. Higher scores indicate more of the characteristic named by the scale. Formal risk assessment and clinical interpretation require separate information."
+        ],
+        "disclaimer": "用于成年工作人群的非商业研究和自我回顾。请结合具体情境理解。 For non-commercial research with adult workers and personal reflection.",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "en"
+        }
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "CO2",
+            "responseValue": "extent_very_small"
+          },
+          {
+            "itemCode": "CO3",
+            "responseValue": "extent_very_small"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "role_conflicts": 0
+          },
+          "totalScoreKeys": [
+            "role_conflicts"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "CO2",
+            "responseValue": "extent_somewhat"
+          },
+          {
+            "itemCode": "CO3",
+            "responseValue": "extent_somewhat"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "role_conflicts": 50
+          },
+          "totalScoreKeys": [
+            "role_conflicts"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "CO2",
+            "responseValue": "extent_very_large"
+          },
+          {
+            "itemCode": "CO3",
+            "responseValue": "extent_very_large"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "role_conflicts": 100
+          },
+          "totalScoreKeys": [
+            "role_conflicts"
+          ]
+        }
+      }
+    ]
+  }
+}

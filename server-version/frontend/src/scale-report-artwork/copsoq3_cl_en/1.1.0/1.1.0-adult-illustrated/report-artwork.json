@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "copsoq3_cl_en/1.1.0/1.1.0-adult-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "三位同事围坐在工作桌旁，用分开放置的任务卡确认各自负责的事项。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

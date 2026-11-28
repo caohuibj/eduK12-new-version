@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_cl_en",
+  "contentVersion": "1.1.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-adult-illustrated",
+  "title": "清楚谁来做、做到什么程度，团队就少走一点弯路",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "role_clarity"
+    ],
+    "scoreOrder": [
+      "role_clarity"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "role_clarity",
+        "headline": "清楚谁来做、做到什么程度，团队就少走一点弯路",
+        "scoreLabel": "角色清晰（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "同一个任务有人以为自己只需提供材料，有人以为自己要交付成品。把目标、边界和期待说清楚，能减少这种不必要的来回。\n\nOne person might think their role is to provide materials while another thinks it includes delivering the final product. The three items address clear objectives, responsibility and expectations.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "用一个典型任务确认负责人、交付物和验收标准。如果两个人的理解不同，在开工前就把差异说开。\n\nChoose one typical task and clarify who owns it, what success would look like, and who makes the final decision. Resolve differences before starting."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本维度由 3 个附录原项构成。各题按 0、25、50、75 或 100 计分，同权求均分。系统仅在答全时计算，未完成的答卷没有该分数。",
+      "得分越高，表示作答者越清楚工作目标、自己的责任和他人对这份工作的期待。结果描述本次作答。可用证据限于该维度相关国际中版研究，项目不套用地方常模、风险分级和个人能力评级。",
+      "English items and the five response options come unchanged from Annex 1. This descriptive score is the mean of completed items when all items are answered. Higher scores indicate more of the characteristic named by the scale. Formal risk assessment and clinical interpretation require separate information."
+    ],
+    "disclaimer": "用于成年工作人群的非商业研究和自我回顾。请结合具体情境理解。 For non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_cl_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
