@@ -1,0 +1,85 @@
+{
+  "toolKey": "fs8_zh_cn_trial",
+  "contentVersion": "1.0.0",
+  "version": "1.0.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "蓬勃感｜独立中文试用图文报告",
+  "report": {
+    "reportVersion": "1.0.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "flourishing"
+    ],
+    "scoreOrder": [
+      "flourishing"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "flourishing",
+        "headline": "给日常多找几个支点",
+        "scoreLabel": "蓬勃感｜8–56 分（原始总分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "日子过得稳，往往靠好几件小事一起托住。有人愿意听你说话，有些事做起来特别投入，你也可能发现自己能给别人帮上忙。这份量表把目标、人际支持、投入、能力感和对未来的期待放在一起，帮你回看平时有哪些力量可以借一借。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想起最近一个感觉踏实的片段。是有人一起做，还是你做成了对自己重要的事？挑出其中一个想留下的条件，约一个具体时间再试一次。可以约朋友一起散步，也可以给自己留二十分钟做一件常被挤掉、却很在意的事。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "八道题各 1–7 分，答全直接相加，范围 8–56 分。原分反映这次自评中感到的心理资源。",
+      "简体中文版为试用译本。本页可作个人回顾，分数不设本地等级或常模。"
+    ],
+    "disclaimer": "供成年人非商业研究与自我回顾使用。报告采用描述性原始分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "fs8_zh_cn_trial/1.0.0/1.0.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "fs8_zh_cn_trial/1.0.0/1.0.0-adult-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位成年人用木架扶住向上攀的植物，周围摆着高低不同的盆栽。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

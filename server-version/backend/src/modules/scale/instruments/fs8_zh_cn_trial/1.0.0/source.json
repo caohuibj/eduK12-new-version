@@ -1,0 +1,631 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "fs8_zh_cn_trial",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "蓬勃感量表｜FS 简体中文试用版",
+      "abbreviation": "FS8-ZH-CN",
+      "instrumentFamily": "Flourishing Scale original English 8-item"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructDefinition": "评估个人自觉的生活目的、关系、投入、贡献、能力、自我评价、乐观及被尊重感。八项用于一个整合原分。",
+      "constructOverlapTags": [
+        "fs8_zh_cn_trial",
+        "domain:wellbeing",
+        "population:adult",
+        "response:self",
+        "locale:zh-CN",
+        "use:noncommercial_research"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "非商业研究用成人简体工作译本，无本地常模和量尺等值证据。原作者另列中文版，其译文及适用研究独立归档。"
+    },
+    "administration": {
+      "itemCount": 8,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "原版未指定固定回忆期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "八题题序与七档同意程度沿用原卷。",
+        "答全后等权求和，范围 8–56；不做插补或分档。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "用于非商业成人研究，按原始总分描述当前心理资源自评。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "https://eddiener.com/wp-content/uploads/2025/02/FS_English.pdf",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "按原作者英文 FS 八题与七档逐一转译，保留题序和评分。本地量尺等值性与认知访谈尚未建立。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-adult-zh-cn-research",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-descriptive-no-raw-feedback",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-credited-noncommercial-adult-zh-cn",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "直接译自作者签署的英文八题原卷。原作者伊利诺伊大学页面明确允许翻译；现行作者网站要求保留署名，仅限非商业研究。本简体工作译本没有采用他人已发表的中文措辞。",
+      "https://labs.psychology.illinois.edu/~ediener/FS.html",
+      "https://eddiener.com/scales/"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "text": "下面有八句话。请根据你的一般情况，为每句话选一个最符合你想法的同意程度。每句话选一项。",
+    "source": "https://eddiener.com/wp-content/uploads/2025/02/FS_English.pdf"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Flourishing Scale｜原版 8 题简体中文试用译本",
+        "citation": "Diener, E., Wirtz, D., Tov, W., Kim-Prieto, C., Choi, D. W., Oishi, S., & Biswas-Diener, R. (2010). New Well-being Measures: Short Scales to Assess Flourishing and Positive and Negative Feelings. Social Indicators Research, 97, 143–156. https://doi.org/10.1007/s11205-009-9493-y. FS 英语题本 © Ed Diener 与 Robert Biswas-Diener（2009 年 1 月）。",
+        "url": "https://eddiener.com/wp-content/uploads/2025/02/FS_English.pdf",
+        "publicationYear": 2009
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "直接译自作者签署的英文八题原卷。原作者伊利诺伊大学页面明确允许翻译；现行作者网站要求保留署名，仅限非商业研究。本简体工作译本没有采用他人已发表的中文措辞。 https://labs.psychology.illinois.edu/~ediener/FS.html https://eddiener.com/scales/"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "fs8_zh_cn_trial",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "agreement_1_7",
+          "options": [
+            {
+              "value": "option_1",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "option_2",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "option_3",
+              "label": "有点不同意",
+              "score": 3
+            },
+            {
+              "value": "option_4",
+              "label": "既不同意，也不反对",
+              "score": 4
+            },
+            {
+              "value": "option_5",
+              "label": "有点同意",
+              "score": 5
+            },
+            {
+              "value": "option_6",
+              "label": "同意",
+              "score": 6
+            },
+            {
+              "value": "option_7",
+              "label": "非常同意",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "FS1",
+          "content": "我的生活有目标，也有意义。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FS2",
+          "content": "我的人际关系能给我支持，也让我有所收获。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FS3",
+          "content": "我对日常做的事感兴趣，也投入其中。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FS4",
+          "content": "我会主动为他人的幸福和安好出一份力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FS5",
+          "content": "我有能力做好对我重要的事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FS6",
+          "content": "我觉得自己是个好人，生活也过得很好。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FS7",
+          "content": "我对自己的未来持乐观态度。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FS8",
+          "content": "别人尊重我。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "agreement_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "flourishing",
+            "type": "dimension",
+            "label": "蓬勃感",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "source": {
+              "type": "items",
+              "aggregation": "sum",
+              "items": [
+                {
+                  "itemCode": "FS1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FS2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FS3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FS4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FS5",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FS6",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FS7",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FS8",
+                  "weight": 1
+                }
+              ]
+            }
+          }
+        ],
+        "itemRules": [
+          {
+            "itemCode": "FS1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FS2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FS3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FS4",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FS5",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FS6",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FS7",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FS8",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ]
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "flourishing"
+        ],
+        "scoreOrder": [
+          "flourishing"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "flourishing",
+            "headline": "给日常多找几个支点",
+            "scoreLabel": "蓬勃感｜8–56 分（原始总分）",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "日子过得稳，往往靠好几件小事一起托住。有人愿意听你说话，有些事做起来特别投入，你也可能发现自己能给别人帮上忙。这份量表把目标、人际支持、投入、能力感和对未来的期待放在一起，帮你回看平时有哪些力量可以借一借。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想起最近一个感觉踏实的片段。是有人一起做，还是你做成了对自己重要的事？挑出其中一个想留下的条件，约一个具体时间再试一次。可以约朋友一起散步，也可以给自己留二十分钟做一件常被挤掉、却很在意的事。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "八道题各 1–7 分，答全直接相加，范围 8–56 分。原分反映这次自评中感到的心理资源。",
+          "简体中文版为试用译本。本页可作个人回顾，分数不设本地等级或常模。"
+        ],
+        "disclaimer": "供成年人非商业研究与自我回顾使用。报告采用描述性原始分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "FS1",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "FS2",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "FS3",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "FS4",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "FS5",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "FS6",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "FS7",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "FS8",
+            "responseValue": "option_1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "flourishing": 8
+          },
+          "totalScoreKeys": [
+            "flourishing"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "FS1",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "FS2",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "FS3",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "FS4",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "FS5",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "FS6",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "FS7",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "FS8",
+            "responseValue": "option_4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "flourishing": 32
+          },
+          "totalScoreKeys": [
+            "flourishing"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "FS1",
+            "responseValue": "option_7"
+          },
+          {
+            "itemCode": "FS2",
+            "responseValue": "option_7"
+          },
+          {
+            "itemCode": "FS3",
+            "responseValue": "option_7"
+          },
+          {
+            "itemCode": "FS4",
+            "responseValue": "option_7"
+          },
+          {
+            "itemCode": "FS5",
+            "responseValue": "option_7"
+          },
+          {
+            "itemCode": "FS6",
+            "responseValue": "option_7"
+          },
+          {
+            "itemCode": "FS7",
+            "responseValue": "option_7"
+          },
+          {
+            "itemCode": "FS8",
+            "responseValue": "option_7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "flourishing": 56
+          },
+          "totalScoreKeys": [
+            "flourishing"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "FS1",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "FS2",
+            "responseValue": "option_7"
+          },
+          {
+            "itemCode": "FS3",
+            "responseValue": "option_2"
+          },
+          {
+            "itemCode": "FS4",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "FS5",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "FS6",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "FS7",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "FS8",
+            "responseValue": "option_2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "flourishing": 30
+          },
+          "totalScoreKeys": [
+            "flourishing"
+          ]
+        }
+      }
+    ]
+  }
+}
