@@ -1,0 +1,100 @@
+{
+  "toolKey": "brcs4_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "困难中的应对方式｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对 López-Pina 等开放表 6 的四条英文、正向计分方向及正式正文所述原家族五级格式；平台分值 4–20。保留独立五点工作版。"
+      }
+    },
+    "primaryScoreKeys": [
+      "resilient_coping"
+    ],
+    "scoreOrder": [
+      "resilient_coping"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "resilient_coping",
+        "scoreLabel": "困难应对合计分（4–20）",
+        "headline": "困难出现时，找一个还有办法改变的地方",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "四题涉及寻找不同做法、照顾自己的反应、从经历中获得一点收获，以及如何面对损失。分数为 4–20，较大值表示你本次更认同这些应对描述。资源、时间和支持是否可得，都会影响实际能做什么。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一件近期遇到的不顺，写下已改变的部分和暂时无法改变的部分。"
+          },
+          {
+            "category": "strategy",
+            "text": "找到一个低成本的小尝试，做完后只观察它是否稍微减轻当前困难。"
+          },
+          {
+            "category": "support",
+            "text": "如果一件事靠自己推进很费力，具体说明需要的是信息、时间还是别人协助。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "当前工作版沿用五级选项。其他临床研究采用过不同选项和常模，报告按照本项目原有 P 输出本次得分。",
+      "采用已登记中文工作译稿及原计分。数值用于理解本次自陈，当前版本以描述分呈现。",
+      "各分数按原来的完整作答规则计算，漏答保留为缺失。"
+    ],
+    "disclaimer": "适用于既有成人试用研究与自我回顾。临床诊断及其他高风险决定需要相应的专门方法。",
+    "artworkKey": "brcs4_zh_cn_research/1.0.0/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

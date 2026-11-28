@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "brcs4_zh_cn_research/1.0.0/1.3.0-adult",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "成年人面对一处坏掉的抽屉，尝试取出备用工具。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
