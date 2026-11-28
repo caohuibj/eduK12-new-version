@@ -1,0 +1,92 @@
+{
+  "toolKey": "cbi_client_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-teacher",
+  "title": "服务互动相关疲惫（CBI-C 中文试用报告）",
+  "report": {
+    "reportVersion": "1.2.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "primaryScoreKeys": [
+      "client_related_burnout"
+    ],
+    "scoreOrder": [
+      "client_related_burnout"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "client_related_burnout",
+        "scoreLabel": "服务互动相关疲惫",
+        "headline": "留意连续互动让你需要什么支持",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "例如已经接待了几位来访者，又要马上开始下一次沟通，即使每个人的诉求都合理，也会觉得很难继续集中精力。六题的 0–100 均分反映你自述的服务互动相关疲惫，分数越高表示这种体验出现得更常或感受更强。这里关注你和同一类服务对象互动时的工作体验。",
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一次较轻松的互动和一次较费力的互动。记下谁负责回应、两次持续多久、有没有人能换手或接上，关注安排上的差别。"
+          },
+          {
+            "category": "support",
+            "text": "和团队商量容易落地的支持，例如提前明确升级求助的联系人、轮流接待，或者在连续互动之间预留缓冲。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "六题里至少回答三题才计算本项。达到最低题数但有漏答时，用已答题计平均；漏答不当作零分。",
+      "适用于经常和服务对象互动的成人工作者。学校场景可以指学生。没有相应服务互动经历时，本项不适用。分数反映成人的工作体验。",
+      "题本是依据英文原版独立翻译的简体中文工作稿，仍待人工译审和本地验证。分数没有本地常模、百分位或等级，请结合答题时的实际情况阅读。",
+      "量表来源与使用署名：Borritz M et al. Burnout among employees in human service work: design and baseline findings of the PUMA study. Scandinavian Journal of Public Health. 2006;34:49–58。工具发展文献：Kristensen TS 等（2005），https://doi.org/10.1080/02678370500297720。"
+    ],
+    "disclaimer": "供成人教师和相关工作者回顾本次自述体验。请勿将结果用于诊断、录用、绩效考核或学校排名。",
+    "artworkKey": "cbi_client_zh_cn/1.0.0/1.2.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

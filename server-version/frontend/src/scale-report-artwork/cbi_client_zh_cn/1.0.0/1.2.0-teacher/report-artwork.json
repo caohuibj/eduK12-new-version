@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "cbi_client_zh_cn/1.0.0/1.2.0-teacher",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一名服务岗位工作人员与同伴短暂交接，准备接待下一位来访者。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
