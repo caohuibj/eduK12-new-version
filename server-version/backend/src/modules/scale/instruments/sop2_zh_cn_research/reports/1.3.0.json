@@ -1,0 +1,97 @@
+{
+  "toolKey": "sop2_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0",
+  "title": "乐观与悲观｜期待和担心可以写在一页",
+  "report": {
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 原件与内容核对",
+        "reviewedAt": "2026-11-28T01:29:32.300Z",
+        "basis": "逐项核对 Nießen 等（2022）论文 Table 1 及 GESIS 英文版。两条各自带定义，七级端点原样对应，不要求单独指导语；第二条 8−原答后与第一条平均。保留成人研究原用途，英文 CC BY 4.0。独立中文工作译稿。"
+      }
+    },
+    "reportVersion": "1.3.0",
+    "primaryScoreKeys": [
+      "optimism_composite"
+    ],
+    "scoreOrder": [
+      "optimism_composite"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "optimism_composite",
+        "headline": "期待和担心可以写在一页",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "换到一个新岗位，你可能期待有机会学点东西，也担心开头跟不上。同一件事出现两种想法很常见，两种想法也都可以变成有用的准备。\n\n两题分别请你形容自己平时的乐观和悲观。换算悲观题后两题取平均，范围 1–7。分数越高，这次回答整体越偏向积极的未来期待。相同合成分可能来自不同的原始作答。日常反思时，可以把总分放在一边，挑件真实的事，看看期待想把你带到哪里，担心又提醒你提前准备什么。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一件即将发生的事，在同一张纸上各写一句「我期待……」和「我担心……」。两栏都可以留下。"
+          },
+          {
+            "category": "strategy",
+            "text": "圈出一条能查清的消息，例如问明第一天要做什么。再写下一件可准备的事，比如提前留出十分钟找地点。"
+          },
+          {
+            "category": "support",
+            "text": "如果事情走得和你期待的不同，给计划留一个能调整的地方。可以在开始前就商量，遇到哪类问题可以找谁一起想办法。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "只有两题，中文研究译稿尚待译审和适用人群验证，没有可用的中文分档或排名。两题需完整作答，漏答不代填；合成分不能还原两题各自的回答。"
+    ],
+    "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断。Adapted from Nießen, D., Groskurth, K., Kemper, C. J., Rammstedt, B., & Lechner, C. M. (2022). The Optimism–Pessimism Short Scale–2 (SOP2): a comprehensive validation of the English-language adaptation. Measurement Instruments for the Social Sciences,4,1. https://doi.org/10.1186/s42409-021-00027-6. CC BY4.0. Changes: Chinese working translation and original explanatory feedback; no author endorsement implied. License: https://creativecommons.org/licenses/by/4.0/",
+    "artworkKey": "sop2_zh_cn_research/1.0.0/1.3.0"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
