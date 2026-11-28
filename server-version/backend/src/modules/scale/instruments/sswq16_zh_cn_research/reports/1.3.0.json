@@ -1,0 +1,161 @@
+{
+  "toolKey": "sswq16_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0",
+  "title": "学校生活｜看看一个月里的四种感受",
+  "report": {
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 原件与内容核对",
+        "reviewedAt": "2026-11-28T01:29:32.303Z",
+        "basis": "逐条核对 Renshaw（2020）CC BY 4.0 版的 16 题、过去一个月指导、四频率锚点、四维题号映射和各项求和。第 8/12 条保留实际完成情况，第 16 条保留各课成绩的自述语境；中文为独立工作译稿，研究对象限 6–8 年级。"
+      }
+    },
+    "reportVersion": "1.3.0",
+    "primaryScoreKeys": [
+      "school_wellbeing"
+    ],
+    "scoreOrder": [
+      "school_wellbeing",
+      "JL",
+      "SC",
+      "EP",
+      "AE"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "school_wellbeing",
+        "headline": "看看一个月里的四种感受",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这个月，你也许很喜欢做一个小组项目，却不太敢在另一节课上说话。校园里的感受可以这样并排出现。试着分开来看：学东西时有没有开心，能不能安心做自己，觉得所学有用吗，自己做任务时感觉怎么样。\n\n十六题把过去一个月的回答加在一起，范围 16–64。分数越高，你越常报告这些积极体验。它不能替你说清校园里的每一天。下面每个方面都有一个可以试的小办法，先挑和你今天最有关的一个。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "在昨天或上周找一个记得的时刻：当时在哪里、和谁一起、发生了什么？有这样的具体片段，比只盯着总分更容易读懂自己的感受。"
+          },
+          {
+            "category": "support",
+            "text": "想改一件事时，找你愿意开口的人，只说清一件具体发生过的事和希望得到的一个帮助。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "JL",
+        "headline": "学习乐趣｜哪件事让你还想多试一次",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "学习乐趣常藏在一个愿意继续的时刻。也许你课上很喜欢动手做模型，却对背术语提不起兴趣。四题加在一起是 4–16，反映这个月你多常在上课、做项目或完成作业时有兴趣和愉快的感受。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "挑这周的一项作业，找一个想弄懂的小问题。可以画图、做个例子，或者问老师能不能换个方式看。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "SC",
+        "headline": "学校归属｜有个地方能安心做自己",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "课间有人给你留座，分组时有人愿意听你的主意，这些小事会让人感觉自己属于这里。四题加在一起是 4–16，关注过去一个月你在学校能不能做自己，有没有感到被关心和尊重。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "support",
+            "text": "先想一个在学校比较放松的地方，或一位可以开口的人。遇到被排斥的事，可以把发生的时间和经过告诉可信的成年人。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "EP",
+        "headline": "学习意义｜课上学的，能在哪儿用一用",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "你可能在科学课学过估算，回家时发现它能帮你算买点材料需要多少钱。四题加在一起是 4–16，记录你这个月多常觉得在校做的事重要、值得认真，或以后能派上用场。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "挑今天学的一个词、方法或故事，给它找一个课堂外的用处。眼下想不到，可以把「它可能用在哪里」留成问题，下一次问老师或同学。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "AE",
+        "headline": "学习表现｜看看哪一步自己已经会做",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一份作业并不需要从头到尾都顺利。也许你会列出第一步，就差弄明白怎么检查。四题加在一起是 4–16，反映过去一个月你对自己完成学校任务、课堂作业和成绩的感受。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "找一份刚做过的作业，圈一处已经能自己处理的地方，再把求助问题缩到一步，例如「我这一步为什么要先算它？」"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "本中文工作稿尚待验证，仅限6–8年级研究与自我了解；没有中文等级或排名。"
+    ],
+    "disclaimer": "依据 Tyler L. Renshaw (2020) SSWQ，CC BY 4.0（https://creativecommons.org/licenses/by/4.0/），来源 https://osf.io/k25yf/ 。本中文翻译与线上排版为独立改编，非作者审定或认可；仅供6–8年级学生研究与自我了解，不用于心理诊断。",
+    "artworkKey": "sswq16_zh_cn_research/1.0.1/1.3.0"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
