@@ -1,0 +1,96 @@
+{
+  "toolKey": "srq63_brown_miller_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-pilot",
+  "title": "从计划到行动的进展｜成人专业研究试用",
+  "report": {
+    "reportVersion": "1.3.0-pilot",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 来源、计分和内容复核",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对 CASAA 完整 63 题与英文计分页。按原 C 的 26 项反向和标准五档求和，保留总分与成人研究用途。"
+      }
+    },
+    "primaryScoreKeys": [
+      "self_regulation_total"
+    ],
+    "scoreOrder": [
+      "self_regulation_total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "self_regulation_total",
+        "scoreLabel": "行动调节自述总分（63–315）",
+        "headline": "想一想计划是在什么时候发生变化的",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "想整理一周开支，你先列出目标，做到一半发现原计划太费时间，便换成每晚记一笔。过程里会遇到新的信息，也需要回看做法能不能持续。总分把 63 道题在统一方向上的回答合在一起。数值越大，表示本次更认同与推进、监测和调整行动有关的自述。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一个近期的小目标，写下最先尝试的做法、什么时候发现需要调整、接下来准备试什么。总分本身无法指出卡在其中哪一步。"
+          },
+          {
+            "category": "strategy",
+            "text": "事先定一个容易观察的结果，例如一周具体做了几次，再用实际经过讨论什么条件有帮助。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "63 题完整作答后统一方向求和，取值 63–315。现有 P 只支持总分，原英文材料涉及的分组及样本参考范围与当前试用范围分开。",
+      "场景、可用条件和答题理解都会影响自述。使用范围为专业人员组织的成人研究。",
+      "Brown、Miller 和 Lawendowski（1999）Self-Regulation Questionnaire，由新墨西哥大学 CASAA 提供原表及计分说明。https://casaa.unm.edu/assets/inst/selfregulation-questionnaire-srq.pdf 。现用中文工作稿与反馈为平台制作。"
+    ],
+    "disclaimer": "由专业人员组织成人研究及结果交流。",
+    "artworkKey": "srq63_brown_miller_zh_cn_research/1.0.1/1.3.0-pilot"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
