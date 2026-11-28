@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "cesd10_zh_cn_research/1.0.0/1.3.0-pilot",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "窗边有一杯水、一册笔记和几张无字便签，供成人回顾一周经历。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

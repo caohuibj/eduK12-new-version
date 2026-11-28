@@ -1,0 +1,92 @@
+{
+  "toolKey": "cesd10_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-pilot",
+  "title": "回顾过去一周的具体感受｜成人研究试用",
+  "report": {
+    "reportVersion": "1.3.0-pilot",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 来源、计分和内容复核",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "按 CMU PMBC10 原件核对过去一周、10 题、四档及第 5/8 反向，保留自填变化和无分档 P。"
+      }
+    },
+    "primaryScoreKeys": [
+      "depressive_symptoms"
+    ],
+    "scoreOrder": [
+      "depressive_symptoms"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "depressive_symptoms",
+        "scoreLabel": "相关感受记录（0–30 合计）",
+        "headline": "把一周中的感受放进当时的日常",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这份记录涵盖一周内的情绪、注意、精力、睡眠和社交感受。题目按 0–3 计分，其中希望和愉快两题按原规则统一方向，再将 10 题合计。数值较高表示本次报告的相关困难更多，也可能对应较少的积极体验。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看答卷覆盖的那一周，尝试说清一个典型时段、当时发生的事和你实际感受到的变化。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "绑定成人研究使用范围和平台中文工作稿。原英文载体是访谈施测材料，现 C 用于自填。跨施测方式或译本的比较需独立证据。",
+      "这里采用既有 0–30 描述性合计。单次自述的用途限于回顾过去一周的相关体验。",
+      "Andresen、Malmgren、Carter 和 Patrick（1994），CES-D 短表。Carnegie Mellon Common Cold Project 提供 PMBC10 版本与公共领域说明。https://www.cmu.edu/common-cold-project/measures-by-study/psychological-and-social-constructs/other-psychological-measures/depressive-symptoms.html 。平台独立中文工作稿和报告为改编。"
+    ],
+    "disclaimer": "用于成人研究试用，描述过去一周自述，临床结论依靠独立评估。",
+    "artworkKey": "cesd10_zh_cn_research/1.0.0/1.3.0-pilot"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
