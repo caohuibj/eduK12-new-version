@@ -1,0 +1,101 @@
+{
+  "toolKey": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "一般任务自我效能｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审（非人工专家译审）",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐项对照 IPIP 官方 NEO C1 十题英文键与正反向方向；沿用现有项目中文工作译稿、五点符合度和十题合计分。IPIP 原题为公有领域，但当前中文译稿的专家译审、认知访谈和目标人群验证仍为待完成；官方不提供可直接套用的通用常模，因此不设分档或阈值。"
+      }
+    },
+    "primaryScoreKeys": [
+      "ipip_neo_c1_self_efficacy10"
+    ],
+    "scoreOrder": [
+      "ipip_neo_c1_self_efficacy10"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "ipip_neo_c1_self_efficacy10",
+        "scoreLabel": "一般任务自我效能合计分（10–50）",
+        "headline": "把“我能不能”换成一条可以检查的线索",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有些任务一看就知道从哪里开始，有些任务却像第一次打开陌生软件：按钮很多，下一步不清楚。此时的把握，往往不只来自一句“我有信心”，也来自过去做成过什么、要求是否清楚、手边有没有示例，以及遇到问题时能否找到支持。\n\n这十题回顾你通常怎样看待自己完成任务、判断情况和想出办法的把握。统一计分方向后，总分范围为 10–50；数值越大，表示本次回答越认可“我能把事情处理好”这一类描述。它记录的是自我看法，不是现场能力测验，也不会告诉你在每一种任务上都同样有把握。\n\n比起急着给自己下结论，更有用的是找一条具体证据：我已经会哪一步？还缺什么信息？先试一个小步骤后，原来的判断需要怎样调整？把握可以随着经验和反馈被校准；需要说明、练习或协助，也不等于能力不足。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一件最近完成的小事，写三行：任务是什么、你实际做了什么、哪条信息或哪种支持帮上了忙。尽量留下可复用的做法，而不是只写“我很厉害”或“只是运气”。"
+          },
+          {
+            "category": "strategy",
+            "text": "面对一件没把握的任务，先缩成一个能验证的小步骤，例如找一个示例、列出三个问题或完成最短的一段。做完后再判断下一步，不要求开始前就保证全程顺利。"
+          },
+          {
+            "category": "support",
+            "text": "把求助写具体：问清一个要求、请人演示一个步骤，或核对一个结果。得到反馈后记录“哪里判断对了、哪里要改”，让信心既有根据，也保留修正空间。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "这是 IPIP-NEO C1 的十题公有领域表征，不是专有 NEO-PI-R，也不是完整人格评估、一般自我效能量表 GSE 或学科学习自我效能量表。",
+      "当前中文为项目工作译稿，专家译审、目标人群认知访谈和本地心理测量验证尚未完成；本报告仅供成人试用研究与自我回顾。",
+      "官方没有提供适合直接套用到当前中文版本的通用常模或阈值，因此不划分高低、不排名，也不把分数解释为客观能力、工作绩效或个人价值。",
+      "十题需完整回答才计算合计分；漏答不按零分处理。单次结果也可能受近期任务、熟悉程度和作答语境影响。"
+    ],
+    "disclaimer": "这是一份成人试用描述报告，不用于心理诊断、能力鉴定、录用考核、教育分流或其他高风险决策。",
+    "artworkKey": "ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
