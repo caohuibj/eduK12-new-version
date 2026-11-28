@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "mpmi_s22_zh_cn_research/1.0.0/1.3.0-pilot",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一个人出门时在门边看见特意放在那里的雨伞和钥匙。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

@@ -1,0 +1,130 @@
+{
+  "toolKey": "mpmi_s22_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-pilot",
+  "title": "把要做的事带到合适的时候｜成人研究试用",
+  "report": {
+    "reportVersion": "1.3.0-pilot",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 来源、计分和内容复核",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "对照原论文 22 题三组与现用中文工作稿，沿用 8／7／7 分组、四条反向及每组最低有效数。"
+      }
+    },
+    "primaryScoreKeys": [
+      "pma",
+      "pmsi",
+      "pmse"
+    ],
+    "scoreOrder": [
+      "pma",
+      "pmsi",
+      "pmse"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "pma",
+        "scoreLabel": "记住待办行动（1–5 均分）",
+        "headline": "最容易忘的可能是某个时点",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "想着回家时顺路取件，经过取件处时却在处理一个新消息。事先计划和到时候记得去做是两个时点。这组 8 题描述你平时对自己记住待办行动的判断，分数越高表示本次自述较能在合适的时候想起。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找一次记住和一次错过的经历，分别记下你在什么时候意识到它、当时有没有明显的提示。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "pmsi",
+        "scoreLabel": "脑中用提醒策略（1–5 均分）",
+        "headline": "在想象里先走一遍下一步",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "把待办和下次经过某处连起来，在脑中预演一次，再回到手上正在做的事。该组 7 题汇总你自述使用这类内部提示的频率。分数较高表示本次报告更常用这类方法。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一件明天要办的小事。在脑中把行动与一个明确时点或地点连起来，办完后回看这个联系是不是好认。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "pmse",
+        "scoreLabel": "使用身边的提醒（1–5 均分）",
+        "headline": "让提醒在用得上的地方出现",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "把伞放到出门处，或在行程前留一条日历提醒，可以把动作和能看到的线索连起来。该组 7 题汇总你自述使用纸条、日历或物品等外部提醒的频率。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "试着把一条提醒放到真正能行动的位置，例如把待带物品放在门边。过几天看这条提示有没有减少来回确认。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "平台四道忘记题按原计分统一方向，各组分别用 1–5 均分。能力组至少 7 题、两个策略组各至少 6 题可计算；均分取有效回答。",
+      "策略用得多可能说明这些做法适合当前生活安排。本次分数用于成年人自述回顾，客观记忆能力需要另有测量。",
+      "Rummel、Danner 和 Kuhlmann（2019），MPMI-s 及英文补充词表，https://doi.org/10.1186/s42409-019-0008-6 ，CC BY 4.0 https://creativecommons.org/licenses/by/4.0/ 。中文工作译稿和报告为平台改编。"
+    ],
+    "disclaimer": "用于现有 19–71 岁成人研究范围的描述性回顾。",
+    "artworkKey": "mpmi_s22_zh_cn_research/1.0.0/1.3.0-pilot"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
