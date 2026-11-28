@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "chime_s24_zh_cn_research/1.0.1/1.3.0-adult",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "散步的人依次留意鞋底、风声和路灯，没有停下脚步。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

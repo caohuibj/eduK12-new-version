@@ -1,0 +1,314 @@
+{
+  "toolKey": "chime_s24_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "日常正念体验短表 CHIME-S24",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "https://doi.org/10.1016/j.jbtep.2022.101751 原作者 CHIME 短版开放论文，Appendix S1 直接核对正式 24 题英文原文及六级频率锚点。"
+      }
+    },
+    "primaryScoreKeys": [
+      "external_awareness",
+      "internal_awareness",
+      "acting_awareness",
+      "thoughts_relativity",
+      "insightful_understanding",
+      "nonjudgmental_acceptance",
+      "nonreactive_decentering",
+      "openness",
+      "total"
+    ],
+    "scoreOrder": [
+      "external_awareness",
+      "internal_awareness",
+      "acting_awareness",
+      "thoughts_relativity",
+      "insightful_understanding",
+      "nonjudgmental_acceptance",
+      "nonreactive_decentering",
+      "openness",
+      "total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "external_awareness",
+        "scoreLabel": "留意周围的体验",
+        "headline": "在街上走，也能看见街上",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录你多常注意声音、光线和身体接触等外部感官细节。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "换一条熟悉的路，你更先注意脚步，还是路旁的声音？"
+          },
+          {
+            "category": "strategy",
+            "text": "走一小段路，试着认出一处颜色、一种声音和一个触感。"
+          },
+          {
+            "category": "support",
+            "text": "环境需要警觉时先看路，把这个练习留在安全地点。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "internal_awareness",
+        "scoreLabel": "觉察内心的体验",
+        "headline": "感觉常比名字先到",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录你多常在活动中留意当时的身体感受、心情或内在变化。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "忙到后来才意识到自己紧张，这种情况在你的一天里常见吗？"
+          },
+          {
+            "category": "strategy",
+            "text": "下一次停下来喝水时，先用一个词说说身体和一个词说说心情。"
+          },
+          {
+            "category": "support",
+            "text": "有些感受很难叫出名字，从简单的舒服、紧绷或说不上来开始即可。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "acting_awareness",
+        "scoreLabel": "专注正在做的事",
+        "headline": "让手里的事回来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录你做事时把注意力放在当下活动的频率。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "哪些一成不变的小事最容易让注意力跑远？"
+          },
+          {
+            "category": "strategy",
+            "text": "选一个很短的日常活动，发现走神后把注意力带回一个具体动作。"
+          },
+          {
+            "category": "support",
+            "text": "注意力会随睡眠、压力和环境波动，发现走神也可以是觉察的一部分。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "thoughts_relativity",
+        "scoreLabel": "看见想法的可变性",
+        "headline": "念头可以先放在桌上",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录你多常把一个想法视为可能的解释，并允许看法变化。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "上次误会别人时，哪个新信息让你改了主意？"
+          },
+          {
+            "category": "strategy",
+            "text": "把一句很确定的内心判断改写成「我现在的一个猜测是……」。"
+          },
+          {
+            "category": "support",
+            "text": "这份练习可以与查事实、照顾现实处境同时进行。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "insightful_understanding",
+        "scoreLabel": "放宽对小事的看法",
+        "headline": "过度用力时，松一格",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录你留意自己什么时候把事情想复杂，并能温和地看待这些反应的频率。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "什么时候你发现自己在为一个小事写一部长篇剧本？"
+          },
+          {
+            "category": "strategy",
+            "text": "留意一个反复出现的想法，给它起个无伤大雅的绰号，再回到手头一步。"
+          },
+          {
+            "category": "support",
+            "text": "面对真实难题时，给自己一点幽默也可以和认真求助并存。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "nonjudgmental_acceptance",
+        "scoreLabel": "善意地看待自己",
+        "headline": "先看见，再决定",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录你多常对自己的不足或不合意经历保有较少自责的态度。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "你会不会用比对朋友更尖刻的话评价自己？"
+          },
+          {
+            "category": "strategy",
+            "text": "把其中一句话换成「发生了什么，我现在可以做哪一步」。"
+          },
+          {
+            "category": "support",
+            "text": "对自己温和一点，可以给改变腾出空间。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "nonreactive_decentering",
+        "scoreLabel": "与想法保持一点距离",
+        "headline": "急着回应时，留一个空格",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录你多常在念头或情绪升起时稍退一步、保留观察距离。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "哪类消息最容易让你想立刻回一句？"
+          },
+          {
+            "category": "strategy",
+            "text": "如果情境安全，把第一反应先写在备忘录，稍后再选合适的回应。"
+          },
+          {
+            "category": "support",
+            "text": "遇到危险、越界或紧急事项时，及时行动和求助优先。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "openness",
+        "scoreLabel": "面对不舒服的体验",
+        "headline": "为感受留一把椅子",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录你面对不舒服的想法或感受时，容许它们被注意到的频率。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "有时试着推开一种感受，会不会让你更关注它？"
+          },
+          {
+            "category": "strategy",
+            "text": "选择一种程度较轻的不舒服，只留意它在哪里出现、怎样变化，再决定下一步。"
+          },
+          {
+            "category": "support",
+            "text": "身体不适或持续痛苦时可以休息、就医或求助，练习无需硬撑。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "total",
+        "scoreLabel": "整体正念体验",
+        "headline": "这是经常怎样，答案会随日子变化",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "总分把本表的 24 道频率题合在一起，概括这段时间你如何留意、理解和回应日常体验。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "哪一种小做法是你已经在用的，哪一种值得用几天试试看？"
+          },
+          {
+            "category": "strategy",
+            "text": "从一项最想尝试的做法开始，选一个安全且好记的日常时刻练习。"
+          },
+          {
+            "category": "support",
+            "text": "八方面可能高低不一，总分用于概览和自我反思。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "当前 C 是短表 S24，八个三题均值及 24 题均值均各为 1–6；保留现有参数的成人研究描述性解释。"
+    ],
+    "disclaimer": "这是成年人日常正念体验的研究试用稿。分数描述自报频率，暂无适用于当前工作译本的分级常模，报告用于回顾近期情境与选择一个可试的做法。",
+    "artworkKey": "chime_s24_zh_cn_research/1.0.1/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
