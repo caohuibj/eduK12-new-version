@@ -1,0 +1,100 @@
+{
+  "toolKey": "ipip_empathic_concern10_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "关切他人的处境｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对 IPIP 官方逐题与正反向键、冻结中文工作译稿和原 P 的 score-only 解释。当前证据适用于成人试用描述。"
+      }
+    },
+    "primaryScoreKeys": [
+      "ipip_empathic_concern10"
+    ],
+    "scoreOrder": [
+      "ipip_empathic_concern10"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "ipip_empathic_concern10",
+        "scoreLabel": "对他人处境的关切合计分（10–50）",
+        "headline": "在想帮忙之前，先弄清对方需要什么",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "得知一个人暂时遇到困境，有人会想起对方所处的环境，也有人先考虑自己能做到什么。这十题汇总你对同情、关心以及卷入他人处境的态度，得分范围为 10–50。较大数值表示更认同关切他人的方向。题目涉及不同群体与对困难的看法，答案也会受经历、群体印象和当下资源影响。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想起一次被他人的处境打动的经历，区分你知道的事实和自己补上的故事。"
+          },
+          {
+            "category": "strategy",
+            "text": "如果想提供帮助，先用一个开放问题请对方说出最需要的支持，再决定自己能做的范围。"
+          },
+          {
+            "category": "support",
+            "text": "当个人能做的有限时，可以提供可靠信息或协助联系适当支持，尊重当事人是否接受的选择。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "本报告使用项目中文工作译稿，面向其现有成人自评研究及自我回顾范围。当前证据支持对本次作答做描述。",
+      "原题和计分可按 IPIP 官方公有领域声明使用。由于本译稿尚无适配常模，报告仅显示实得分。",
+      "各结果按相应题组完整作答后计算，漏答保留为缺失。请结合近期情境和具体经历理解。"
+    ],
+    "disclaimer": "适用于成人试用研究及自我回顾。诊断、人员筛选、排名与个体高风险决定需要相应的专门方法。",
+    "artworkKey": "ipip_empathic_concern10_zh_cn_research/1.0.1/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
