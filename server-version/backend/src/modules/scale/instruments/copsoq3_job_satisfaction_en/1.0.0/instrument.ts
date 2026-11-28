@@ -1,6 +1,13 @@
 /** Teacher Pilot Batch 1: COPSOQ III International Middle Job Satisfaction. PILOT scientific maturity; package release is distinct from DB publication. */
 export const SCALE_INSTRUMENT_SOURCE = {
   "schemaVersion": 1,
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "Regarding your work in general. How pleased are you with",
+    "language": "en",
+    "version": "1.0.0",
+    "source": "COPSOQ International Network, COPSOQ III guidelines and questionnaire, Annex 1, shared prompt JS_T for the existing JS1/JS4/JS5 group."
+  },
   "identity": {
     "instrumentKey": "copsoq3_job_satisfaction_en",
     "instrumentVersion": "1.0.0"

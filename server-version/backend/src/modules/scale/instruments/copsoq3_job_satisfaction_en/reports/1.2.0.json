@@ -1,0 +1,80 @@
+{
+  "toolKey": "copsoq3_job_satisfaction_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0",
+  "title": "Job satisfaction | See what sits behind your answer",
+  "report": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "job_satisfaction"
+    ],
+    "scoreOrder": [
+      "job_satisfaction"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "job_satisfaction",
+        "scoreLabel": "Job satisfaction mean (0–100)",
+        "headline": "See what sits behind your answer",
+        "summary": "You can enjoy the people and the work, and still feel uncertain about what comes next. The three questions look at job prospects, how you feel about the job as a whole, and pay. This mean summarises your three responses. Two people can give very different answers to those three questions and still have similar means.\n\nTake a moment to decide which of the three topics you actually want to understand better. A change in responsibilities, information about pay, or a clearer view of the next step might matter to you for different reasons.",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Choose one topic and write down one experience that shaped your answer. If it would help, identify the information or conversation that might make the situation clearer."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "A higher mean reflects greater reported satisfaction across the three existing aspects. Read the answers in their work context. The brief subscale provides one score and has no reference group or threshold in this profile.",
+      "COPSOQ International Network, COPSOQ III, International Middle English. Preserve the questionnaire and Network attribution. Workplace use follows Network guidance, and it does not permit a fee for the questionnaire itself. Feedback and illustration are original platform materials."
+    ],
+    "disclaimer": "This pilot report describes responses for reflection in the stated research context.",
+    "artworkKey": "copsoq3_job_satisfaction_en/1.0.0/1.2.0"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
