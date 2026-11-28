@@ -1,0 +1,83 @@
+[
+  {
+    "id": "classroom-management",
+    "key": "talis2018_classroom_management_efficacy_zh_cn",
+    "title": "课堂管理中的自我把握",
+    "role": "上海 ISCED 2 教师",
+    "edition": "TALIS 2018 CN Shanghai Q34",
+    "locale": "zh-CN",
+    "questionnaireArchive": "https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip",
+    "teacherQuestionnaireSha256": "62075d479ff38078839cd61db4c8d6691ccc1f6f0a213a5e962bdf133b64a97b",
+    "officialIndex": "T3SECLS",
+    "technicalTable": "11.65",
+    "itemCodes": [
+      "TT3G34D",
+      "TT3G34F",
+      "TT3G34H",
+      "TT3G34I"
+    ],
+    "options": [
+      "完全不能",
+      "一定程度上能",
+      "比较能",
+      "非常能"
+    ],
+    "mode": "PER_ITEM_COUNTS",
+    "review": "classroom-management/review.md",
+    "artwork": "classroom-management/hero.webp"
+  },
+  {
+    "id": "instruction",
+    "key": "talis2018_instruction_efficacy_zh_cn",
+    "title": "调整教学方式的自我把握",
+    "role": "上海 ISCED 2 教师",
+    "edition": "TALIS 2018 CN Shanghai Q34",
+    "locale": "zh-CN",
+    "questionnaireArchive": "https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip",
+    "teacherQuestionnaireSha256": "62075d479ff38078839cd61db4c8d6691ccc1f6f0a213a5e962bdf133b64a97b",
+    "officialIndex": "T3SEINS",
+    "technicalTable": "11.66",
+    "itemCodes": [
+      "TT3G34C",
+      "TT3G34J",
+      "TT3G34K",
+      "TT3G34L"
+    ],
+    "options": [
+      "完全不能",
+      "一定程度上能",
+      "比较能",
+      "非常能"
+    ],
+    "mode": "PER_ITEM_COUNTS",
+    "review": "instruction/review.md",
+    "artwork": "instruction/hero.webp"
+  },
+  {
+    "id": "student-engagement",
+    "key": "talis2018_student_engagement_efficacy_zh_cn",
+    "title": "支持学生参与的自我把握",
+    "role": "上海 ISCED 2 教师",
+    "edition": "TALIS 2018 CN Shanghai Q34",
+    "locale": "zh-CN",
+    "questionnaireArchive": "https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip",
+    "teacherQuestionnaireSha256": "62075d479ff38078839cd61db4c8d6691ccc1f6f0a213a5e962bdf133b64a97b",
+    "officialIndex": "T3SEENG",
+    "technicalTable": "11.67",
+    "itemCodes": [
+      "TT3G34A",
+      "TT3G34B",
+      "TT3G34E",
+      "TT3G34G"
+    ],
+    "options": [
+      "完全不能",
+      "一定程度上能",
+      "比较能",
+      "非常能"
+    ],
+    "mode": "PER_ITEM_COUNTS",
+    "review": "student-engagement/review.md",
+    "artwork": "student-engagement/hero.webp"
+  }
+]

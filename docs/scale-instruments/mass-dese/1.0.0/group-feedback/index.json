@@ -1,0 +1,562 @@
+{
+  "schemaVersion": 1,
+  "reportType": "anonymous-group-item-counts",
+  "scoring": "none",
+  "protection": "authorized aggregate input only",
+  "reportLabels": {
+    "en": {
+      "item": "Item",
+      "valid": "Valid responses",
+      "form": "Form",
+      "groupSize": "Group size",
+      "denominator": "This is an item-by-item summary for one cohort and one form. Percentages use the number of valid responses to each item. Blank responses are counted separately, as are not-applicable responses on staff forms. A dash denotes a percentage with no valid responses. Use the report for a conversation about teaching or leadership practices.",
+      "action": "One change to try",
+      "source": "Official form",
+      "protocol": "Administration protocol"
+    },
+    "zh-CN": {
+      "item": "题号",
+      "valid": "有效人数",
+      "form": "使用表单",
+      "groupSize": "群组人数",
+      "denominator": "同一版、同一群组逐题汇总。比例的分母为该题的有效作答人数。空白单独记数；教职工版另列不适用。没有有效作答时，比例显示为横线。这份报告用于讨论教学或管理实践。",
+      "action": "下一步可以试试",
+      "source": "官方原件",
+      "protocol": "施测说明"
+    }
+  },
+  "responseSets": {
+    "student": {
+      "columns": [
+        "strongly_agree",
+        "agree",
+        "disagree",
+        "strongly_disagree",
+        "blank"
+      ],
+      "labels": {
+        "en": [
+          "Strongly Agree",
+          "Agree",
+          "Disagree",
+          "Strongly Disagree",
+          "Blank"
+        ],
+        "zh-CN": [
+          "非常同意",
+          "同意",
+          "不同意",
+          "非常不同意",
+          "空白"
+        ]
+      }
+    },
+    "staff": {
+      "columns": [
+        "strongly_agree",
+        "agree",
+        "neutral",
+        "disagree",
+        "strongly_disagree",
+        "not_applicable",
+        "blank"
+      ],
+      "labels": {
+        "en": [
+          "Strongly Agree",
+          "Moderately Agree",
+          "Neither Agree nor Disagree",
+          "Moderately Disagree",
+          "Strongly Disagree",
+          "Not Applicable",
+          "Blank"
+        ],
+        "zh-CN": [
+          "非常同意",
+          "比较同意",
+          "中立",
+          "比较不同意",
+          "非常不同意",
+          "不适用",
+          "空白"
+        ]
+      }
+    }
+  },
+  "forms": [
+    {
+      "catalogKey": "mass_dese_student_standard_g3_5_en@1.0.0",
+      "sourceSha256": "4e6f75731b8f31a32cdeef0eb078735794d68e0cdcb50208f4bd90e5479d1123",
+      "numberedCount": 40,
+      "respondent": "STUDENT",
+      "ratedRole": "TEACHER_AND_CLASSROOM",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "responseSet": "student",
+      "title": {
+        "en": "Massachusetts DESE · Grades 3–5 students Standard Form",
+        "zh-CN": "Massachusetts DESE · 3–5 年级学生 标准卷"
+      },
+      "officialSource": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5standard-form.docx",
+      "administrationProtocol": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5-admin-protocol.docx",
+      "worksheet": "g35-standard/item-counts.csv",
+      "review": {
+        "en": "g35-standard/review-en.md",
+        "zh-CN": "g35-standard/review.md"
+      },
+      "artwork": "g35-standard/hero.webp",
+      "illustrationAlt": "小学教室里，学生在几个活动角动手和讨论。",
+      "content": {
+        "en": {
+          "title": "Find the part of class that helps pupils keep up",
+          "lead": "Imagine a lesson as a short journey. Pupils’ feedback can show where it is easy to keep up and where a clearer signpost might help. This 40-item report keeps the responses attached to each question so you can read them alongside recent classroom examples.",
+          "action": "Choose a question with a spread of answers and recall a recent explanation or transition. In the next lesson, model the step once and ask pupils to describe what they will do next.",
+          "scope": "The intended reader is the teacher of the class supplying the aggregate feedback for grades 3–5 students. The form has 40 numbered items. Handle optional comments separately under the administration protocol."
+        },
+        "zh-CN": {
+          "title": "问问课堂里哪一步更容易跟上",
+          "lead": "把一节课想成一条小路。学生的反馈可以告诉我们，哪一段好走，哪一段需要一个更清楚的提示。这份 40 题报告把声音放回各道题，便于结合最近的课堂片段理解。",
+          "action": "选一道分布较分散的题，回看最近一次讲解或过渡。下节课先示范一遍，再请学生描述自己接下来要做什么。",
+          "scope": "供3–5 年级学生所在班级的教师查看群体反馈。表单为 40 道编号题。可选评论按原施测说明另行处理。"
+        }
+      },
+      "illustrationAltEn": "Primary school pupils discuss and take part in several classroom activities."
+    },
+    {
+      "catalogKey": "mass_dese_student_short_g3_5_en@1.0.0",
+      "sourceSha256": "361fe64404893ac64b9d8c9268f05902795ba4073a1c905c3294a468e34e1139",
+      "numberedCount": 20,
+      "respondent": "STUDENT",
+      "ratedRole": "TEACHER_AND_CLASSROOM",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "responseSet": "student",
+      "title": {
+        "en": "Massachusetts DESE · Grades 3–5 students Short Form",
+        "zh-CN": "Massachusetts DESE · 3–5 年级学生 短卷"
+      },
+      "officialSource": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5short-form.docx",
+      "administrationProtocol": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5-admin-protocol.docx",
+      "worksheet": "g35-short/item-counts.csv",
+      "review": {
+        "en": "g35-short/review-en.md",
+        "zh-CN": "g35-short/review.md"
+      },
+      "artwork": "g35-short/hero.webp",
+      "illustrationAlt": "小学课桌旁，一张匿名课后反思便签静静放着。",
+      "content": {
+        "en": {
+          "title": "Use a brief check-in to plan the next lesson",
+          "lead": "A short form offers a quick sketch of pupils’ current experience. Use the 20 questions to spot a specific issue you can explore, and read the valid response count beside each distribution.",
+          "action": "Choose an activity about which pupils had mixed views. Try opening it with one sentence and one example, then see whether pupils can more readily explain what to do.",
+          "scope": "The intended reader is the teacher of the class supplying the aggregate feedback for grades 3–5 students. The form has 20 numbered items. Handle optional comments separately under the administration protocol."
+        },
+        "zh-CN": {
+          "title": "用一次短反馈找到下节课的起点",
+          "lead": "一张短卷像课堂的速写。用 20 道题看到学生此时的经历，再挑一个能验证的小问题。每道题有自己的有效人数，少量回收先作线索。",
+          "action": "选一个学生意见不同的地方，把活动开头改成一句话加一个实例。下次比较学生能否更快说出要做哪一步。",
+          "scope": "供3–5 年级学生所在班级的教师查看群体反馈。表单为 20 道编号题。可选评论按原施测说明另行处理。"
+        }
+      },
+      "illustrationAltEn": "A short reflection note is left beside a primary school desk."
+    },
+    {
+      "catalogKey": "mass_dese_student_mini_i_g3_5_en@1.0.0",
+      "sourceSha256": "3eb360afbff14a1e237f9f0b65656524a93b6748948adbab6c1e3d5b9ba92436",
+      "numberedCount": 8,
+      "respondent": "STUDENT",
+      "ratedRole": "TEACHER_AND_CLASSROOM",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "responseSet": "student",
+      "title": {
+        "en": "Massachusetts DESE · Grades 3–5 students Mini Standard I",
+        "zh-CN": "Massachusetts DESE · 3–5 年级学生 迷你卷 I"
+      },
+      "officialSource": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5mini-form-i.docx",
+      "administrationProtocol": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5-admin-protocol.docx",
+      "worksheet": "g35-mini-i/item-counts.csv",
+      "review": {
+        "en": "g35-mini-i/review-en.md",
+        "zh-CN": "g35-mini-i/review.md"
+      },
+      "artwork": "g35-mini-i/hero.webp",
+      "illustrationAlt": "老师展示课堂目标，学生对照具体的活动材料。",
+      "content": {
+        "en": {
+          "title": "Make the learning goal visible",
+          "lead": "These eight questions concern curriculum, instruction and assessment. Read each distribution alongside a classroom activity and notice when the goal, an example or feedback helped pupils work out what to do next.",
+          "action": "Pair one learning goal with a visible example and invite pupils to explain in their own words what finished work might look like.",
+          "scope": "The intended reader is the teacher of the class supplying the aggregate feedback for grades 3–5 students. The form has 8 numbered items. Handle optional comments separately under the administration protocol."
+        },
+        "zh-CN": {
+          "title": "让孩子看见这节课要学到什么",
+          "lead": "这 8 道题围绕课程、教学与评价。把每题反馈和一项具体课堂活动对照，看看目标、例子或反馈在什么时候帮助学生明白下一步。",
+          "action": "把一个学习目标配上一份看得见的示例，让孩子用自己的话说说做到什么样算完成。",
+          "scope": "供3–5 年级学生所在班级的教师查看群体反馈。表单为 8 道编号题。可选评论按原施测说明另行处理。"
+        }
+      },
+      "illustrationAltEn": "A teacher introduces a learning goal with classroom materials."
+    },
+    {
+      "catalogKey": "mass_dese_student_mini_ii_g3_5_en@1.0.0",
+      "sourceSha256": "ea5a1eef4fce78a6a6578f947c61c5d3f48579189cb6b93eeef4afd907cc92ac",
+      "numberedCount": 10,
+      "respondent": "STUDENT",
+      "ratedRole": "TEACHER_AND_CLASSROOM",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "responseSet": "student",
+      "title": {
+        "en": "Massachusetts DESE · Grades 3–5 students Mini Standard II",
+        "zh-CN": "Massachusetts DESE · 3–5 年级学生 迷你卷 II"
+      },
+      "officialSource": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5mini-form-ii.docx",
+      "administrationProtocol": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5-admin-protocol.docx",
+      "worksheet": "g35-mini-ii/item-counts.csv",
+      "review": {
+        "en": "g35-mini-ii/review-en.md",
+        "zh-CN": "g35-mini-ii/review.md"
+      },
+      "artwork": "g35-mini-ii/hero.webp",
+      "illustrationAlt": "小学同伴用两种不同材料尝试同一个活动。",
+      "content": {
+        "en": {
+          "title": "Give every pupil a way into the task",
+          "lead": "Pupils may need different ways into the same activity. These 10 questions help you notice whether the classroom offers routes that pupils can actually use.",
+          "action": "Offer two routes into one familiar task, such as looking at an example or trying it first. Use what you observe to decide whether both routes should stay.",
+          "scope": "The intended reader is the teacher of the class supplying the aggregate feedback for grades 3–5 students. The form has 10 numbered items. Handle optional comments separately under the administration protocol."
+        },
+        "zh-CN": {
+          "title": "给每个孩子一条走进任务的路",
+          "lead": "同一个任务，有的孩子靠看图理解，有的孩子要先动手。这 10 道题帮助你看看学生进入课堂活动时的具体经历。",
+          "action": "在一个已有任务中给出两种起步方式，例如先看例子或先试一遍。观察孩子怎样进入任务，再决定是否保留两种方式。",
+          "scope": "供3–5 年级学生所在班级的教师查看群体反馈。表单为 10 道编号题。可选评论按原施测说明另行处理。"
+        }
+      },
+      "illustrationAltEn": "Pupils use different materials to take part in the same activity."
+    },
+    {
+      "catalogKey": "mass_dese_student_mini_i_ii_g3_5_en@1.0.0",
+      "sourceSha256": "3adf250d2424648bc30c5f3426b9f41e09f35ec22b4f8bca4f9cfa8152e9b31b",
+      "numberedCount": 12,
+      "respondent": "STUDENT",
+      "ratedRole": "TEACHER_AND_CLASSROOM",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "responseSet": "student",
+      "title": {
+        "en": "Massachusetts DESE · Grades 3–5 students Mini Standards I and II",
+        "zh-CN": "Massachusetts DESE · 3–5 年级学生 迷你卷 I 与 II"
+      },
+      "officialSource": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5mini-form-i-ii.docx",
+      "administrationProtocol": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5-admin-protocol.docx",
+      "worksheet": "g35-mini-both/item-counts.csv",
+      "review": {
+        "en": "g35-mini-both/review-en.md",
+        "zh-CN": "g35-mini-both/review.md"
+      },
+      "artwork": "g35-mini-both/hero.webp",
+      "illustrationAlt": "小学学生围在同一张桌边，以不同方式参与合作。",
+      "content": {
+        "en": {
+          "title": "Connect the learning goal to ways of taking part",
+          "lead": "A task can have a clear goal and several ways for pupils to join in. This fixed 12-item form brings both topics into one round of feedback and keeps the result for each question separate.",
+          "action": "Use one group activity to name the goal and offer ways to contribute by speaking, writing or arranging materials. Notice which choices created genuine contributions.",
+          "scope": "The intended reader is the teacher of the class supplying the aggregate feedback for grades 3–5 students. The form has 12 numbered items. Handle optional comments separately under the administration protocol."
+        },
+        "zh-CN": {
+          "title": "让目标和参与机会接在一起",
+          "lead": "一个任务可以有清楚的目标，也可以让不同的孩子找到自己的参与方式。固定 12 题合并版把两类经历放在同一次反馈里，阅读时仍按原题分开看。",
+          "action": "挑一个合作活动，把目标说清，再提供说、写或摆材料的参与选择。记录哪一种选择让更多孩子有了实际贡献。",
+          "scope": "供3–5 年级学生所在班级的教师查看群体反馈。表单为 12 道编号题。可选评论按原施测说明另行处理。"
+        }
+      },
+      "illustrationAltEn": "Pupils work together and take part in different ways."
+    },
+    {
+      "catalogKey": "mass_dese_student_standard_g6_12_en@1.0.0",
+      "sourceSha256": "2bc62c1c2b28e32922186d1c165722f2a39348f7835a14b458bacb67a5700448",
+      "numberedCount": 45,
+      "respondent": "STUDENT",
+      "ratedRole": "TEACHER_AND_CLASSROOM",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "responseSet": "student",
+      "title": {
+        "en": "Massachusetts DESE · Grades 6–12 students Standard Form",
+        "zh-CN": "Massachusetts DESE · 6–12 年级学生 标准卷"
+      },
+      "officialSource": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12standard-form.docx",
+      "administrationProtocol": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12-admin-protocol.docx",
+      "worksheet": "g612-standard/item-counts.csv",
+      "review": {
+        "en": "g612-standard/review-en.md",
+        "zh-CN": "g612-standard/review.md"
+      },
+      "artwork": "g612-standard/hero.webp",
+      "illustrationAlt": "中学生分组探究，同伴交流，把想法记录在共享材料上。",
+      "content": {
+        "en": {
+          "title": "Bring the distributions back to a real lesson",
+          "lead": "The 45 questions give you several observation points into students’ experience. When answers cluster or spread out, use the task, attendance and examples of student work to put that question in context.",
+          "action": "Pick two questions worth exploring in one class. Find a related assignment or discussion, then decide what to observe next time.",
+          "scope": "The intended reader is the teacher of the class supplying the aggregate feedback for grades 6–12 students. The form has 45 numbered items. Handle optional comments separately under the administration protocol."
+        },
+        "zh-CN": {
+          "title": "把分布带回一堂实际的课",
+          "lead": "45 道原题给出学生经历的多个观察点。看到相近或分开的分布时，先对照课程任务、当天参与情况和学生作品，看看这一行可能在提醒什么。",
+          "action": "在一门课里挑两道值得了解的题。找一个相关的作业或讨论片段，再决定下次收集哪一点观察。",
+          "scope": "供6–12 年级学生所在班级的教师查看群体反馈。表单为 45 道编号题。可选评论按原施测说明另行处理。"
+        }
+      },
+      "illustrationAltEn": "Secondary students discuss an inquiry and record ideas together."
+    },
+    {
+      "catalogKey": "mass_dese_student_short_g6_12_en@1.0.0",
+      "sourceSha256": "8bb9205ea956afc3ac70ca8b3ab28dc033afd319312eb83865d39389e90a8686",
+      "numberedCount": 20,
+      "respondent": "STUDENT",
+      "ratedRole": "TEACHER_AND_CLASSROOM",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "responseSet": "student",
+      "title": {
+        "en": "Massachusetts DESE · Grades 6–12 students Short Form",
+        "zh-CN": "Massachusetts DESE · 6–12 年级学生 短卷"
+      },
+      "officialSource": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12short-form.docx",
+      "administrationProtocol": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12-admin-protocol.docx",
+      "worksheet": "g612-short/item-counts.csv",
+      "review": {
+        "en": "g612-short/review-en.md",
+        "zh-CN": "g612-short/review.md"
+      },
+      "artwork": "g612-short/hero.webp",
+      "illustrationAlt": "课将结束时，一名中学生回看材料并写下反思。",
+      "content": {
+        "en": {
+          "title": "Leave five minutes to look back at the lesson",
+          "lead": "These 20 items offer a brief look at classroom experience. Keep the response distribution and valid count together, and take one finding you can connect to practice into your next planning session.",
+          "action": "Invite students to name one step that helped and one that remains unclear at the end of class. Use anonymous feedback to see whether it echoes the item distributions.",
+          "scope": "The intended reader is the teacher of the class supplying the aggregate feedback for grades 6–12 students. The form has 20 numbered items. Handle optional comments separately under the administration protocol."
+        },
+        "zh-CN": {
+          "title": "给课末回看留五分钟",
+          "lead": "这 20 道题是一张简要课堂反馈。把每题的档位分布与有效人数放在一起读，选择一个能联系课堂实践的发现带去下一次备课。",
+          "action": "请学生在课末写下「清楚的一步」和「还不清楚的一步」，用不记名的方式比较是否呼应你看到的逐题分布。",
+          "scope": "供6–12 年级学生所在班级的教师查看群体反馈。表单为 20 道编号题。可选评论按原施测说明另行处理。"
+        }
+      },
+      "illustrationAltEn": "A student looks back at learning materials near the end of class."
+    },
+    {
+      "catalogKey": "mass_dese_student_mini_i_g6_12_en@1.0.0",
+      "sourceSha256": "bb3411253ed01280586fb93abf17faf124caa57bdb96581dfe84f3626002db02",
+      "numberedCount": 8,
+      "respondent": "STUDENT",
+      "ratedRole": "TEACHER_AND_CLASSROOM",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "responseSet": "student",
+      "title": {
+        "en": "Massachusetts DESE · Grades 6–12 students Mini Standard I",
+        "zh-CN": "Massachusetts DESE · 6–12 年级学生 迷你卷 I"
+      },
+      "officialSource": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12mini-form-i.docx",
+      "administrationProtocol": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12-admin-protocol.docx",
+      "worksheet": "g612-mini-i/item-counts.csv",
+      "review": {
+        "en": "g612-mini-i/review-en.md",
+        "zh-CN": "g612-mini-i/review.md"
+      },
+      "artwork": "g612-mini-i/hero.webp",
+      "illustrationAlt": "中学生和老师对照两份作业示例，思考下一步改进。",
+      "content": {
+        "en": {
+          "title": "Make feedback usable in the next attempt",
+          "lead": "These eight questions concern curriculum, instruction and assessment. Start with the goals, activities and feedback students experienced, and identify one classroom routine worth changing and observing again.",
+          "action": "Build a visible feedback step into another attempt at one task. Use two de-identified examples of work to examine whether students used the guidance.",
+          "scope": "The intended reader is the teacher of the class supplying the aggregate feedback for grades 6–12 students. The form has 8 numbered items. Handle optional comments separately under the administration protocol."
+        },
+        "zh-CN": {
+          "title": "让反馈能落到下一次尝试",
+          "lead": "这 8 道题围绕课程、教学与评价。从学生所经历的目标、活动和反馈出发，看看有没有哪一处安排值得调整和再看。",
+          "action": "给同一项作业的下一次尝试安排一个能看见的反馈步骤。收集两份去身份作品，看看学生能否把提示用到改进中。",
+          "scope": "供6–12 年级学生所在班级的教师查看群体反馈。表单为 8 道编号题。可选评论按原施测说明另行处理。"
+        }
+      },
+      "illustrationAltEn": "Students and a teacher examine examples of work together."
+    },
+    {
+      "catalogKey": "mass_dese_student_mini_ii_g6_12_en@1.0.0",
+      "sourceSha256": "786c83673831ac6cedbed922047be83a16759946c321a83b927056e9b1d4ee61",
+      "numberedCount": 10,
+      "respondent": "STUDENT",
+      "ratedRole": "TEACHER_AND_CLASSROOM",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "responseSet": "student",
+      "title": {
+        "en": "Massachusetts DESE · Grades 6–12 students Mini Standard II",
+        "zh-CN": "Massachusetts DESE · 6–12 年级学生 迷你卷 II"
+      },
+      "officialSource": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12mini-form-ii.docx",
+      "administrationProtocol": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12-admin-protocol.docx",
+      "worksheet": "g612-mini-ii/item-counts.csv",
+      "review": {
+        "en": "g612-mini-ii/review-en.md",
+        "zh-CN": "g612-mini-ii/review.md"
+      },
+      "artwork": "g612-mini-ii/hero.webp",
+      "illustrationAlt": "中学教室里，有人写观点卡，有人先与伙伴交流。",
+      "content": {
+        "en": {
+          "title": "Notice where students can join in",
+          "lead": "These 10 questions capture students’ perceptions of how teaching supports different learners. Observe where responses gather or differ and connect the pattern to real opportunities to participate.",
+          "action": "Add a way to enter one discussion, such as writing a view first or sharing with a partner. Observe whether students who participate less often have a workable route in.",
+          "scope": "The intended reader is the teacher of the class supplying the aggregate feedback for grades 6–12 students. The form has 10 numbered items. Handle optional comments separately under the administration protocol."
+        },
+        "zh-CN": {
+          "title": "看看学生在哪里能参与进来",
+          "lead": "这 10 道题记录学生对于教学如何支持不同学习者的感受。每题先看意见是否集中，再结合实际参与机会去理解差异。",
+          "action": "在一个课堂讨论中加入一种替代参与方式，例如先写观点或先与同伴交流。观察原本不常开口的人是否也有机会贡献。",
+          "scope": "供6–12 年级学生所在班级的教师查看群体反馈。表单为 10 道编号题。可选评论按原施测说明另行处理。"
+        }
+      },
+      "illustrationAltEn": "Students write ideas or talk with a partner before a discussion."
+    },
+    {
+      "catalogKey": "mass_dese_student_mini_i_ii_g6_12_en@1.0.0",
+      "sourceSha256": "b787962cbe3031b36c372ba13793bd7660a757f7ba9ea349870f2aa9efa2ed4f",
+      "numberedCount": 12,
+      "respondent": "STUDENT",
+      "ratedRole": "TEACHER_AND_CLASSROOM",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "responseSet": "student",
+      "title": {
+        "en": "Massachusetts DESE · Grades 6–12 students Mini Standards I and II",
+        "zh-CN": "Massachusetts DESE · 6–12 年级学生 迷你卷 I 与 II"
+      },
+      "officialSource": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12mini-form-i-ii.docx",
+      "administrationProtocol": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12-admin-protocol.docx",
+      "worksheet": "g612-mini-both/item-counts.csv",
+      "review": {
+        "en": "g612-mini-both/review-en.md",
+        "zh-CN": "g612-mini-both/review.md"
+      },
+      "artwork": "g612-mini-both/hero.webp",
+      "illustrationAlt": "中学师生正从走廊进入教室，准备开始分组学习。",
+      "content": {
+        "en": {
+          "title": "Connect purpose and participation in one routine",
+          "lead": "This fixed 12-item form brings together perceptions of instructional design and opportunities to participate. One classroom transition can give a practical context for reading the distributions.",
+          "action": "Invite students to express the purpose of an activity in different ways and observe how they get started. Make one small adjustment and examine later feedback alongside work samples.",
+          "scope": "The intended reader is the teacher of the class supplying the aggregate feedback for grades 6–12 students. The form has 12 numbered items. Handle optional comments separately under the administration protocol."
+        },
+        "zh-CN": {
+          "title": "从一个课堂环节连起目标与机会",
+          "lead": "固定 12 题合并版让课程安排与参与体验出现在同一份反馈里。可以选一个具体环节来解释逐题分布，例如从课前活动过渡到课堂讨论。",
+          "action": "邀请学生用不同方式说出活动目的，观察他们如何进入任务。选一个小改动，再用课堂作品和下次反馈检查。",
+          "scope": "供6–12 年级学生所在班级的教师查看群体反馈。表单为 12 道编号题。可选评论按原施测说明另行处理。"
+        }
+      },
+      "illustrationAltEn": "Students move from a school corridor into a classroom group activity."
+    },
+    {
+      "catalogKey": "mass_dese_staff_standard_adult_en@1.0.0",
+      "sourceSha256": "c06e039047483bf362db3f34c926aad2b01a329ff47a1edbc53419568bfc4197",
+      "numberedCount": 65,
+      "respondent": "STAFF",
+      "ratedRole": "SCHOOL_ADMINISTRATOR",
+      "gradeRange": null,
+      "responseSet": "staff",
+      "title": {
+        "en": "Massachusetts DESE · Staff Standard Form",
+        "zh-CN": "Massachusetts DESE · 教职工 标准卷"
+      },
+      "officialSource": "https://www.doe.mass.edu/edeval/evidence/feedback/staff-standard-form.docx",
+      "administrationProtocol": "https://www.doe.mass.edu/edeval/evidence/feedback/staff-admin-protocol.docx",
+      "worksheet": "staff-standard/item-counts.csv",
+      "review": {
+        "en": "staff-standard/review-en.md",
+        "zh-CN": "staff-standard/review.md"
+      },
+      "artwork": "staff-standard/hero.webp",
+      "illustrationAlt": "教职工围桌讨论工作支持和协作流程。",
+      "content": {
+        "en": {
+          "title": "Bring leadership feedback into a planned conversation",
+          "lead": "These 65 questions capture staff perceptions of school leadership practices covered by the form’s Standards I, II and IV. Read each distribution with the actual context of collaboration, communication and support in mind.",
+          "action": "Choose a question with enough valid feedback for your context and a pattern worth exploring. Discuss the observable process with staff in different roles and agree on one practice to revisit.",
+          "scope": "Staff give anonymous feedback about school leadership. The form has 65 numbered items. Handle optional comments separately under the administration protocol."
+        },
+        "zh-CN": {
+          "title": "把管理反馈带到一次有议程的对话",
+          "lead": "65 道题记录教职工对学校管理实践的感受，涉及原卷中的标准 I、II 和 IV。把每一行放回实际的协作、沟通和支持情境，看看哪一点值得团队进一步了解。",
+          "action": "选一道有效作答较充分、意见分布值得了解的题。会上围绕可观察的流程讨论，听取不同岗位需要，各记下一项可以调整的做法。",
+          "scope": "教职工匿名反馈学校管理实践，供校内改进。表单为 65 道编号题。可选评论按原施测说明另行处理。"
+        }
+      },
+      "illustrationAltEn": "Staff meet to discuss how to support and work with one another."
+    },
+    {
+      "catalogKey": "mass_dese_staff_short_adult_en@1.0.0",
+      "sourceSha256": "c549fa2f208ec426a615e67a0bf0075fdf58f7ab4055d743b211e0855993a797",
+      "numberedCount": 35,
+      "respondent": "STAFF",
+      "ratedRole": "SCHOOL_ADMINISTRATOR",
+      "gradeRange": null,
+      "responseSet": "staff",
+      "title": {
+        "en": "Massachusetts DESE · Staff Short Form",
+        "zh-CN": "Massachusetts DESE · 教职工 短卷"
+      },
+      "officialSource": "https://www.doe.mass.edu/edeval/evidence/feedback/staff-short-form.docx",
+      "administrationProtocol": "https://www.doe.mass.edu/edeval/evidence/feedback/staff-admin-protocol.docx",
+      "worksheet": "staff-short/item-counts.csv",
+      "review": {
+        "en": "staff-short/review-en.md",
+        "zh-CN": "staff-short/review.md"
+      },
+      "artwork": "staff-short/hero.webp",
+      "illustrationAlt": "两位教职工在安静会议室回看一项具体工作流程。",
+      "content": {
+        "en": {
+          "title": "Turn one point of friction into a small change",
+          "lead": "These 35 questions give a short snapshot of staff perceptions of leadership practice. Some processes apply to a subset of roles, and counting not-applicable responses separately helps clarify the feedback.",
+          "action": "Choose a communication or support process used by many staff. Ask about one specific point of friction, try a small change, and agree when to review it.",
+          "scope": "Staff give anonymous feedback about school leadership. The form has 35 numbered items. Handle optional comments separately under the administration protocol."
+        },
+        "zh-CN": {
+          "title": "把一处流程摩擦变成可尝试的小改动",
+          "lead": "35 道题提供教职工对管理实践的简要快照。有些做法只涉及部分岗位，「不适用」单列后，意见分布更容易读。",
+          "action": "选一项大家接触较多的沟通或支持流程，请教职工描述其中一个具体的卡点。尝试改进一个环节，并约定何时回看。",
+          "scope": "教职工匿名反馈学校管理实践，供校内改进。表单为 35 道编号题。可选评论按原施测说明另行处理。"
+        }
+      },
+      "illustrationAltEn": "Two colleagues review a school routine in a quiet meeting space."
+    }
+  ]
+}

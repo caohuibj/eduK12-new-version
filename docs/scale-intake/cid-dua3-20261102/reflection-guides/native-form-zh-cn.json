@@ -1,0 +1,226 @@
+{
+  "requestId": "19f1e02e-8234-5bec-be53-05d0cb2fd3b7",
+  "toolKey": "cid_dua3_2026_evidence_form_zh_cn",
+  "version": "1.0.0",
+  "title": "CID-DUA3｜实践证据与行动记录｜教师自评｜简体中文工作译稿",
+  "statement": "由 Gómez Martín、Cruz Cruz、Martínez Cano 和 Martín Cruz（2026）论文表 2（CC BY 4.0）全 12 项陈述翻译。原顺序保留，中文指导语与 3 个项目反思提示用于教师开放文字记录。保留英文来源及改动说明。无参数、无数值报告或分量表。简体中文项目工作译稿，未建立中文版测量效度。",
+  "classificationTags": [
+    "population:teacher",
+    "language_validation:content_zh-CN",
+    "language_validation:maturity_pilot",
+    "use:reflection"
+  ],
+  "reference": {
+    "source": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1921354/full",
+    "doi": "10.3389/feduc.2026.1921354",
+    "published": "2026-09-09",
+    "authors": [
+      "Marta Gómez Martín",
+      "Purificación Cruz Cruz",
+      "Amparo Martínez Cano",
+      "Inés Martín Cruz"
+    ],
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "sourceTable": "Table 2",
+    "sourceItemIds": [
+      "I1",
+      "I2",
+      "I3",
+      "I4",
+      "I5",
+      "I6",
+      "I7",
+      "I8",
+      "I9",
+      "I10",
+      "I11",
+      "I12"
+    ],
+    "tags": [
+      "family:cid_dua3",
+      "role:teacher_self",
+      "stage:mixed_teaching_contexts",
+      "language:zh-CN",
+      "source_version:2026_revised_12",
+      "use:reflection",
+      "status:PILOT",
+      "license:cc_by_4_0"
+    ],
+    "adaptation": "Translated the twelve published English statements into simplified Chinese, in the published order. The existing project adds three optional reflection questions, page guidance and optional evidence responses in free text. This unscored working translation has no validated Chinese scoring interpretation.",
+    "languageStatus": "project_working_translation_zh-CN_unscored_not_psychometrically_validated",
+    "translationChanges": [
+      "I1–I12 translated into Simplified Chinese in original order",
+      "Chinese page guidance lightly edited for clarity",
+      "Original optional project reflection questions preserved verbatim",
+      "All response fields, limits and field keys unchanged"
+    ],
+    "originalEvidenceForm": {
+      "toolKey": "cid_dua3_2026_evidence_form_en",
+      "version": "1.0.0",
+      "sha256": "b5a71238071b423215d64e38d6c1187211cc6e027c38090cf21e01721eca47a9"
+    },
+    "deploymentScope": "NON_COMMERCIAL_EDUCATIONAL"
+  },
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "cid_context",
+        "title": "项目提示｜选择一个教学计划",
+        "description": "请选取近期一次教学安排，简要记录相关情境。请勿填写能识别学生个人身份的信息。本表用于记录教学实践，不计分。",
+        "questions": [
+          {
+            "itemKey": "cid_instructional_plan",
+            "type": "LONG_TEXT",
+            "prompt": "请简要描述作为参照的教学活动、目标及情境。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1500
+          }
+        ]
+      },
+      {
+        "pageKey": "cid_source_evidence",
+        "title": "CID-DUA3｜12项实践证据｜简体中文工作译稿",
+        "description": "以下陈述译自 Gómez Martín 等人于 2026 年发表的论文表 2（CC BY 4.0）。每项都可记录一个具体例子、已经掌握的证据、实施条件或不适用情况，也可留空。反馈为文字记录，不计算频率得分。",
+        "questions": [
+          {
+            "itemKey": "cid_dua3_i1_evidence",
+            "type": "LONG_TEXT",
+            "prompt": "我会用文字、图片、音频或视频等不同形式呈现内容，方便学生获取和理解这些内容。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 2000
+          },
+          {
+            "itemKey": "cid_dua3_i2_evidence",
+            "type": "LONG_TEXT",
+            "prompt": "我会调整材料、示例和讲解，尽量消除可能妨碍学生理解的因素。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 2000
+          },
+          {
+            "itemKey": "cid_dua3_i3_evidence",
+            "type": "LONG_TEXT",
+            "prompt": "在引入新内容前，我会引导学生调动已有知识。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 2000
+          },
+          {
+            "itemKey": "cid_dua3_i4_evidence",
+            "type": "LONG_TEXT",
+            "prompt": "我会突出完成任务所涉及的核心概念、关键步骤或重要联系。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 2000
+          },
+          {
+            "itemKey": "cid_dua3_i5_evidence",
+            "type": "LONG_TEXT",
+            "prompt": "活动中，我会提供多种方式，让学生参与并相互交流。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 2000
+          },
+          {
+            "itemKey": "cid_dua3_i6_evidence",
+            "type": "LONG_TEXT",
+            "prompt": "我会让学生选择适合任务的方式展示学习成果，例如口头表达、书面表达、视觉呈现或使用数字工具。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 2000
+          },
+          {
+            "itemKey": "cid_dua3_i7_evidence",
+            "type": "LONG_TEXT",
+            "prompt": "在开始任务前，我会提供指南、图形组织工具或分步提示等支持，帮助学生规划和组织自己的工作。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 2000
+          },
+          {
+            "itemKey": "cid_dua3_i8_evidence",
+            "type": "LONG_TEXT",
+            "prompt": "在任务进行中，我会提供进度检查指南、核对清单或自评工具等有步骤的支持，帮助学生回顾进展并及时调整。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 2000
+          },
+          {
+            "itemKey": "cid_dua3_i9_evidence",
+            "type": "LONG_TEXT",
+            "prompt": "我会在活动的不同环节安排有实际意义的选择机会，增强学生的自主性和参与度。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 2000
+          },
+          {
+            "itemKey": "cid_dua3_i10_evidence",
+            "type": "LONG_TEXT",
+            "prompt": "我会把活动与学生的兴趣、目标或学习动机联系起来。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 2000
+          },
+          {
+            "itemKey": "cid_dua3_i11_evidence",
+            "type": "LONG_TEXT",
+            "prompt": "我会设计活动，让学生在整个学习过程中都有机会合作和互助。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 2000
+          },
+          {
+            "itemKey": "cid_dua3_i12_evidence",
+            "type": "LONG_TEXT",
+            "prompt": "我会安排学习环境，帮助学生建立信心、保持良好的情绪状态，并积极参与学习。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 2000
+          }
+        ]
+      },
+      {
+        "pageKey": "cid_next_action",
+        "title": "项目新增反思｜条件与下一步",
+        "description": "以下为项目新增反思。请结合学习目标和实际条件，选一个下一次可以尝试的小调整。",
+        "questions": [
+          {
+            "itemKey": "cid_support_barriers",
+            "type": "LONG_TEXT",
+            "prompt": "当前哪些条件或障碍影响了你的实践？如愿意，可以记录需要的支持。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1500
+          },
+          {
+            "itemKey": "cid_next_step",
+            "type": "LONG_TEXT",
+            "prompt": "下一次愿意尝试哪一个小调整，并用什么证据了解它是否有帮助？",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1500
+          }
+        ]
+      }
+    ]
+  }
+}

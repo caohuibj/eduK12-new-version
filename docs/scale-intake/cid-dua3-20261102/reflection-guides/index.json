@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "assessmentVersion": "2026",
+  "mode": "COLLECTION_ONLY",
+  "source": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1921354/full",
+  "sourceStatus": "Original frequency-response categories and exact coding unavailable",
+  "versions": [
+    {
+      "locale": "en",
+      "toolKey": "cid_dua3_2026_evidence_form_en",
+      "contentVersion": "1.0.0",
+      "formFile": "../native-form.json",
+      "formSha256": "b5a71238071b423215d64e38d6c1187211cc6e027c38090cf21e01721eca47a9",
+      "guideFile": "en.md",
+      "artworkFile": "hero.webp",
+      "knownSourceStatements": 12,
+      "optionalProjectQuestions": 3
+    },
+    {
+      "locale": "zh-CN",
+      "toolKey": "cid_dua3_2026_evidence_form_zh_cn",
+      "contentVersion": "1.0.0",
+      "formFile": "native-form-zh-cn.json",
+      "formSha256": "207ec8cc8eb3f6e6919aab9e99a856331a382b7630279630fb30e587d7a44ffa",
+      "guideFile": "zh-cn.md",
+      "artworkFile": "hero.webp",
+      "knownSourceStatements": 12,
+      "optionalProjectQuestions": 3
+    }
+  ]
+}
