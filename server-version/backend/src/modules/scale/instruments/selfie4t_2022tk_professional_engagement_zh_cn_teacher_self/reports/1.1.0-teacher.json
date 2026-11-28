@@ -1,0 +1,239 @@
+{
+  "toolKey": "selfie4t_2022tk_professional_engagement_zh_cn_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "SELFIEforTEACHERS｜让技术用在日常协作里｜中文试用版",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "primaryScoreKeys": [
+      "competence_1_1",
+      "competence_1_2",
+      "competence_1_3",
+      "competence_1_4",
+      "competence_1_5",
+      "competence_1_6",
+      "competence_1_7",
+      "competence_1_8",
+      "competence_1_9"
+    ],
+    "scoreOrder": [
+      "competence_1_1",
+      "competence_1_2",
+      "competence_1_3",
+      "competence_1_4",
+      "competence_1_5",
+      "competence_1_6",
+      "competence_1_7",
+      "competence_1_8",
+      "competence_1_9"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_1_1",
+        "headline": "先弄清想让谁做什么",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "同一个通知发到五个群，未必比一条能让人找到重点的消息好用。数字沟通的价值，常在于让接收者清楚下一步怎么做。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "挑一条近期要发的消息，先写明对象、需要回应的事项和截止时间，再选择一条合适的发送渠道。"
+          }
+        ],
+        "scoreLabel": "组织沟通（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_2",
+        "headline": "平台的默认设置值得看一眼",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "同一份课堂资料，有的只需要学生本人看，有的适合全班共享。平台权限、存储位置和保留期限，决定了信息实际去了哪里。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "选一个在用课程空间，以学生视角核对一次查看与上传权限，留意谁能看到哪些学生数据。"
+          }
+        ],
+        "scoreLabel": "在线学习环境（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_3",
+        "headline": "共享文档可以承载共同思考",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "把资料堆进一个文件夹只能算第一步。协作真正省力的地方，是同事能看见谁正在改什么、哪个决定还没定下来。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "把一个小任务交给两三位同事一起完成，约定编辑人、反馈时间和定稿位置。"
+          }
+        ],
+        "scoreLabel": "专业协作（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_4",
+        "headline": "先让现有设备解决一个常见问题",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "教室里的平板、网络或学习平台用得是否顺手，往往取决于它们能不能解决一件每周都要做的事。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "挑一项经常遇到的小麻烦，用现有设备试行一周，并记下省掉哪一步、添了哪一步。"
+          }
+        ],
+        "scoreLabel": "数字技术与学校基础设施（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_5",
+        "headline": "留一个片段，下次备课有据可循",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "下课后的印象容易被最后几分钟左右。几条课堂记录、学生作品或同伴观察，能帮助你从另一个角度回看自己的技术选择。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "给最近的一次数字教学保留一份合规的材料，记下当时的判断，下次试着只改一处。"
+          }
+        ],
+        "scoreLabel": "反思实践（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_6",
+        "headline": "发布前，想想内容离开原场景会怎样",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一个内部群里的截图被转发之后，别人可能看不到原来的上下文。网络形象来自一连串可以回看和传播的行为。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "检查近期一项公开分享，核对受众、必要的个人信息和引用来源，想想转发后别人会怎么理解。"
+          }
+        ],
+        "scoreLabel": "数字生活（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_7",
+        "headline": "把网上学到的东西用到一节课里",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "在线资源很多，能持续影响教学习惯的，通常是一种你愿意亲手试一次的做法。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "从一个正在解决的教学问题出发，找一个在线资源或同行案例，下周选一个环节试用。"
+          }
+        ],
+        "scoreLabel": "借助数字技术开展专业学习（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_8",
+        "headline": "选一项学完马上能练的技术",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "培训内容还有多少记得，常取决于返校后能不能找到练习机会。自己设计一个小任务再跟同事交换反馈，更容易把技能带进课堂。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "带着一份现有教学材料参加学习活动，约定结束后一周内完成一次小改版。"
+          }
+        ],
+        "scoreLabel": "学习如何使用数字技术（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_1_9",
+        "headline": "先把难题说清，再选数字工具",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一个程序或课堂流程反复出错时，把问题拆成几个可以分别检查的小步骤，通常更容易找到可以调整的地方。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "挑一个任务，和同事或学生一起画出步骤，改变其中一条规则，看看会影响后面的哪一步。"
+          }
+        ],
+        "scoreLabel": "计算思维（自评描述，0–6）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "© European Union 2022（Toolkit JRC129699）及 2023（计分说明 JRC131282），作者 Anastasia Economou。欧盟拥有版权的原文按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）改编。本项目改动为简体中文直译、拆分六个领域、自编作答说明与反馈，并采用整领域缺答处理。各题的 A1 至 C2 均来自 2022 年工具包，含 2023 年报告第 4 章未列的第 6.5 题 B2。材料不包含欧盟标识、徽章、截图、第三方图片或软件。欧盟未对本译稿背书。",
+      "每项能力分别报告。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。 未选择任何选项保留为缺答，整份未完成时不生成解读。本工具不提供领域总分、常模、百分位或达标判定。",
+      "适用于理解简体中文的成年中小学教师。本文是 2022 年固定工具包的项目试用译稿。尚未完成专家译校、理解访谈或本地测量验证，六个拆分领域也未单独验证。",
+      "结果反映教师对当前实践的自我描述。请结合任教情境反思，不用于教学能力评定、教师考核或群体比较。"
+    ],
+    "disclaimer": "中文试用版。结果帮助教师回看做法、选定下一步专业学习，不用于考核、认定或证书。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

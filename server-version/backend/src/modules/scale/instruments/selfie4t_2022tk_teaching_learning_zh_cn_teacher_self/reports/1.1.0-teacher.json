@@ -1,0 +1,163 @@
+{
+  "toolKey": "selfie4t_2022tk_teaching_learning_zh_cn_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "SELFIEforTEACHERS｜让学生动手试、说清楚｜中文试用版",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "primaryScoreKeys": [
+      "competence_3_1",
+      "competence_3_2",
+      "competence_3_3",
+      "competence_3_4",
+      "competence_3_5"
+    ],
+    "scoreOrder": [
+      "competence_3_1",
+      "competence_3_2",
+      "competence_3_3",
+      "competence_3_4",
+      "competence_3_5"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_3_1",
+        "headline": "先问学生要做什么，再决定用什么工具",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "给学生一个真实的学习任务，工具才有用武之地。一个数字活动能不能改善教学，可从学生的作品、讨论或选择中观察。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "比较同一任务的两个做法，选一种最容易让学生说明自己思路的技术，当堂留下一件作品。"
+          }
+        ],
+        "scoreLabel": "教学（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_3_2",
+        "headline": "反馈最好带着可以立刻试的一步",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "指出全部问题可能让学生无从下手。一条能当场应用的提示，能让学生看到自己如何把想法做得更清楚。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "在一次活动里安排第一次尝试、收到提示和第二次尝试，请学生说说哪条提示真的帮上了忙。"
+          }
+        ],
+        "scoreLabel": "指导（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_3_3",
+        "headline": "让每位学生都能给小组贡献点东西",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "多人打开同一份文档时，可能只剩一个人在写。协作任务更有价值的时候，是每个人的分工能让其他人用得上。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "约定每位成员写出一个不同证据，并给至少一条同伴证据加上解释或疑问。"
+          }
+        ],
+        "scoreLabel": "协作学习（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_3_4",
+        "headline": "给学生一个能自己判断进度的依据",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "任务清单能提醒学生下一步做什么。学习日志的另一项价值，是学生可以用自己的证据决定是否需要改变计划。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "让学生自定一个本周可观察的目标，安排一次检查，写下下一步的决定及理由。"
+          }
+        ],
+        "scoreLabel": "自我调节学习（自评描述，0–6）",
+        "provisional": true
+      },
+      {
+        "scoreKey": "competence_3_5",
+        "headline": "试用新工具之前，先写下怎样算有帮助",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "新技术让课堂耳目一新，教学价值还需要看学生具体做出了什么，也要关心工具替学生作了哪些决定。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "从一个小活动试起，记录学生多获得了哪种体验，以及设备、隐私和退出的安排。"
+          }
+        ],
+        "scoreLabel": "新兴技术（自评描述，0–6）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "© European Union 2022（Toolkit JRC129699）及 2023（计分说明 JRC131282），作者 Anastasia Economou。欧盟拥有版权的原文按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）改编。本项目改动为简体中文直译、拆分六个领域、自编作答说明与反馈，并采用整领域缺答处理。各题的 A1 至 C2 均来自 2022 年工具包，含 2023 年报告第 4 章未列的第 6.5 题 B2。材料不包含欧盟标识、徽章、截图、第三方图片或软件。欧盟未对本译稿背书。",
+      "每项能力分别报告。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。 未选择任何选项保留为缺答，整份未完成时不生成解读。本工具不提供领域总分、常模、百分位或达标判定。",
+      "适用于理解简体中文的成年中小学教师。本文是 2022 年固定工具包的项目试用译稿。尚未完成专家译校、理解访谈或本地测量验证，六个拆分领域也未单独验证。",
+      "结果反映教师对当前实践的自我描述。请结合任教情境反思，不用于教学能力评定、教师考核或群体比较。"
+    ],
+    "disclaimer": "中文试用版。结果帮助教师回看做法、选定下一步专业学习，不用于考核、认定或证书。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

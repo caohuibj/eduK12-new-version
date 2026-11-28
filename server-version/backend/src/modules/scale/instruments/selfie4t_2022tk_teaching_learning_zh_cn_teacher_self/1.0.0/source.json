@@ -1,0 +1,1142 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "selfie4t_2022tk_teaching_learning_zh_cn_teacher_self",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "SELFIEforTEACHERS｜教学与学习（5项）｜教师自评｜2022 工具包中文试用版",
+      "abbreviation": "SELFIE4T-3",
+      "instrumentFamily": "SELFIEforTEACHERS 32 项教师数字能力自我反思工具（2022 年固定工具包）"
+    },
+    "construct": {
+      "primaryDomain": "SELF_EFFICACY",
+      "secondaryDomains": [],
+      "constructDefinition": "教学与学习领域的教师数字能力自我反思。各题描述教师当前实践，对应 A1 至 C2 和单独的未了解选项。每项分别计分。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:selfie4t",
+        "role:teacher_self",
+        "stage:primary_sec",
+        "locale:zh_cn",
+        "version:2022tk1",
+        "use:reflection",
+        "license:CCBY4",
+        "pilot",
+        "scoring:0_6_items",
+        "source:JRC129699"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "能理解简体中文的中小学成年教师。18 岁为平台试用范围。中文译稿未完成本地验证，先用于专业学习与反思。"
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "当前的数字化专业实践与经验。无固定的回顾时段。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "每项能力选择一条最符合当前实践的描述。每题专有的 A1、A2、B1、B2、C1、C2 分别记 1 至 6 分，末项“我不了解这项能力”记 0 分。",
+        "保持原题顺序、选项顺序和具体陈述。",
+        "六个数字化领域为平台拆分版本。单独施测的等值性尚未建立。原工具共 32 项。",
+        "分别报告各项能力，一律不计算领域均分、整体总分或总体 A1 至 C2 等级。",
+        "缺答保留为空值，选 0 有效。当前沿用完整领域方可生成解读的项目设置。",
+        "填写时间为对原工具全 32 项约 25 分钟的估计拆分，未对中文版独立计时。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "教师借助 2022 年固定原版的中文试用译稿开展专业反思。"
+        },
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "可用于积累中文译稿试用和测量证据。解释时应考虑语言与拆分领域尚未验证。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Economou, A. (2022). SELFIEforTEACHERS Toolkit – Using SELFIEforTEACHERS. Publications Office of the European Union, Luxembourg. doi:10.2760/626409, JRC129699, Annex I, pp. 48–64 (PDF pages 49–64 for the item text). All six-level statements from this fixed Toolkit; seventh awareness option and scoring from official2023 report.",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "项目简体中文直译，保留 2022 固定版题序、选项、例子与原始评分。专家译校和认知访谈待完成。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "selfie4t_2022tk_teaching_learning_zh_cn_teacher_self-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "selfie4t_2022tk_teaching_learning_zh_cn_teacher_self-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": false,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "selfie4t_2022tk_teaching_learning_zh_cn_teacher_self-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "© European Union 2022（Toolkit JRC129699）及 2023（计分说明 JRC131282），作者 Anastasia Economou。欧盟拥有版权的原文按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）改编。本项目改动为简体中文直译、拆分六个领域、自编作答说明与反馈，并采用整领域缺答处理。各题的 A1 至 C2 均来自 2022 年工具包，含 2023 年报告第 4 章未列的第 6.5 题 B2。材料不包含欧盟标识、徽章、截图、第三方图片或软件。欧盟未对本译稿背书。",
+      "https://education.ec.europa.eu/sites/default/files/2022-12/selfie-for-teachers-toolkit-dec-22_en.pdf",
+      "https://publications.jrc.ec.europa.eu/repository/bitstream/JRC131282/JRC131282_01.pdf"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "teacher_self_report",
+      "source": {
+        "title": "SELFIEforTEACHERS 2022 年固定工具包附录 I（项目简体中文译稿）及 2023 年计分说明",
+        "citation": "Economou, A. (2022). SELFIEforTEACHERS Toolkit – Using SELFIEforTEACHERS. Publications Office of the European Union, Luxembourg. doi:10.2760/626409, JRC129699, Annex I, pp. 48–64 (PDF pages 49–64 for the item text). Scoring/awareness option: Economou, A. (2023). SELFIEforTEACHERS. Designing and developing a self-reflection tool for teachers’ digital competence. doi:10.2760/561258, JRC131282, p.11 and Annex 1 p.92 (PDF page96).",
+        "url": "https://education.ec.europa.eu/sites/default/files/2022-12/selfie-for-teachers-toolkit-dec-22_en.pdf",
+        "publicationYear": 2022
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© European Union 2022（Toolkit JRC129699）及 2023（计分说明 JRC131282），作者 Anastasia Economou。欧盟拥有版权的原文按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）改编。本项目改动为简体中文直译、拆分六个领域、自编作答说明与反馈，并采用整领域缺答处理。各题的 A1 至 C2 均来自 2022 年工具包，含 2023 年报告第 4 章未列的第 6.5 题 B2。材料不包含欧盟标识、徽章、截图、第三方图片或软件。欧盟未对本译稿背书。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "maturity_3_1",
+          "options": [
+            {
+              "value": "A1",
+              "label": "A1：我知道数字技术可以支持并促进教学与学习（如软件程序和套件、移动应用与工具、在线和云端资源）。",
+              "score": 1
+            },
+            {
+              "value": "A2",
+              "label": "A2：我尝试过使用数字技术来支持和／或改善自己的教学（如软件程序和套件、移动应用与工具、在线和云端资源、交互式白板）。",
+              "score": 2
+            },
+            {
+              "value": "B1",
+              "label": "B1：我会使用不同的数字技术支持创新教学方法，提高学生在学习中的主动参与程度（如探究式学习、项目式学习、基于游戏的学习、同伴评价与自我评价、电子学习档案、学生担任学习教练）。",
+              "score": 3
+            },
+            {
+              "value": "B2",
+              "label": "B2：我会在学习活动设计中选择和使用数字技术，以实现教学与学习目标（如模拟、数字游戏、在线交互工具、协作环境）。",
+              "score": 4
+            },
+            {
+              "value": "C1",
+              "label": "C1：我会和学生一起反思并设计或重新设计数字技术的使用方式，以改进教学实践、促进创新学习方法（如由学生担任学习教练、使用新兴技术、开展示范并提供建议、开展课例研修）。",
+              "score": 5
+            },
+            {
+              "value": "C2",
+              "label": "C2：我发起并推动本校及更广泛的社区设计、分享借助数字技术开展的创新教学与学习实践（如网络工作坊、使用数字技术设计学习活动、微格教学和合作授课、围绕技术使用成效开展反思讨论）。",
+              "score": 6
+            },
+            {
+              "value": "UNAWARE",
+              "label": "我不了解这项能力。",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "maturity_3_2",
+          "options": [
+            {
+              "value": "A1",
+              "label": "A1：我知道，可以用数字技术提供和接收反馈，并创造机会反思教与学的做法（如电子邮件、在线聊天、视频回复）。",
+              "score": 1
+            },
+            {
+              "value": "A2",
+              "label": "A2：我尝试过用数字技术为学生提供反馈和支持（如在线辅导、在线聊天、自动或即时反馈、在线问答链接）。",
+              "score": 2
+            },
+            {
+              "value": "B1",
+              "label": "B1：我会用不同的数字技术，以即时和／或异步方式给学生提供反馈和反思学习的机会（如在线聊天、讨论论坛、视频回复、课堂投票）。",
+              "score": 3
+            },
+            {
+              "value": "B2",
+              "label": "B2：我会选择并运用数字技术，让学生有机会参与自我评价和同伴评价，并参与设计自己的学习（如共享在线文档、记录学习活动、为反思提供分步引导）。",
+              "score": 4
+            },
+            {
+              "value": "C1",
+              "label": "C1：我会与学生一起，依据数字技术收集到的证据，反思并设计或重新设计教与学（如电子投票或调查结果、学习活动记录、学习分析数据）。",
+              "score": 5
+            },
+            {
+              "value": "C2",
+              "label": "C2：我发起并推动本校及校外使用数字技术，支持教师和学生获得反馈、开展反思（如讨论论坛、在线聊天、共享文档、常见问题解答）。",
+              "score": 6
+            },
+            {
+              "value": "UNAWARE",
+              "label": "我不了解这项能力。",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "maturity_3_3",
+          "options": [
+            {
+              "value": "A1",
+              "label": "A1：我知道数字技术可以促进并加强学生之间的协作，支持个人和集体学习（如在线协作、共享学习资源）。",
+              "score": 1
+            },
+            {
+              "value": "A2",
+              "label": "A2：我尝试过使用数字技术来支持和加强学生的协作活动（如共享文档、参与论坛和维基）。",
+              "score": 2
+            },
+            {
+              "value": "B1",
+              "label": "B1：我会在面对面和／或在线环境中使用不同的数字技术，支持并加强学生的协作学习（如共享文档、论坛、维基、博客、在线协同写作）。",
+              "score": 3
+            },
+            {
+              "value": "B2",
+              "label": "B2：我会根据数字技术的特点，在学习活动设计中选用能支持和加强学生协作学习的技术，这些活动可在面对面和／或在线环境中进行（如共同设计、共同创作、同伴评价和小组反思、创建项目、分享成果）。",
+              "score": 4
+            },
+            {
+              "value": "C1",
+              "label": "C1：我会与学生一起反思并设计或重新设计他们如何利用数字技术进行个人和／或协作学习（如编辑和开发内容、共同创作作品、参与协作项目、在线交流、用数字工具管理任务和时间、沟通和分享）。",
+              "score": 5
+            },
+            {
+              "value": "C2",
+              "label": "C2：我发起并推动本校和更广泛的社区使用数字技术，为校内外协作提供机会，从而支持个人和集体学习（如使用同步和异步在线环境和工具、教师交流短会、联合项目、合办在线学习活动、协作设计和制作学习材料）。",
+              "score": 6
+            },
+            {
+              "value": "UNAWARE",
+              "label": "我不了解这项能力。",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "maturity_3_4",
+          "options": [
+            {
+              "value": "A1",
+              "label": "A1：我知道数字技术可以促进主动学习和自主学习（如制定计划、设定目标、记录进度）。",
+              "score": 1
+            },
+            {
+              "value": "A2",
+              "label": "A2：我尝试过用数字技术帮助学生规划自己的学习（如用电子日历做计划和安排时间、用电子日志设定目标、记录进度）。",
+              "score": 2
+            },
+            {
+              "value": "B1",
+              "label": "B1：我会使用不同的数字技术帮助学生规划和调节自己的学习（如在线学习环境、在线资源库、协作工具和空间、学习日志、电子学习档案）。",
+              "score": 3
+            },
+            {
+              "value": "B2",
+              "label": "B2：我会根据数字技术的特点，在学习活动中选用有助于培养学生自我调节能力和学习自主性的技术（如鼓励学生主动开展学习、在新的学习情境中灵活应对和创造，通过自我反思规划和推进学习）。",
+              "score": 4
+            },
+            {
+              "value": "C1",
+              "label": "C1：我会与学生一起反思数字技术的使用，并支持他们借助数字技术来设计或重新设计自己的学习，促进自我调节和自主学习（如明确需求、设定学习目标、描述实现目标的策略、执行学习任务、收集并反思学习证据、分享学习成果）。",
+              "score": 5
+            },
+            {
+              "value": "C2",
+              "label": "C2：我发起并推动本校及更广泛的社区探索用数字技术支持自我调节学习的策略和做法（如创客空间、用数字技术支持动手活动的学习空间、学生担任学习教练）。",
+              "score": 6
+            },
+            {
+              "value": "UNAWARE",
+              "label": "我不了解这项能力。",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "maturity_3_5",
+          "options": [
+            {
+              "value": "A1",
+              "label": "A1：我知道教育活动中已经在使用一些新兴技术（如模拟、机器人技术、虚拟现实、人工智能）。",
+              "score": 1
+            },
+            {
+              "value": "A2",
+              "label": "A2：我尝试过使用新兴技术，以了解它们对我的教学和学生是否有帮助（如虚拟现实和增强现实、机器人、人工智能）。",
+              "score": 2
+            },
+            {
+              "value": "B1",
+              "label": "B1：我会用不同的新兴技术为学生提供新的学习体验和学习方式，促进他们发展可以迁移到不同领域的能力（如含模拟或建模、游戏、计算思维、创造与创新思维、数据驱动决策的学习活动）。",
+              "score": 3
+            },
+            {
+              "value": "B2",
+              "label": "B2：我会在学习活动设计中选择和使用新兴技术，给学生提供新的学习机会，同时考虑伦理影响（如沉浸式学习、计算思维、关注学生与人工智能互动时的自主决定权）。",
+              "score": 4
+            },
+            {
+              "value": "C1",
+              "label": "C1：我会与学生一起反思并设计或重新设计教与学，让他们参与使用新兴技术的应用设计和创作，并处理相关伦理问题（如设计增强现实场景和三维探险、为人形机器人编程、思考数据化和人工智能在决策中可自主发挥的作用）。",
+              "score": 5
+            },
+            {
+              "value": "C2",
+              "label": "C2：我发起并推动本校及更广泛的社区采用策略与做法，支持同事和学生使用新兴技术探索新的教学与学习体验和内容，同时考虑伦理影响（如为学习活动定制虚拟世界，在数据驱动决策中保留人的自主决定权，与科技公司合作）。",
+              "score": 6
+            },
+            {
+              "value": "UNAWARE",
+              "label": "我不了解这项能力。",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "S4T_3_1",
+          "content": "3.1．教学与学习｜教学。在设计、开发和实施学习活动时使用数字技术，改善学习成效。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "maturity_3_1",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "S4T_3_2",
+          "content": "3.2．教学与学习｜指导。使用数字技术提供反馈及反思机会，帮助教师和学生调整教与学的做法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "maturity_3_2",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "S4T_3_3",
+          "content": "3.3．教学与学习｜协作学习。使用数字技术促进和加强学生之间的协作，支持个人和集体学习。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "maturity_3_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "S4T_3_4",
+          "content": "3.4．教学与学习｜自我调节学习。使用数字技术改善学生自我调节学习的过程，鼓励学生主动、自主地学习，为自己的学习承担更多责任，让重心从教师怎么教转向学生怎么学。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "maturity_3_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "S4T_3_5",
+          "content": "3.5．教学与学习｜新兴技术。以符合伦理的方式使用新兴技术，探索新的学习体验与学习内容。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "maturity_3_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "S4T_3_1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "S4T_3_2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "S4T_3_3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "S4T_3_4",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "S4T_3_5",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "competence_3_1",
+            "type": "dimension",
+            "label": "3.1 教学",
+            "description": "单题原版自评定位。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。 分数对应当题描述，暂不合成领域总分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "S4T_3_1",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "competence_3_2",
+            "type": "dimension",
+            "label": "3.2 指导",
+            "description": "单题原版自评定位。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。 分数对应当题描述，暂不合成领域总分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "S4T_3_2",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "competence_3_3",
+            "type": "dimension",
+            "label": "3.3 协作学习",
+            "description": "单题原版自评定位。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。 分数对应当题描述，暂不合成领域总分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "S4T_3_3",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "competence_3_4",
+            "type": "dimension",
+            "label": "3.4 自我调节学习",
+            "description": "单题原版自评定位。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。 分数对应当题描述，暂不合成领域总分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "S4T_3_4",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "competence_3_5",
+            "type": "dimension",
+            "label": "3.5 新兴技术",
+            "description": "单题原版自评定位。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。 分数对应当题描述，暂不合成领域总分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "S4T_3_5",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "competence_3_1",
+          "competence_3_2",
+          "competence_3_3",
+          "competence_3_4",
+          "competence_3_5"
+        ],
+        "scoreOrder": [
+          "competence_3_1",
+          "competence_3_2",
+          "competence_3_3",
+          "competence_3_4",
+          "competence_3_5"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "competence_3_1",
+            "headline": "回看你的教学实践",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "你的选择对应“教学”这项能力当前的自我描述。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。可以回想一个近期例子，看看当时的教学安排、资源或学校环境如何影响了这项做法。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "比较同一任务的两个做法，选一种最容易让学生说明自己思路的技术，当堂留下一件作品。"
+              }
+            ],
+            "scoreLabel": "教学（0–6）",
+            "provisional": true
+          },
+          {
+            "scoreKey": "competence_3_2",
+            "headline": "回看你的指导实践",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "你的选择对应“指导”这项能力当前的自我描述。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。可以回想一个近期例子，看看当时的教学安排、资源或学校环境如何影响了这项做法。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "在一次活动里安排第一次尝试、收到提示和第二次尝试，请学生说说哪条提示真的帮上了忙。"
+              }
+            ],
+            "scoreLabel": "指导（0–6）",
+            "provisional": true
+          },
+          {
+            "scoreKey": "competence_3_3",
+            "headline": "回看你的协作学习实践",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "你的选择对应“协作学习”这项能力当前的自我描述。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。可以回想一个近期例子，看看当时的教学安排、资源或学校环境如何影响了这项做法。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "约定每位成员写出一个不同证据，并给至少一条同伴证据加上解释或疑问。"
+              }
+            ],
+            "scoreLabel": "协作学习（0–6）",
+            "provisional": true
+          },
+          {
+            "scoreKey": "competence_3_4",
+            "headline": "回看你的自我调节学习实践",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "你的选择对应“自我调节学习”这项能力当前的自我描述。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。可以回想一个近期例子，看看当时的教学安排、资源或学校环境如何影响了这项做法。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "让学生自定一个本周可观察的目标，安排一次检查，写下下一步的决定及理由。"
+              }
+            ],
+            "scoreLabel": "自我调节学习（0–6）",
+            "provisional": true
+          },
+          {
+            "scoreKey": "competence_3_5",
+            "headline": "回看你的新兴技术实践",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "你的选择对应“新兴技术”这项能力当前的自我描述。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。可以回想一个近期例子，看看当时的教学安排、资源或学校环境如何影响了这项做法。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "从一个小活动试起，记录学生多获得了哪种体验，以及设备、隐私和退出的安排。"
+              }
+            ],
+            "scoreLabel": "新兴技术（0–6）",
+            "provisional": true
+          }
+        ],
+        "limitations": [
+          "© European Union 2022（Toolkit JRC129699）及 2023（计分说明 JRC131282），作者 Anastasia Economou。欧盟拥有版权的原文按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）改编。本项目改动为简体中文直译、拆分六个领域、自编作答说明与反馈，并采用整领域缺答处理。各题的 A1 至 C2 均来自 2022 年工具包，含 2023 年报告第 4 章未列的第 6.5 题 B2。材料不包含欧盟标识、徽章、截图、第三方图片或软件。欧盟未对本译稿背书。",
+          "每项能力分别报告。0＝未了解这项能力。1＝A1，2＝A2，3＝B1，4＝B2，5＝C1，6＝C2。 未选择任何选项保留为缺答，整份未完成时不生成解读。本工具不提供领域总分、常模、百分位或达标判定。",
+          "适用于理解简体中文的成年中小学教师。本文是 2022 年固定工具包的项目试用译稿。尚未完成专家译校、理解访谈或本地测量验证，六个拆分领域也未单独验证。",
+          "结果反映教师对当前实践的自我描述。请结合任教情境反思，不用于教学能力评定、教师考核或群体比较。"
+        ],
+        "disclaimer": "中文试用版。仅供成年中小学教师个人专业学习与反思。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "selfie4t_2022tk_teaching_learning_zh_cn_teacher_self",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_unaware",
+        "answers": [
+          {
+            "itemCode": "S4T_3_1",
+            "responseValue": "UNAWARE"
+          },
+          {
+            "itemCode": "S4T_3_2",
+            "responseValue": "UNAWARE"
+          },
+          {
+            "itemCode": "S4T_3_3",
+            "responseValue": "UNAWARE"
+          },
+          {
+            "itemCode": "S4T_3_4",
+            "responseValue": "UNAWARE"
+          },
+          {
+            "itemCode": "S4T_3_5",
+            "responseValue": "UNAWARE"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_3_1": 0,
+            "competence_3_2": 0,
+            "competence_3_3": 0,
+            "competence_3_4": 0,
+            "competence_3_5": 0
+          },
+          "totalScoreKeys": [
+            "competence_3_1",
+            "competence_3_2",
+            "competence_3_3",
+            "competence_3_4",
+            "competence_3_5"
+          ]
+        }
+      },
+      {
+        "name": "all_a1",
+        "answers": [
+          {
+            "itemCode": "S4T_3_1",
+            "responseValue": "A1"
+          },
+          {
+            "itemCode": "S4T_3_2",
+            "responseValue": "A1"
+          },
+          {
+            "itemCode": "S4T_3_3",
+            "responseValue": "A1"
+          },
+          {
+            "itemCode": "S4T_3_4",
+            "responseValue": "A1"
+          },
+          {
+            "itemCode": "S4T_3_5",
+            "responseValue": "A1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_3_1": 1,
+            "competence_3_2": 1,
+            "competence_3_3": 1,
+            "competence_3_4": 1,
+            "competence_3_5": 1
+          },
+          "totalScoreKeys": [
+            "competence_3_1",
+            "competence_3_2",
+            "competence_3_3",
+            "competence_3_4",
+            "competence_3_5"
+          ]
+        }
+      },
+      {
+        "name": "all_a2",
+        "answers": [
+          {
+            "itemCode": "S4T_3_1",
+            "responseValue": "A2"
+          },
+          {
+            "itemCode": "S4T_3_2",
+            "responseValue": "A2"
+          },
+          {
+            "itemCode": "S4T_3_3",
+            "responseValue": "A2"
+          },
+          {
+            "itemCode": "S4T_3_4",
+            "responseValue": "A2"
+          },
+          {
+            "itemCode": "S4T_3_5",
+            "responseValue": "A2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_3_1": 2,
+            "competence_3_2": 2,
+            "competence_3_3": 2,
+            "competence_3_4": 2,
+            "competence_3_5": 2
+          },
+          "totalScoreKeys": [
+            "competence_3_1",
+            "competence_3_2",
+            "competence_3_3",
+            "competence_3_4",
+            "competence_3_5"
+          ]
+        }
+      },
+      {
+        "name": "all_b1",
+        "answers": [
+          {
+            "itemCode": "S4T_3_1",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_3_2",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_3_3",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_3_4",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_3_5",
+            "responseValue": "B1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_3_1": 3,
+            "competence_3_2": 3,
+            "competence_3_3": 3,
+            "competence_3_4": 3,
+            "competence_3_5": 3
+          },
+          "totalScoreKeys": [
+            "competence_3_1",
+            "competence_3_2",
+            "competence_3_3",
+            "competence_3_4",
+            "competence_3_5"
+          ]
+        }
+      },
+      {
+        "name": "all_b2",
+        "answers": [
+          {
+            "itemCode": "S4T_3_1",
+            "responseValue": "B2"
+          },
+          {
+            "itemCode": "S4T_3_2",
+            "responseValue": "B2"
+          },
+          {
+            "itemCode": "S4T_3_3",
+            "responseValue": "B2"
+          },
+          {
+            "itemCode": "S4T_3_4",
+            "responseValue": "B2"
+          },
+          {
+            "itemCode": "S4T_3_5",
+            "responseValue": "B2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_3_1": 4,
+            "competence_3_2": 4,
+            "competence_3_3": 4,
+            "competence_3_4": 4,
+            "competence_3_5": 4
+          },
+          "totalScoreKeys": [
+            "competence_3_1",
+            "competence_3_2",
+            "competence_3_3",
+            "competence_3_4",
+            "competence_3_5"
+          ]
+        }
+      },
+      {
+        "name": "all_c1",
+        "answers": [
+          {
+            "itemCode": "S4T_3_1",
+            "responseValue": "C1"
+          },
+          {
+            "itemCode": "S4T_3_2",
+            "responseValue": "C1"
+          },
+          {
+            "itemCode": "S4T_3_3",
+            "responseValue": "C1"
+          },
+          {
+            "itemCode": "S4T_3_4",
+            "responseValue": "C1"
+          },
+          {
+            "itemCode": "S4T_3_5",
+            "responseValue": "C1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_3_1": 5,
+            "competence_3_2": 5,
+            "competence_3_3": 5,
+            "competence_3_4": 5,
+            "competence_3_5": 5
+          },
+          "totalScoreKeys": [
+            "competence_3_1",
+            "competence_3_2",
+            "competence_3_3",
+            "competence_3_4",
+            "competence_3_5"
+          ]
+        }
+      },
+      {
+        "name": "all_c2",
+        "answers": [
+          {
+            "itemCode": "S4T_3_1",
+            "responseValue": "C2"
+          },
+          {
+            "itemCode": "S4T_3_2",
+            "responseValue": "C2"
+          },
+          {
+            "itemCode": "S4T_3_3",
+            "responseValue": "C2"
+          },
+          {
+            "itemCode": "S4T_3_4",
+            "responseValue": "C2"
+          },
+          {
+            "itemCode": "S4T_3_5",
+            "responseValue": "C2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_3_1": 6,
+            "competence_3_2": 6,
+            "competence_3_3": 6,
+            "competence_3_4": 6,
+            "competence_3_5": 6
+          },
+          "totalScoreKeys": [
+            "competence_3_1",
+            "competence_3_2",
+            "competence_3_3",
+            "competence_3_4",
+            "competence_3_5"
+          ]
+        }
+      },
+      {
+        "name": "mixed_positions",
+        "answers": [
+          {
+            "itemCode": "S4T_3_1",
+            "responseValue": "UNAWARE"
+          },
+          {
+            "itemCode": "S4T_3_2",
+            "responseValue": "A1"
+          },
+          {
+            "itemCode": "S4T_3_3",
+            "responseValue": "A2"
+          },
+          {
+            "itemCode": "S4T_3_4",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_3_5",
+            "responseValue": "B2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_3_1": 0,
+            "competence_3_2": 1,
+            "competence_3_3": 2,
+            "competence_3_4": 3,
+            "competence_3_5": 4
+          },
+          "totalScoreKeys": [
+            "competence_3_1",
+            "competence_3_2",
+            "competence_3_3",
+            "competence_3_4",
+            "competence_3_5"
+          ]
+        }
+      },
+      {
+        "name": "missing_one_not_zero",
+        "answers": [
+          {
+            "itemCode": "S4T_3_1",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_3_2",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_3_3",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_3_4",
+            "responseValue": "B1"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "competence_3_1": 3,
+            "competence_3_2": 3,
+            "competence_3_3": 3,
+            "competence_3_4": 3,
+            "competence_3_5": null
+          },
+          "totalScoreKeys": [
+            "competence_3_1",
+            "competence_3_2",
+            "competence_3_3",
+            "competence_3_4",
+            "competence_3_5"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "competence_3_1": null,
+            "competence_3_2": null,
+            "competence_3_3": null,
+            "competence_3_4": null,
+            "competence_3_5": null
+          },
+          "totalScoreKeys": [
+            "competence_3_1",
+            "competence_3_2",
+            "competence_3_3",
+            "competence_3_4",
+            "competence_3_5"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请回想你当前在教学工作中使用数字技术的做法。每题请选一条最符合你目前情况的描述，只选一项。A1、A2、B1、B2、C1、C2 由浅入深，每一道题都有具体描述。请比较这些描述后作答。如果你此前不了解这项能力，请选择最后一项“我不了解这项能力”。作答没有固定的回顾期限。结果用于个人专业学习与反思。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "项目编写。依据 JRC129699 工具包自我反思流程和附录 I，以及 JRC131282 第 11 页和附录 1。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  }
+}
