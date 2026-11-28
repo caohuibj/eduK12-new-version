@@ -1,11 +1,11 @@
 {
-  "toolKey": "wibps7_adolescent_zh_cn_research",
+  "toolKey": "wibps7_adolescent_zh_cn_context_pilot",
   "contentVersion": "1.1.0",
   "parameterVersion": "default",
-  "version": "1.3.0-context-pilot-illustrated",
-  "title": "中文情境试用报告｜图文版",
+  "version": "1.3.0-context-pilot",
+  "title": "中文情境试用报告",
   "report": {
-    "reportVersion": "1.3.0-context-pilot-illustrated",
+    "reportVersion": "1.3.0-context-pilot",
     "primaryScoreKeys": [
       "while_in_bed_procrastination"
     ],
@@ -15,11 +15,11 @@
     "interpretations": [
       {
         "scoreKey": "while_in_bed_procrastination",
-        "headline": "上了床，给今天找个舒服的结束点",
+        "headline": "上床以后，你通常怎样收尾？",
         "source": {
           "type": "score_only"
         },
-        "summary": "上床后，也许你想看一会儿视频、听一首歌，或者回完一条消息再睡。7 题总分为 7–35 分，分数越高，表示你报告这些活动发生得越频繁。这个分数记录的是活动频率。听歌有时能让人放松，回消息也可能有现实需要。想知道什么真的影响了自己的作息，可以从最常做、又经常比预想结束得晚的一件事开始观察。\n\n上床后的活动频率可以提醒你观察习惯。真正在睡前发生了什么，还要看这些活动持续多久、当晚是否原本就难以收尾。",
+        "summary": "上床后，也许你想看一会儿视频、听一首歌，或者回完一条消息再睡。7 题总分为 7–35 分，分数越高，表示你报告这些活动发生得越频繁。这个分数记录的是活动频率。听歌有时能让人放松，回消息也可能有现实需要。想知道什么真的影响了自己的作息，可以从最常做、又经常比预想结束得晚的一件事开始观察。",
         "bands": [],
         "guidance": [
           {
@@ -28,7 +28,7 @@
           },
           {
             "category": "strategy",
-            "text": "选一个常让你晚一点合眼的情境，只试一项改变，例如看完当前这集就退出或把聊天留到第二天，并回看两三晚的体验。"
+            "text": "选一个小改动试两晚。可以关闭视频自动连播，或把想继续看的内容留到第二天。留意自己收尾时有没有更从容。"
           },
           {
             "category": "support",
@@ -49,12 +49,11 @@
       "respondent": "STUDENT_SELF",
       "audience": "student",
       "locale": "zh-CN"
-    },
-    "artworkKey": "wibps7_adolescent_zh_cn_research/1.1.0/1.3.0-context-pilot-illustrated"
+    }
   },
   "reportVisibility": {
     "schemaVersion": 1,
-    "policyVersion": "1.3.0-context-pilot-illustrated",
+    "policyVersion": "1.3.0-context-pilot",
     "unknownAudience": "DENY",
     "audiences": {
       "respondent": {
@@ -63,7 +62,7 @@
         "scoreDerivedLabels": false,
         "individualInterpretations": true,
         "educationalContent": false,
-        "artwork": true
+        "artwork": false
       },
       "subject": {
         "numericScores": true,
@@ -71,7 +70,7 @@
         "scoreDerivedLabels": false,
         "individualInterpretations": true,
         "educationalContent": false,
-        "artwork": true
+        "artwork": false
       },
       "researcher": {
         "numericScores": true,
@@ -79,7 +78,7 @@
         "scoreDerivedLabels": false,
         "individualInterpretations": true,
         "educationalContent": false,
-        "artwork": true
+        "artwork": false
       }
     }
   }

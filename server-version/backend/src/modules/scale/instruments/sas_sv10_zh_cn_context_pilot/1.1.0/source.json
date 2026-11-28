@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "identity": {
-    "instrumentKey": "sas_sv10_zh_cn_research",
+    "instrumentKey": "sas_sv10_zh_cn_context_pilot",
     "instrumentVersion": "1.1.0"
   },
   "catalog": {
