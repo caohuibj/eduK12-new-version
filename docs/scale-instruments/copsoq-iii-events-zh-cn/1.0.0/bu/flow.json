@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "embeddedData": [],
+  "blocks": [
+    {
+      "blockKey": "copsoq3_cn_s1_bu_frequency",
+      "kind": "INSTRUMENT",
+      "instrumentKey": "copsoq3_cn_s1_bu_frequency"
+    },
+    {
+      "blockKey": "copsoq3_cn_s1_bu_source",
+      "kind": "INSTRUMENT",
+      "instrumentKey": "copsoq3_cn_s1_bu_source",
+      "when": {
+        "op": "OR",
+        "terms": [
+          {
+            "op": "EQUALS",
+            "field": {
+              "source": "ANSWER",
+              "instrumentKey": "copsoq3_cn_s1_bu_frequency",
+              "itemKey": "bu1"
+            },
+            "value": "yes_daily"
+          },
+          {
+            "op": "EQUALS",
+            "field": {
+              "source": "ANSWER",
+              "instrumentKey": "copsoq3_cn_s1_bu_frequency",
+              "itemKey": "bu1"
+            },
+            "value": "yes_weekly"
+          },
+          {
+            "op": "EQUALS",
+            "field": {
+              "source": "ANSWER",
+              "instrumentKey": "copsoq3_cn_s1_bu_frequency",
+              "itemKey": "bu1"
+            },
+            "value": "yes_monthly"
+          },
+          {
+            "op": "EQUALS",
+            "field": {
+              "source": "ANSWER",
+              "instrumentKey": "copsoq3_cn_s1_bu_frequency",
+              "itemKey": "bu1"
+            },
+            "value": "yes_few_times"
+          }
+        ]
+      }
+    },
+    {
+      "blockKey": "copsoq3_cn_s1_bu_independent",
+      "kind": "INSTRUMENT",
+      "instrumentKey": "copsoq3_cn_s1_bu_independent"
+    }
+  ]
+}

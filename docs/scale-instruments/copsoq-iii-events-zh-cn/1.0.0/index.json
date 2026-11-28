@@ -1,0 +1,316 @@
+[
+  {
+    "code": "GS",
+    "title": "流言和诽谤",
+    "englishTitle": "Gossip and Slander",
+    "catalogKey": "copsoq3_gs_zh_cn@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 9,
+    "originalOptionsPage": 15,
+    "sourceUrl": "https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+    "sourceSha256": "b9e1d75d678b765739e57e60ef43afc409965ae1b90b72ff3f7968b889ecf822",
+    "formFiles": [
+      "gs/copsoq3_cn_s1_gs_frequency.form.json",
+      "gs/copsoq3_cn_s1_gs_source.form.json"
+    ],
+    "flowFile": "gs/flow.json",
+    "reviewFile": "gs/review.md",
+    "illustrationKey": "copsoq-iii-zh-cn-s1-gs-event-v1",
+    "artPrompt": "窗边一张安静的工作桌，笔记本上抽象的几根线分别通向信息、事实与影响三个小图示，用留白保护私密感，无可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "gs1",
+      "sourceItemKey": "gs2",
+      "independentItemKey": null,
+      "instrumentKeys": {
+        "frequency": "copsoq3_cn_s1_gs_frequency",
+        "source": "copsoq3_cn_s1_gs_source"
+      }
+    },
+    "sourceArticleUrl": "https://www.mdpi.com/2227-9032/13/7/825",
+    "sourcePages": [
+      9
+    ],
+    "questionnaireLanguage": "zh-CN",
+    "edition": "2025 年正式论文公开附件 S1 中国医疗人员中文事件分项",
+    "exactFinal89Claim": false,
+    "caseScope": "适用于成年医疗工作者的非商业研究。公开附件 S1 中文原题分项，独立于论文最后施测的 89 题版。",
+    "artworkFile": "gs/hero.webp"
+  },
+  {
+    "code": "CQ",
+    "title": "冲突和争吵",
+    "englishTitle": "Conflicts and Quarrels",
+    "catalogKey": "copsoq3_cq_zh_cn@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 9,
+    "originalOptionsPage": 15,
+    "sourceUrl": "https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+    "sourceSha256": "b9e1d75d678b765739e57e60ef43afc409965ae1b90b72ff3f7968b889ecf822",
+    "formFiles": [
+      "cq/copsoq3_cn_s1_cq_frequency.form.json"
+    ],
+    "flowFile": "cq/flow.json",
+    "reviewFile": "cq/review.md",
+    "illustrationKey": "copsoq-iii-zh-cn-s1-cq-event-v1",
+    "artPrompt": "两位同事隔桌对照两份不同的工作计划，第三位中立主持人把便笺整理成可共享议程，无可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "cq1",
+      "sourceItemKey": null,
+      "independentItemKey": null,
+      "instrumentKeys": {
+        "frequency": "copsoq3_cn_s1_cq_frequency"
+      }
+    },
+    "sourceArticleUrl": "https://www.mdpi.com/2227-9032/13/7/825",
+    "sourcePages": [
+      9
+    ],
+    "questionnaireLanguage": "zh-CN",
+    "edition": "2025 年正式论文公开附件 S1 中国医疗人员中文事件分项",
+    "exactFinal89Claim": false,
+    "caseScope": "适用于成年医疗工作者的非商业研究。公开附件 S1 中文原题分项，独立于论文最后施测的 89 题版。",
+    "artworkFile": "cq/hero.webp"
+  },
+  {
+    "code": "UT",
+    "title": "不愉快的取笑",
+    "englishTitle": "Unpleasant Teasing",
+    "catalogKey": "copsoq3_ut_zh_cn@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 9,
+    "originalOptionsPage": 15,
+    "sourceUrl": "https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+    "sourceSha256": "b9e1d75d678b765739e57e60ef43afc409965ae1b90b72ff3f7968b889ecf822",
+    "formFiles": [
+      "ut/copsoq3_cn_s1_ut_frequency.form.json",
+      "ut/copsoq3_cn_s1_ut_source.form.json"
+    ],
+    "flowFile": "ut/flow.json",
+    "reviewFile": "ut/review.md",
+    "illustrationKey": "copsoq-iii-zh-cn-s1-ut-event-v1",
+    "artPrompt": "明亮安静的走廊，两位同事保持舒适距离用平静的手势交谈，旁边有一扇开放的办公室门，无可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "ut1",
+      "sourceItemKey": "ut2",
+      "independentItemKey": null,
+      "instrumentKeys": {
+        "frequency": "copsoq3_cn_s1_ut_frequency",
+        "source": "copsoq3_cn_s1_ut_source"
+      }
+    },
+    "sourceArticleUrl": "https://www.mdpi.com/2227-9032/13/7/825",
+    "sourcePages": [
+      9,
+      10
+    ],
+    "questionnaireLanguage": "zh-CN",
+    "edition": "2025 年正式论文公开附件 S1 中国医疗人员中文事件分项",
+    "exactFinal89Claim": false,
+    "caseScope": "适用于成年医疗工作者的非商业研究。公开附件 S1 中文原题分项，独立于论文最后施测的 89 题版。",
+    "artworkFile": "ut/hero.webp"
+  },
+  {
+    "code": "HSM",
+    "title": "网络欺凌",
+    "englishTitle": "Cyber Bullying",
+    "catalogKey": "copsoq3_hsm_zh_cn@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 10,
+    "originalOptionsPage": 15,
+    "sourceUrl": "https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+    "sourceSha256": "b9e1d75d678b765739e57e60ef43afc409965ae1b90b72ff3f7968b889ecf822",
+    "formFiles": [
+      "hsm/copsoq3_cn_s1_hsm_frequency.form.json",
+      "hsm/copsoq3_cn_s1_hsm_source.form.json"
+    ],
+    "flowFile": "hsm/flow.json",
+    "reviewFile": "hsm/review.md",
+    "illustrationKey": "copsoq-iii-zh-cn-s1-hsm-event-v1",
+    "artPrompt": "桌上一支正面朝下的手机、合起的笔记簿和柔和台灯，窗旁有两位同事在安静的地方交谈，无手机屏幕内容和可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "hsm1",
+      "sourceItemKey": "hsm2",
+      "independentItemKey": null,
+      "instrumentKeys": {
+        "frequency": "copsoq3_cn_s1_hsm_frequency",
+        "source": "copsoq3_cn_s1_hsm_source"
+      }
+    },
+    "sourceArticleUrl": "https://www.mdpi.com/2227-9032/13/7/825",
+    "sourcePages": [
+      10
+    ],
+    "questionnaireLanguage": "zh-CN",
+    "edition": "2025 年正式论文公开附件 S1 中国医疗人员中文事件分项",
+    "exactFinal89Claim": false,
+    "caseScope": "适用于成年医疗工作者的非商业研究。公开附件 S1 中文原题分项，独立于论文最后施测的 89 题版。",
+    "artworkFile": "hsm/hero.webp"
+  },
+  {
+    "code": "SH",
+    "title": "性骚扰",
+    "englishTitle": "Sexual Harassment",
+    "catalogKey": "copsoq3_sh_zh_cn@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 10,
+    "originalOptionsPage": 15,
+    "sourceUrl": "https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+    "sourceSha256": "b9e1d75d678b765739e57e60ef43afc409965ae1b90b72ff3f7968b889ecf822",
+    "formFiles": [
+      "sh/copsoq3_cn_s1_sh_frequency.form.json",
+      "sh/copsoq3_cn_s1_sh_source.form.json"
+    ],
+    "flowFile": "sh/flow.json",
+    "reviewFile": "sh/review.md",
+    "illustrationKey": "copsoq-iii-zh-cn-s1-sh-event-v1",
+    "artPrompt": "光线温和的私密支持室，空椅和水杯旁保留清晰的出口方向，构图克制，无人物受害情节，无可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "sh1",
+      "sourceItemKey": "sh2",
+      "independentItemKey": null,
+      "instrumentKeys": {
+        "frequency": "copsoq3_cn_s1_sh_frequency",
+        "source": "copsoq3_cn_s1_sh_source"
+      }
+    },
+    "sourceArticleUrl": "https://www.mdpi.com/2227-9032/13/7/825",
+    "sourcePages": [
+      10
+    ],
+    "questionnaireLanguage": "zh-CN",
+    "edition": "2025 年正式论文公开附件 S1 中国医疗人员中文事件分项",
+    "exactFinal89Claim": false,
+    "caseScope": "适用于成年医疗工作者的非商业研究。公开附件 S1 中文原题分项，独立于论文最后施测的 89 题版。",
+    "artworkFile": "sh/hero.webp"
+  },
+  {
+    "code": "TV",
+    "title": "暴力威胁",
+    "englishTitle": "Threats of Violence",
+    "catalogKey": "copsoq3_tv_zh_cn@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 10,
+    "originalOptionsPage": 15,
+    "sourceUrl": "https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+    "sourceSha256": "b9e1d75d678b765739e57e60ef43afc409965ae1b90b72ff3f7968b889ecf822",
+    "formFiles": [
+      "tv/copsoq3_cn_s1_tv_frequency.form.json",
+      "tv/copsoq3_cn_s1_tv_source.form.json"
+    ],
+    "flowFile": "tv/flow.json",
+    "reviewFile": "tv/review.md",
+    "illustrationKey": "copsoq-iii-zh-cn-s1-tv-event-v1",
+    "artPrompt": "开阔办公室走廊里一处清楚可辨的出口，远处是有人值守的安全帮助台，以暖冷配光表现方向，无威胁场面和可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "tv1",
+      "sourceItemKey": "tv2",
+      "independentItemKey": null,
+      "instrumentKeys": {
+        "frequency": "copsoq3_cn_s1_tv_frequency",
+        "source": "copsoq3_cn_s1_tv_source"
+      }
+    },
+    "sourceArticleUrl": "https://www.mdpi.com/2227-9032/13/7/825",
+    "sourcePages": [
+      10
+    ],
+    "questionnaireLanguage": "zh-CN",
+    "edition": "2025 年正式论文公开附件 S1 中国医疗人员中文事件分项",
+    "exactFinal89Claim": false,
+    "caseScope": "适用于成年医疗工作者的非商业研究。公开附件 S1 中文原题分项，独立于论文最后施测的 89 题版。",
+    "artworkFile": "tv/hero.webp"
+  },
+  {
+    "code": "PV",
+    "title": "身体暴力",
+    "englishTitle": "Physical Violence",
+    "catalogKey": "copsoq3_pv_zh_cn@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 10,
+    "originalOptionsPage": 15,
+    "sourceUrl": "https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+    "sourceSha256": "b9e1d75d678b765739e57e60ef43afc409965ae1b90b72ff3f7968b889ecf822",
+    "formFiles": [
+      "pv/copsoq3_cn_s1_pv_frequency.form.json",
+      "pv/copsoq3_cn_s1_pv_source.form.json"
+    ],
+    "flowFile": "pv/flow.json",
+    "reviewFile": "pv/review.md",
+    "illustrationKey": "copsoq-iii-zh-cn-s1-pv-event-v1",
+    "artPrompt": "工作场所中安静安全的出口与附近可求助的服务站，前景一杯温水和一把空椅表示事后支持，不出现冲突、伤害或可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "pv1",
+      "sourceItemKey": "pv2",
+      "independentItemKey": null,
+      "instrumentKeys": {
+        "frequency": "copsoq3_cn_s1_pv_frequency",
+        "source": "copsoq3_cn_s1_pv_source"
+      }
+    },
+    "sourceArticleUrl": "https://www.mdpi.com/2227-9032/13/7/825",
+    "sourcePages": [
+      10
+    ],
+    "questionnaireLanguage": "zh-CN",
+    "edition": "2025 年正式论文公开附件 S1 中国医疗人员中文事件分项",
+    "exactFinal89Claim": false,
+    "caseScope": "适用于成年医疗工作者的非商业研究。公开附件 S1 中文原题分项，独立于论文最后施测的 89 题版。",
+    "artworkFile": "pv/hero.webp"
+  },
+  {
+    "code": "BU",
+    "title": "欺凌",
+    "englishTitle": "Bullying",
+    "catalogKey": "copsoq3_bu_zh_cn@1.0.0",
+    "version": "1.0.0",
+    "originalItemPage": 11,
+    "originalOptionsPage": 15,
+    "sourceUrl": "https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+    "sourceSha256": "b9e1d75d678b765739e57e60ef43afc409965ae1b90b72ff3f7968b889ecf822",
+    "formFiles": [
+      "bu/copsoq3_cn_s1_bu_frequency.form.json",
+      "bu/copsoq3_cn_s1_bu_source.form.json",
+      "bu/copsoq3_cn_s1_bu_independent.form.json"
+    ],
+    "flowFile": "bu/flow.json",
+    "reviewFile": "bu/review.md",
+    "illustrationKey": "copsoq-iii-zh-cn-s1-bu-event-v1",
+    "artPrompt": "几张不带日期字样的日历页与一叠放入文件夹的匿名便笺，一束安静光线表现持续记录的时间感，无可读文字。",
+    "claims": {
+      "aggregateOnly": true,
+      "score": null,
+      "frequencyItemKey": "bu1",
+      "sourceItemKey": "bu3",
+      "independentItemKey": "bu2",
+      "instrumentKeys": {
+        "frequency": "copsoq3_cn_s1_bu_frequency",
+        "source": "copsoq3_cn_s1_bu_source",
+        "independent": "copsoq3_cn_s1_bu_independent"
+      }
+    },
+    "sourceArticleUrl": "https://www.mdpi.com/2227-9032/13/7/825",
+    "sourcePages": [
+      11
+    ],
+    "questionnaireLanguage": "zh-CN",
+    "edition": "2025 年正式论文公开附件 S1 中国医疗人员中文事件分项",
+    "exactFinal89Claim": false,
+    "caseScope": "适用于成年医疗工作者的非商业研究。公开附件 S1 中文原题分项，独立于论文最后施测的 89 题版。",
+    "optionalMissingFootnotePage": 16,
+    "artworkFile": "bu/hero.webp"
+  }
+]

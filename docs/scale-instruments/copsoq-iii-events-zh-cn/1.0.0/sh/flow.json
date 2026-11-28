@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "embeddedData": [],
+  "blocks": [
+    {
+      "blockKey": "copsoq3_cn_s1_sh_frequency",
+      "kind": "INSTRUMENT",
+      "instrumentKey": "copsoq3_cn_s1_sh_frequency"
+    },
+    {
+      "blockKey": "copsoq3_cn_s1_sh_source",
+      "kind": "INSTRUMENT",
+      "instrumentKey": "copsoq3_cn_s1_sh_source",
+      "when": {
+        "op": "OR",
+        "terms": [
+          {
+            "op": "EQUALS",
+            "field": {
+              "source": "ANSWER",
+              "instrumentKey": "copsoq3_cn_s1_sh_frequency",
+              "itemKey": "sh1"
+            },
+            "value": "yes_daily"
+          },
+          {
+            "op": "EQUALS",
+            "field": {
+              "source": "ANSWER",
+              "instrumentKey": "copsoq3_cn_s1_sh_frequency",
+              "itemKey": "sh1"
+            },
+            "value": "yes_weekly"
+          },
+          {
+            "op": "EQUALS",
+            "field": {
+              "source": "ANSWER",
+              "instrumentKey": "copsoq3_cn_s1_sh_frequency",
+              "itemKey": "sh1"
+            },
+            "value": "yes_monthly"
+          },
+          {
+            "op": "EQUALS",
+            "field": {
+              "source": "ANSWER",
+              "instrumentKey": "copsoq3_cn_s1_sh_frequency",
+              "itemKey": "sh1"
+            },
+            "value": "yes_few_times"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "requestId": "537abae7-d670-5ccc-b13a-d884efade1cb",
+  "toolKey": "copsoq3_cn_s1_bu_source",
+  "version": "1.0.0",
+  "title": "COPSOQ III 中国医疗 S1 · 欺凌（来源）",
+  "statement": "适用于成年医疗工作者的非商业研究。公开附件 S1 中文原题分项，独立于论文最后施测的 89 题版。在同目录的 Survey Flow 中组装使用。",
+  "classificationTags": [
+    "language_validation:content_zh-CN",
+    "use:not_diagnostic"
+  ],
+  "reference": {
+    "catalogKey": "copsoq3_bu_zh_cn@1.0.0",
+    "originalItemPage": 11,
+    "originalOptionsPage": 15,
+    "reportLanguage": "zh-CN",
+    "reportSource": "独立中文类别描述与报告解读",
+    "annexItemIds": [
+      "BU3"
+    ],
+    "annexResponseTypes": [
+      "5M"
+    ],
+    "sourceTitle": "2025 年正式论文公开附件 S1 中国医疗人员中文事件分项",
+    "author": "Huang et al. (2025); COPSOQ International Network",
+    "sourceUrl": "https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+    "documentSha256": "b9e1d75d678b765739e57e60ef43afc409965ae1b90b72ff3f7968b889ecf822",
+    "license": "发表论文为 CC BY 4.0，保留 COPSOQ 国际网络对原表的非商业、署名和保留题文要求。",
+    "licenseUrl": "https://www.copsoq-network.org/licence-guidelines-and-questionnaire",
+    "titleLanguage": "zh-CN",
+    "questionnaireLanguage": "zh-CN",
+    "scorePolicy": "NONE",
+    "edition": "2025 年正式论文公开附件 S1 中国医疗人员中文事件分项",
+    "thirdPartyEndorsement": false,
+    "citation": "Huang, Y.; Zhang, M.; Wang, F.; Tang, Y.; He, C.; Fang, X.; Wang, X. (2025). Healthcare 13(7), 825, doi:10.3390/healthcare13070825. Supplement S1.",
+    "sourceArticleUrl": "https://www.mdpi.com/2227-9032/13/7/825",
+    "exactFinal89Claim": false,
+    "studyScope": "适用于成年医疗工作者的非商业研究。公开附件 S1 中文原题分项，独立于论文最后施测的 89 题版。"
+  },
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "s1_original",
+        "title": "冲突和冒犯行为",
+        "questions": [
+          {
+            "itemKey": "bu3",
+            "type": "MULTIPLE",
+            "prompt": "如果是，来自谁？（您可以勾选多个选项）",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "colleagues",
+                "label": "同事"
+              },
+              {
+                "optionKey": "manager",
+                "label": "经理/上级"
+              },
+              {
+                "optionKey": "subordinates",
+                "label": "下属"
+              },
+              {
+                "optionKey": "clients",
+                "label": "客户/顾客/患者"
+              }
+            ],
+            "rows": []
+          }
+        ]
+      }
+    ]
+  }
+}

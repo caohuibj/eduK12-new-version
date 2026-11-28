@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "embeddedData": [],
+  "blocks": [
+    {
+      "blockKey": "copsoq3_cn_s1_tv_frequency",
+      "kind": "INSTRUMENT",
+      "instrumentKey": "copsoq3_cn_s1_tv_frequency"
+    },
+    {
+      "blockKey": "copsoq3_cn_s1_tv_source",
+      "kind": "INSTRUMENT",
+      "instrumentKey": "copsoq3_cn_s1_tv_source",
+      "when": {
+        "op": "OR",
+        "terms": [
+          {
+            "op": "EQUALS",
+            "field": {
+              "source": "ANSWER",
+              "instrumentKey": "copsoq3_cn_s1_tv_frequency",
+              "itemKey": "tv1"
+            },
+            "value": "yes_daily"
+          },
+          {
+            "op": "EQUALS",
+            "field": {
+              "source": "ANSWER",
+              "instrumentKey": "copsoq3_cn_s1_tv_frequency",
+              "itemKey": "tv1"
+            },
+            "value": "yes_weekly"
+          },
+          {
+            "op": "EQUALS",
+            "field": {
+              "source": "ANSWER",
+              "instrumentKey": "copsoq3_cn_s1_tv_frequency",
+              "itemKey": "tv1"
+            },
+            "value": "yes_monthly"
+          },
+          {
+            "op": "EQUALS",
+            "field": {
+              "source": "ANSWER",
+              "instrumentKey": "copsoq3_cn_s1_tv_frequency",
+              "itemKey": "tv1"
+            },
+            "value": "yes_few_times"
+          }
+        ]
+      }
+    }
+  ]
+}
