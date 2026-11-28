@@ -1,0 +1,209 @@
+{
+  "toolKey": "ipip50_zh_cn_research",
+  "contentVersion": "1.1.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "生活中的五个性格倾向｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对 IPIP 官方 50 题交错原顺序、逐题正反向键、冻结中文工作译稿及每维十题合计。按五个原维单独解释。"
+      }
+    },
+    "primaryScoreKeys": [
+      "extraversion",
+      "agreeableness",
+      "conscientiousness",
+      "emotional_stability",
+      "intellect_imagination"
+    ],
+    "scoreOrder": [
+      "extraversion",
+      "agreeableness",
+      "conscientiousness",
+      "emotional_stability",
+      "intellect_imagination"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "extraversion",
+        "scoreLabel": "外向性合计分（10–50）",
+        "headline": "看看怎样的互动让你自在",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这十题会问到是否主动开口、喜欢热闹以及在陌生人面前多常保持安静。较大数值表示你更认同主动而显眼的交往方式。熟悉程度和你所处的位置，都可能改变选择。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想两次不同规模的聚会，你分别怎样开始与别人互动。"
+          },
+          {
+            "category": "strategy",
+            "text": "下次在舒服的场合试一个简短开场，或提前选一个你愿意参与的小话题。"
+          },
+          {
+            "category": "support",
+            "text": "和同伴商量喜欢的交流方式，给主动聊与安静听都保留空间。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "agreeableness",
+        "scoreLabel": "宜人性合计分（10–50）",
+        "headline": "把关心和界限都摆在桌面上",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这十题关注留意他人、体谅感受、帮助对方和冲突中的表达。较大数值表示在本次作答中更认同亲和体贴的反应。边界、信任和当事人角色都会影响表现。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想一件团队中有分歧的小事，看看你怎样处理双方不同需要。"
+          },
+          {
+            "category": "strategy",
+            "text": "先复述理解到的需求，再清楚告诉对方你自己能协助的部分。"
+          },
+          {
+            "category": "support",
+            "text": "若问题复杂，可请大家一起确认一个可执行的约定。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "conscientiousness",
+        "scoreLabel": "尽责性合计分（10–50）",
+        "headline": "让安排方便自己坚持使用",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这十题关注准备、整理、按时处理事务和注意细节。较大数值表示你更认同有计划、讲究秩序和承担事务的自评描述。不同数量的任务与可用资源也会影响你能做到什么。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找一个最近按时处理的事务，想想帮上忙的是步骤、提醒还是协作。"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一件常被忘记的小任务，替它设一个看得见的提醒或者固定收纳位置。"
+          },
+          {
+            "category": "support",
+            "text": "任务超过手边资源时，尽早与有关的人确认轻重顺序。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "emotional_stability",
+        "scoreLabel": "情绪稳定性合计分（10–50）",
+        "headline": "在波动里辨认自己的恢复线索",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这十题把平静、压力感、担心与情绪起伏按同一方向加总。较大值表示在本次填写中更认同相对平稳的描述。最近的变化和环境压力也值得一起回顾。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "在一个有压力的片段里找出较早的提醒线索，比如身体紧张、睡眠减少或事情太多。"
+          },
+          {
+            "category": "strategy",
+            "text": "给自己一个可以短时执行的缓冲安排，观察随后有没有更好地继续处理事情。"
+          },
+          {
+            "category": "support",
+            "text": "如负担连续干扰日常，可以把具体变化说给可信的人或合适的支持者听。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "intellect_imagination",
+        "scoreLabel": "智性与想象力合计分（10–50）",
+        "headline": "找一种能展开想法的场合",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "题目包含词语、抽象概念、想象、反思和生成新点子的自评。较大值表示你较认可这些思考习惯，理解范围也受所处语言、教育经验和兴趣影响。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找一个你觉得容易想到新办法的问题，看看题目为什么让你感兴趣。"
+          },
+          {
+            "category": "strategy",
+            "text": "试着把一个想法换成一幅图、一句话或一个生活例子。"
+          },
+          {
+            "category": "support",
+            "text": "找人用不同表达解释同一件事，比较哪种方式让你最容易进入。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "本报告使用项目中文工作译稿，面向其现有成人自评研究及自我回顾范围。当前证据支持对本次作答做描述。",
+      "原题和计分可按 IPIP 官方公有领域声明使用。由于本译稿尚无适配常模，报告仅显示实得分。",
+      "各结果按相应题组完整作答后计算，漏答保留为缺失。请结合近期情境和具体经历理解。",
+      "五维独立呈现，每维十题合计。一个维度的数值无法替代另一个维度，亦不用于合成一个人格优劣分。"
+    ],
+    "disclaimer": "适用于成人试用研究及自我回顾。诊断、人员筛选和个体高风险决定需要相应的专门方法。",
+    "artworkKey": "ipip50_zh_cn_research/1.1.0/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

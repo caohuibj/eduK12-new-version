@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "ipip50_zh_cn_research/1.1.0/1.3.0-adult",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "同一位成年人出现在五个日常场景中，画面等权呈现。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
