@@ -1,0 +1,149 @@
+{
+  "toolKey": "jss8_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-pilot",
+  "title": "从不同位置感受不公平｜成人研究试用",
+  "report": {
+    "reportVersion": "1.3.0-pilot",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 来源、计分和内容复核",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "对照作者英文题本与本库工作译稿，沿用 8 题、6 档选项、完整作答及四组 1–6 均分。"
+      }
+    },
+    "primaryScoreKeys": [
+      "victim",
+      "observer",
+      "beneficiary",
+      "perpetrator"
+    ],
+    "scoreOrder": [
+      "victim",
+      "observer",
+      "beneficiary",
+      "perpetrator"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "victim",
+        "scoreLabel": "自己遇到不公平（1–6 均分）",
+        "headline": "当自己承担得多、得到得少",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "在一次约好的分工中，假如你多承担了一份工作，却很晚才知道原因，你可能很快觉得委屈或生气。这个部分记录你对自己受到不公平待遇时的自述或想象反应。分数越高，表示相关反应更符合你的回答。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一个具体片段，分别记下你知道的事实、你认为原本该有的安排，以及哪件事还值得核实。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "observer",
+        "scoreLabel": "看见别人遇到不公平（1–6 均分）",
+        "headline": "先听对方希望得到什么支持",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "在团队分工时，有人一直承担收尾，却没机会表达意见，你或许会替对方生气，也可能想先了解情形。这个部分记录当你看到别人受到不公平对待时，相关反应有多符合你。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "试着描述一件你亲眼看到的事，再问对方是否希望你帮忙了解规则、转达意见或陪同沟通。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "beneficiary",
+        "scoreLabel": "自己得了不公平的好处（1–6 均分）",
+        "headline": "多得到一份时，想想原来的规则",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "如果你意外得到本该轮到别人的机会，心里的不自在可能提示你去弄清来龙去脉。这个部分记录在自己获益时，你对他人处境和分配公平的反应。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次意外得利，你当时知道哪些信息，后来又知道哪些？需要时可以找负责的人确认一次分配依据。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "perpetrator",
+        "scoreLabel": "自己造成不公平（1–6 均分）",
+        "headline": "发现遗漏之后，可以做一次修正",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "分发资料时忘了通知一位同事，等事情做完才意识到对方少了一次参与机会。这个部分关心你在自己造成不公平时如何反应，包括事后想到这件事的难受。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想想怎样把修正变具体，例如让遗漏的人补充意见、重新确认顺序，或改一条容易漏人的操作习惯。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "每个视角由两题均分，范围为 1–6。分别阅读四个视角可保留不同处境的信息。",
+      "独立中文工作译稿供成人研究与描述性自我了解。分数反映作答者报告或想象的反应，事件是否发生、处境是否公平及实际后果需回到具体情况了解。",
+      "Groskurth、Beierlein、Nießen、Baumert、Rammstedt 和 Lechner（2024），JSS-8 英文题本，https://access.gesis.org/zis/1396 ，CC BY 4.0 https://creativecommons.org/licenses/by/4.0/ 。此中文工作译稿和报告为平台改编。"
+    ],
+    "disclaimer": "供成人研究试用，解释本次回答与四个视角的关系。",
+    "artworkKey": "jss8_zh_cn_research/1.0.1/1.3.0-pilot"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
