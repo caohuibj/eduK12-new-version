@@ -1,0 +1,101 @@
+{
+  "toolKey": "ipip_neo_c5_self_discipline10_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "任务启动与执行习惯｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审（非人工专家译审）",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐项对照 IPIP 官方 NEO C5 十题英文键与正反向方向；沿用现有项目中文工作译稿、五点符合度和十题合计分。IPIP 原题为公有领域，但当前中文译稿的专家译审、认知访谈和目标人群验证仍为待完成；官方不提供可直接套用的通用常模，因此不设分档或阈值。"
+      }
+    },
+    "primaryScoreKeys": [
+      "task_self_discipline"
+    ],
+    "scoreOrder": [
+      "task_self_discipline"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "task_self_discipline",
+        "scoreLabel": "任务启动与执行习惯合计分（10–50）",
+        "headline": "先找到门把手，再谈“自律”",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "“把材料都整理好”听起来是一件事，真正动手时却可能没有清楚的第一步。若改成“先把三张票据放进同一个文件夹”，入口就变得看得见。任务能否启动，常常同时受到要求、材料、时间、精力和干扰影响，不只是所谓意志力。\n\n这十题回顾你通常怎样准备、开始任务、执行计划，以及是否容易推迟行动或决定。统一计分方向后，总分范围为 10–50；数值越大，表示本次回答越认可及时着手、做好准备和落实计划这一类描述。它是自我报告，不是实际效率测试，也不能把一个人分成“勤快”或“懒惰”。\n\n如果某件事已经有顺手的启动方式，可以把有效条件保留下来；若总在原地打转，可以先找具体障碍：第一步是否含糊、资料是否齐全、时间是否现实、身体是否需要休息。缩小第一步是一种办法，但不是唯一答案；有时更需要问清要求、调整范围或请人协作。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "比较一件容易开始和一件总卡住的事：分别写下第一步、所需材料、可用时间和当时精力。先找条件差异，不把差异换成“我够不够自律”。"
+          },
+          {
+            "category": "strategy",
+            "text": "把第一步写成一个看得见的动作，例如打开已有文件、把资料放到桌上，或给相关人发出一个澄清问题。先试着进入，不要求一次完成整件事。"
+          },
+          {
+            "category": "environment",
+            "text": "只减少一道阻力：提前准备材料、关掉一个无关干扰，或约一段不被打断的时间。做完后记录哪项调整有帮助，避免把全部责任都压在意志力上。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "这是 IPIP-NEO C5 的十题公有领域表征，不是专有 NEO-PI-R、完整人格评估、毅力量表或自控力量表。",
+      "当前中文为项目工作译稿，专家译审、目标人群认知访谈和本地心理测量验证尚未完成；本报告仅供成人试用研究与自我回顾。",
+      "官方没有提供适合直接套用到当前中文版本的通用常模或阈值，因此不划分高低、不排名，也不据此判断道德品质、注意问题、执行功能障碍或工作绩效。",
+      "十题需完整回答才计算合计分；漏答不按零分处理。任务清晰度、疲劳、打断与可用支持都可能影响一次回答。"
+    ],
+    "disclaimer": "这是一份成人试用描述报告，不用于心理诊断、道德评价、录用考核、教育分流或其他高风险决策。",
+    "artworkKey": "ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
