@@ -1,0 +1,256 @@
+{
+  "talis2024_clarity_isced1_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_clarity_isced1_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q51",
+    "publicVariableIds": [
+      "TT4G51A",
+      "TT4G51B",
+      "TT4G51C",
+      "TT4G51D"
+    ],
+    "localizationKind": "PROJECT_WORKING_TRANSLATION",
+    "sourceNote": "国际英语题本 Q51，公共变量 TT4G51A、TT4G51B、TT4G51C、TT4G51D。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+  },
+  "talis2024_cognitive_activation_isced1_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_cognitive_activation_isced1_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q51",
+    "publicVariableIds": [
+      "TT4G51E",
+      "TT4G51F",
+      "TT4G51G",
+      "TT4G51H"
+    ],
+    "localizationKind": "PROJECT_WORKING_TRANSLATION",
+    "sourceNote": "国际英语题本 Q51，公共变量 TT4G51E、TT4G51F、TT4G51G、TT4G51H。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+  },
+  "talis2024_classroom_management_isced1_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_classroom_management_isced1_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q51",
+    "publicVariableIds": [
+      "TT4G51I",
+      "TT4G51J",
+      "TT4G51K",
+      "TT4G51L"
+    ],
+    "localizationKind": "PROJECT_WORKING_TRANSLATION",
+    "sourceNote": "国际英语题本 Q51，公共变量 TT4G51I、TT4G51J、TT4G51K、TT4G51L。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+  },
+  "talis2024_other_practices_isced1_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_other_practices_isced1_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q51",
+    "publicVariableIds": [
+      "TT4G51M",
+      "TT4G51N",
+      "TT4G51O"
+    ],
+    "localizationKind": "PROJECT_WORKING_TRANSLATION",
+    "sourceNote": "国际英语题本 Q51，公共变量 TT4G51M、TT4G51N、TT4G51O。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+  },
+  "talis2024_time_allocation_isced1_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_time_allocation_isced1_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q50",
+    "publicVariableIds": [
+      "TT4G50A",
+      "TT4G50B",
+      "TT4G50C"
+    ],
+    "localizationKind": "PROJECT_WORKING_TRANSLATION",
+    "sourceNote": "国际英语题本 Q50，公共变量 TT4G50A、TT4G50B、TT4G50C。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+  },
+  "talis2024_clarity_isced2_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_clarity_isced2_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q51",
+    "publicVariableIds": [
+      "TT4G51A",
+      "TT4G51B",
+      "TT4G51C",
+      "TT4G51D"
+    ],
+    "localizationKind": "OECD_SHANGHAI_OFFICIAL_EXCERPT",
+    "sourceNote": "国际英语题本 Q51，公共变量 TT4G51A、TT4G51B、TT4G51C、TT4G51D。上海官方中文教师问卷第 53 页，页面标记 TQ_52。",
+    "oecdShanghaiForm": "https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip",
+    "oecdShanghaiPages": "53",
+    "oecdShanghaiScreen": "TQ_52",
+    "oecdShanghaiFormSha256": "25133b9a702687feb770bfe161255b097814b69911899bd031eb5743ae270b3b"
+  },
+  "talis2024_cognitive_activation_isced2_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_cognitive_activation_isced2_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q51",
+    "publicVariableIds": [
+      "TT4G51E",
+      "TT4G51F",
+      "TT4G51G",
+      "TT4G51H"
+    ],
+    "localizationKind": "OECD_SHANGHAI_OFFICIAL_EXCERPT",
+    "sourceNote": "国际英语题本 Q51，公共变量 TT4G51E、TT4G51F、TT4G51G、TT4G51H。上海官方中文教师问卷第 54 页，页面标记 TQ_52。",
+    "oecdShanghaiForm": "https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip",
+    "oecdShanghaiPages": "54",
+    "oecdShanghaiScreen": "TQ_52",
+    "oecdShanghaiFormSha256": "25133b9a702687feb770bfe161255b097814b69911899bd031eb5743ae270b3b"
+  },
+  "talis2024_classroom_management_isced2_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_classroom_management_isced2_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q51",
+    "publicVariableIds": [
+      "TT4G51I",
+      "TT4G51J",
+      "TT4G51K",
+      "TT4G51L"
+    ],
+    "localizationKind": "OECD_SHANGHAI_OFFICIAL_EXCERPT",
+    "sourceNote": "国际英语题本 Q51，公共变量 TT4G51I、TT4G51J、TT4G51K、TT4G51L。上海官方中文教师问卷第 54 页，页面标记 TQ_52。",
+    "oecdShanghaiForm": "https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip",
+    "oecdShanghaiPages": "54",
+    "oecdShanghaiScreen": "TQ_52",
+    "oecdShanghaiFormSha256": "25133b9a702687feb770bfe161255b097814b69911899bd031eb5743ae270b3b"
+  },
+  "talis2024_other_practices_isced2_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_other_practices_isced2_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q51",
+    "publicVariableIds": [
+      "TT4G51M",
+      "TT4G51N",
+      "TT4G51O"
+    ],
+    "localizationKind": "OECD_SHANGHAI_OFFICIAL_EXCERPT",
+    "sourceNote": "国际英语题本 Q51，公共变量 TT4G51M、TT4G51N、TT4G51O。上海官方中文教师问卷第 54–55 页，页面标记 TQ_52。",
+    "oecdShanghaiForm": "https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip",
+    "oecdShanghaiPages": "54–55",
+    "oecdShanghaiScreen": "TQ_52",
+    "oecdShanghaiFormSha256": "25133b9a702687feb770bfe161255b097814b69911899bd031eb5743ae270b3b"
+  },
+  "talis2024_time_allocation_isced2_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_time_allocation_isced2_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q50",
+    "publicVariableIds": [
+      "TT4G50A",
+      "TT4G50B",
+      "TT4G50C"
+    ],
+    "localizationKind": "OECD_SHANGHAI_OFFICIAL_EXCERPT",
+    "sourceNote": "国际英语题本 Q50，公共变量 TT4G50A、TT4G50B、TT4G50C。上海官方中文教师问卷第 52–53 页，页面标记 TQ_50。上海 C 项“实际的教学”按当地题本保留。",
+    "oecdShanghaiForm": "https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip",
+    "oecdShanghaiPages": "52–53",
+    "oecdShanghaiScreen": "TQ_50",
+    "oecdShanghaiFormSha256": "25133b9a702687feb770bfe161255b097814b69911899bd031eb5743ae270b3b"
+  },
+  "talis2024_clarity_isced3_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_clarity_isced3_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q51",
+    "publicVariableIds": [
+      "TT4G51A",
+      "TT4G51B",
+      "TT4G51C",
+      "TT4G51D"
+    ],
+    "localizationKind": "PROJECT_WORKING_TRANSLATION",
+    "sourceNote": "国际英语题本 Q51，公共变量 TT4G51A、TT4G51B、TT4G51C、TT4G51D。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+  },
+  "talis2024_cognitive_activation_isced3_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_cognitive_activation_isced3_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q51",
+    "publicVariableIds": [
+      "TT4G51E",
+      "TT4G51F",
+      "TT4G51G",
+      "TT4G51H"
+    ],
+    "localizationKind": "PROJECT_WORKING_TRANSLATION",
+    "sourceNote": "国际英语题本 Q51，公共变量 TT4G51E、TT4G51F、TT4G51G、TT4G51H。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+  },
+  "talis2024_classroom_management_isced3_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_classroom_management_isced3_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q51",
+    "publicVariableIds": [
+      "TT4G51I",
+      "TT4G51J",
+      "TT4G51K",
+      "TT4G51L"
+    ],
+    "localizationKind": "PROJECT_WORKING_TRANSLATION",
+    "sourceNote": "国际英语题本 Q51，公共变量 TT4G51I、TT4G51J、TT4G51K、TT4G51L。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+  },
+  "talis2024_other_practices_isced3_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_other_practices_isced3_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q51",
+    "publicVariableIds": [
+      "TT4G51M",
+      "TT4G51N",
+      "TT4G51O"
+    ],
+    "localizationKind": "PROJECT_WORKING_TRANSLATION",
+    "sourceNote": "国际英语题本 Q51，公共变量 TT4G51M、TT4G51N、TT4G51O。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+  },
+  "talis2024_time_allocation_isced3_teacher_self_zh_cn": {
+    "pairedEnglishKey": "talis2024_time_allocation_isced3_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q50",
+    "publicVariableIds": [
+      "TT4G50A",
+      "TT4G50B",
+      "TT4G50C"
+    ],
+    "localizationKind": "PROJECT_WORKING_TRANSLATION",
+    "sourceNote": "国际英语题本 Q50，公共变量 TT4G50A、TT4G50B、TT4G50C。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+  }
+}

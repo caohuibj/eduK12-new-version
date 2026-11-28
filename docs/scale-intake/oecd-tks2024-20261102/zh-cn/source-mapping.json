@@ -1,0 +1,88 @@
+{
+  "tks2024_assessment_methods_isced2_teacher_self_zh_cn": {
+    "pairedEnglishKey": "tks2024_assessment_methods_isced2_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q24",
+    "publicVariableIds": [
+      "TT4G53A",
+      "TT4G53B",
+      "TT4G53C",
+      "TT4G53D",
+      "TT4G53E",
+      "TT4G53F"
+    ],
+    "localizationKind": "PROJECT_WORKING_TRANSLATION",
+    "sourceNote": "国际英语题本 Q24，公共变量 TT4G53A、TT4G53B、TT4G53C、TT4G53D、TT4G53E、TT4G53F。上海官方中文教师问卷第 57 页，页面标记 TQ_54。参考上海同项。F 项“否是”按英文原义校为“是否”。",
+    "oecdShanghaiForm": "https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip",
+    "oecdShanghaiPages": "57",
+    "oecdShanghaiScreen": "TQ_54",
+    "oecdShanghaiFormSha256": "25133b9a702687feb770bfe161255b097814b69911899bd031eb5743ae270b3b"
+  },
+  "tks2024_adaptive_learning_isced2_teacher_self_zh_cn": {
+    "pairedEnglishKey": "tks2024_adaptive_learning_isced2_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q25",
+    "publicVariableIds": [
+      "TT4G55A",
+      "TT4G55B",
+      "TT4G55C",
+      "TT4G55D",
+      "TT4G55E"
+    ],
+    "localizationKind": "PROJECT_WORKING_TRANSLATION",
+    "sourceNote": "国际英语题本 Q25，公共变量 TT4G55A、TT4G55B、TT4G55C、TT4G55D、TT4G55E。上海官方中文教师问卷第 58–59 页，页面标记 TQ_56。参考上海同项。B 项依英文的 point students to 改为“推荐”。",
+    "oecdShanghaiForm": "https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip",
+    "oecdShanghaiPages": "58–59",
+    "oecdShanghaiScreen": "TQ_56",
+    "oecdShanghaiFormSha256": "25133b9a702687feb770bfe161255b097814b69911899bd031eb5743ae270b3b"
+  },
+  "tks2024_progression_learning_isced2_teacher_self_zh_cn": {
+    "pairedEnglishKey": "tks2024_progression_learning_isced2_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q26",
+    "publicVariableIds": [
+      "TT4G56A",
+      "TT4G56B",
+      "TT4G56C",
+      "TT4G56D"
+    ],
+    "localizationKind": "PROJECT_WORKING_TRANSLATION",
+    "sourceNote": "国际英语题本 Q26，公共变量 TT4G56A、TT4G56B、TT4G56C、TT4G56D。上海官方中文教师问卷第 59–60 页，页面标记 TQ_57。沿用上海同项中文，原题和原变量依据 TKS。",
+    "oecdShanghaiForm": "https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip",
+    "oecdShanghaiPages": "59–60",
+    "oecdShanghaiScreen": "TQ_57",
+    "oecdShanghaiFormSha256": "25133b9a702687feb770bfe161255b097814b69911899bd031eb5743ae270b3b"
+  },
+  "tks2024_lesson_aims_isced2_teacher_self_zh_cn": {
+    "pairedEnglishKey": "tks2024_lesson_aims_isced2_teacher_self_en",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf",
+    "sourceLocaleVersion": "1.0.0",
+    "sourceQuestion": "Q27",
+    "publicVariableIds": [
+      "TT4G58A",
+      "TT4G58B",
+      "TT4G58C",
+      "TT4G58D",
+      "TT4G58E",
+      "TT4G58F",
+      "TT4G58G"
+    ],
+    "localizationKind": "PROJECT_WORKING_TRANSLATION",
+    "sourceNote": "国际英语题本 Q27，公共变量 TT4G58A、TT4G58B、TT4G58C、TT4G58D、TT4G58E、TT4G58F、TT4G58G。上海官方中文教师问卷第 61–62 页，页面标记 TQ_59。按 TKS 英文回顾过去一周，上海同项只作中文参照。TKS 题干没有上海版的“平均而言”。",
+    "oecdShanghaiForm": "https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip",
+    "oecdShanghaiPages": "61–62",
+    "oecdShanghaiScreen": "TQ_59",
+    "oecdShanghaiFormSha256": "25133b9a702687feb770bfe161255b097814b69911899bd031eb5743ae270b3b"
+  }
+}

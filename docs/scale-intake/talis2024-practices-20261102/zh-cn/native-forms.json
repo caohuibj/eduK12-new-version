@@ -1,0 +1,2294 @@
+{
+  "recordType": "native_form_api_arguments_and_source_handoff_not_new_runtime_schema",
+  "familyTag": "family:talis24_tp",
+  "sourceUrl": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+  "sourceCitation": "OECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire",
+  "sourcePdfSha256": "f6ff9c69c98ced95500ed0201bef3c46d6bb97e0baba2ae317c1479ae4cc7ba7",
+  "sourceTechnicalV3Sha256": "19942b8f378e02a067e7fe7de7e19571af2fd01df7c814b16ed5d98610e4526c",
+  "sourceUserGuideV3Sha256": "2acc4dfb840c80c647c3843549a8ef9ac708ca4c871cd3e00b726d0951ac674e",
+  "resources": [
+    {
+      "instrumentKey": "talis2024_clarity_isced1_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4CLAIN",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51A",
+        "TT4G51B",
+        "TT4G51C",
+        "TT4G51D"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 1,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜清晰教学（无计分）｜教师自评｜小学｜简中工作译本",
+        "description": "国际英语题本 Q51，公共变量 TT4G51A、TT4G51B、TT4G51C、TT4G51D。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。",
+        "instruction": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个小学班级。如果您在周二没有任教小学班级，请顺延到之后一天，选择您任教的小学班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "从不或几乎从不"
+            },
+            {
+              "optionKey": "r2",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "r3",
+              "label": "经常"
+            },
+            {
+              "optionKey": "r4",
+              "label": "总是"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51a",
+              "label": "我为学生总结近期学过的内容。"
+            },
+            {
+              "rowKey": "tt4g51b",
+              "label": "我在一节课或一个单元开始时就设定好目标。"
+            },
+            {
+              "rowKey": "tt4g51c",
+              "label": "我说明希望学生学习的内容。"
+            },
+            {
+              "rowKey": "tt4g51d",
+              "label": "我说明新旧主题之间的联系。"
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_clarity_isced1_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜清晰教学（无计分）｜教师自评｜小学｜简中工作译本",
+            "description": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个小学班级。如果您在周二没有任教小学班级，请顺延到之后一天，选择您任教的小学班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid.",
+            "questions": [
+              {
+                "itemKey": "talis2024_clarity_isced1_teacher_self_zh_cn",
+                "type": "MATRIX",
+                "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "从不或几乎从不"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "偶尔"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "经常"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "总是"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51a",
+                    "label": "我为学生总结近期学过的内容。"
+                  },
+                  {
+                    "rowKey": "tt4g51b",
+                    "label": "我在一节课或一个单元开始时就设定好目标。"
+                  },
+                  {
+                    "rowKey": "tt4g51c",
+                    "label": "我说明希望学生学习的内容。"
+                  },
+                  {
+                    "rowKey": "tt4g51d",
+                    "label": "我说明新旧主题之间的联系。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_clarity_isced1_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q51",
+        "publicVariableIds": [
+          "TT4G51A",
+          "TT4G51B",
+          "TT4G51C",
+          "TT4G51D"
+        ],
+        "localizationKind": "PROJECT_WORKING_TRANSLATION",
+        "sourceNote": "国际英语题本 Q51，公共变量 TT4G51A、TT4G51B、TT4G51C、TT4G51D。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+      }
+    },
+    {
+      "instrumentKey": "talis2024_cognitive_activation_isced1_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4COGAC",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51E",
+        "TT4G51F",
+        "TT4G51G",
+        "TT4G51H"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 1,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜认知激活（无计分）｜教师自评｜小学｜简中工作译本",
+        "description": "国际英语题本 Q51，公共变量 TT4G51E、TT4G51F、TT4G51G、TT4G51H。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。",
+        "instruction": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个小学班级。如果您在周二没有任教小学班级，请顺延到之后一天，选择您任教的小学班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "从不或几乎从不"
+            },
+            {
+              "optionKey": "r2",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "r3",
+              "label": "经常"
+            },
+            {
+              "optionKey": "r4",
+              "label": "总是"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51e",
+              "label": "我给出没有明确解法的任务。"
+            },
+            {
+              "rowKey": "tt4g51f",
+              "label": "我布置需要学生批判性思考的任务。"
+            },
+            {
+              "rowKey": "tt4g51g",
+              "label": "我让学生以小组合作的形式共同解决一个问题或完成一个任务。"
+            },
+            {
+              "rowKey": "tt4g51h",
+              "label": "我要求学生决定他们自己解决复杂问题的步骤。"
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_cognitive_activation_isced1_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜认知激活（无计分）｜教师自评｜小学｜简中工作译本",
+            "description": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个小学班级。如果您在周二没有任教小学班级，请顺延到之后一天，选择您任教的小学班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid.",
+            "questions": [
+              {
+                "itemKey": "talis2024_cognitive_activation_isced1_teacher_self_zh_cn",
+                "type": "MATRIX",
+                "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "从不或几乎从不"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "偶尔"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "经常"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "总是"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51e",
+                    "label": "我给出没有明确解法的任务。"
+                  },
+                  {
+                    "rowKey": "tt4g51f",
+                    "label": "我布置需要学生批判性思考的任务。"
+                  },
+                  {
+                    "rowKey": "tt4g51g",
+                    "label": "我让学生以小组合作的形式共同解决一个问题或完成一个任务。"
+                  },
+                  {
+                    "rowKey": "tt4g51h",
+                    "label": "我要求学生决定他们自己解决复杂问题的步骤。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_cognitive_activation_isced1_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q51",
+        "publicVariableIds": [
+          "TT4G51E",
+          "TT4G51F",
+          "TT4G51G",
+          "TT4G51H"
+        ],
+        "localizationKind": "PROJECT_WORKING_TRANSLATION",
+        "sourceNote": "国际英语题本 Q51，公共变量 TT4G51E、TT4G51F、TT4G51G、TT4G51H。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+      }
+    },
+    {
+      "instrumentKey": "talis2024_classroom_management_isced1_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4CLASM",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51I",
+        "TT4G51J",
+        "TT4G51K",
+        "TT4G51L"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 1,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜课堂管理（无计分）｜教师自评｜小学｜简中工作译本",
+        "description": "国际英语题本 Q51，公共变量 TT4G51I、TT4G51J、TT4G51K、TT4G51L。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。",
+        "instruction": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个小学班级。如果您在周二没有任教小学班级，请顺延到之后一天，选择您任教的小学班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "从不或几乎从不"
+            },
+            {
+              "optionKey": "r2",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "r3",
+              "label": "经常"
+            },
+            {
+              "optionKey": "r4",
+              "label": "总是"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51i",
+              "label": "我告诉学生要遵守课堂纪律。"
+            },
+            {
+              "rowKey": "tt4g51j",
+              "label": "我告诉学生要听我讲话。"
+            },
+            {
+              "rowKey": "tt4g51k",
+              "label": "我帮助扰乱课堂的学生平静下来。"
+            },
+            {
+              "rowKey": "tt4g51l",
+              "label": "课堂开始时，我告诉学生迅速安静下来。"
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_classroom_management_isced1_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜课堂管理（无计分）｜教师自评｜小学｜简中工作译本",
+            "description": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个小学班级。如果您在周二没有任教小学班级，请顺延到之后一天，选择您任教的小学班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid.",
+            "questions": [
+              {
+                "itemKey": "talis2024_classroom_management_isced1_teacher_self_zh_cn",
+                "type": "MATRIX",
+                "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "从不或几乎从不"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "偶尔"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "经常"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "总是"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51i",
+                    "label": "我告诉学生要遵守课堂纪律。"
+                  },
+                  {
+                    "rowKey": "tt4g51j",
+                    "label": "我告诉学生要听我讲话。"
+                  },
+                  {
+                    "rowKey": "tt4g51k",
+                    "label": "我帮助扰乱课堂的学生平静下来。"
+                  },
+                  {
+                    "rowKey": "tt4g51l",
+                    "label": "课堂开始时，我告诉学生迅速安静下来。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_classroom_management_isced1_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q51",
+        "publicVariableIds": [
+          "TT4G51I",
+          "TT4G51J",
+          "TT4G51K",
+          "TT4G51L"
+        ],
+        "localizationKind": "PROJECT_WORKING_TRANSLATION",
+        "sourceNote": "国际英语题本 Q51，公共变量 TT4G51I、TT4G51J、TT4G51K、TT4G51L。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+      }
+    },
+    {
+      "instrumentKey": "talis2024_other_practices_isced1_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": null,
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51M",
+        "TT4G51N",
+        "TT4G51O"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 1,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜其他课堂实践（无计分）｜教师自评｜小学｜简中工作译本",
+        "description": "国际英语题本 Q51，公共变量 TT4G51M、TT4G51N、TT4G51O。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。",
+        "instruction": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个小学班级。如果您在周二没有任教小学班级，请顺延到之后一天，选择您任教的小学班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "从不或几乎从不"
+            },
+            {
+              "optionKey": "r2",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "r3",
+              "label": "经常"
+            },
+            {
+              "optionKey": "r4",
+              "label": "总是"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51m",
+              "label": "我结合日常生活或工作中的问题来说明新授知识为什么是有用的。"
+            },
+            {
+              "rowKey": "tt4g51n",
+              "label": "我给学生安排至少需要一周才能完成的项目。"
+            },
+            {
+              "rowKey": "tt4g51o",
+              "label": "我鼓励学生质疑并评议其他学生提出的论证。"
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_other_practices_isced1_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜其他课堂实践（无计分）｜教师自评｜小学｜简中工作译本",
+            "description": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个小学班级。如果您在周二没有任教小学班级，请顺延到之后一天，选择您任教的小学班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid.",
+            "questions": [
+              {
+                "itemKey": "talis2024_other_practices_isced1_teacher_self_zh_cn",
+                "type": "MATRIX",
+                "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "从不或几乎从不"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "偶尔"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "经常"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "总是"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51m",
+                    "label": "我结合日常生活或工作中的问题来说明新授知识为什么是有用的。"
+                  },
+                  {
+                    "rowKey": "tt4g51n",
+                    "label": "我给学生安排至少需要一周才能完成的项目。"
+                  },
+                  {
+                    "rowKey": "tt4g51o",
+                    "label": "我鼓励学生质疑并评议其他学生提出的论证。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_other_practices_isced1_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q51",
+        "publicVariableIds": [
+          "TT4G51M",
+          "TT4G51N",
+          "TT4G51O"
+        ],
+        "localizationKind": "PROJECT_WORKING_TRANSLATION",
+        "sourceNote": "国际英语题本 Q51，公共变量 TT4G51M、TT4G51N、TT4G51O。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+      }
+    },
+    {
+      "instrumentKey": "talis2024_time_allocation_isced1_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": null,
+      "sourceQuestion": "Q50",
+      "sourceItemIds": [
+        "TT4G50A",
+        "TT4G50B",
+        "TT4G50C"
+      ],
+      "sourcePdfPage": 31,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 1,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜课堂时间分配（无计分）｜教师自评｜小学｜简中工作译本",
+        "description": "国际英语题本 Q50，公共变量 TT4G50A、TT4G50B、TT4G50C。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。",
+        "instruction": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个小学班级。如果您在周二没有任教小学班级，请顺延到之后一天，选择您任教的小学班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "constant_sum",
+        "formLabel": "该目标班级通常用于以下活动的课堂时间百分比是多少？\n请写出每项活动的百分比。若没有，请填写0（零）。\n请确保答案的总和为100%。",
+        "required": false,
+        "formDefinition": {
+          "type": "CONSTANT_SUM",
+          "prompt": "该目标班级通常用于以下活动的课堂时间百分比是多少？\n请写出每项活动的百分比。若没有，请填写0（零）。\n请确保答案的总和为100%。",
+          "required": false,
+          "total": 100,
+          "integerOnly": false,
+          "options": [
+            {
+              "optionKey": "tt4g50a",
+              "label": "管理任务（例如记录学生出勤、发放学校通知和表格）"
+            },
+            {
+              "optionKey": "tt4g50b",
+              "label": "维持课堂秩序（维持纪律）"
+            },
+            {
+              "optionKey": "tt4g50c",
+              "label": "实际用于教学与学习的时间"
+            }
+          ],
+          "rows": []
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_time_allocation_isced1_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜课堂时间分配（无计分）｜教师自评｜小学｜简中工作译本",
+            "description": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个小学班级。如果您在周二没有任教小学班级，请顺延到之后一天，选择您任教的小学班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid.",
+            "questions": [
+              {
+                "itemKey": "talis2024_time_allocation_isced1_teacher_self_zh_cn",
+                "type": "CONSTANT_SUM",
+                "prompt": "该目标班级通常用于以下活动的课堂时间百分比是多少？\n请写出每项活动的百分比。若没有，请填写0（零）。\n请确保答案的总和为100%。",
+                "required": false,
+                "total": 100,
+                "integerOnly": false,
+                "options": [
+                  {
+                    "optionKey": "tt4g50a",
+                    "label": "管理任务（例如记录学生出勤、发放学校通知和表格）"
+                  },
+                  {
+                    "optionKey": "tt4g50b",
+                    "label": "维持课堂秩序（维持纪律）"
+                  },
+                  {
+                    "optionKey": "tt4g50c",
+                    "label": "实际用于教学与学习的时间"
+                  }
+                ],
+                "rows": []
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_time_allocation_isced1_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q50",
+        "publicVariableIds": [
+          "TT4G50A",
+          "TT4G50B",
+          "TT4G50C"
+        ],
+        "localizationKind": "PROJECT_WORKING_TRANSLATION",
+        "sourceNote": "国际英语题本 Q50，公共变量 TT4G50A、TT4G50B、TT4G50C。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+      }
+    },
+    {
+      "instrumentKey": "talis2024_clarity_isced2_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4CLAIN",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51A",
+        "TT4G51B",
+        "TT4G51C",
+        "TT4G51D"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 2,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜清晰教学（无计分）｜教师自评｜初中｜上海正式调查中文",
+        "description": "国际英语题本 Q51，公共变量 TT4G51A、TT4G51B、TT4G51C、TT4G51D。上海官方中文教师问卷第 53 页，页面标记 TQ_52。",
+        "instruction": "下面就您任教的一个特定班级提问。这个班级是您在上周二上午11点以后任教的第一个本校初中班级。请注意，如果您在周二没有任何任教初中班级，请顺延至上周二之后任一天任教的初中班级。在下列问题中，这个班级被称为目标班级。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (China), 正式调查中文，https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "从不或几乎从不"
+            },
+            {
+              "optionKey": "r2",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "r3",
+              "label": "经常"
+            },
+            {
+              "optionKey": "r4",
+              "label": "总是"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51a",
+              "label": "我为学生总结近期学过的内容。"
+            },
+            {
+              "rowKey": "tt4g51b",
+              "label": "我在一节课或一个单元开始时就设定好目标。"
+            },
+            {
+              "rowKey": "tt4g51c",
+              "label": "我说明希望学生学习的内容。"
+            },
+            {
+              "rowKey": "tt4g51d",
+              "label": "我说明新旧主题之间的联系。"
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_clarity_isced2_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜清晰教学（无计分）｜教师自评｜初中｜上海正式调查中文",
+            "description": "下面就您任教的一个特定班级提问。这个班级是您在上周二上午11点以后任教的第一个本校初中班级。请注意，如果您在周二没有任何任教初中班级，请顺延至上周二之后任一天任教的初中班级。在下列问题中，这个班级被称为目标班级。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (China), 正式调查中文，https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_clarity_isced2_teacher_self_zh_cn",
+                "type": "MATRIX",
+                "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "从不或几乎从不"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "偶尔"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "经常"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "总是"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51a",
+                    "label": "我为学生总结近期学过的内容。"
+                  },
+                  {
+                    "rowKey": "tt4g51b",
+                    "label": "我在一节课或一个单元开始时就设定好目标。"
+                  },
+                  {
+                    "rowKey": "tt4g51c",
+                    "label": "我说明希望学生学习的内容。"
+                  },
+                  {
+                    "rowKey": "tt4g51d",
+                    "label": "我说明新旧主题之间的联系。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_clarity_isced2_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q51",
+        "publicVariableIds": [
+          "TT4G51A",
+          "TT4G51B",
+          "TT4G51C",
+          "TT4G51D"
+        ],
+        "localizationKind": "OECD_SHANGHAI_OFFICIAL_EXCERPT",
+        "sourceNote": "国际英语题本 Q51，公共变量 TT4G51A、TT4G51B、TT4G51C、TT4G51D。上海官方中文教师问卷第 53 页，页面标记 TQ_52。",
+        "oecdShanghaiForm": "https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip",
+        "oecdShanghaiPages": "53",
+        "oecdShanghaiScreen": "TQ_52",
+        "oecdShanghaiFormSha256": "25133b9a702687feb770bfe161255b097814b69911899bd031eb5743ae270b3b"
+      }
+    },
+    {
+      "instrumentKey": "talis2024_cognitive_activation_isced2_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4COGAC",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51E",
+        "TT4G51F",
+        "TT4G51G",
+        "TT4G51H"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 2,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜认知激活（无计分）｜教师自评｜初中｜上海正式调查中文",
+        "description": "国际英语题本 Q51，公共变量 TT4G51E、TT4G51F、TT4G51G、TT4G51H。上海官方中文教师问卷第 54 页，页面标记 TQ_52。",
+        "instruction": "下面就您任教的一个特定班级提问。这个班级是您在上周二上午11点以后任教的第一个本校初中班级。请注意，如果您在周二没有任何任教初中班级，请顺延至上周二之后任一天任教的初中班级。在下列问题中，这个班级被称为目标班级。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (China), 正式调查中文，https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "从不或几乎从不"
+            },
+            {
+              "optionKey": "r2",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "r3",
+              "label": "经常"
+            },
+            {
+              "optionKey": "r4",
+              "label": "总是"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51e",
+              "label": "我给出没有明确解法的任务。"
+            },
+            {
+              "rowKey": "tt4g51f",
+              "label": "我布置需要学生批判性思考的任务。"
+            },
+            {
+              "rowKey": "tt4g51g",
+              "label": "我让学生以小组合作的形式共同解决一个问题或完成一个任务。"
+            },
+            {
+              "rowKey": "tt4g51h",
+              "label": "我要求学生决定他们自己解决复杂问题的步骤。"
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_cognitive_activation_isced2_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜认知激活（无计分）｜教师自评｜初中｜上海正式调查中文",
+            "description": "下面就您任教的一个特定班级提问。这个班级是您在上周二上午11点以后任教的第一个本校初中班级。请注意，如果您在周二没有任何任教初中班级，请顺延至上周二之后任一天任教的初中班级。在下列问题中，这个班级被称为目标班级。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (China), 正式调查中文，https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_cognitive_activation_isced2_teacher_self_zh_cn",
+                "type": "MATRIX",
+                "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "从不或几乎从不"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "偶尔"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "经常"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "总是"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51e",
+                    "label": "我给出没有明确解法的任务。"
+                  },
+                  {
+                    "rowKey": "tt4g51f",
+                    "label": "我布置需要学生批判性思考的任务。"
+                  },
+                  {
+                    "rowKey": "tt4g51g",
+                    "label": "我让学生以小组合作的形式共同解决一个问题或完成一个任务。"
+                  },
+                  {
+                    "rowKey": "tt4g51h",
+                    "label": "我要求学生决定他们自己解决复杂问题的步骤。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_cognitive_activation_isced2_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q51",
+        "publicVariableIds": [
+          "TT4G51E",
+          "TT4G51F",
+          "TT4G51G",
+          "TT4G51H"
+        ],
+        "localizationKind": "OECD_SHANGHAI_OFFICIAL_EXCERPT",
+        "sourceNote": "国际英语题本 Q51，公共变量 TT4G51E、TT4G51F、TT4G51G、TT4G51H。上海官方中文教师问卷第 54 页，页面标记 TQ_52。",
+        "oecdShanghaiForm": "https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip",
+        "oecdShanghaiPages": "54",
+        "oecdShanghaiScreen": "TQ_52",
+        "oecdShanghaiFormSha256": "25133b9a702687feb770bfe161255b097814b69911899bd031eb5743ae270b3b"
+      }
+    },
+    {
+      "instrumentKey": "talis2024_classroom_management_isced2_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4CLASM",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51I",
+        "TT4G51J",
+        "TT4G51K",
+        "TT4G51L"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 2,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜课堂管理（无计分）｜教师自评｜初中｜上海正式调查中文",
+        "description": "国际英语题本 Q51，公共变量 TT4G51I、TT4G51J、TT4G51K、TT4G51L。上海官方中文教师问卷第 54 页，页面标记 TQ_52。",
+        "instruction": "下面就您任教的一个特定班级提问。这个班级是您在上周二上午11点以后任教的第一个本校初中班级。请注意，如果您在周二没有任何任教初中班级，请顺延至上周二之后任一天任教的初中班级。在下列问题中，这个班级被称为目标班级。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (China), 正式调查中文，https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "从不或几乎从不"
+            },
+            {
+              "optionKey": "r2",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "r3",
+              "label": "经常"
+            },
+            {
+              "optionKey": "r4",
+              "label": "总是"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51i",
+              "label": "我告诉学生要遵守课堂纪律。"
+            },
+            {
+              "rowKey": "tt4g51j",
+              "label": "我告诉学生要听我讲话。"
+            },
+            {
+              "rowKey": "tt4g51k",
+              "label": "我让破坏纪律的学生安静下来。"
+            },
+            {
+              "rowKey": "tt4g51l",
+              "label": "课堂开始时，我告诉学生迅速安静下来。"
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_classroom_management_isced2_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜课堂管理（无计分）｜教师自评｜初中｜上海正式调查中文",
+            "description": "下面就您任教的一个特定班级提问。这个班级是您在上周二上午11点以后任教的第一个本校初中班级。请注意，如果您在周二没有任何任教初中班级，请顺延至上周二之后任一天任教的初中班级。在下列问题中，这个班级被称为目标班级。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (China), 正式调查中文，https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_classroom_management_isced2_teacher_self_zh_cn",
+                "type": "MATRIX",
+                "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "从不或几乎从不"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "偶尔"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "经常"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "总是"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51i",
+                    "label": "我告诉学生要遵守课堂纪律。"
+                  },
+                  {
+                    "rowKey": "tt4g51j",
+                    "label": "我告诉学生要听我讲话。"
+                  },
+                  {
+                    "rowKey": "tt4g51k",
+                    "label": "我让破坏纪律的学生安静下来。"
+                  },
+                  {
+                    "rowKey": "tt4g51l",
+                    "label": "课堂开始时，我告诉学生迅速安静下来。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_classroom_management_isced2_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q51",
+        "publicVariableIds": [
+          "TT4G51I",
+          "TT4G51J",
+          "TT4G51K",
+          "TT4G51L"
+        ],
+        "localizationKind": "OECD_SHANGHAI_OFFICIAL_EXCERPT",
+        "sourceNote": "国际英语题本 Q51，公共变量 TT4G51I、TT4G51J、TT4G51K、TT4G51L。上海官方中文教师问卷第 54 页，页面标记 TQ_52。",
+        "oecdShanghaiForm": "https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip",
+        "oecdShanghaiPages": "54",
+        "oecdShanghaiScreen": "TQ_52",
+        "oecdShanghaiFormSha256": "25133b9a702687feb770bfe161255b097814b69911899bd031eb5743ae270b3b"
+      }
+    },
+    {
+      "instrumentKey": "talis2024_other_practices_isced2_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": null,
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51M",
+        "TT4G51N",
+        "TT4G51O"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 2,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜其他课堂实践（无计分）｜教师自评｜初中｜上海正式调查中文",
+        "description": "国际英语题本 Q51，公共变量 TT4G51M、TT4G51N、TT4G51O。上海官方中文教师问卷第 54–55 页，页面标记 TQ_52。",
+        "instruction": "下面就您任教的一个特定班级提问。这个班级是您在上周二上午11点以后任教的第一个本校初中班级。请注意，如果您在周二没有任何任教初中班级，请顺延至上周二之后任一天任教的初中班级。在下列问题中，这个班级被称为目标班级。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (China), 正式调查中文，https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "从不或几乎从不"
+            },
+            {
+              "optionKey": "r2",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "r3",
+              "label": "经常"
+            },
+            {
+              "optionKey": "r4",
+              "label": "总是"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51m",
+              "label": "我结合日常生活或工作中的问题来说明新授知识为什么是有用的。"
+            },
+            {
+              "rowKey": "tt4g51n",
+              "label": "我给学生布置至少需要一周才能完成的任务。"
+            },
+            {
+              "rowKey": "tt4g51o",
+              "label": "我鼓励学生对其他学生的观点进行质疑和评判。"
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_other_practices_isced2_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜其他课堂实践（无计分）｜教师自评｜初中｜上海正式调查中文",
+            "description": "下面就您任教的一个特定班级提问。这个班级是您在上周二上午11点以后任教的第一个本校初中班级。请注意，如果您在周二没有任何任教初中班级，请顺延至上周二之后任一天任教的初中班级。在下列问题中，这个班级被称为目标班级。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (China), 正式调查中文，https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_other_practices_isced2_teacher_self_zh_cn",
+                "type": "MATRIX",
+                "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "从不或几乎从不"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "偶尔"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "经常"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "总是"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51m",
+                    "label": "我结合日常生活或工作中的问题来说明新授知识为什么是有用的。"
+                  },
+                  {
+                    "rowKey": "tt4g51n",
+                    "label": "我给学生布置至少需要一周才能完成的任务。"
+                  },
+                  {
+                    "rowKey": "tt4g51o",
+                    "label": "我鼓励学生对其他学生的观点进行质疑和评判。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_other_practices_isced2_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q51",
+        "publicVariableIds": [
+          "TT4G51M",
+          "TT4G51N",
+          "TT4G51O"
+        ],
+        "localizationKind": "OECD_SHANGHAI_OFFICIAL_EXCERPT",
+        "sourceNote": "国际英语题本 Q51，公共变量 TT4G51M、TT4G51N、TT4G51O。上海官方中文教师问卷第 54–55 页，页面标记 TQ_52。",
+        "oecdShanghaiForm": "https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip",
+        "oecdShanghaiPages": "54–55",
+        "oecdShanghaiScreen": "TQ_52",
+        "oecdShanghaiFormSha256": "25133b9a702687feb770bfe161255b097814b69911899bd031eb5743ae270b3b"
+      }
+    },
+    {
+      "instrumentKey": "talis2024_time_allocation_isced2_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": null,
+      "sourceQuestion": "Q50",
+      "sourceItemIds": [
+        "TT4G50A",
+        "TT4G50B",
+        "TT4G50C"
+      ],
+      "sourcePdfPage": 31,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 2,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜课堂时间分配（无计分）｜教师自评｜初中｜上海正式调查中文",
+        "description": "国际英语题本 Q50，公共变量 TT4G50A、TT4G50B、TT4G50C。上海官方中文教师问卷第 52–53 页，页面标记 TQ_50。上海 C 项“实际的教学”按当地题本保留。",
+        "instruction": "下面就您任教的一个特定班级提问。这个班级是您在上周二上午11点以后任教的第一个本校初中班级。请注意，如果您在周二没有任何任教初中班级，请顺延至上周二之后任一天任教的初中班级。在下列问题中，这个班级被称为目标班级。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (China), 正式调查中文，https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "constant_sum",
+        "formLabel": "该目标班级通常用于以下活动的课堂时间百分比是多少？\n请写出每项活动的百分比。若没有，请填写0（零）。\n请确保答案的总和为100%。",
+        "required": false,
+        "formDefinition": {
+          "type": "CONSTANT_SUM",
+          "prompt": "该目标班级通常用于以下活动的课堂时间百分比是多少？\n请写出每项活动的百分比。若没有，请填写0（零）。\n请确保答案的总和为100%。",
+          "required": false,
+          "total": 100,
+          "integerOnly": false,
+          "options": [
+            {
+              "optionKey": "tt4g50a",
+              "label": "管理任务（例如记录学生出勤、发放学校通知和表格）"
+            },
+            {
+              "optionKey": "tt4g50b",
+              "label": "维持课堂秩序（维持纪律）"
+            },
+            {
+              "optionKey": "tt4g50c",
+              "label": "实际的教学"
+            }
+          ],
+          "rows": []
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_time_allocation_isced2_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜课堂时间分配（无计分）｜教师自评｜初中｜上海正式调查中文",
+            "description": "下面就您任教的一个特定班级提问。这个班级是您在上周二上午11点以后任教的第一个本校初中班级。请注意，如果您在周二没有任何任教初中班级，请顺延至上周二之后任一天任教的初中班级。在下列问题中，这个班级被称为目标班级。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (China), 正式调查中文，https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_time_allocation_isced2_teacher_self_zh_cn",
+                "type": "CONSTANT_SUM",
+                "prompt": "该目标班级通常用于以下活动的课堂时间百分比是多少？\n请写出每项活动的百分比。若没有，请填写0（零）。\n请确保答案的总和为100%。",
+                "required": false,
+                "total": 100,
+                "integerOnly": false,
+                "options": [
+                  {
+                    "optionKey": "tt4g50a",
+                    "label": "管理任务（例如记录学生出勤、发放学校通知和表格）"
+                  },
+                  {
+                    "optionKey": "tt4g50b",
+                    "label": "维持课堂秩序（维持纪律）"
+                  },
+                  {
+                    "optionKey": "tt4g50c",
+                    "label": "实际的教学"
+                  }
+                ],
+                "rows": []
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_time_allocation_isced2_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q50",
+        "publicVariableIds": [
+          "TT4G50A",
+          "TT4G50B",
+          "TT4G50C"
+        ],
+        "localizationKind": "OECD_SHANGHAI_OFFICIAL_EXCERPT",
+        "sourceNote": "国际英语题本 Q50，公共变量 TT4G50A、TT4G50B、TT4G50C。上海官方中文教师问卷第 52–53 页，页面标记 TQ_50。上海 C 项“实际的教学”按当地题本保留。",
+        "oecdShanghaiForm": "https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip",
+        "oecdShanghaiPages": "52–53",
+        "oecdShanghaiScreen": "TQ_50",
+        "oecdShanghaiFormSha256": "25133b9a702687feb770bfe161255b097814b69911899bd031eb5743ae270b3b"
+      }
+    },
+    {
+      "instrumentKey": "talis2024_clarity_isced3_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4CLAIN",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51A",
+        "TT4G51B",
+        "TT4G51C",
+        "TT4G51D"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 3,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜清晰教学（无计分）｜教师自评｜高中｜简中工作译本",
+        "description": "国际英语题本 Q51，公共变量 TT4G51A、TT4G51B、TT4G51C、TT4G51D。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。",
+        "instruction": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个高中班级。如果您在周二没有任教高中班级，请顺延到之后一天，选择您任教的高中班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "从不或几乎从不"
+            },
+            {
+              "optionKey": "r2",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "r3",
+              "label": "经常"
+            },
+            {
+              "optionKey": "r4",
+              "label": "总是"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51a",
+              "label": "我为学生总结近期学过的内容。"
+            },
+            {
+              "rowKey": "tt4g51b",
+              "label": "我在一节课或一个单元开始时就设定好目标。"
+            },
+            {
+              "rowKey": "tt4g51c",
+              "label": "我说明希望学生学习的内容。"
+            },
+            {
+              "rowKey": "tt4g51d",
+              "label": "我说明新旧主题之间的联系。"
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_clarity_isced3_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜清晰教学（无计分）｜教师自评｜高中｜简中工作译本",
+            "description": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个高中班级。如果您在周二没有任教高中班级，请顺延到之后一天，选择您任教的高中班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid.",
+            "questions": [
+              {
+                "itemKey": "talis2024_clarity_isced3_teacher_self_zh_cn",
+                "type": "MATRIX",
+                "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "从不或几乎从不"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "偶尔"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "经常"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "总是"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51a",
+                    "label": "我为学生总结近期学过的内容。"
+                  },
+                  {
+                    "rowKey": "tt4g51b",
+                    "label": "我在一节课或一个单元开始时就设定好目标。"
+                  },
+                  {
+                    "rowKey": "tt4g51c",
+                    "label": "我说明希望学生学习的内容。"
+                  },
+                  {
+                    "rowKey": "tt4g51d",
+                    "label": "我说明新旧主题之间的联系。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_clarity_isced3_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q51",
+        "publicVariableIds": [
+          "TT4G51A",
+          "TT4G51B",
+          "TT4G51C",
+          "TT4G51D"
+        ],
+        "localizationKind": "PROJECT_WORKING_TRANSLATION",
+        "sourceNote": "国际英语题本 Q51，公共变量 TT4G51A、TT4G51B、TT4G51C、TT4G51D。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+      }
+    },
+    {
+      "instrumentKey": "talis2024_cognitive_activation_isced3_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4COGAC",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51E",
+        "TT4G51F",
+        "TT4G51G",
+        "TT4G51H"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 3,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜认知激活（无计分）｜教师自评｜高中｜简中工作译本",
+        "description": "国际英语题本 Q51，公共变量 TT4G51E、TT4G51F、TT4G51G、TT4G51H。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。",
+        "instruction": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个高中班级。如果您在周二没有任教高中班级，请顺延到之后一天，选择您任教的高中班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "从不或几乎从不"
+            },
+            {
+              "optionKey": "r2",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "r3",
+              "label": "经常"
+            },
+            {
+              "optionKey": "r4",
+              "label": "总是"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51e",
+              "label": "我给出没有明确解法的任务。"
+            },
+            {
+              "rowKey": "tt4g51f",
+              "label": "我布置需要学生批判性思考的任务。"
+            },
+            {
+              "rowKey": "tt4g51g",
+              "label": "我让学生以小组合作的形式共同解决一个问题或完成一个任务。"
+            },
+            {
+              "rowKey": "tt4g51h",
+              "label": "我要求学生决定他们自己解决复杂问题的步骤。"
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_cognitive_activation_isced3_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜认知激活（无计分）｜教师自评｜高中｜简中工作译本",
+            "description": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个高中班级。如果您在周二没有任教高中班级，请顺延到之后一天，选择您任教的高中班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid.",
+            "questions": [
+              {
+                "itemKey": "talis2024_cognitive_activation_isced3_teacher_self_zh_cn",
+                "type": "MATRIX",
+                "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "从不或几乎从不"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "偶尔"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "经常"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "总是"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51e",
+                    "label": "我给出没有明确解法的任务。"
+                  },
+                  {
+                    "rowKey": "tt4g51f",
+                    "label": "我布置需要学生批判性思考的任务。"
+                  },
+                  {
+                    "rowKey": "tt4g51g",
+                    "label": "我让学生以小组合作的形式共同解决一个问题或完成一个任务。"
+                  },
+                  {
+                    "rowKey": "tt4g51h",
+                    "label": "我要求学生决定他们自己解决复杂问题的步骤。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_cognitive_activation_isced3_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q51",
+        "publicVariableIds": [
+          "TT4G51E",
+          "TT4G51F",
+          "TT4G51G",
+          "TT4G51H"
+        ],
+        "localizationKind": "PROJECT_WORKING_TRANSLATION",
+        "sourceNote": "国际英语题本 Q51，公共变量 TT4G51E、TT4G51F、TT4G51G、TT4G51H。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+      }
+    },
+    {
+      "instrumentKey": "talis2024_classroom_management_isced3_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4CLASM",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51I",
+        "TT4G51J",
+        "TT4G51K",
+        "TT4G51L"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 3,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜课堂管理（无计分）｜教师自评｜高中｜简中工作译本",
+        "description": "国际英语题本 Q51，公共变量 TT4G51I、TT4G51J、TT4G51K、TT4G51L。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。",
+        "instruction": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个高中班级。如果您在周二没有任教高中班级，请顺延到之后一天，选择您任教的高中班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "从不或几乎从不"
+            },
+            {
+              "optionKey": "r2",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "r3",
+              "label": "经常"
+            },
+            {
+              "optionKey": "r4",
+              "label": "总是"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51i",
+              "label": "我告诉学生要遵守课堂纪律。"
+            },
+            {
+              "rowKey": "tt4g51j",
+              "label": "我告诉学生要听我讲话。"
+            },
+            {
+              "rowKey": "tt4g51k",
+              "label": "我帮助扰乱课堂的学生平静下来。"
+            },
+            {
+              "rowKey": "tt4g51l",
+              "label": "课堂开始时，我告诉学生迅速安静下来。"
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_classroom_management_isced3_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜课堂管理（无计分）｜教师自评｜高中｜简中工作译本",
+            "description": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个高中班级。如果您在周二没有任教高中班级，请顺延到之后一天，选择您任教的高中班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid.",
+            "questions": [
+              {
+                "itemKey": "talis2024_classroom_management_isced3_teacher_self_zh_cn",
+                "type": "MATRIX",
+                "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "从不或几乎从不"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "偶尔"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "经常"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "总是"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51i",
+                    "label": "我告诉学生要遵守课堂纪律。"
+                  },
+                  {
+                    "rowKey": "tt4g51j",
+                    "label": "我告诉学生要听我讲话。"
+                  },
+                  {
+                    "rowKey": "tt4g51k",
+                    "label": "我帮助扰乱课堂的学生平静下来。"
+                  },
+                  {
+                    "rowKey": "tt4g51l",
+                    "label": "课堂开始时，我告诉学生迅速安静下来。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_classroom_management_isced3_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q51",
+        "publicVariableIds": [
+          "TT4G51I",
+          "TT4G51J",
+          "TT4G51K",
+          "TT4G51L"
+        ],
+        "localizationKind": "PROJECT_WORKING_TRANSLATION",
+        "sourceNote": "国际英语题本 Q51，公共变量 TT4G51I、TT4G51J、TT4G51K、TT4G51L。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+      }
+    },
+    {
+      "instrumentKey": "talis2024_other_practices_isced3_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": null,
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51M",
+        "TT4G51N",
+        "TT4G51O"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 3,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜其他课堂实践（无计分）｜教师自评｜高中｜简中工作译本",
+        "description": "国际英语题本 Q51，公共变量 TT4G51M、TT4G51N、TT4G51O。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。",
+        "instruction": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个高中班级。如果您在周二没有任教高中班级，请顺延到之后一天，选择您任教的高中班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "从不或几乎从不"
+            },
+            {
+              "optionKey": "r2",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "r3",
+              "label": "经常"
+            },
+            {
+              "optionKey": "r4",
+              "label": "总是"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51m",
+              "label": "我结合日常生活或工作中的问题来说明新授知识为什么是有用的。"
+            },
+            {
+              "rowKey": "tt4g51n",
+              "label": "我给学生安排至少需要一周才能完成的项目。"
+            },
+            {
+              "rowKey": "tt4g51o",
+              "label": "我鼓励学生质疑并评议其他学生提出的论证。"
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_other_practices_isced3_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜其他课堂实践（无计分）｜教师自评｜高中｜简中工作译本",
+            "description": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个高中班级。如果您在周二没有任教高中班级，请顺延到之后一天，选择您任教的高中班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid.",
+            "questions": [
+              {
+                "itemKey": "talis2024_other_practices_isced3_teacher_self_zh_cn",
+                "type": "MATRIX",
+                "prompt": "考虑一下您在该目标班级的教学，您从事以下活动的频率是怎样的？\n请每行只勾选一项。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "从不或几乎从不"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "偶尔"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "经常"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "总是"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51m",
+                    "label": "我结合日常生活或工作中的问题来说明新授知识为什么是有用的。"
+                  },
+                  {
+                    "rowKey": "tt4g51n",
+                    "label": "我给学生安排至少需要一周才能完成的项目。"
+                  },
+                  {
+                    "rowKey": "tt4g51o",
+                    "label": "我鼓励学生质疑并评议其他学生提出的论证。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_other_practices_isced3_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q51",
+        "publicVariableIds": [
+          "TT4G51M",
+          "TT4G51N",
+          "TT4G51O"
+        ],
+        "localizationKind": "PROJECT_WORKING_TRANSLATION",
+        "sourceNote": "国际英语题本 Q51，公共变量 TT4G51M、TT4G51N、TT4G51O。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+      }
+    },
+    {
+      "instrumentKey": "talis2024_time_allocation_isced3_teacher_self_zh_cn",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": null,
+      "sourceQuestion": "Q50",
+      "sourceItemIds": [
+        "TT4G50A",
+        "TT4G50B",
+        "TT4G50C"
+      ],
+      "sourcePdfPage": 31,
+      "contentLocale": "zh-CN",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 3,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜课堂时间分配（无计分）｜教师自评｜高中｜简中工作译本",
+        "description": "国际英语题本 Q50，公共变量 TT4G50A、TT4G50B、TT4G50C。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。",
+        "instruction": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个高中班级。如果您在周二没有任教高中班级，请顺延到之后一天，选择您任教的高中班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "constant_sum",
+        "formLabel": "该目标班级通常用于以下活动的课堂时间百分比是多少？\n请写出每项活动的百分比。若没有，请填写0（零）。\n请确保答案的总和为100%。",
+        "required": false,
+        "formDefinition": {
+          "type": "CONSTANT_SUM",
+          "prompt": "该目标班级通常用于以下活动的课堂时间百分比是多少？\n请写出每项活动的百分比。若没有，请填写0（零）。\n请确保答案的总和为100%。",
+          "required": false,
+          "total": 100,
+          "integerOnly": false,
+          "options": [
+            {
+              "optionKey": "tt4g50a",
+              "label": "管理任务（例如记录学生出勤、发放学校通知和表格）"
+            },
+            {
+              "optionKey": "tt4g50b",
+              "label": "维持课堂秩序（维持纪律）"
+            },
+            {
+              "optionKey": "tt4g50c",
+              "label": "实际用于教学与学习的时间"
+            }
+          ],
+          "rows": []
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_time_allocation_isced3_teacher_self_zh_cn",
+            "title": "TALIS2024教学实践｜课堂时间分配（无计分）｜教师自评｜高中｜简中工作译本",
+            "description": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个高中班级。如果您在周二没有任教高中班级，请顺延到之后一天，选择您任教的高中班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid.",
+            "questions": [
+              {
+                "itemKey": "talis2024_time_allocation_isced3_teacher_self_zh_cn",
+                "type": "CONSTANT_SUM",
+                "prompt": "该目标班级通常用于以下活动的课堂时间百分比是多少？\n请写出每项活动的百分比。若没有，请填写0（零）。\n请确保答案的总和为100%。",
+                "required": false,
+                "total": 100,
+                "integerOnly": false,
+                "options": [
+                  {
+                    "optionKey": "tt4g50a",
+                    "label": "管理任务（例如记录学生出勤、发放学校通知和表格）"
+                  },
+                  {
+                    "optionKey": "tt4g50b",
+                    "label": "维持课堂秩序（维持纪律）"
+                  },
+                  {
+                    "optionKey": "tt4g50c",
+                    "label": "实际用于教学与学习的时间"
+                  }
+                ],
+                "rows": []
+              }
+            ]
+          }
+        ]
+      },
+      "questionnaireLocalization": {
+        "pairedEnglishKey": "talis2024_time_allocation_isced3_teacher_self_en",
+        "sourceLocale": "en",
+        "targetLocale": "zh-CN",
+        "sourceMaster": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "sourceLocaleVersion": "1.0.0",
+        "sourceQuestion": "Q50",
+        "publicVariableIds": [
+          "TT4G50A",
+          "TT4G50B",
+          "TT4G50C"
+        ],
+        "localizationKind": "PROJECT_WORKING_TRANSLATION",
+        "sourceNote": "国际英语题本 Q50，公共变量 TT4G50A、TT4G50B、TT4G50C。以对应的小学或高中英文母题本为基准，沿用与学段相符的表述。"
+      }
+    }
+  ],
+  "ordinaryCombinations": [
+    {
+      "key": "talis2024_teaching_practices_isced1_teacher_self_zh_cn",
+      "name": "TALIS2024教学实践｜教师自评｜小学｜简中工作译本",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection"
+      ],
+      "sourceOrder": [
+        "talis2024_time_allocation_isced1_teacher_self_zh_cn",
+        "talis2024_clarity_isced1_teacher_self_zh_cn",
+        "talis2024_cognitive_activation_isced1_teacher_self_zh_cn",
+        "talis2024_classroom_management_isced1_teacher_self_zh_cn",
+        "talis2024_other_practices_isced1_teacher_self_zh_cn"
+      ],
+      "crossToolScore": false,
+      "instruction": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个小学班级。如果您在周二没有任教小学班级，请顺延到之后一天，选择您任教的小学班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid.",
+      "reportMode": "COLLECTION_ONLY"
+    },
+    {
+      "key": "talis2024_teaching_practices_isced2_teacher_self_zh_cn",
+      "name": "TALIS2024教学实践｜教师自评｜初中｜上海正式调查中文",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection"
+      ],
+      "sourceOrder": [
+        "talis2024_time_allocation_isced2_teacher_self_zh_cn",
+        "talis2024_clarity_isced2_teacher_self_zh_cn",
+        "talis2024_cognitive_activation_isced2_teacher_self_zh_cn",
+        "talis2024_classroom_management_isced2_teacher_self_zh_cn",
+        "talis2024_other_practices_isced2_teacher_self_zh_cn"
+      ],
+      "crossToolScore": false,
+      "instruction": "下面就您任教的一个特定班级提问。这个班级是您在上周二上午11点以后任教的第一个本校初中班级。请注意，如果您在周二没有任何任教初中班级，请顺延至上周二之后任一天任教的初中班级。在下列问题中，这个班级被称为目标班级。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (China), 正式调查中文，https://webfs.oecd.org/talis/CSH_China_Shanghai_TALIS2024CoreQuestionnaires.zip\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+      "reportMode": "COLLECTION_ONLY"
+    },
+    {
+      "key": "talis2024_teaching_practices_isced3_teacher_self_zh_cn",
+      "name": "TALIS2024教学实践｜教师自评｜高中｜简中工作译本",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:zh-cn",
+        "wave:talis2024",
+        "use:reflection"
+      ],
+      "sourceOrder": [
+        "talis2024_time_allocation_isced3_teacher_self_zh_cn",
+        "talis2024_clarity_isced3_teacher_self_zh_cn",
+        "talis2024_cognitive_activation_isced3_teacher_self_zh_cn",
+        "talis2024_classroom_management_isced3_teacher_self_zh_cn",
+        "talis2024_other_practices_isced3_teacher_self_zh_cn"
+      ],
+      "crossToolScore": false,
+      "instruction": "下面的问题针对您任教的一个班级。请选择上周二上午11点以后，您在本校任教的第一个高中班级。如果您在周二没有任教高中班级，请顺延到之后一天，选择您任教的高中班级。下文称其为“目标班级”。\n\n请使用同一个目标班级作答。可以略过不作答的项目。答案编号只标记回答类别。\n\nOECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.\n\n本组为项目简中工作译本，随原件署名发布。In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid.",
+      "reportMode": "COLLECTION_ONLY"
+    }
+  ],
+  "contentLocale": "zh-CN",
+  "releasePurpose": "NONCOMMERCIAL",
+  "oecdTerms": "https://www.oecd.org/en/about/terms-conditions.html",
+  "adaptationDisclaimer": "This is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+  "translationDisclaimer": "In the event of any discrepancy between the original work and the translation, only the text of the original work should be considered valid."
+}
