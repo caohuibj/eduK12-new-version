@@ -2,6 +2,13 @@ import type { ScaleInstrumentSourceV1 } from '../../../onboarding/types'
 
 export const SCALE_INSTRUMENT_SOURCE = {
   schemaVersion: 1,
+  instruction: {
+    "schemaVersion": 1,
+    "text": "请按整对词来判断每一题有多符合自己。即使同一对词里的一个词比另一个更像你，也请在考虑两个词后选出一个答案。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "Administration cue adapted from the Gosling Lab original TIPI response instruction. Existing Lu, Liu, Liao & Wang (2020) Chinese item wording is retained."
+  },
   identity: {
     instrumentKey: 'tipi_zh_cn',
     instrumentVersion: '1.0.0',

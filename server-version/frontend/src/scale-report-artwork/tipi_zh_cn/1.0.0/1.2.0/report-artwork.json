@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "tipi_zh_cn/1.0.0/1.2.0",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一名年轻人在同伴交流、整理材料和尝试新活动时展现不同侧面。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

@@ -1,0 +1,156 @@
+{
+  "toolKey": "tipi_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0",
+  "title": "十题性格速写｜从一件小事理解一个倾向",
+  "report": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "extraversion",
+      "agreeableness",
+      "conscientiousness",
+      "emotional_stability",
+      "openness_to_experience"
+    ],
+    "scoreOrder": [
+      "extraversion",
+      "agreeableness",
+      "conscientiousness",
+      "emotional_stability",
+      "openness_to_experience"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "extraversion",
+        "scoreLabel": "外向性（1–7）",
+        "headline": "看自己在什么时候想加入谈话",
+        "summary": "在熟悉的小组里接话很自然，碰到陌生场合却想先听一会儿。外向性描述的是在通常情形下认同活跃、外向的程度。两题可以提供一个简短视角，也值得拿真实社交场景对照。",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次最自在的交流。记下当时和谁在一起、自己是先听还是先说，以及哪些条件让你愿意多参与。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "agreeableness",
+        "scoreLabel": "宜人性（1–7）",
+        "headline": "意见不同时，你习惯怎样开口",
+        "summary": "一起做事时，既需要表达意见，也可能想先听懂对方为什么那样想。这个分数关注作答者对自己平时合作、体谅或与人争论方式的描述。",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "下一次意见不同，可以先试着复述对方最在意的一点，再具体说明自己担心的地方。观察这样的开头是否帮助双方继续商量。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "conscientiousness",
+        "scoreLabel": "尽责性（1–7）",
+        "headline": "把可靠的做法具体化",
+        "summary": "有时人觉得自己比较有条理，是因为有一套提醒、清单或收尾习惯。这一维记录你对自己负责、做事有条理的总体看法。",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想最近准时完成的一件事。找出最管用的一个安排，例如预留余量、把任务写下来或提前向伙伴确认。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional_stability",
+        "scoreLabel": "情绪稳定性（1–7）",
+        "headline": "留意什么帮助自己稳住",
+        "summary": "等消息时有点紧张，收到明确进展后又平静下来。这里概括的是你对自己通常比较平静、情绪较稳定的看法。具体事件和身边支持也会影响当天感受。",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想起一次情绪过去得比较快的时刻，记下真正有帮助的条件。它可能是确定了下一步、有人愿意听，或终于可以暂停一会儿。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "openness_to_experience",
+        "scoreLabel": "开放性（1–7）",
+        "headline": "从一次愿意尝试的小事看起",
+        "summary": "听同伴讲一种新做法时，你有时会想自己试一下，有时只想把手头的方法做扎实。开放性关注自述中的好奇、想象力和对新体验的倾向。",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一件你愿意了解但还没实际尝试的小事。找一个时间短、后果轻的入口，试过后再问自己哪部分有兴趣。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "五个维度分别使用两题，各为 1–7 描述分。简式量表适合简要研究和反思，单个维度的信息量有限。",
+      "题本与计分来自 Gosling、Rentfrow 和 Swann（2003），采用 Lu 等（2020）中文条目。配文及配图由平台制作。"
+    ],
+    "disclaimer": "本报告用于研究试用和本次作答的描述性回顾。",
+    "artworkKey": "tipi_zh_cn/1.0.0/1.2.0"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
