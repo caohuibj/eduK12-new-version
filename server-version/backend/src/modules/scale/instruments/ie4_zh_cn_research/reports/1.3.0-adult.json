@@ -1,0 +1,120 @@
+{
+  "toolKey": "ie4_zh_cn_research",
+  "contentVersion": "1.2.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "行动与限制都看见｜成人试用版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex source, rights and editorial review; not human translation or psychometric approval",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "依据ZIS官方IE-4英文题本、当前中文工作译稿C1.2.0及default P复核四题、五档锚点、内部与外部控制点两组独立均值。本次只新增score-only成人审稿R；两维不相减、不合总，不引入常模、参考或分档。"
+      }
+    },
+    "primaryScoreKeys": [
+      "internal",
+      "external"
+    ],
+    "scoreOrder": [
+      "internal",
+      "external"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "internal",
+        "scoreLabel": "自己的行动与结果（两题均分1–5）",
+        "headline": "找得到能动的一步，也给结果留出余地",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "准备搬家时，你可以决定先整理哪一间房、联系哪家车辆、怎样给箱子做标记。这些行动会影响过程，却不能保证电梯一定有空、路上一定不堵，或所有人都按原计划到场。看到自己能做的部分，不等于要为全部结果负责。\n\n这一维由两题取1–5的平均值，描述你在多大程度上认同“自己作主”和“努力会影响结果”。数值越大，只表示这次更认同这类信念；它不测实际能力、意志力或控制范围，也不能证明只要努力就一定成功。\n\n回顾时，可以把一件事拆成三个部分：自己能决定什么、可以与别人协商什么、哪些条件暂时不能控制。这样既能看见行动空间，也不把环境、资源和偶然因素造成的困难全部归到自己身上。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一件最近推进过的事，写下一个由自己作出的决定，以及一个帮助这个决定落地的外部条件。两者同时成立，不必只归功或归责于自己。"
+          },
+          {
+            "category": "strategy",
+            "text": "在当前能影响的范围里选一步，例如确认时间、准备材料或提出一个具体方案。完成后看实际反馈，再决定是否调整，而不是用结果一次性评价自己。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "external",
+        "scoreLabel": "外部力量与结果（两题均分1–5）",
+        "headline": "把限制说具体，才看得见可以协商的地方",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一次预约被系统取消，可能是名额、规则或技术问题，也可能还缺一项没有确认的信息。把它只概括成“都是命运”会漏掉细节；把它全算成自己的失败，同样不准确。先弄清是哪一种限制，才知道应当等待、补充信息、寻找替代方案，还是请有职责的人处理。\n\n这一维也由两题取1–5的平均值，描述你在多大程度上认同别人、命运或外部条件会影响结果。数值越大，不等于消极、懒惰或推卸责任；数值越小也不代表现实限制不存在。它与“自己的行动与结果”是并列的另一维，平台不会把两者相减，也不会合成一个好坏总分。\n\n更有用的复盘，是把笼统的外部力量拆成可核实的信息：谁在决定、哪条规则在起作用、还有没有替代路径、需要什么支持。确认真实限制，本身可以帮助行动更准确。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一个最近受阻的计划，分别记录已确认的外部限制、仍只是猜测的部分，以及可以向谁核实。不要先用“全怪我”或“完全没办法”收尾。"
+          },
+          {
+            "category": "support",
+            "text": "如果限制来自规则、资源或他人的决定，找对能提供信息或承担职责的人，提出一个具体问题或请求；无法改变的部分，也可以据此调整计划并保护自己的边界。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "当前C是依据ZIS官方英文IE-4制作的中文工作译稿，尚未完成人工专家译审、认知访谈或中文目标人群心理测量验证；不得称为官方或已验证中文版。",
+      "内部控制点与外部控制点各由两题完整作答后取均值，范围均为1–5。两维分别解释，不相减、不反向替代，也不生成总体控制点分数。",
+      "default P不含常模、百分位、cut-off或参考分档。本报告不判断哪一维更好，也不把信念当作实际能力、责任、品格或未来结果。",
+      "来源：Nießen, D., Schmidt, I., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2022). Internal–External Locus of Control Short Scale–4 (IE-4). ZIS. https://access.gesis.org/zis/1259 。© 2022 Nießen et al.，CC BY 4.0：https://creativecommons.org/licenses/by/4.0/。中文工作译稿与平台报告为独立改编，须保留署名、许可链接和改动说明；原作者未背书本平台。"
+    ],
+    "disclaimer": "成人研究试用版，仅供描述性自我回顾；不用于诊断、能力鉴定、责任判断、选拔或排名。中文工作译稿尚待人工译审，报告不提供高低分界。",
+    "artworkKey": "ie4_zh_cn_research/1.2.0/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
