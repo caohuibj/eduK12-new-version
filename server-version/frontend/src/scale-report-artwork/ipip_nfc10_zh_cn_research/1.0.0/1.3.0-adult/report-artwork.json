@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "ipip_nfc10_zh_cn_research/1.0.0/1.3.0-adult",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "桌上一册打开的书、无字笔记、安静阅读的成年人。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

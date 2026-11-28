@@ -1,0 +1,100 @@
+{
+  "toolKey": "ipip_nfc10_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "深度思考偏好｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对 IPIP 官方逐题与正反向键、冻结中文工作译稿和原 P 的 score-only 解释。当前证据适用于成人试用描述。"
+      }
+    },
+    "primaryScoreKeys": [
+      "need_for_cognition"
+    ],
+    "scoreOrder": [
+      "need_for_cognition"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "need_for_cognition",
+        "scoreLabel": "认知需求合计分（10–50）",
+        "headline": "用一个有意思的问题，开始一次深入思考",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "面对一份费脑筋的材料，有人会想再查下去，有人更喜欢先抓住能用的结论。这十题包含对复杂问题、挑战性阅读的兴趣，也包含自评的理解速度、信息处理与讨论偏好。十题按同一方向加总，10–50 分，较大数值表示更认同投入复杂思考的描述。实际会投入多少，也取决于材料难度、背景知识与当下精力。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一件你愿意弄懂的小事，写下是什么问题让你想继续查。"
+          },
+          {
+            "category": "strategy",
+            "text": "遇到难读材料，先写一个可回答的问题，再读一段找证据；暂停后用自己的话复述。"
+          },
+          {
+            "category": "support",
+            "text": "向熟悉材料的人询问一个例子，比较例子与原说法是否相符，再决定要不要继续深入。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "本报告使用项目中文工作译稿，面向其现有成人自评研究及自我回顾范围。当前证据支持对本次作答做描述。",
+      "原题和计分可按 IPIP 官方公有领域声明使用。由于本译稿尚无适配常模，报告仅显示实得分。",
+      "各结果按相应题组完整作答后计算，漏答保留为缺失。请结合近期情境和具体经历理解。"
+    ],
+    "disclaimer": "适用于成人试用研究及自我回顾。诊断、人员筛选、排名与个体高风险决定需要相应的专门方法。",
+    "artworkKey": "ipip_nfc10_zh_cn_research/1.0.0/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
