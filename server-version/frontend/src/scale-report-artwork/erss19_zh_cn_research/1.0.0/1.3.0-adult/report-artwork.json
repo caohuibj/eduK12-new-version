@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "erss19_zh_cn_research/1.0.0/1.3.0-adult",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一张桌上放着可以移开的小绿植、一个计时器和一本翻页的笔记。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

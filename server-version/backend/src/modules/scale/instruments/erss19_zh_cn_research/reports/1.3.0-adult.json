@@ -1,0 +1,179 @@
+{
+  "toolKey": "erss19_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "情绪调节策略量表 ERSS-19",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "https://doi.org/10.3389/fpsyg.2019.01486 作者开放原文 Methods 逐题列出策略题、量尺及计分，保留其中改编来源署名。"
+      }
+    },
+    "primaryScoreKeys": [
+      "situation_modification",
+      "attentional_deployment",
+      "cognitive_reappraisal",
+      "suppression"
+    ],
+    "scoreOrder": [
+      "situation_modification",
+      "attentional_deployment",
+      "cognitive_reappraisal",
+      "suppression"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "situation_modification",
+        "scoreLabel": "调整眼前的处境",
+        "headline": "局面可以挪一挪",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组描述你多常通过改变事情安排、环境或待处理环节来影响感受。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近哪个让人烦的情境，实际能动到其中哪一小部分？"
+          },
+          {
+            "category": "strategy",
+            "text": "可以调整时，先把一件具体事变小，例如改约地点或重新分一下工作。"
+          },
+          {
+            "category": "support",
+            "text": "情况牵涉别人时，可以先核对对方的条件和需要。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "attentional_deployment",
+        "scoreLabel": "让注意力换个落点",
+        "headline": "先让注意力有个新的落点",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组描述把注意力换到另一件事上的倾向，包含题本里的两道反向题。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "遇到一时间解决不了的事情，什么能帮你先缓一缓？"
+          },
+          {
+            "category": "strategy",
+            "text": "试一项有结束时间的活动，等缓下来后再决定要不要回到原问题。"
+          },
+          {
+            "category": "support",
+            "text": "需要及时处理的事项可以先保安全与期限。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "cognitive_reappraisal",
+        "scoreLabel": "换个角度想一想",
+        "headline": "同一件事，多试一个解释",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组描述你通过改变看待情境的方式来调节感受的倾向。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "有次紧张是因为以为别人不满，后来事实有没有给另一种答案？"
+          },
+          {
+            "category": "strategy",
+            "text": "写下目前解释，再找一个同样符合证据的解释，看看是否改变下一步。"
+          },
+          {
+            "category": "support",
+            "text": "遇到明确危险、不公或越界时，可以先确保安全、记录和寻求支持。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "suppression",
+        "scoreLabel": "把情绪先留在心里",
+        "headline": "有的情绪会先放在心里",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组描述控制表情、言语等情绪表现的倾向。分数较高表示更认同少让别人看见。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "在哪些场面暂时保持镇定对你有用，哪些时候说出来更能被理解？"
+          },
+          {
+            "category": "strategy",
+            "text": "如果先不表达是合适的，可以回头找一个安全时机和合适对象说明需要。"
+          },
+          {
+            "category": "support",
+            "text": "内心的感受和外在表现都可以各自被关注。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "四个均值分别由 3、4、7、5 题计算，原分范围各 1–7，第 6、7 题反向。原研究包含模拟领导情境；此 R 描述自报策略，不作职务能力评定。"
+    ],
+    "disclaimer": "这是成年人情绪调节方式的研究试用稿。报告帮助你识别习惯使用哪些做法，以及它们在不同场景下可能起到的作用，暂无分级常模。",
+    "artworkKey": "erss19_zh_cn_research/1.0.0/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
