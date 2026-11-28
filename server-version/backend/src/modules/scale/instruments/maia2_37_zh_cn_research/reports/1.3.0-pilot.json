@@ -1,0 +1,225 @@
+{
+  "toolKey": "maia2_37_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-pilot",
+  "title": "日常如何感受和理解身体｜成人研究试用",
+  "report": {
+    "reportVersion": "1.3.0-pilot",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 来源、计分和内容复核",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "对照原论文表 2 和当前独立中译，按 37 题、8 维、9 项反向、0–5 均分及完整作答设置释义。"
+      }
+    },
+    "primaryScoreKeys": [
+      "noticing",
+      "not_distracting",
+      "not_worrying",
+      "attention_regulation",
+      "emotional_awareness",
+      "self_regulation",
+      "body_listening",
+      "trusting"
+    ],
+    "scoreOrder": [
+      "noticing",
+      "not_distracting",
+      "not_worrying",
+      "attention_regulation",
+      "emotional_awareness",
+      "self_regulation",
+      "body_listening",
+      "trusting"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "noticing",
+        "scoreLabel": "感觉觉察（0–5 均分）",
+        "headline": "能够发现哪里紧、哪里轻松",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "忙了一阵后，可能先注意到肩膀发紧，或在坐稳时发现呼吸轻了一点。这组记录本次回答里你有多常留意舒服、不舒服或中性的感觉。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回顾一次自然注意到的变化，写下具体感受与当时活动。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "not_distracting",
+        "scoreLabel": "不转移感受（0–5 均分）",
+        "headline": "出现不适时，留意注意力去了哪里",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "身体有些不舒服时，有的人会先继续手头的事，有的人会停下来了解。统一方向后，较大的均分表示本次较少报告把注意移开或忽略感觉。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一个轻微、熟悉的例子，说清你先注意到了什么，然后怎样决定继续活动、暂停或照护。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "not_worrying",
+        "scoreLabel": "不为感受担忧（0–5 均分）",
+        "headline": "同一种感觉可以带来不同想法",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "身体有点绷紧，你或许只是留意到它，也可能马上牵挂接下来会怎样。统一方向后，较大的均分表示本次较少报告因不适而担忧或烦乱。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看一段普通场景，把直接感觉和当时想到的解释分开写。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "attention_regulation",
+        "scoreLabel": "身体注意调节（0–5 均分）",
+        "headline": "注意力走开之后怎样再回来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "你也许可以在一段忙碌里发现脚踩在地上的感觉，分心后也能再注意到它。该维描述你报告有多常把注意放到身体、保持或转回去。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选择一个日常停顿，回顾什么环境有利于你注意到身体，什么会打断。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional_awareness",
+        "scoreLabel": "身体与情绪联系（0–5 均分）",
+        "headline": "不同情境里，感受可能一起变化",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有时期待一个消息和赶时间带来的紧绷很相似。该维反映你报告有多常注意到情绪和身体感觉之间的联系。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑最近一个情绪起伏，记下当时场景、情绪和身体感觉。把记录当作线索，继续观察是否重复。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "self_regulation",
+        "scoreLabel": "用身体注意调节状态（0–5 均分）",
+        "headline": "回到当下时，哪些做法帮过自己",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "结束一段嘈杂的等候后，有人会留意姿势或呼吸，让状态慢慢安定下来。该维记录身体注意在你自述的调节和安顿体验中多常出现。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "记录一个已经对你有用的方式，以及当你更需要安静、休息或别人帮忙时怎样作出选择。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "body_listening",
+        "scoreLabel": "身体感觉作为线索（0–5 均分）",
+        "headline": "身体感觉可以参与判断",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "原先计划把事一口气做完，开始觉得明显疲劳时，你也会把这个感受放进接下来的安排。该维记录你报告多常从感受获得自我了解的线索。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看一件决定，记下当时的身体线索、可用信息与最后采取的行动。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "trusting",
+        "scoreLabel": "身体感受中的安心与信任（0–5 均分）",
+        "headline": "安心体验会随场景变化",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "熟悉的空间和适合的活动，有时让你感到身体是个可以安心停留的地方。该维记录你报告的这类感受频率。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "举一个更有安心感的具体场景，留意环境、活动或者在场的人带来的差别。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "每维按本库指定题组统一方向计算均分，均为 0–5，八个结果各自阅读。",
+      "报告用于成人自述研究。解释限于长期日常体验中的身体注意方式，强迫忍耐或依靠量表解释新发不适都超出用途。",
+      "Mehling、Acree、Stewart、Silas 和 Jones（2018），MAIA-2，PLOS ONE 表 2，https://doi.org/10.1371/journal.pone.0208034 ，CC BY 4.0 https://creativecommons.org/licenses/by/4.0/ 。此平台中文工作译稿及报告为独立改编。"
+    ],
+    "disclaimer": "中文成人研究试用，结果用来回看身体注意和感受方式。",
+    "artworkKey": "maia2_37_zh_cn_research/1.0.1/1.3.0-pilot"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
