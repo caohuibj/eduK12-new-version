@@ -1,0 +1,97 @@
+{
+  "toolKey": "mslq_critical_thinking5_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0",
+  "title": "课程批判性思考｜给结论多问一句",
+  "report": {
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 原件与内容核对",
+        "reviewedAt": "2026-11-28T01:29:32.293Z",
+        "basis": "对照 ERIC ED338122 MSLQ 手册第 22 页的完整批判性思考条目 38、47、51、66、71，及课程版答题指导。保留同一门大学课程、七级原端点、等权均分和证据／个人推演／替代解释含义。作者 Teresa Duncan 公共领域声明要求正确引用。独立中文工作译稿。"
+      }
+    },
+    "reportVersion": "1.3.0",
+    "primaryScoreKeys": [
+      "course_critical_thinking_strategy"
+    ],
+    "scoreOrder": [
+      "course_critical_thinking_strategy"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "course_critical_thinking_strategy",
+        "headline": "给结论多问一句",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "课程材料里写着「这个办法有效」。你能复述它，也可以再问：在哪些条件下有效？支持它的证据够吗？换一种情况，结论还成立吗？这就是把学到的内容变成可以自己使用的想法。\n\n这五题记录你在作答前选定的同一门大学课程里，自述使用这些学习办法的情况。题目是按「符合自己情况的程度」作答，取 1–7 的平均。你在另一门课有不同体验很自然。接下来可以挑一条重要的结论练习，看看原本只会复述的一句话，能不能说明它凭什么成立。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一段课程材料，写下「它说什么」「依据是什么」各一句。碰到暂时核实不了的地方，给它留一个问号。"
+          },
+          {
+            "category": "strategy",
+            "text": "换一个情境试试同一个结论。比如把时间、对象或前提换掉，看结果是否可能不同，再写出你想核对的一条信息。"
+          },
+          {
+            "category": "support",
+            "text": "把问题带到课上、讨论区或答疑时间。问「哪条证据让我区分这两种解释？」通常比一句「我不懂」更容易打开讨论。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "独立中文成人课程研究稿尚未验证，无跨课程等级；仅描述同一门课的自述策略，不测智商或固定能力。"
+    ],
+    "disclaimer": "依据 Pintrich、Smith、Garcia、McKeachie（1991）MSLQ手册的完整五题模块。独立中文工作译稿，非作者背书；仅供成人大学课程研究与反思，不用于学生筛选、排名或诊断。",
+    "artworkKey": "mslq_critical_thinking5_zh_cn_research/1.0.1/1.3.0"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
