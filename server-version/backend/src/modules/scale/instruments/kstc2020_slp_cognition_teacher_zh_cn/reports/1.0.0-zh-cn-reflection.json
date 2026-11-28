@@ -30,7 +30,9 @@
             "category": "strategy",
             "text": "试着用一道课前预测题开场。请学生先写出理由，再在课末回看自己的解释。两次答案之间的变化，可以成为下次备课的线索。"
           }
-        ]
+        ],
+        "scoreLabel": "备课｜考虑学生的认知（试用版，1–5 分）",
+        "provisional": true
       }
     ],
     "limitations": [

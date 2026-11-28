@@ -30,7 +30,9 @@
             "category": "strategy",
             "text": "用两段来源不同、结论有差异的短材料开场。请学生先找出各自的证据，再说说还需要知道什么才好判断。"
           }
-        ]
+        ],
+        "scoreLabel": "科学教学｜科学与日常生活（试用版，1–5 分）",
+        "provisional": true
       }
     ],
     "limitations": [

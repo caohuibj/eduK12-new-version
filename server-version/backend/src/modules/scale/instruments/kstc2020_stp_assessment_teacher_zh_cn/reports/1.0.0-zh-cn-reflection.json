@@ -30,7 +30,9 @@
             "category": "strategy",
             "text": "下次试一张离场条。请学生既给出一个答案，也说出一条理由。按理由整理典型想法，为下一节课决定从哪里接上。"
           }
-        ]
+        ],
+        "scoreLabel": "科学教学｜评价实施（试用版，1–5 分）",
+        "provisional": true
       }
     ],
     "limitations": [

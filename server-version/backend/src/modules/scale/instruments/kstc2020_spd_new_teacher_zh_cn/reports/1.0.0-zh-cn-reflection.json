@@ -30,7 +30,9 @@
             "category": "strategy",
             "text": "选一份学生作品或一段简短课堂记录，与同事在一次例会里一起看。先约定想弄清的一件事，再比较各自的观察。"
           }
-        ]
+        ],
+        "scoreLabel": "专业发展｜协作与实践研究（试用版，1–5 分）",
+        "provisional": true
       }
     ],
     "limitations": [

@@ -471,7 +471,9 @@
                 "category": "strategy",
                 "text": "下次备课只改一个环节。可先检查实验器材是否能让每组参与，或者用一份短任务单明确各组需要留下的观察记录。"
               }
-            ]
+            ],
+            "scoreLabel": "备课｜科学学习环境（试用版，1–5 分）",
+            "provisional": true
           }
         ],
         "limitations": [

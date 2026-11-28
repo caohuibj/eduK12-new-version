@@ -30,7 +30,9 @@
             "category": "strategy",
             "text": "下一次探究交给学生一个明确的决定，例如选一种记录观察的方式。比较不同组的记录，再讨论哪种记录更便于检验解释。"
           }
-        ]
+        ],
+        "scoreLabel": "科学教学｜开展科学探究（试用版，1–5 分）",
+        "provisional": true
       }
     ],
     "limitations": [

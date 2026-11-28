@@ -395,7 +395,9 @@
                 "category": "strategy",
                 "text": "安排一次“先独想、再同伴交流、最后全班分享”。保留写、画或口头说明的选择，比较不同学生在这些环节中提供的证据。"
               }
-            ]
+            ],
+            "scoreLabel": "科学教学｜促进学生参与（试用版，1–5 分）",
+            "provisional": true
           }
         ],
         "limitations": [

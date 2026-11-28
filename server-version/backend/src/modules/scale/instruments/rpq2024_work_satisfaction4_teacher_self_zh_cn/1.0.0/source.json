@@ -1,0 +1,578 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "rpq2024_work_satisfaction4_teacher_self_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "RPQ｜工作满意感｜教师自评（2024 简体中文试用版）",
+      "abbreviation": "RPQ-E Work satisfaction",
+      "instrumentFamily": "Reflective Practice Questionnaire / RPQ (Rogers et al.,2024)"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "分数越高，表示本次自述更常感到工作充实、有意义或令人愉快。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:rpq",
+        "role:teacher_self",
+        "language:zh-cn",
+        "source_version:2024",
+        "stage:teacher_all_school_levels",
+        "purpose:professional_reflection",
+        "source:Rogers_2024",
+        "rights:CC_BY_4_0",
+        "status:pilot",
+        "component:work_satisfaction4",
+        "localization:direct_translation"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "供成年教师回顾自身的工作感受和行为。2024 年原研究招募有工作经历的大学生，涉及多个行业；简体中文译稿与教师群体尚无本地常模或验证数据。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "以平时的工作感受和做法为准。原作答说明没有设定固定回顾时段。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "题目对应 2024 年 RPQ-E 原题第 27–30 题，保留原题序、六档频率次序及各题计分。",
+        "本分量表全部答完后按等权平均，缺答不估分。2024 年版全部同向计分。",
+        "分量表独立展示为平台呈现方式；答题时长为平台估计。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "可用于成年教师自我反思与试用研究。正式研究须自行评估中文译文和独立施测的适用性。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "可用于成年教师自我反思与试用研究。正式研究须自行评估中文译文和独立施测的适用性。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Rogers 等（2024）PeerJ 表 5、表 6 和作者发布的计分题本。https://doi.org/10.7717/peerj.16879；https://www.shanerogersresearch.com/rpq",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "EDUK12 按英文原题和顺序译为简体中文。遵照作者指导语，教育情境中的 client 对应学生。尚未做独立译审、认知访谈和本地样本验证。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "rpq2024_work_satisfaction4_teacher_self_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "rpq2024_work_satisfaction4_teacher_self_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "rpq2024_work_satisfaction4_teacher_self_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "© 2024 Rogers, S. L., Van Winkle, L., Michels, N., Lucas, C., Ziada, H., Da Silva, E. J., Jotangia, A., Gabrielsson, S., Gustafsson, S., and Priddis, L. Further development of the reflective practice questionnaire. PeerJ 12:e16879, Tables 5 and 6. https://doi.org/10.7717/peerj.16879. CC BY 4.0: https://creativecommons.org/licenses/by/4.0/. 作者题本及计分：https://www.shanerogersresearch.com/rpq。EDUK12 将英文题项和选项译为简体中文，按作者说明在教学情境中将 client 译为学生，保留题序与计分。分量表独立展示、完整作答规则和中文报告为平台改编。原作者未审定此译本。",
+      "本平台档案按非商业用途录入。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "teacher_self_report",
+      "source": {
+        "title": "RPQ／RPQ-E（2024）｜工作满意感｜简体中文独立试用版",
+        "citation": "Rogers, S. L., Van Winkle, L., Michels, N., Lucas, C., Ziada, H., Da Silva, E. J., Jotangia, A., Gabrielsson, S., Gustafsson, S., & Priddis, L. (2024). Further development of the reflective practice questionnaire. PeerJ 12:e16879. https://doi.org/10.7717/peerj.16879",
+        "url": "https://doi.org/10.7717/peerj.16879"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2024 Rogers, S. L., Van Winkle, L., Michels, N., Lucas, C., Ziada, H., Da Silva, E. J., Jotangia, A., Gabrielsson, S., Gustafsson, S., and Priddis, L. Further development of the reflective practice questionnaire. PeerJ 12:e16879, Tables 5 and 6. https://doi.org/10.7717/peerj.16879. CC BY 4.0: https://creativecommons.org/licenses/by/4.0/. 作者题本及计分：https://www.shanerogersresearch.com/rpq。EDUK12 将英文题项和选项译为简体中文，按作者说明在教学情境中将 client 译为学生，保留题序与计分。分量表独立展示、完整作答规则和中文报告为平台改编。原作者未审定此译本。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "rpq2024_frequency",
+          "options": [
+            {
+              "value": "1",
+              "label": "极少",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "很少",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有时",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "经常",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常经常",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "几乎总是",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "RPQ2024_27",
+          "content": "我的工作让我感到充实。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_28",
+          "content": "我觉得工作对我的意义不只是挣钱。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_29",
+          "content": "我喜欢自己的工作。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_30",
+          "content": "我觉得自己的工作是值得的。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "RPQ2024_27",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_28",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_29",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_30",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "work_satisfaction4",
+            "type": "total",
+            "label": "工作满意感平均分",
+            "description": "4 题按 1–6 分计分，完整作答后取算术平均。分数越高，表示本次自述更常感到工作充实、有意义或令人愉快。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "RPQ2024_27",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_28",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_29",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_30",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "work_satisfaction4"
+        ],
+        "scoreOrder": [
+          "work_satisfaction4"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "work_satisfaction4",
+            "headline": "找出哪些工作时刻让你觉得值得",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "工作满意感包括工作带来的充实、意义、乐趣，以及做完一件事感到有收获。它可能随工作安排和环境变化。回看最近让你觉得值得的一小段时间，想想当时在做什么、和谁一起做、哪些安排帮了忙，能给接下来的工作留下一条线索。",
+            "provisional": true,
+            "scoreLabel": "工作满意感平均分（试用版，1–6 分）",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "记下一件最近让你觉得“这件事做得值”的工作小事，再写下当时真正让你觉得有收获的那个细节。"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一个能自己安排的小环节，让喜欢的工作内容多出现一次。例如和同事共备一段，让彼此展示一个奏效的方法。"
+              },
+              {
+                "category": "support",
+                "text": "如果耗费时间的流程反复挤掉你重视的工作，可以带着具体例子与同事讨论有没有简化或分担的可能。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这里的分数是 4 道题的平均值，范围为 1–6 分。分数越高，表示本次自述更常感到工作充实、有意义或令人愉快。",
+          "中文版目前用于试用，缺少本地常模和独立施测验证。报告提供个人反思建议，分数没有划分等级。",
+          "近期工作安排、时间资源和获得的支持，都会影响本次作答。请结合自己的实际处境理解结果。"
+        ],
+        "disclaimer": "供教师个人回顾工作体验。请勿将此结果用于临床判断、教师绩效、学校排名或跨群体比较。缺答时不计算平均分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "rpq2024_work_satisfaction4_teacher_self_zh_cn",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "rpq2024_work_satisfaction4_teacher_self_en_all_min",
+        "answers": [
+          {
+            "itemCode": "RPQ2024_27",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_28",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_30",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "work_satisfaction4": 1
+          },
+          "totalScoreKeys": [
+            "work_satisfaction4"
+          ]
+        }
+      },
+      {
+        "name": "rpq2024_work_satisfaction4_teacher_self_en_all_max",
+        "answers": [
+          {
+            "itemCode": "RPQ2024_27",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_28",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_29",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_30",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "work_satisfaction4": 6
+          },
+          "totalScoreKeys": [
+            "work_satisfaction4"
+          ]
+        }
+      },
+      {
+        "name": "rpq2024_work_satisfaction4_teacher_self_en_mixed",
+        "answers": [
+          {
+            "itemCode": "RPQ2024_27",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_28",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_30",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "work_satisfaction4": 3.5
+          },
+          "totalScoreKeys": [
+            "work_satisfaction4"
+          ]
+        }
+      },
+      {
+        "name": "rpq2024_work_satisfaction4_teacher_self_en_one_missing",
+        "answers": [
+          {
+            "itemCode": "RPQ2024_27",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RPQ2024_28",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RPQ2024_29",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "work_satisfaction4": null
+          },
+          "totalScoreKeys": [
+            "work_satisfaction4"
+          ]
+        }
+      },
+      {
+        "name": "rpq2024_work_satisfaction4_teacher_self_en_all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "work_satisfaction4": null
+          },
+          "totalScoreKeys": [
+            "work_satisfaction4"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面的题目和你平时的工作感受、做法有关。请仔细阅读每句话，选择最符合它在你工作中出现频率的一项。\n\n原问卷里的“服务对象”会因职业而异，例如零售行业指顾客，医疗行业指患者。本版供教师自评，因此题目中写作“学生”。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "依据 Rogers 等（2024）作者版问卷指导语翻译。https://www.shanerogersresearch.com/rpq"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "rpq2024_work_satisfaction4_teacher_self_zh_cn-1.0.0",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": true
+      }
+    }
+  }
+}

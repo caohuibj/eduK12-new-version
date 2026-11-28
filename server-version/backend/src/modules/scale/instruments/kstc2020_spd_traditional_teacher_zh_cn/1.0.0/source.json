@@ -357,7 +357,9 @@
                 "category": "strategy",
                 "text": "从一次研修选一个可行做法试用。课后记下学生做了什么、你准备保留什么，再用这份记录安排下一次尝试。"
               }
-            ]
+            ],
+            "scoreLabel": "专业发展｜教学反思与研修（试用版，1–5 分）",
+            "provisional": true
           }
         ],
         "limitations": [

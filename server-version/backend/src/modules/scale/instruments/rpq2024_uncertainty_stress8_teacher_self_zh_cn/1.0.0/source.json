@@ -1,0 +1,718 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "rpq2024_uncertainty_stress8_teacher_self_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "RPQ｜不确定与压力｜教师自评（2024 简体中文试用版）",
+      "abbreviation": "RPQ-E Uncertainty / stress",
+      "instrumentFamily": "Reflective Practice Questionnaire / RPQ (Rogers et al.,2024)"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "分数越高，表示本次自述更常感到与学生工作有关的不确定或压力。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:rpq",
+        "role:teacher_self",
+        "language:zh-cn",
+        "source_version:2024",
+        "stage:teacher_all_school_levels",
+        "purpose:professional_reflection",
+        "source:Rogers_2024",
+        "rights:CC_BY_4_0",
+        "status:pilot",
+        "component:uncertainty_stress8",
+        "localization:direct_translation"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "供成年教师回顾自身的工作感受和行为。2024 年原研究招募有工作经历的大学生，涉及多个行业；简体中文译稿与教师群体尚无本地常模或验证数据。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 8,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "以平时的工作感受和做法为准。原作答说明没有设定固定回顾时段。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "题目对应 2024 年 RPQ-E 原题第 19–26 题，保留原题序、六档频率次序及各题计分。",
+        "本分量表全部答完后按等权平均，缺答不估分。2024 年版全部同向计分。",
+        "分量表独立展示为平台呈现方式；答题时长为平台估计。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "可用于成年教师自我反思与试用研究。正式研究须自行评估中文译文和独立施测的适用性。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "可用于成年教师自我反思与试用研究。正式研究须自行评估中文译文和独立施测的适用性。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Rogers 等（2024）PeerJ 表 5、表 6 和作者发布的计分题本。https://doi.org/10.7717/peerj.16879；https://www.shanerogersresearch.com/rpq",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "EDUK12 按英文原题和顺序译为简体中文。遵照作者指导语，教育情境中的 client 对应学生。尚未做独立译审、认知访谈和本地样本验证。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "rpq2024_uncertainty_stress8_teacher_self_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "rpq2024_uncertainty_stress8_teacher_self_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "rpq2024_uncertainty_stress8_teacher_self_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "© 2024 Rogers, S. L., Van Winkle, L., Michels, N., Lucas, C., Ziada, H., Da Silva, E. J., Jotangia, A., Gabrielsson, S., Gustafsson, S., and Priddis, L. Further development of the reflective practice questionnaire. PeerJ 12:e16879, Tables 5 and 6. https://doi.org/10.7717/peerj.16879. CC BY 4.0: https://creativecommons.org/licenses/by/4.0/. 作者题本及计分：https://www.shanerogersresearch.com/rpq。EDUK12 将英文题项和选项译为简体中文，按作者说明在教学情境中将 client 译为学生，保留题序与计分。分量表独立展示、完整作答规则和中文报告为平台改编。原作者未审定此译本。",
+      "本平台档案按非商业用途录入。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "teacher_self_report",
+      "source": {
+        "title": "RPQ／RPQ-E（2024）｜不确定与压力｜简体中文独立试用版",
+        "citation": "Rogers, S. L., Van Winkle, L., Michels, N., Lucas, C., Ziada, H., Da Silva, E. J., Jotangia, A., Gabrielsson, S., Gustafsson, S., & Priddis, L. (2024). Further development of the reflective practice questionnaire. PeerJ 12:e16879. https://doi.org/10.7717/peerj.16879",
+        "url": "https://doi.org/10.7717/peerj.16879"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2024 Rogers, S. L., Van Winkle, L., Michels, N., Lucas, C., Ziada, H., Da Silva, E. J., Jotangia, A., Gabrielsson, S., Gustafsson, S., and Priddis, L. Further development of the reflective practice questionnaire. PeerJ 12:e16879, Tables 5 and 6. https://doi.org/10.7717/peerj.16879. CC BY 4.0: https://creativecommons.org/licenses/by/4.0/. 作者题本及计分：https://www.shanerogersresearch.com/rpq。EDUK12 将英文题项和选项译为简体中文，按作者说明在教学情境中将 client 译为学生，保留题序与计分。分量表独立展示、完整作答规则和中文报告为平台改编。原作者未审定此译本。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "rpq2024_frequency",
+          "options": [
+            {
+              "value": "1",
+              "label": "极少",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "很少",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有时",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "经常",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常经常",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "几乎总是",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "RPQ2024_19",
+          "content": "与学生互动后，我感到精疲力竭。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_20",
+          "content": "我觉得和学生互动让我感到有压力。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_21",
+          "content": "与学生沟通后，我感到很难受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_22",
+          "content": "为了满足学生需要而承受的压力，有时会让我觉得难以招架。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_23",
+          "content": "我不确定自己为学生制订的计划是不是最好的做法。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_24",
+          "content": "我不确定自己对学生需要的判断是否正确。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_25",
+          "content": "我不确定该怎样回应学生的需要。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_26",
+          "content": "我不确定自己是否真正理解了学生的需要。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "RPQ2024_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_22",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_23",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_24",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_25",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_26",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "uncertainty_stress8",
+            "type": "total",
+            "label": "不确定与压力平均分",
+            "description": "8 题按 1–6 分计分，完整作答后取算术平均。分数越高，表示本次自述更常感到与学生工作有关的不确定或压力。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "RPQ2024_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_24",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_25",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_26",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "uncertainty_stress8"
+        ],
+        "scoreOrder": [
+          "uncertainty_stress8"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "uncertainty_stress8",
+            "headline": "先分清哪里没把握，哪里已经太累",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "与学生交流时，拿不准怎样回应和交流后觉得疲惫，是两种可能同时发生的体验。前一种常需要更多信息或一个可尝试的方案，后一种也可能和工作量、时间安排或支持条件有关。把它们分开看，有助于找到今天能解决的一小步。",
+            "provisional": true,
+            "scoreLabel": "不确定与压力平均分（试用版，1–6 分）",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有一件事拿不准时，写下最想弄清楚的问题。可以先问学生“你现在最希望得到哪方面的帮助”，再决定怎么回应。"
+              },
+              {
+                "category": "strategy",
+                "text": "如果几次相似的互动都格外耗神，记一下它们通常发生在什么时段、有哪些同时要处理的任务。挑一个能调整的条件试一试。"
+              },
+              {
+                "category": "support",
+                "text": "需要协作时，带着一个具体情境和希望得到的支持，与同事、教研团队或学校的支持人员沟通。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这里的分数是 8 道题的平均值，范围为 1–6 分。分数越高，表示本次自述更常感到与学生工作有关的不确定或压力。",
+          "中文版目前用于试用，缺少本地常模和独立施测验证。报告提供个人反思建议，分数没有划分等级。",
+          "近期工作安排、时间资源和获得的支持，都会影响本次作答。请结合自己的实际处境理解结果。"
+        ],
+        "disclaimer": "供教师个人回顾工作体验。请勿将此结果用于临床判断、教师绩效、学校排名或跨群体比较。缺答时不计算平均分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "rpq2024_uncertainty_stress8_teacher_self_zh_cn",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "rpq2024_uncertainty_stress8_teacher_self_en_all_min",
+        "answers": [
+          {
+            "itemCode": "RPQ2024_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_24",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_26",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "uncertainty_stress8": 1
+          },
+          "totalScoreKeys": [
+            "uncertainty_stress8"
+          ]
+        }
+      },
+      {
+        "name": "rpq2024_uncertainty_stress8_teacher_self_en_all_max",
+        "answers": [
+          {
+            "itemCode": "RPQ2024_19",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_20",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_21",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_22",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_23",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_24",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_25",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_26",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "uncertainty_stress8": 6
+          },
+          "totalScoreKeys": [
+            "uncertainty_stress8"
+          ]
+        }
+      },
+      {
+        "name": "rpq2024_uncertainty_stress8_teacher_self_en_mixed",
+        "answers": [
+          {
+            "itemCode": "RPQ2024_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_20",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_22",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_24",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_26",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "uncertainty_stress8": 3.5
+          },
+          "totalScoreKeys": [
+            "uncertainty_stress8"
+          ]
+        }
+      },
+      {
+        "name": "rpq2024_uncertainty_stress8_teacher_self_en_one_missing",
+        "answers": [
+          {
+            "itemCode": "RPQ2024_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RPQ2024_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RPQ2024_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RPQ2024_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RPQ2024_23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RPQ2024_24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RPQ2024_25",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "uncertainty_stress8": null
+          },
+          "totalScoreKeys": [
+            "uncertainty_stress8"
+          ]
+        }
+      },
+      {
+        "name": "rpq2024_uncertainty_stress8_teacher_self_en_all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "uncertainty_stress8": null
+          },
+          "totalScoreKeys": [
+            "uncertainty_stress8"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面的题目和你平时的工作感受、做法有关。请仔细阅读每句话，选择最符合它在你工作中出现频率的一项。\n\n原问卷里的“服务对象”会因职业而异，例如零售行业指顾客，医疗行业指患者。本版供教师自评，因此题目中写作“学生”。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "依据 Rogers 等（2024）作者版问卷指导语翻译。https://www.shanerogersresearch.com/rpq"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "rpq2024_uncertainty_stress8_teacher_self_zh_cn-1.0.0",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": true
+      }
+    }
+  }
+}
