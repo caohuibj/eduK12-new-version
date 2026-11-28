@@ -125,7 +125,7 @@
         "numericScores": true,
         "references": false,
         "scoreDerivedLabels": false,
-        "individualInterpretations": false,
+        "individualInterpretations": true,
         "educationalContent": false,
         "artwork": true
       }
