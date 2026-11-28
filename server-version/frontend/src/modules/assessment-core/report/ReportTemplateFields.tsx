@@ -11,7 +11,7 @@ function ReportBlockPanel({plain,plainTitle,expanded,onExpand,heading,children}:
   return <details className="survey-report-block" open={expanded} onToggle={event=>{if(event.currentTarget.open)onExpand()}}><summary className="survey-report-block-heading">{heading}</summary>{children}</details>
 }
 
-export function ReportTemplateFields({template,metricKeys,onChange,plain=true,expandedBlock=0,onExpandedBlockChange=()=>{}}:{template:ReportTemplateDefinition;metricKeys:string[];onChange:(template:ReportTemplateDefinition)=>void;plain?:boolean;expandedBlock?:number|null;onExpandedBlockChange?:(index:number)=>void}){
+export function ReportTemplateFields({template,metricKeys,onChange,plain=true,allowReferenceBlocks=true,expandedBlock=0,onExpandedBlockChange=()=>{}}:{template:ReportTemplateDefinition;metricKeys:string[];onChange:(template:ReportTemplateDefinition)=>void;plain?:boolean;allowReferenceBlocks?:boolean;expandedBlock?:number|null;onExpandedBlockChange?:(index:number)=>void}){
  const replaceBlock=(index:number,block:ReportTemplateBlock)=>onChange({...template,blocks:template.blocks.map((value,i)=>i===index?block:value)})
  const addBlock=(type:'TEXT'|'METRIC'|'REFERENCE_BAND')=>{
   const metricKey=metricKeys[0]||''
@@ -36,7 +36,7 @@ export function ReportTemplateFields({template,metricKeys,onChange,plain=true,ex
             {(block.type==='TEXT'||block.type==='METRIC'||block.type==='REFERENCE_BAND')&&<button type="button" className="btn-secondary" onClick={()=>{onExpandedBlockChange(0);onChange({...template,blocks:template.blocks.filter((_,i)=>i!==index)})}}>删除区块 {index+1}</button>}
           </div></ReportBlockPanel></article>)}
           <div className="survey-report-add-blocks flex flex-wrap gap-2"><span>添加内容</span><button type="button" className="btn-secondary" onClick={()=>addBlock('TEXT')}>添加文字段落</button>
-            <button type="button" className="btn-secondary" onClick={()=>addBlock('METRIC')}>添加指标</button><button type="button" className="btn-secondary" onClick={()=>addBlock('REFERENCE_BAND')}>添加参考解释</button></div>
+            <button type="button" className="btn-secondary" onClick={()=>addBlock('METRIC')}>添加指标</button>{allowReferenceBlocks&&<button type="button" className="btn-secondary" onClick={()=>addBlock('REFERENCE_BAND')}>添加参考解释</button>}</div>
           <label className="block">局限说明（每行一条）<textarea className="input block w-full" value={template.limitations.join('\n')} onChange={e=>onChange({...template,limitations:e.target.value.split('\n')})}/></label>
           <label className="block">免责声明<textarea className="input block w-full" value={template.disclaimer||''} onChange={e=>onChange({...template,disclaimer:e.target.value||undefined})}/></label>
 </>

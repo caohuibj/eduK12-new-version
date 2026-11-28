@@ -7,7 +7,8 @@ import type { SituationPackage } from '../situational/situation-package'
 import { validateSituationPackage } from '../situational/situation-package'
 import type { SituationRuntimeDefinition } from '../situational/situation-runtime-definition'
 import { resolveSituationalScientificContext } from '../situational/scientific-maturity'
-import { situationalScientificContextSchema } from '../situational/onboarding/scientific-schema'
+import { situationalExecutionRef } from '../situational/onboarding/scientific-qualification'
+import { situationalScientificContextSchema, type SituationalScientificContextV1 } from '../situational/onboarding/scientific-schema'
 import { SURVEY_NATIVE_SJT_PROTOCOL,SurveySituationalProtocolError } from './situational-native.contract'
 
 const text=z.string().min(1).max(240),hash=z.string().regex(/^[a-f0-9]{64}$/)
@@ -49,11 +50,11 @@ export function surveyNativeSituationalRequiresStageNotice(definition:SituationR
   assertSurveyNativeSituationalDefinition(definition)
   return definition.schemaVersion===2
 }
-export function compileSurveyNativeSituationalHeader(pkg:SituationPackage):SurveyNativeSituationalHeader{
+export function compileSurveyNativeSituationalHeader(pkg:SituationPackage, verifiedScience?:SituationalScientificContextV1):SurveyNativeSituationalHeader{
   if(pkg.online||pkg.releaseStatus!=='PUBLISHED'||!validateSituationPackage(pkg).valid)fail()
   assertSurveyNativeSituationalDefinition(pkg.definition)
-  const scientificContext=resolveSituationalScientificContext(pkg)
-  if(!scientificContext)fail()
+  const scientificContext=verifiedScience??resolveSituationalScientificContext(pkg)
+  if(!scientificContext||verifiedScience&&canonicalHash(scientificContext.executionRef)!==canonicalHash(situationalExecutionRef(pkg)))fail()
   const snapshot=freezeSituationalRuntimeAtAttemptStart({instrumentKey:pkg.key,
     instrumentVersion:pkg.instrumentVersion,definition:pkg.definition,scientificContext})
   return surveyNativeSituationalHeaderSchema.parse({protocol:SURVEY_NATIVE_SJT_PROTOCOL,

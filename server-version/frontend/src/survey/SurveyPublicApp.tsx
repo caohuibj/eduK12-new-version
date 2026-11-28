@@ -52,7 +52,8 @@ type ParticipantFeedback=ParticipantFeedbackBase&(
   {feedbackKind:'RAW_METRICS';measurementReleaseId:string;metrics:{key:string;label:string;value:number|null;unit:null;status:string}[]}
   |{feedbackKind?:undefined;measurementDigest:string;maturity:'PILOT';metrics:{key:string;label:string;value:number|null;unit:'ratio'|'ms';status:string}[]})
 type NativeFeedback={importId:string;title:string;status:string;factsHash:string|null;profileView:BundleProfileView|null;derivedView?:DerivedBundleView|null}
-type General={nativeBundles?:NativeFeedback[];kind:'GENERAL_ONLY'|'DESCRIPTIVE';text:string;disclaimer:string;completedAt:string;pending?:boolean;measurements?:ParticipantFeedback[]}
+type FormCompletion={instrumentKey:string;title:string;report:SurveyDeclaredReport}
+type General={nativeBundles?:NativeFeedback[];formCompletions?:FormCompletion[];kind:'GENERAL_ONLY'|'DESCRIPTIVE';text:string;disclaimer:string;completedAt:string;pending?:boolean;measurements?:ParticipantFeedback[]}
 type FinalResponse={status:string;attemptId?:string;receiptId?:string;completedAt?:string;
   idempotent?:boolean;generalReceipt?:unknown;participantFeedbackReceipt?:unknown}
 // Only the first, unambiguous committed FINAL may supply this submission-time
@@ -77,7 +78,7 @@ function firstFinalParticipantFeedback(result:FinalResponse,attemptId:string):Ge
   const receipt=value as Record<string,unknown>
   if(receipt.text!==general.text||receipt.disclaimer!==general.disclaimer||receipt.completedAt!==general.completedAt)return null
   if(receipt.kind==='GENERAL_ONLY')return Object.keys(receipt).sort().join(',')==='completedAt,disclaimer,kind,text'?general:null
-  if(receipt.kind!=='DESCRIPTIVE'||Object.keys(receipt).filter(k=>k!=='nativeBundles').sort().join(',')!=='completedAt,disclaimer,kind,measurements,pending,text'
+  if(receipt.kind!=='DESCRIPTIVE'||Object.keys(receipt).filter(k=>k!=='nativeBundles'&&k!=='formCompletions').sort().join(',')!=='completedAt,disclaimer,kind,measurements,pending,text'
     ||typeof receipt.pending!=='boolean'||!Array.isArray(receipt.measurements))return null
   const valid=receipt.measurements.every(value=>{
     if(!value||typeof value!=='object'||Array.isArray(value))return false
@@ -102,9 +103,16 @@ function firstFinalParticipantFeedback(result:FinalResponse,attemptId:string):Ge
     if(item.declaredReport!==undefined&&!isSurveyDeclaredReport(item.declaredReport))return false
     return true
   })
+  const formCompletions=receipt.formCompletions
+  if(formCompletions!==undefined&&(!Array.isArray(formCompletions)||formCompletions.length>30||!formCompletions.every((value:unknown)=>{
+    if(!value||typeof value!=='object'||Array.isArray(value))return false
+    const report=value as Record<string,unknown>
+    return Object.keys(report).sort().join(',')==='instrumentKey,report,title'
+      &&typeof report.instrumentKey==='string'&&typeof report.title==='string'&&isSurveyDeclaredReport(report.report)
+  })))return null
   const native=receipt.nativeBundles
   if(native!==undefined&&(!Array.isArray(native)||native.some(v=>!v||typeof v!=='object'||typeof v.importId!=='string'||typeof v.title!=='string'||typeof v.status!=='string'||(v.factsHash!==null&&typeof v.factsHash!=='string')||(v.profileView!==null&&(!v.profileView||typeof v.profileView!=='object'||v.profileView.schemaVersion!=='bundle-profile-view-v1'||!Array.isArray(v.profileView.constructs)||!Array.isArray(v.profileView.actions)))||(v.derivedView!==undefined&&v.derivedView!==null&&!isDerivedBundleView(v.derivedView)))))return null
-  return valid?{...general,kind:'DESCRIPTIVE',pending:receipt.pending,measurements:receipt.measurements as ParticipantFeedback[],...(native?{nativeBundles:native as NativeFeedback[]}:{})}:null
+  return valid?{...general,kind:'DESCRIPTIVE',pending:receipt.pending,measurements:receipt.measurements as ParticipantFeedback[],...(native?{nativeBundles:native as NativeFeedback[]}:{}),...(formCompletions?{formCompletions:formCompletions as FormCompletion[]}:{})}:null
 }
 const feedbackQualityText=(value:string)=>({interpretable:'本次结果可作参考',limited:'本次结果仅供有限参考',invalid:'本次作答不足以形成有效解释'} as Record<string,string>)[value]??'本次结果暂无法解释'
 const feedbackMetricStatusText=(value:string)=>({OK:'已计算',calculated:'已计算',INSUFFICIENT_DATA:'有效作答不足',insufficient_data:'有效作答不足',INVALID:'本次数据无效',invalid:'本次数据无效',not_calculable:'暂无法计算',limited:'仅供有限参考'} as Record<string,string>)[value]??'暂无法说明'
@@ -1340,6 +1348,9 @@ export default function SurveyPublicApp(){
               {measurement.feedbackKind==='RAW_METRICS'&&measurement.declaredReport&&<SurveyDeclaredReportView report={measurement.declaredReport} proof={completion?{publicId,attemptId:completion.attemptId,...completion.proof}:undefined}/>}
             </article>)}
           </section>}
+          {general.formCompletions?.map(({instrumentKey,title,report})=><section key={instrumentKey} aria-label={title+'完成说明'}>
+            <SurveyDeclaredReportView report={report}/>
+          </section>)}
           {general.nativeBundles?.map(bundle=><section key={bundle.importId} aria-label="整体理论报告"><h2>{bundle.title}</h2>{bundle.derivedView?<BundleDerivedReport view={bundle.derivedView}/>:bundle.profileView?<BundleProfileSummary view={bundle.profileView}/>:<p>综合结果暂不可用；单项作答已保存。</p>}</section>)}
           {info.project.collectionMode==='LINKED_WAVES'&&info.project.hasPersonalTracking!==false&&completion&&<SurveyPersonalChanges publicId={publicId} attemptId={completion.attemptId} proof={completion.proof}/>}
           {info.project.collectionMode==='LINKED_WAVES'&&<div className="survey-completion-primary">

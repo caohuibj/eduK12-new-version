@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "toolKey": "demographics_v1",
+  "version": "1.0.0",
+  "contentVersion": "1.0.0",
+  "contentHash": "59efd1589fdf549b2547ba8883652ab27f89995bcf383cd9799360d2052b02c2",
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": true,
+        "artwork": false
+      }
+    }
+  },
+  "template": {
+    "title": "已完成",
+    "blocks": [
+      {
+        "type": "TEXT",
+        "text": "感谢填写背景信息。该表单不产生分数。"
+      }
+    ],
+    "limitations": []
+  }
+}

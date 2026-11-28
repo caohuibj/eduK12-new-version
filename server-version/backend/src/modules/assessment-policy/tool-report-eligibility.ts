@@ -146,6 +146,9 @@ export function evaluateSurveyUnitReportEligibility(unit: SurveyUnitEligibilityI
   if (unit.sourceProvenance?.reportConfigured === false) {
     return dataCollectionOnly('该已定版工具明确不配置报告，仅用于数据采集')
   }
+  if (unit.kind === 'SJT' && (unit.sourceProvenance?.sjtGitRelease !== undefined || unit.sourceProvenance?.sjtWorkbookRelease !== undefined)) {
+    return dataCollectionOnly('此版本的 SJT 报告仅面向具备授权的研究者')
+  }
   if (unit.kind === 'COGNITIVE') {
     return ready('NATIVE_TASK_REPORT')
   }

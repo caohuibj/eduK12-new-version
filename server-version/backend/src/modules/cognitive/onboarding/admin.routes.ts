@@ -1,3 +1,4 @@
+import { cognitiveReportReleaseRouter } from './report-release.routes'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../../config/database'
@@ -15,6 +16,7 @@ import { listCognitiveDraftInstallCandidates, pendingCognitiveInstallCandidates,
  * Inputs select registered code-owned seeds; they never name files or commands. */
 export const cognitiveIntakeAdminRouter: Router = Router()
 cognitiveIntakeAdminRouter.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next() })
+cognitiveIntakeAdminRouter.use('/reports',cognitiveReportReleaseRouter)
 
 function registeredSelection(raw: unknown) {
   const selection = cognitiveInstallSelectionSchema.parse(raw)

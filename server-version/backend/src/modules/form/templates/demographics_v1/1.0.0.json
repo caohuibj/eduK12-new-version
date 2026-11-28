@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "toolKey": "demographics_v1",
+  "version": "1.0.0",
+  "title": "基础背景表单（合成样例）",
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "background",
+        "title": "背景信息",
+        "questions": [
+          {
+            "itemKey": "respondent_role",
+            "type": "SINGLE",
+            "prompt": "您的填答角色",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "self",
+                "label": "本人"
+              },
+              {
+                "optionKey": "caregiver",
+                "label": "照护者"
+              },
+              {
+                "optionKey": "other",
+                "label": "其他或不填写"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "age_band",
+            "type": "SINGLE",
+            "prompt": "您的年龄段",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "under_18",
+                "label": "未满 18 岁"
+              },
+              {
+                "optionKey": "adult",
+                "label": "18 岁及以上"
+              },
+              {
+                "optionKey": "prefer_not",
+                "label": "不填写"
+              }
+            ],
+            "rows": []
+          }
+        ]
+      }
+    ]
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0",
+    "audiences": {},
+    "unknownAudience": "DENY"
+  },
+  "statement": "仅作标准表单声明和验证流程的合成示例，尚未上线。",
+  "classificationTags": [],
+  "reference": {
+    "purpose": "synthetic_example",
+    "publication": "hold"
+  },
+  "representativeCase": {
+    "synthetic": true,
+    "answers": {
+      "respondent_role": "self",
+      "age_band": "adult"
+    },
+    "expected": {
+      "rawAnswers": {
+        "respondent_role": "self",
+        "age_band": "adult"
+      },
+      "missing": []
+    }
+  }
+}

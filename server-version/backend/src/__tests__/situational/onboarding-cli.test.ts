@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { execFileSync, spawnSync } from 'node:child_process'
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, cpSync, rmSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, cpSync, rmSync, symlinkSync } from 'node:fs'
 import path from 'node:path'
 import { tmpdir } from 'node:os'
 import { classifySituationalPath } from '../../modules/situational/onboarding/path-policy'
@@ -18,6 +18,44 @@ describe('SJT authoring CLI and actual content-only diff', () => {
     expect(failed.status).not.toBe(0)
     expect(failed.stderr).toContain('full 40-character')
   }, 30_000)
+  it('keeps the real legacy manifest reproducible alongside declarative SJT releases', () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'sjt-coexisting-sources-'))
+    const situational = 'src/modules/situational'
+    const target = path.join(root, 'server-version/backend')
+    const tools = path.join(target, situational, 'instruments')
+    const manifest = path.join(situational, 'onboarding/instruments.generated.ts')
+    const generate = path.join(target, 'scripts/generate-situational-instruments.mjs')
+    const run = () => execFileSync(process.execPath, [generate, '--check'], { cwd: target, stdio: 'pipe' })
+
+    try {
+      mkdirSync(path.dirname(generate), { recursive: true })
+      mkdirSync(path.join(target, situational, 'onboarding'), { recursive: true })
+      cpSync(path.join(backend, 'scripts/generate-situational-instruments.mjs'), generate)
+      cpSync(path.join(backend, situational, 'instruments'), tools, { recursive: true })
+      cpSync(path.join(backend, manifest), path.join(target, manifest))
+
+      const legacy = path.join(tools, 'cpj-cj01-sd-baseline')
+      const declarative = path.join(tools, 'declarative-only-sjt')
+      for (const tool of [legacy, declarative]) {
+        for (const part of ['1.0.0', 'parameters', 'reports']) mkdirSync(path.join(tool, part), { recursive: true })
+        const declarations = ['releases.json', '1.0.0/content.json', 'parameters/1.0.0.json', 'reports/1.0.0.json']
+        for (const file of declarations) writeFileSync(path.join(tool, file), '{}')
+      }
+      // A semantic version can contain both registry and declarative C files.
+      const historicVersion = path.join(legacy, '0.4.3')
+      writeFileSync(path.join(historicVersion, 'content.json'), '{}')
+      expect(() => run()).not.toThrow()
+
+      const scientific = path.join(historicVersion, 'scientific.json')
+      const original = readFileSync(scientific)
+      rmSync(scientific)
+      expect(() => run()).toThrow(/scientific\.json/)
+      writeFileSync(scientific, original)
+
+      symlinkSync(path.join(declarative, 'reports/1.0.0.json'), path.join(declarative, 'reports/1.0.1.json'))
+      expect(() => run()).toThrow(/Symlink forbidden/)
+    } finally { rmSync(root, { recursive: true, force: true }) }
+  }, 15_000)
   it('scaffolds and generates an unknown package with zero shared-core edits', () => {
     const root = mkdtempSync(path.join(tmpdir(), 'sjt-content-diff-'))
     const prefix = 'server-version/backend/'

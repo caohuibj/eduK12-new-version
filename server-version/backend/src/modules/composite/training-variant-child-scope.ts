@@ -1,11 +1,4 @@
-import { prisma } from '../../config/database'
-import {assertTrainingReferenceReadyForMeasurement} from './training-reference-admission'
-import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
-import { applyTrainingAttemptScope, resolveTrainingAttemptScope } from './training-variant-scope'
-import { resolveTrainingFlowScope, trainingFlowMarkerState } from './training-flow-scope'
-import { trainingFlowItemKey, trainingFlowUnitKey } from '../assessment-core/flow/training'
-import { compositeItemSlotKey, formSectionSlotKey } from '../assessment-runtime/slot-set'
-
+// Initialize the pure marker selectors before loading the participant runtimes.
 import {
   TRAINING_VARIANT_DEFINITION_MARKER_SELECT,
   TRAINING_VARIANT_PARENT_MARKER_SELECT,
@@ -16,6 +9,15 @@ export {
   TRAINING_VARIANT_PARENT_MARKER_SELECT,
   trainingVariantMarkerState,
 } from './training-variant-markers'
+
+import { prisma } from '../../config/database'
+import {assertTrainingReferenceReadyForMeasurement} from './training-reference-admission'
+import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
+import { applyTrainingAttemptScope, resolveTrainingAttemptScope } from './training-variant-scope'
+import { resolveTrainingFlowScope, trainingFlowMarkerState } from './training-flow-scope'
+import { trainingFlowItemKey, trainingFlowUnitKey } from '../assessment-core/flow/training'
+import { compositeItemSlotKey, formSectionSlotKey } from '../assessment-runtime/slot-set'
+
 
 const requireKnownMarkers = (parent: any): void => {
   if (trainingVariantMarkerState(parent) === 'UNKNOWN') {

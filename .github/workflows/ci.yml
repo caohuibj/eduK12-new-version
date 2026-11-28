@@ -298,7 +298,7 @@ jobs:
         with:
           node-version: '24.21.0'
       - name: verify bounded risk-tier routing and historical evidence refusal
-        run: node --test .github/scripts/ci-qualification.test.mjs .github/scripts/ci-backend-regression-reuse.test.mjs .github/scripts/ci-legacy-retirement.test.mjs .github/scripts/ci-frontend-retest.test.mjs
+        run: node --test .github/scripts/ci-qualification.test.mjs .github/scripts/ci-backend-regression-reuse.test.mjs .github/scripts/ci-legacy-retirement.test.mjs .github/scripts/ci-frontend-retest.test.mjs .github/scripts/git-content-release-scope.test.mjs
       - name: fetch the exact diff base without full history
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -692,6 +692,11 @@ jobs:
       - name: backend prisma generate
         working-directory: server-version/backend
         run: npx prisma generate
+      - name: validate changed Git content declarations in mixed application changes
+        working-directory: server-version/backend
+        env:
+          CONTENT_BASE_SHA: ${{ github.event.before }}
+        run: node ../../.github/scripts/check-git-content-releases.mjs "$CONTENT_BASE_SHA"
       - name: Bundle immutable history (declarations checked once by npm build)
         working-directory: server-version/backend
         env:

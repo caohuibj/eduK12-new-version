@@ -40,7 +40,7 @@ export function verifyHistory(base: string) {
   const root = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim()
   const prefix = 'server-version/backend/src/modules/assessment-bundle/'
   const paths = ['packages/', 'ci-fixtures/'].map(p => prefix + p)
-  const files = execFileSync('git', ['ls-tree', '-r', '--name-only', '-z', base, '--', ...paths], { encoding: 'utf8', cwd: root }).split('\0').filter(Boolean)
+  const files = execFileSync('git', ['ls-tree', '-r', '--name-only', '-z', base, '--', ...paths], { encoding: 'utf8', cwd: root }).split('\0').filter(file => file && !/^packages\/[a-z][a-z0-9_]*\/releases\.json$/.test(file.slice(prefix.length)))
   const before = new Map<string, string>(), after = new Map<string, string>()
   for (const file of files) {
     before.set(file, execFileSync('git', ['show', `${base}:${file}`], { encoding: 'utf8', cwd: root }))

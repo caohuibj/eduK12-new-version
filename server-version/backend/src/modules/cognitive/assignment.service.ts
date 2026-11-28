@@ -6,7 +6,7 @@ import { Prisma, UserRole, CourseStudentStatus, CognitiveAssignmentStatus, Mater
 import { prisma } from '../../config/database'
 import { readCognitiveQuota } from './attempt-quota'
 import { getCognitiveRegistryEntry, hasCognitiveProfile } from './cognitive.registry'
-import { freezeAssignmentProfile, freezeDataForWrite, hashResolvedConfig, readFrozenReport } from './profile-freeze'
+import { cognitiveDeclaredReport, freezeAssignmentProfile, freezeDataForWrite, hashResolvedConfig, readFrozenReport } from './profile-freeze'
 import type { CognitiveProfile } from './cognitive.types'
 import { CreateAssignmentInput, UpdateAssignmentInput, ListAssignmentsQuery } from './cognitive.schema'
 import {
@@ -142,6 +142,7 @@ export const createAssignment = async (
     return {...safe,configurationName:selected.configurationName,selectedBinding:selected.pin.selectedBinding,profileLocked:true}
   })
   if(precise)return {...precise,config:undefined,course:{id:course.id,title:course.title,courseCode:course.courseCode}}
+  if(cognitiveDeclaredReport(config.config))throw FORBIDDEN('此认知配置需要已批准的精确 Profile 和 Training 使用授权')
   if (!(await canInstantiateConfig(userId, role, config))) {
     throw FORBIDDEN('无权限使用此认知任务类型')
   }
@@ -660,6 +661,8 @@ export const prepareTeacherPublishedAssignment = async (
   if (!parsed.success) throw BAD_REQUEST('CognitiveTestConfig config does not match its registry schema')
 
   const source = input.sourceFreeze ?? null
+  if(cognitiveDeclaredReport(config.config)&&!source?.selectedCognitiveProfile)
+    throw FORBIDDEN('此认知配置只能从已经授权的精确 Profile 投放')
   if (source && input.profile) throw BAD_REQUEST('不能同时指定来源冻结信息和新 Profile')
   const freezeFields = [
     source?.profile,

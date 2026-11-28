@@ -19,7 +19,7 @@ import { loadCognitiveSessionConfig } from './session.service'
 import { ensureCognitiveAssessmentContext } from './v2/assessment-context'
 import { loadCognitiveReferenceSets, resolveCognitiveMetricReferences } from './v2/reference-adapter'
 import { projectThreeLayerReport, referencesForReportReading } from './v2/report'
-import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from './v2/result-snapshot'
+import { cognitiveParticipantResult, parseCognitiveResultSnapshot } from './v2/result-snapshot'
 import type { CognitiveResultSnapshot } from './v2/types'
 
 /**
@@ -111,14 +111,7 @@ const decryptResult = (session: {
   }
 }
 
-const v2ResponseFromSnapshot = (snapshot: CognitiveResultSnapshot) => ({
-  metrics: snapshot.metrics,
-  quality: snapshot.quality,
-  qualityFlags: snapshot.quality.flags,
-  references: referencesForCognitiveResult(snapshot),
-  report: snapshot.report,
-  assessmentContext: snapshot.assessmentContext,
-})
+const v2ResponseFromSnapshot = cognitiveParticipantResult
 
 const buildV2CompletedPayload = (
   session: { id: string },
@@ -202,6 +195,9 @@ const completeV2Session = async (tx: any, session: any, snapshot: Awaited<Return
     profile: report.method.profile,
     metrics: scored.metrics,
     quality: scored.quality,
+    ...(freeze.frozenReport?.participantPresentation?.declaredRelease
+      ? {effectiveDisclosure:freeze.frozenReport.participantPresentation.declaredRelease.effectiveDisclosure}
+      : {}),
     references: referencesForReportReading(report, resolvedReferences) as unknown as Array<Record<string, unknown>>,
     report: report as unknown as Record<string, unknown>,
     assessmentContext: contextState.reference,

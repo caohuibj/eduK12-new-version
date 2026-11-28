@@ -1,3 +1,4 @@
+import { resolveAudienceDisclosure } from '../../scale/policy/disclosure'
 import type {
   CognitiveProfile,
   CognitiveScoreResult,
@@ -190,6 +191,22 @@ const legacyProfileLabel = (profile: CognitiveProfile | null): string | null => 
   return null
 }
 
+function applyDeclaredCognitiveDisclosure(report:ThreeLayerReport,presentation?:CognitiveParticipantPresentationV1){
+  const declaration=presentation?.declaredRelease
+  if(!declaration)return report
+  const visibility=resolveAudienceDisclosure(declaration.effectiveDisclosure,'respondent')
+  if(!visibility.numericScores)report.headline=report.user=report.detail=[]
+  if(!visibility.resultQualityDetails)report.quality=[]
+  if(!visibility.individualInterpretations)report.conclusion=''
+  if(!visibility.educationalContent)report.practicalTips=[]
+  // Installed R3 reading can contain method/config details and per-trial plots.
+  // Declarative reports expose only the audited top-level projection and prose.
+  delete report.reading
+  delete report.schemaVersion
+  if(visibility.educationalContent&&declaration.introduction)report.practicalTips=[declaration.introduction,...report.practicalTips]
+  return report
+}
+
 export const projectThreeLayerReport = (input: {
   participantPresentation?: CognitiveParticipantPresentationV1
   testType: string
@@ -267,7 +284,7 @@ export const projectThreeLayerReport = (input: {
     practicalTips: (input.participantPresentation ? input.participantPresentation.suppressTips : legacySuppressTips(input.testType)) ? [] : input.participantPresentation?.practicalTips ?? input.definition.practicalTips,
   }
   const policy = input.participantPresentation?.reportReading
-  if (!policy) return report // Historical frozen presentations retain their original projection.
+  if (!policy) return applyDeclaredCognitiveDisclosure(report,input.participantPresentation)
   const globalWithheld = input.score.quality.state === 'invalid'
     || policy.withholdFlags.some(flag => input.score.quality.flags[flag]
       && (flag !== 'legacyUninterpretable' || !Object.entries(input.score.quality.flags).some(([key, active]) => active && key !== 'legacyUninterpretable' && key !== 'interrupted')))
@@ -380,5 +397,5 @@ export const projectThreeLayerReport = (input: {
       labels: Object.fromEntries(Object.keys(input.metricDefinitions).map(key => [key, input.participantPresentation?.metrics[key]?.label ?? input.metricDefinitions[key].label])),
       units: Object.fromEntries(Object.entries(input.metricDefinitions).map(([key, value]) => [key, value.unit])) }),
   }
-  return report
+  return applyDeclaredCognitiveDisclosure(report,input.participantPresentation)
 }

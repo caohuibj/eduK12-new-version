@@ -4,6 +4,7 @@ import { getAssignmentForTeacher } from './assignment.service'
 import { FORBIDDEN } from './cognitive.errors'
 import { decryptCognitivePayload } from './cognitive.security'
 import { parseCognitiveResultSnapshot } from './v2/result-snapshot'
+import { resolveAudienceDisclosure } from '../scale/policy/disclosure'
 import { isRelationalCohortOnlyCompositeAttempt } from '../assessment-relational/result-authority'
 import { createHash } from 'crypto'
 import { requireCognitiveCollection, cognitiveCollectionSessionWhere } from './collection-data.service'
@@ -44,8 +45,21 @@ export async function listProfessionalReports(input: { userId: string; role: Use
         || !Array.isArray(report.detail) || !Array.isArray(report.quality) || !report.method || typeof report.method !== 'object'
         || !['interpretable', 'limited', 'invalid'].includes(String(report.qualityState))
         || typeof report.conclusion !== 'string' || typeof report.disclaimer !== 'string' || !Array.isArray(report.practicalTips)) throw new Error('Unsupported frozen report shape')
-      const allowedKeys = new Set([...report.headline, ...report.user, ...report.detail].map(metric => metric.key))
-      records.push({ ...metadata, finishedAt: result.completedAt, label, report, references: result.quality.state === 'invalid' ? [] : (result.references ?? []).filter(reference => allowedKeys.has(reference.metricKey)), unavailableReason: null })
+      const policy = result.effectiveDisclosure && resolveAudienceDisclosure(result.effectiveDisclosure, 'teacher')
+      const teacherReport = {...report}
+      if (policy) {
+        if (!policy.numericScores) teacherReport.headline = teacherReport.user = teacherReport.detail = []
+        if (!policy.resultQualityDetails) teacherReport.quality = []
+        if (!policy.individualInterpretations) teacherReport.conclusion = ''
+        if (!policy.educationalContent) teacherReport.practicalTips = []
+        if (!policy.methods) teacherReport.method = {}
+        delete teacherReport.reading
+      }
+      const allowedKeys = new Set(policy && !policy.numericScores ? [] : [...report.headline, ...report.user, ...report.detail].map(metric => metric.key))
+      const references = result.quality.state === 'invalid' || (policy && (!policy.numericScores || !policy.references || !policy.scoreDerivedLabels))
+        ? []
+        : result.references.filter(reference => allowedKeys.has(reference.metricKey))
+      records.push({ ...metadata, finishedAt: result.completedAt, label, report:teacherReport, references, unavailableReason: null })
     } catch {
       // An unreadable record must not abort other reports or be replaced with live registry content.
       records.push({ ...metadata, label, report: null, references: [], unavailableReason: '冻结报告暂不可读，请核查记录完整性；未重算或补值。' })

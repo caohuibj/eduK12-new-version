@@ -1,8 +1,11 @@
+import { governedFormRawAnswersAllowed, governedFormRelease } from '../form/disclosure'
+import { compileEffectiveDisclosure } from '../scale/policy/disclosure'
 import type {SurveyNativeBundle} from '../bundle-product/survey-native'
 import {governedMediaBlocker} from './governed-tool.media'
 import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {reportTemplateSchema,validateReportTemplateBindings,type ReportTemplate} from '../measurement-content/report-template'
+import type {AudienceDisclosurePolicyV1} from '../scale/policy/types'
 import {prepareRelease,type ReleaseInput} from '../measurement-content/release'
 import {scaleMeasurementRelease} from '../measurement-content/scale'
 import {sjtMeasurementRelease} from '../measurement-content/sjt'
@@ -27,7 +30,7 @@ export const packageReportSchema=z.object({version:z.string().trim().min(1).max(
 export type PackageReport=z.infer<typeof packageReportSchema>
 export type GovernedParameter=Extract<StoredRelease,{layer:'REFERENCE'}>&{sourceMeasurementHash:string}
 export type GovernedArtifact={nativeBundle?:SurveyNativeBundle;schemaVersion:1;family:GovernedFamily;toolKey:string;version:string;title:string;
- unit:CatalogSourceSnapshot|null;parameters:GovernedParameter|null;report:{version:string;template:ReportTemplate;audience?:'student'|'researcher'}|null;
+ unit:CatalogSourceSnapshot|null;parameters:GovernedParameter|null;report:{version:string;template:ReportTemplate;audience?:'student'|'researcher';effectiveDisclosure?:AudienceDisclosurePolicyV1;assetRefs?:ReleaseInput['assetRefs']}|null;
  components:Array<{slotKey:string;title:string;source:{type:'STANDARD'|'GOVERNED';id:string;hash:string};unit:CatalogSourceSnapshot}>;
  packageReport:PackageReport|null;reference:ToolReference}
 export type GovernedRow={id:string;family:GovernedFamily;tool_key:string;tool_version:string;title:string;snapshot:GovernedArtifact;snapshot_hash:string;reference:ToolReference;
@@ -61,7 +64,6 @@ export function artifactBlockers(a:GovernedArtifact):string[]{
    if(a.components.filter(c=>c.unit.ref.kind==='COGNITIVE').length>4)blockers.push('当前单次 Survey 最多运行 4 个受控认知任务')
    if(!a.components.length||a.components.length>30)blockers.push('组合需要 1–30 个固定组件')
    if(new Set(a.components.map(c=>c.slotKey)).size!==a.components.length)blockers.push('组合组件编码重复')
-   if(a.family==='COMBINATION'&&a.packageReport)blockers.push('单纯组合没有组合报告；有组合报告时请选择组合包')
    if(a.family==='BUNDLE'&&!a.packageReport&&!a.nativeBundle)blockers.push('组合包缺少组合报告设计')
    if(a.packageReport&&!a.packageReport.introduction.trim()&&!a.packageReport.blocks.length)blockers.push('组合报告需要说明或至少一个报告区块')
    if(a.packageReport){for(const b of a.packageReport.blocks){if(b.type==='TEXT')continue
@@ -73,6 +75,7 @@ export function artifactBlockers(a:GovernedArtifact):string[]{
      if(measurement.layer!=='MEASUREMENT'||!measurement.content.metrics.some(m=>m.metricKey===b.metricKey))blockers.push('组合报告指标不存在：'+b.slotKey+'/'+b.metricKey)
     }else{
      if(component.unit.ref.kind!=='FORM'||!(component.unit.displayDefinition as FormDraft).pages.some(p=>p.questions.some(q=>q.itemKey===b.itemKey)))blockers.push('组合报告表单字段不存在：'+b.slotKey+'/'+b.itemKey)
+     else if(!governedFormRawAnswersAllowed(component.unit.provenance,'researcher'))blockers.push('表单源版本禁止研究者读取原始答案：'+b.slotKey+'/'+b.itemKey)
     }
    }
     assertPackageReportBytes(packageReportWorstCaseBytes(a.packageReport,a.components,a.title))
@@ -82,8 +85,19 @@ export function artifactBlockers(a:GovernedArtifact):string[]{
    if(!a.unit||a.unit.ref.kind!==a.family)blockers.push('工具类型与内容版本不一致')
    if(a.components.length||a.packageReport)blockers.push('单个工具不承载组合绑定')
    if(a.family==='FORM'){
-    if(a.parameters||a.report)blockers.push('表单没有参数和报告')
+    if(a.parameters)blockers.push('表单没有计分参数')
     if(a.unit)assertSurveyDraft('FORM',a.unit.displayDefinition,true)
+    const release=governedFormRelease(a.unit?.provenance)
+    if(release){
+     if(!a.unit||!a.report||a.report.version!==release.reportVersion||a.unit.ref.sourceVersion!==release.contentVersion)
+      blockers.push('表单报告必须绑定完全一致的题本与报告版本')
+     else{
+      const template=reportTemplateSchema.parse(a.report.template)
+      if(template.blocks.some(block=>block.type!=='TEXT'))blockers.push('表单只允许无计分的完成说明')
+     }
+     if(canonicalHash(release.effectiveDisclosure)!==canonicalHash(compileEffectiveDisclosure(release.dataCeiling,release.reportVisibility,undefined)))
+      blockers.push('表单披露范围与冻结版本不一致')
+    }else if(a.report)blockers.push('旧表单没有报告版本')
    }else if(a.unit){
     const prepared=prepareRelease(governedMeasurementInput(snapshotUnit(a.unit),{kind:'PLATFORM'},a.toolKey,a.version))
     if(prepared.layer!=='MEASUREMENT')throw new Error('测量层类型错误')
@@ -93,9 +107,11 @@ export function artifactBlockers(a:GovernedArtifact):string[]{
      for(const e of a.parameters.content.entries)if(!metrics.includes(e.metricKey))blockers.push('参数引用未知指标：'+e.metricKey)
      for(const item of a.parameters.content.entries){const e=item.definition as unknown as import('../assessment-reference/reference').AssessmentReferenceEntry;if(e.instrumentVersion!==prepared.content.instrumentVersion||e.scoringVersion!==prepared.content.scoringVersion)blockers.push('参数引用的内容或计分版本不匹配');if(e.governance&&e.governance.measurementHash!==a.parameters.sourceMeasurementHash)blockers.push('参数的测量指纹绑定不一致')}
      const original=a.parameters.sourceMeasurementHash
-     if(original!==prepared.content.measurementHash)blockers.push('参数绑定的测量内容版本不匹配')
+     const compiledSource=a.unit.ref.kind==='COGNITIVE'?parseFrozenSurveyCognitive(a.unit.compiledDefinition):null
+     const validMeasurement=compiledSource?.schemaVersion===2?compiledSource.sourceMeasurement.content.measurementHash:prepared.content.measurementHash
+     if(original!==validMeasurement)blockers.push('参数绑定的测量内容版本不匹配')
     }
-    if(a.report){validateReportTemplateBindings(reportTemplateSchema.parse(a.report.template),metrics,[]);for(const b of a.report.template.blocks)if(b.type==='REFERENCE_BAND'&&!a.parameters?.content.entries.some(e=>e.metricKey===b.metricKey&&e.referenceKind===b.referenceKind&&(e.definition as unknown as import('../assessment-reference/reference').AssessmentReferenceEntry).statistics.thresholds?.some(t=>t.key===b.bandKey)))blockers.push('报告区间未对应已配置的参数阈值：'+b.metricKey)}
+    if(a.report){validateReportTemplateBindings(reportTemplateSchema.parse(a.report.template),metrics,a.report.assetRefs?.map(asset=>asset.assetId)??[]);for(const b of a.report.template.blocks)if(b.type==='REFERENCE_BAND'&&!a.parameters?.content.entries.some(e=>e.metricKey===b.metricKey&&e.referenceKind===b.referenceKind&&(e.definition as unknown as import('../assessment-reference/reference').AssessmentReferenceEntry).statistics.thresholds?.some(t=>t.key===b.bandKey)))blockers.push('报告区间未对应已配置的参数阈值：'+b.metricKey)}
    }
   }
  }catch(e){blockers.push(e instanceof Error?e.message:'内容版本或运行格式不完整')}
@@ -107,6 +123,7 @@ export function governedSnapshot(row:GovernedRow):CatalogSourceSnapshot{
  if(!row.snapshot.unit||packageFamily(row.family))throw new Error('组合只能整包导入，禁止按单个工具使用')
  const s=clone(row.snapshot.unit)
  return {...s,ref:{kind:s.ref.kind,sourceId:'survey-tool:'+row.id,sourceVersion:row.snapshot_hash},provenance:{...s.provenance,surveyToolReleaseId:row.id,governedInstrumentVersion:s.ref.sourceVersion,
- reportConfigured:row.snapshot.report!==null,...(row.snapshot.report?.audience?{reportAudience:row.snapshot.report.audience}:{}),parametersConfigured:row.snapshot.parameters!==null,toolReference:row.reference,...(row.measurement_release?{sourceMeasurementRelease:row.measurement_release}:{})}}
+ reportConfigured:row.snapshot.report!==null,...(s.ref.kind==='FORM'&&row.snapshot.report&&s.provenance.formRelease
+  ?{formCompletionTemplate:clone(row.snapshot.report.template)}:{}),...(row.snapshot.report?.audience?{reportAudience:row.snapshot.report.audience}:{}),parametersConfigured:row.snapshot.parameters!==null,toolReference:row.reference,...(row.measurement_release?{sourceMeasurementRelease:row.measurement_release}:{})}}
 }
 export const isGovernedSource=(id:string)=>id.startsWith('survey-tool:')

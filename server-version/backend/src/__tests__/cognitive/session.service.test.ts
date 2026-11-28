@@ -35,7 +35,7 @@ import {
   restartSession,
 } from '../../modules/cognitive/session.service'
 import { decryptCognitivePayload, encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
-import { hashResolvedConfig } from '../../modules/cognitive/profile-freeze'
+import { freezeAssignmentProfile, hashResolvedConfig } from '../../modules/cognitive/profile-freeze'
 import { parseSessionConfigSnapshot } from '../../modules/cognitive/v2/session-snapshot'
 
 const PUBLISHED_ASSIGNMENT = {
@@ -414,6 +414,30 @@ describe('C23 single admission decode', () => {
       expect(stored).toHaveBeenCalledTimes(1)
       expect(ensure).not.toHaveBeenCalled()
     } finally { stored.mockRestore(); ensure.mockRestore() }
+  })
+})
+
+describe('legacy declared report disclosure',()=>{
+  it.each(['owner','public'])('uses the frozen report policy in the %s legacy result',async kind=>{
+    const {requireCognitiveRegistryEntry}=await import('../../modules/cognitive/cognitive.registry')
+    const {compileEffectiveDisclosure}=await import('../../modules/scale/policy/disclosure')
+    const config={totalTrials:120,nogoRatio:.25,stimulusMs:800,isiMs:500,validRtFloorMs:100,
+      report:{reportVersion:'declared-r1',referenceMode:'none',declaredRelease:{parameterVersion:'declared-p1',
+        title:'Synthetic',introduction:'Synthetic',practicalTips:[],disclaimer:'Synthetic disclaimer',
+        effectiveDisclosure:compileEffectiveDisclosure(undefined,undefined,undefined)}}}
+    const frozen=freezeAssignmentProfile({entry:requireCognitiveRegistryEntry('gonogo','1.0.0','1.0.0'),baseConfig:config,profile:'standard'})
+    mockPrisma.cognitiveSession.findUnique.mockResolvedValue(sessionRow({
+      status:'COMPLETED',testType:'gonogo',configSnapshotEncrypted:encryptCognitivePayload(config),
+      assignment:{resolvedReportSnapshotEncrypted:frozen.resolvedReportSnapshotEncrypted},
+      scoreEncrypted:encryptCognitivePayload(.92),metricsEncrypted:encryptCognitivePayload({hitRate:.92}),
+      qualityFlagsEncrypted:encryptCognitivePayload({interpretable:true,privateFlag:true}),
+      ...(kind==='public'?{userId:null,recoveryTokenHash:'token'}:{}),
+    }))
+    const result=kind==='public'?await getPublicSession('token','session-1'):await getSession('student-1','session-1')
+    expect(result).toHaveProperty('result')
+    expect((result as {result:unknown}).result).toMatchObject({
+      score:null,metrics:{},qualityFlags:{},singleTaskReport:{headline:null,primaryMetrics:[]},
+    })
   })
 })
 

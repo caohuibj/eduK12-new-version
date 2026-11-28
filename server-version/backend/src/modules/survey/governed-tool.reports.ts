@@ -1,4 +1,7 @@
+import { governedFormRawAnswersAllowed, renderGovernedFormCompletion } from '../form/disclosure'
 import {renderDeclaredReport,type ReportMetricFact,type ReportReferenceFact} from '../measurement-content/report-renderer'
+import {resolveAudienceDisclosure} from '../scale/policy/disclosure'
+import {parseFrozenSurveyCognitive} from './cognitive.definition'
 import {resolveAssessmentReference,type AssessmentReferenceEntry} from '../assessment-reference/reference'
 import {prepareRelease} from '../measurement-content/release'
 import type {FrozenUnitResult,SurveyComputedFinal} from './final.compute'
@@ -16,18 +19,26 @@ export function resultMetrics(result:FrozenUnitResult):ReportMetricFact[]{
 }
 export function renderGovernedUnitReport(a:GovernedArtifact,result:FrozenUnitResult){
  if(!a.report)return null
+ if(result.kind==='FORM'){
+  const report=renderGovernedFormCompletion(a.report.template,a.unit?.provenance,'researcher')
+  return report??renderDeclaredReport({blocks:[],limitations:[]},[],[])
+ }
  const references:ReportReferenceFact[]=[]
  if(a.parameters&&a.unit){
   const m=prepareRelease(governedMeasurementInput(snapshotUnit(a.unit),{kind:'PLATFORM'},a.toolKey,a.version))
   if(m.layer!=='MEASUREMENT')throw new Error('参数必须绑定测量内容')
+  const cognitive=a.unit.ref.kind==='COGNITIVE'?parseFrozenSurveyCognitive(a.unit.compiledDefinition):null
+  const measurement=cognitive?.schemaVersion===2?cognitive.sourceMeasurement.content:m.content
+  const key=cognitive?.schemaVersion===2?cognitive.sessionSnapshot.testType:a.toolKey
   for(const metric of resultMetrics(result))for(const item of a.parameters.content.entries.filter(e=>e.metricKey===metric.metricKey)){
    const e=item.definition as unknown as AssessmentReferenceEntry,kind=m.family==='SCALE'?'scale':m.family==='SJT'?'sjt':'cognitive'
-   const values=resolveAssessmentReference({instrumentType:kind,instrumentKey:a.toolKey,instrumentVersion:m.content.instrumentVersion,scoringVersion:m.content.scoringVersion,measurementHash:m.content.measurementHash,
-    selections:[{scoreKey:item.metricKey,referenceVersion:a.parameters.version,referenceKind:item.referenceKind}],references:[{schemaVersion:1,instrumentType:kind,instrumentKey:a.toolKey,referenceVersion:a.parameters.version,status:'ACTIVE',entries:[e]}],score:{key:metric.metricKey,value:metric.value,status:metric.value===null?'not_calculable':'calculated'}})
+   const values=resolveAssessmentReference({instrumentType:kind,instrumentKey:key,instrumentVersion:measurement.instrumentVersion,scoringVersion:measurement.scoringVersion,measurementHash:measurement.measurementHash,
+    selections:[{scoreKey:item.metricKey,referenceVersion:a.parameters.version,referenceKind:item.referenceKind}],references:[{schemaVersion:1,instrumentType:kind,instrumentKey:key,referenceVersion:a.parameters.version,status:'ACTIVE',entries:[e]}],score:{key:metric.metricKey,value:metric.value,status:metric.value===null?'not_calculable':'calculated'}})
    for(const v of values)references.push({metricKey:metric.metricKey,referenceKind:item.referenceKind,status:v.status==='available'?'AVAILABLE':'UNAVAILABLE',bandKey:v.criterionBand?.key??null})
   }
  }
- return renderDeclaredReport(a.report.template,resultMetrics(result),references)
+ return renderDeclaredReport(a.report.template,resultMetrics(result),references,
+  a.report.effectiveDisclosure?resolveAudienceDisclosure(a.report.effectiveDisclosure,a.report.audience==='researcher'?'researcher':'respondent'):undefined)
 }
 const missingText={REFUSED:'明确拒答',NOT_SHOWN:'未展示',SHOWN_MISSING:'未填写',UNABLE_TO_JUDGE:'无法判断'} as const
 function fieldDisplay(question:FormQuestion,answers:Record<string,unknown>,missing:ReadonlyMap<string,MissingItem['reason']>):string{
@@ -46,7 +57,7 @@ function fieldDisplay(question:FormQuestion,answers:Record<string,unknown>,missi
  return option(value)
 }
 /** Rendering consumes already computed/stored facts; it never runs any scorer. */
-export function renderPackageReport(spec:PackageReport,components:Array<{slotKey:string;unit:{ref:{kind:string};displayDefinition:unknown}}>,calculated:SurveyComputedFinal,keys:Record<string,string>){
+export function renderPackageReport(spec:PackageReport,components:Array<{slotKey:string;unit:{ref:{kind:string};displayDefinition:unknown;provenance?:Record<string,unknown>}}>,calculated:SurveyComputedFinal,keys:Record<string,string>){
  const metrics:ReportMetricFact[]=[],blocks:Array<{type:'TEXT';text:string}|{type:'METRIC';metricKey:string;label:string;display:'RAW'}>=[]
  const byComponent=new Map(components.map(c=>[c.slotKey,c])),byResult=new Map(calculated.units.map(u=>[u.instrumentKey,u]))
  const fields=new Map<string,Map<string,FormQuestion>>(),missing=new Map<string,Map<string,MissingItem['reason']>>(),metricFacts=new Map<string,Map<string,ReportMetricFact>>()
@@ -59,6 +70,7 @@ export function renderPackageReport(spec:PackageReport,components:Array<{slotKey
   if(!component||!result||result.notExecuted)throw new Error('组合报告缺少固定组件结果：'+b.slotKey)
   if(b.type==='FORM_FIELD'){
    if(component.unit.ref.kind!=='FORM')throw new Error('组合报告字段类型错误')
+   if(!governedFormRawAnswersAllowed(component.unit.provenance,'researcher'))return
    if(!fields.has(b.slotKey))fields.set(b.slotKey,new Map((component.unit.displayDefinition as FormDraft).pages.flatMap(p=>p.questions).map(q=>[q.itemKey,q])))
    if(!missing.has(b.slotKey))missing.set(b.slotKey,new Map(result.missing.map(m=>[m.itemKey,m.reason])))
    const question=fields.get(b.slotKey)!.get(b.itemKey);if(!question)throw new Error('组合报告字段未固定')

@@ -102,16 +102,20 @@ test('new release assets and manifest-only rollback use the single content job',
  const remove=file=>({file,status:'D',oldMode:'100644',newMode:'000000'});
  const files=[manifest,parameter,report];
  const readers={readHeadFile:()=>'{ "version": "1.1.0" }'};
- for(const entries of [files.map(add),[remove(manifest)],[mod(manifest)]]){
+ for(const entries of [files.map(add),[mod(manifest)]]){
   assert.deepEqual(selectScaleIntake(entries).toolKeys,['test_scale']);
   assert.equal(classifyChanges(entries).scale_intake_light,true);
   assert.equal(classifyChanges(entries).frontend,false);
   assert.equal(contentCodeqlRequired(entries,readers),false);
-  assert.equal(contentCodeqlRequired(entries,{readHeadFile:()=> '[]'}),entries[0].status!=='D');
+  assert.equal(contentCodeqlRequired(entries,{readHeadFile:()=> '[]'}),true);
   assert.equal(classifyChanges([...entries,mod(file)]).scale_intake_light,false);
  }
  assert.equal(selectScaleIntake([{...add(report),newMode:'120000'}]),null);
- for(const version of [parameter,report])assert.equal(selectScaleIntake([remove(version)]),null);
+ assert.equal(selectScaleIntake([remove(manifest)]),null);
+ for(const version of [parameter,report]){
+  assert.equal(selectScaleIntake([remove(version)]),null);
+  assert.equal(selectScaleIntake([mod(version)]),null);
+ }
  const isolated={scope:{outputs:{scale_intake_light:'true',scale_release_mixed:'false'}}, content:{result:'success'}};
  assert.deepEqual(recheckScaleReleaseScope(isolated,files.map(add)),[]);
  assert.deepEqual(recheckScaleReleaseScope(isolated,[remove(report)]),['recomputed-scale-release-scope']);
@@ -181,3 +185,24 @@ test('only the exact registered Scale CI tools are excluded from application fin
  for(const file of ['.github/scripts','server-version/scripts/release','server-version/backend/scripts/scale-intake-selected-check.ts','server-version/backend/scripts/scale-intake-selected-check.test.ts','server-version/backend/src/scripts/cognitive-onboarding-check.ts','server-version/scripts/cognitive'])assert.ok(paths.some(dir=>file===dir||file.startsWith(dir+'/')),file);
  for(const dir of paths)assert.ok(statSync(new URL('../../'+dir,import.meta.url)).isDirectory(),'Python SAST root must be a directory: '+dir);
  });
+
+test('direct Scale CI keeps prior release keys on exact Git commits',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'scale-release-history-'));
+ const git=(...args)=>execFileSync('git',args,{cwd:dir,encoding:'utf8'}).trim();
+ const manifest=file.replace('1.0.0/instrument.ts','releases.json');
+ function commit(releases) {
+  writeFileSync(join(dir,manifest),JSON.stringify({releases}));
+  git('add','--',manifest);git('commit','-qm','release manifest');
+  return git('rev-parse','HEAD');
+ }
+ try{
+  git('init','-q');git('config','user.name','Synthetic test');git('config','user.email','test@example.invalid');
+  mkdirSync(dirname(join(dir,manifest)),{recursive:true});
+  const first={releaseKey:'first',state:'ONLINE'},second={releaseKey:'second',state:'ONLINE'};
+  const base=commit([first,second]);
+  const head=commit([{...first,state:'WITHDRAWN'},second]);
+  assert.deepEqual(readScaleIntakeDiff(base,head,{cwd:dir,declarationsOnly:true}).toolKeys,['test_scale']);
+  const removed=commit([second]);
+  assert.throws(()=>readScaleIntakeDiff(head,removed,{cwd:dir,declarationsOnly:true}),/Keep existing release identifiers/);
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});

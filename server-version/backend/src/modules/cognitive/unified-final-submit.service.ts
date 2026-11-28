@@ -35,7 +35,7 @@ import {
 } from './v2/authoritative-scorer'
 import { resolveCognitiveMetricReferences } from './v2/reference-adapter'
 import { projectThreeLayerReport, referencesForReportReading } from './v2/report'
-import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from './v2/result-snapshot'
+import { cognitiveParticipantResult, parseCognitiveResultSnapshot } from './v2/result-snapshot'
 import type { CognitiveResultSnapshot, TrialEnvelope } from './v2/types'
 import { canonicalJsonBytes } from '../assessment-runtime/canonical'
 import { encryptUnifiedRuntimePayload } from '../assessment-runtime/security'
@@ -74,14 +74,7 @@ export type UnifiedCognitiveFinalSubmitInput = {
 export type UnifiedCognitiveAdmission = CognitiveAdmissionChildRow
 
 const responseFromSnapshot = (sessionId: string, snapshot: CognitiveResultSnapshot) => {
-  const result = {
-    metrics: snapshot.metrics,
-    quality: snapshot.quality,
-    qualityFlags: snapshot.quality.flags,
-    references: referencesForCognitiveResult(snapshot),
-    report: snapshot.report,
-    assessmentContext: snapshot.assessmentContext,
-  }
+  const result = cognitiveParticipantResult(snapshot)
   return {
     sessionId,
     status: 'COMPLETED' as const,
@@ -408,6 +401,9 @@ export const submitUnifiedCognitiveSessionFinal = async (
     profile: freeze.profile,
     metrics: scored.metrics,
     quality: scored.quality,
+    ...(freeze.frozenReport?.participantPresentation?.declaredRelease
+      ? {effectiveDisclosure:freeze.frozenReport.participantPresentation.declaredRelease.effectiveDisclosure}
+      : {}),
     references: referencesForReportReading(report, resolvedReferences) as unknown as Array<Record<string, unknown>>,
     report: report as unknown as Record<string, unknown>,
     assessmentContext: contextState.reference,

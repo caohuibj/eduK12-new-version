@@ -1,3 +1,4 @@
+import {isCognitiveRuntimePath,verifyGitContentHistory} from './git-content-release-scope.mjs';
 import {studentDiscoveryScope} from './student-discovery-scope.mjs';
 import {unitOnly} from './ci-qualification.mjs';
 import {readEdgeScope,edgeConfigOutputs} from './edge-config-scope.mjs';
@@ -10,6 +11,8 @@ import {readCognitiveIntakeDiff} from './cognitive-intake-scope.mjs';
 import {verifiedFrontendRetest} from './ci-frontend-retest.mjs';
 export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd(),draft=false}={}) {
   const actual=readCognitiveIntakeDiff(base,head,{cwd});
+  const readReleaseFile = ref => file => execFileSync('git',['show',ref+':'+file],{cwd,encoding:'utf8'});
+  verifyGitContentHistory(actual.entries,{readBaseFile:readReleaseFile(base),readHeadFile:readReleaseFile(head)});
   const scope=needs.scope?.outputs||{};
   if(scope.application_route==='cognitive-product'){
     const read=ref=>file=>{try{return execFileSync('git',['show',ref+':'+file],{cwd,encoding:'utf8',stdio:['ignore','pipe','ignore']});}catch{return null;}};
@@ -29,7 +32,7 @@ export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd(),draft=
         || Object.keys(acceptanceFor([])).some(key=>scope[key]!=='true')) return ['recomputed-cognitive-product-scope'];
       return requiredChecks(needs,draft).filter(name=>needs[name]?.result!=='success');
     }
-    return actual.entries.some(e=>/^server-version\/(?:backend\/src\/modules\/cognitive\/(?:tasks|generated|content-candidates)\/|frontend\/src\/modules\/cognitive\/(?:(?:tasks|generated)\/|native-runners\.tsx$))/.test(e.file)) ? ['unsupported-cognitive-intake'] : [];
+    return actual.entries.some(entry=>isCognitiveRuntimePath(entry.file)) ? ['unsupported-cognitive-intake'] : [];
   }
   const {base:baseSHA,head:checkout,entries,...selection}=actual;
   const failed=[];

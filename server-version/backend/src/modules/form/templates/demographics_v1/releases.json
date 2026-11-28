@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "toolKey": "demographics_v1",
+  "releases": [
+    {
+      "releaseKey": "1.0.0",
+      "contentVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "contentHash": "59efd1589fdf549b2547ba8883652ab27f89995bcf383cd9799360d2052b02c2",
+      "reportHash": "e17481000701f8e7f548956546333d4e4f253c92ce60bfc259e131c48fcaf76a",
+      "state": "HOLD",
+      "allowedEntries": [
+        "SURVEY"
+      ]
+    }
+  ]
+}

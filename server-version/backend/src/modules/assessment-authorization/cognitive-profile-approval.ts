@@ -7,6 +7,10 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {publicTemplatesForDatabase} from '../assessment-runtime/public-templates'
 import {approveCognitiveProfileEntryPolicies,exactStandardCombinationEntryProducts,readApprovedToolEntryProducts} from '../assessment-governance/tool-entry-policy'
 import {preparePublishedCognitiveProfile,cognitiveProfilePolicyIdentity} from './cognitive-profile-source'
+import {assertGitScalePublisher} from '../scale/onboarding/git-release-actor'
+import {randomUUID} from 'node:crypto'
+import type {CognitiveProfile} from '../cognitive/cognitive.types'
+import {lockToolPolicyMutation,type StandardCombinationEntryProduct} from '../assessment-governance/tool-entry-policy'
 import {saveCognitiveProfileArtifact} from './cognitive-profile-artifact'
 import {selectedConfigurationSchema} from './selected-configuration'
 const id=z.string().guid(),profile=z.enum(['experience','standard','research']),hash=z.string().regex(/^[a-f0-9]{64}$/)
@@ -51,10 +55,63 @@ export async function approveCognitiveProfile(actorId:string,configId:string,raw
   }
   const source=await preparePublishedCognitiveProfile(tx,configId,selected)
   if(source.artifactHash!==input.expectedArtifactHash)throw new AdminPermissionError(409,'审批预览已变化，请核对精确配置')
-  const saved=await saveCognitiveProfileArtifact(source.artifact,publicTemplatesForDatabase(tx))
-  await approveCognitiveProfileEntryPolicies(tx,cognitiveProfilePolicyIdentity(configId,selected,saved.artifactHash),products,actorId,input.reason)
-  await tx.assessmentManagementEvent.create({data:{id:input.requestId,actorId,resourceId:configId,action:'COGNITIVE_PROFILE_APPROVED',
-   metadata:{schemaVersion:1,requestIntentHash:intentHash,artifactHash:saved.artifactHash,configuration:saved.identity,artifactFormatVersion:source.artifact.schemaVersion,executionRequirements:{hasPresentation:source.artifact.execution?.presentation!=null,referenceCount:source.artifact.execution?.referenceDefinitions.length??0},allowedProducts:products,reason:input.reason}}})
+  const saved=await persistApprovedCognitiveProfile(tx,actorId,source,input.requestId,intentHash,products,input.reason)
+
   return {requestId:input.requestId,artifactHash:saved.artifactHash,allowedProducts:products,replayed:false,changed:true}
  },options)
+}
+
+
+type ProfilePublicationSource=Awaited<ReturnType<typeof preparePublishedCognitiveProfile>>
+async function persistApprovedCognitiveProfile(tx:Prisma.TransactionClient,actorId:string,source:ProfilePublicationSource,
+ requestId:string,intentHash:string,products:StandardCombinationEntryProduct[],reason:string,preservePause=false){
+ const saved=await saveCognitiveProfileArtifact(source.artifact,publicTemplatesForDatabase(tx))
+ await approveCognitiveProfileEntryPolicies(tx,cognitiveProfilePolicyIdentity(source.config.id,source.artifact.identity.profile,saved.artifactHash),
+    products,actorId,reason,{preservePause})
+ await tx.assessmentManagementEvent.create({data:{id:requestId,actorId,resourceId:source.config.id,action:'COGNITIVE_PROFILE_APPROVED',
+  metadata:{schemaVersion:1,requestIntentHash:intentHash,artifactHash:saved.artifactHash,configuration:saved.identity,
+   artifactFormatVersion:source.artifact.schemaVersion,executionRequirements:{hasPresentation:source.artifact.execution?.presentation!=null,
+    referenceCount:source.artifact.execution?.referenceDefinitions.length??0},allowedProducts:products,reason}}})
+ return saved
+}
+type GitProfileReceipt={artifactHash:string;allowedProducts:StandardCombinationEntryProduct[];everSurvey:boolean}
+async function reconcileGitCognitiveProfile(tx:Prisma.TransactionClient,actorId:string,configId:string,selected:CognitiveProfile,
+ products:StandardCombinationEntryProduct[],gitCommitSha:string){
+ await assertGitScalePublisher(tx,actorId)
+ if(!/^[0-9a-f]{40}$/.test(gitCommitSha))throw new Error('Invalid Cognitive release Git commit')
+ const source=await preparePublishedCognitiveProfile(tx,configId,selected)
+ const identity=cognitiveProfilePolicyIdentity(configId,selected,source.artifactHash)
+ await lockToolPolicyMutation(tx,[identity])
+ const row=await tx.assessmentManagementEvent.findFirst({where:{actorId,resourceId:configId,action:'COGNITIVE_GIT_PROFILE_SYNCED'},
+    orderBy:[{createdAt:'desc'},{id:'desc'}]})
+ const prior=row?.metadata as GitProfileReceipt|undefined
+ if(prior&&prior.artifactHash!==source.artifactHash)throw new Error('Installed Cognitive profile no longer matches its immutable Git approval')
+ const current=await tx.$queryRaw<Array<{product:StandardCombinationEntryProduct;decision:string;reviewed_by:string;paused:boolean}>>`
+  SELECT product,decision,reviewed_by,paused FROM survey_tool_policies WHERE resource_key=${identity.resourceKey} AND fingerprint=${identity.fingerprint}`
+ const manual=current.some(policy=>policy.reviewed_by!==actorId)
+ const hadSurvey=Boolean(prior?.everSurvey)
+ const outcome={artifact:source.artifact,hadSurvey}
+ if(manual)return {...outcome,action:'MANUAL_HOLD' as const}
+ const allowed=current.filter(policy=>policy.decision==='APPROVED').map(policy=>policy.product).sort()
+ if(canonicalHash(allowed)===canonicalHash(products)&&prior)return {...outcome,action:'UNCHANGED' as const}
+ const reason='Git main '+gitCommitSha
+ if(products.length){
+  if(!prior)await persistApprovedCognitiveProfile(tx,actorId,source,randomUUID(),
+    canonicalHash({source:'SYSTEM_GIT_RELEASE',gitCommitSha,configId,selected,products}),products,reason,true)
+  else await approveCognitiveProfileEntryPolicies(tx,identity,products,actorId,reason,{preservePause:true})
+ }else if(current.length){
+  await tx.$executeRaw`UPDATE survey_tool_policies SET decision='RETURNED',version=version+1,reason=${reason},
+    updated_at=clock_timestamp() WHERE resource_key=${identity.resourceKey} AND fingerprint=${identity.fingerprint}
+    AND decision='APPROVED'`
+ }
+ await tx.assessmentManagementEvent.create({data:{id:randomUUID(),actorId,resourceId:configId,action:'COGNITIVE_GIT_PROFILE_SYNCED',
+   metadata:{artifactHash:source.artifactHash,allowedProducts:products,everSurvey:hadSurvey||products.includes('SURVEY'),gitCommitSha}}})
+ return {...outcome,action:products.length?(prior?.allowedProducts.length?'SCOPE_CHANGED':'ACTIVATED'):'WITHDRAWN'}
+}
+export function approveGitCognitiveProfile(tx:Prisma.TransactionClient,actorId:string,configId:string,selected:CognitiveProfile,
+ rawProducts:unknown,gitCommitSha:string){
+ return reconcileGitCognitiveProfile(tx,actorId,configId,selected,exactStandardCombinationEntryProducts(rawProducts),gitCommitSha)
+}
+export function stopGitCognitiveProfileAdmission(tx:Prisma.TransactionClient,actorId:string,configId:string,selected:CognitiveProfile,gitCommitSha:string){
+ return reconcileGitCognitiveProfile(tx,actorId,configId,selected,[],gitCommitSha)
 }

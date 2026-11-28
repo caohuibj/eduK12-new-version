@@ -27,7 +27,8 @@ export function buildSurveyCognitiveReportSnapshot(frozen:FrozenSurveyCognitiveP
   protocolSignature:s.protocolSignature,profile:frozen.artifact.identity.profile,participantPresentation:r.participantPresentation,reportCaveats:r.reportCaveats,
   trials,config:s.config as Record<string,unknown>,definition:r.v2ReportDefinition!,metrics:scored.metrics,score:scored,metricDefinitions:r.v2MetricDefinitions!,qualityDefinitions:r.v2QualityDefinitions!})
  return parseCognitiveResultSnapshot({schemaVersion:1,completedAt:completedAt.toISOString(),testType:s.testType,configVersion:s.configVersion,engineVersion:s.engineVersion,
-  scoringVersion:s.scoringVersion,protocolSignature:s.protocolSignature,profile:frozen.artifact.identity.profile,metrics:scored.metrics,quality:scored.quality,references:[],report:JSON.parse(JSON.stringify(report)),assessmentContext:null})
+  scoringVersion:s.scoringVersion,protocolSignature:s.protocolSignature,profile:frozen.artifact.identity.profile,metrics:scored.metrics,quality:scored.quality,references:[],report:JSON.parse(JSON.stringify(report)),
+  ...(r.participantPresentation?.declaredRelease?{effectiveDisclosure:r.participantPresentation.declaredRelease.effectiveDisclosure}:{}),assessmentContext:null})
 }
 export function surveyBundleCognitiveKeys(unit:ResearchFrozenUnit):string[]{
  const binding=unit.nativeBundleCognitiveReport,frozen=parseFrozenSurveyCognitive(unit.compiledDefinition)

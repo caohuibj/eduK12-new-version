@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
+import {verifyGitContentHistory} from './git-content-release-scope.mjs';
 
 export const scaleIntakeToolingInputs = Object.freeze([
  '.github/scripts/declarative-content.mjs',
@@ -28,6 +29,7 @@ export function selectScaleReleaseAssets(entries) {
   if(!(status==='A'&&oldMode==='000000'&&newMode==='100644'||
        status==='M'&&oldMode==='100644'&&newMode==='100644'||
        status==='D'&&match[2]==='releases.json'&&oldMode==='100644'&&newMode==='000000'))return null;
+  if(status==='D'||status==='M'&&match[2]!=='releases.json')return null;
   tools.add(match[1]);files.add(file);
  }
  return {toolKeys:[...tools].sort(),files:[...files].sort()};
@@ -65,6 +67,9 @@ export function readScaleIntakeDiff(base,head,{cwd=process.cwd(),declarationsOnl
  assert.equal(git('rev-parse','HEAD').trim(),head,'Checkout identity mismatch');
  const diff=parseScaleIntakeRawDiff(git('diff','--raw','--abbrev=40','--no-renames','-z',base,head));
  const entries=declarationsOnly?diff.filter(entry=>isScaleReleaseAsset(entry.file)):diff;
+ verifyGitContentHistory(entries,{
+  readBaseFile:file=>git('show',base+':'+file),readHeadFile:file=>git('show',head+':'+file),
+ });
  const selected=selectScaleIntake(entries);assert.ok(selected,'Not an isolated Scale declaration intake');
  // A changed JSON source must retain its actual ordinary declaration wrapper.
  for(const file of selected.sources??[])assert.match(git('ls-tree',head,'--',file),/^100644 blob [a-f0-9]{40}\t/,'Missing/nonregular instrument wrapper');

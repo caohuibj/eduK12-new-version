@@ -7,6 +7,8 @@
     "dev": "tsx watch src/index.ts",
     "scale:instruments:generate": "tsx scripts/generate-scale-instruments.ts",
     "scale:instruments:check": "tsx scripts/generate-scale-instruments.ts --check",
+    "content:check": "tsx src/scripts/check-content-releases.ts",
+    "content:sync-releases": "tsx src/scripts/sync-content-releases.ts",
     "scale:check": "tsx src/scripts/check-scale-releases.ts",
     "scale:provision-publisher": "tsx src/scripts/provision-scale-publisher.ts",
     "scale:sync-releases": "tsx src/scripts/sync-scale-releases.ts",

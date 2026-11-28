@@ -2,7 +2,7 @@ import {scaleSourceClassificationTags,catalogClassificationTags,catalogTagFacets
 import {scaleAssessmentMediaReferences} from '../scale/scale-image-retention'
 import {retainAssessmentAssetReferences} from '../assessment-media/assessment-asset'
 import {authorizedTrainingMaterial} from '../assessment-media/training-materials'
-import { isProvisionedGitScalePublisher } from '../scale/onboarding/git-release-actor'
+import { assertGitScalePublisher } from '../scale/onboarding/git-release-actor'
 import {ensureStandardNativeScale} from '../scale/onboarding/standard-release-native'
 import {computeDeclaredStandardTrial} from './standard-triplet.trial'
 import {approveStandardCombinationEntryPolicies,exactStandardCombinationEntryProducts} from '../assessment-governance/tool-entry-policy'
@@ -165,9 +165,6 @@ async function persistStandardTripletApproval(tx:Prisma.TransactionClient,actor:
   await audit(tx,actor,'STANDARD_TRIPLET_APPROVED',{releaseId:input.requestId,combinationHash:triplet.combinationHash,reason:input.reason,allowedProducts:products,scope:'PRODUCT_ENTRIES',researcherGrantsCreated:0,
    ...(git?{gitRelease:git}:{})})
   return input.requestId
-}
-export async function assertGitScalePublisher(tx:Db,actor:string){
- if(!await isProvisionedGitScalePublisher(tx,actor))fail(403,'Git 量表发布需要 SYSTEM_GIT_RELEASE 部署身份')
 }
 
 /** Shared transaction for exact admin selections, component import, and Git sync.
