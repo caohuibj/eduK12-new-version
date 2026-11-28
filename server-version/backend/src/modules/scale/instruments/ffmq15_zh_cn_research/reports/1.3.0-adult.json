@@ -1,0 +1,206 @@
+{
+  "toolKey": "ffmq15_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "五因素正念问卷短表 FFMQ-15",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "https://www.researchgate.net/publication/303709635_FFMQ-15_items_and_scoring_information Gu 等作者归档的 15 题原件与计分说明，2018 年修订附件含五组各三题与反向清单。"
+      }
+    },
+    "primaryScoreKeys": [
+      "observe",
+      "describe",
+      "act_aware",
+      "nonjudge",
+      "nonreact"
+    ],
+    "scoreOrder": [
+      "observe",
+      "describe",
+      "act_aware",
+      "nonjudge",
+      "nonreact"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "observe",
+        "scoreLabel": "留意身边和身体的感觉",
+        "headline": "感官会悄悄报新闻",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录你多常留意感官细节，例如物品的气味、声音和身体接触。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "平常进入一个房间时，哪种感觉最容易被你注意？"
+          },
+          {
+            "category": "strategy",
+            "text": "找一个安全片刻，把注意力放到手掌温度、近处声音或眼前纹理中的一个。"
+          },
+          {
+            "category": "support",
+            "text": "可从自己觉得自在的感觉做起。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "describe",
+        "scoreLabel": "把感受说出来",
+        "headline": "把说不清的感受说得近一点",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录你多常能用语言表达自己的感觉和体验。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "当你说「还好」时，里面有没有几种不同的感受？"
+          },
+          {
+            "category": "strategy",
+            "text": "给当下的体验选两个贴近的词，例如累又放心、紧张但期待。"
+          },
+          {
+            "category": "support",
+            "text": "感受难描述时，写下来或用图画表达都可以。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "act_aware",
+        "scoreLabel": "留意正在做的事",
+        "headline": "手里的事值得被看一眼",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录你活动时把注意力放在动作本身的频率，已把三道走神条目反向换算。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "什么事情最容易做完才发现自己刚才有点恍惚？"
+          },
+          {
+            "category": "strategy",
+            "text": "选一个可重复的短动作，例如放下杯子时感受手指松开。"
+          },
+          {
+            "category": "support",
+            "text": "走神很常见，回到动作一次就算一次练习。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "nonjudge",
+        "scoreLabel": "少一点急着评价自己",
+        "headline": "少一句自我指责，多看一眼当下",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录你多常少用责备或否定评价自己的情绪与想法，已把三道评价条目反向换算。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "紧张时，你会不会又责备自己「怎么又紧张」？"
+          },
+          {
+            "category": "strategy",
+            "text": "试着把责备换成描述，例如「现在心跳有点快，我需要缓一缓」。"
+          },
+          {
+            "category": "support",
+            "text": "听见感受之后，仍可以认真处理行为后果或修补关系。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "nonreact",
+        "scoreLabel": "给想法留一点空间",
+        "headline": "念头来到时，可以晚一些回应",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录你多常留出一点距离来观察情绪和念头，以及是否能放下其中一些。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "什么念头一出现，就会让你想马上采取行动？"
+          },
+          {
+            "category": "strategy",
+            "text": "在安全的日常场景给自己短暂停顿，再选一个符合当时需要的动作。"
+          },
+          {
+            "category": "support",
+            "text": "遇到紧急危险时，及时响应通常更重要。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "五方面各三题相加，都是 3–15，七道题反向；保留五分项，无总分。原短版的检验样本包括英国有复发抑郁史的成人，提示正式跨人群解释需要材料。"
+    ],
+    "disclaimer": "这是成年人正念体验的研究试用稿。五个分数来自彼此不同的三题小组，帮助回想体验与习惯，暂无适用于当前工作译本的等级常模。",
+    "artworkKey": "ffmq15_zh_cn_research/1.0.1/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
