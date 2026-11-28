@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "phq4_zh_cn_research/1.0.0/1.3.0-pilot",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位成人在桌边用两叠无字卡片回顾近况。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

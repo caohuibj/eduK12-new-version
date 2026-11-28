@@ -1,0 +1,130 @@
+{
+  "toolKey": "phq4_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-pilot",
+  "title": "过去两周的四项简短记录｜成人研究试用",
+  "report": {
+    "reportVersion": "1.3.0-pilot",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 来源、计分和内容复核",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "对照作者原 PHQ-4 两个两题分组，依据当前 C 顺序复核各题实际键。保持过去两周、0–12 总和、两个 0–6 小计和原 P 的描述范围。"
+      }
+    },
+    "primaryScoreKeys": [
+      "phq4_total",
+      "gad2",
+      "phq2"
+    ],
+    "scoreOrder": [
+      "phq4_total",
+      "gad2",
+      "phq2"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "phq4_total",
+        "scoreLabel": "四题合计（0–12）",
+        "headline": "同一合计可以对应不同经历",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这份研究记录汇总你过去两周对两项紧张担忧、两项兴趣和情绪体验所报告的频度。每题的选项对应 0–3，完整四题相加得到 0–12。数值越大，表示本次四题涉及的相关情况合并起来报告得更多。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看具体回答时，可以先想一件典型的事以及它发生的时段。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "gad2",
+        "scoreLabel": "紧张、担忧两题（0–6）",
+        "headline": "回看紧张与担忧出现的日子",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这个分只合计过去两周报告的紧张及难以停止或控制担忧两道题。分值较高表示本次这两类反应报告得更频繁。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把出现相关感受的时点和当时面对的具体事情放在一起看。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "phq2",
+        "scoreLabel": "情绪、兴趣两题（0–6）",
+        "headline": "留意兴趣或情绪在不同情境下的感受",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这个分只合计过去两周里低落及兴趣乐趣减少两道题。分值较高表示这两类体验在本次记录里更频繁。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "可以回想一件平常会做的事，并记下那段时间具体感到怎样。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "现有 C 先展示焦虑相关两题，随后展示抑郁相关两题，P 保留两个分组及合计。报告为研究性描述，成人工作译稿与论文所用其他中文题本分别处理。",
+      "四道题围绕所问的频次，理解个人经历时还需考虑更完整的信息。",
+      "Kroenke、Spitzer、Williams 和 Löwe（2009），PHQ-4，https://doi.org/10.1016/S0033-3182(09)70864-3 。依据开发者可复制、翻译、展示与分发说明。平台中文为独立工作译稿。"
+    ],
+    "disclaimer": "用于成人研究试用，理解这四项自述频度。临床结论需要独立专业评估。",
+    "artworkKey": "phq4_zh_cn_research/1.0.0/1.3.0-pilot"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
