@@ -1,0 +1,100 @@
+{
+  "toolKey": "ipip_emotion_based_decision9_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "感受与逻辑的决策偏好｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对 IPIP 官方逐题与正反向键、冻结中文工作译稿和原 P 的 score-only 解释。当前证据适用于成人试用描述。"
+      }
+    },
+    "primaryScoreKeys": [
+      "ipip_emotion_based_decision9"
+    ],
+    "scoreOrder": [
+      "ipip_emotion_based_decision9"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "ipip_emotion_based_decision9",
+        "scoreLabel": "感受导向合计分（9–45）",
+        "headline": "先听见在意的事，再核对决定所需的信息",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "收到一份邀约时，你可能先被它吸引，过一会儿才想到时间、预算或跟谁合作。这个分数记录你自述让感受、灵感或内心偏好参与选择的倾向；九题反向处理后加总，9–45 分。较大数值表示更认同感受导向的作答，情境的风险、经验和信息多少都会改变实际选择。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次近期选择，写下最先冒出的感受，以及它提醒你在意的东西。"
+          },
+          {
+            "category": "strategy",
+            "text": "对可撤回的小决定先试一次；碰到影响长久的选择，再核对时间、代价和可能的退路。"
+          },
+          {
+            "category": "support",
+            "text": "如果意见不一，问对方最在意的事实，并告诉对方你的顾虑，给不同理由留出空间。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "本报告使用项目中文工作译稿，面向其现有成人自评研究及自我回顾范围。当前证据支持对本次作答做描述。",
+      "原题和计分可按 IPIP 官方公有领域声明使用。由于本译稿尚无适配常模，报告仅显示实得分。",
+      "各结果按相应题组完整作答后计算，漏答保留为缺失。请结合近期情境和具体经历理解。"
+    ],
+    "disclaimer": "适用于成人试用研究及自我回顾。诊断、人员筛选、排名与个体高风险决定需要相应的专门方法。",
+    "artworkKey": "ipip_emotion_based_decision9_zh_cn_research/1.0.1/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
