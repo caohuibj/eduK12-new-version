@@ -1,0 +1,168 @@
+{
+  "toolKey": "pba23_2018_zh_cn",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-pilot",
+  "title": "看见养育日常里需要支持的地方｜成人父母研究试用",
+  "report": {
+    "reportVersion": "1.3.0-pilot",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "parent",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 来源、计分和内容复核",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "对照 2018 原论文 PBA 23 项、各频度选项及四组计分，保留既有中文工作稿和用途。"
+      }
+    },
+    "primaryScoreKeys": [
+      "exhaustion",
+      "contrast_previous_self",
+      "fed_up",
+      "emotional_distancing",
+      "parental_burnout"
+    ],
+    "scoreOrder": [
+      "exhaustion",
+      "contrast_previous_self",
+      "fed_up",
+      "emotional_distancing",
+      "parental_burnout"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "exhaustion",
+        "scoreLabel": "养育中的疲惫与消耗（0–54）",
+        "headline": "忙完一天之后，能不能缓过来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "接送、吃饭和临时需要处理的事情接连发生，连坐下来喝口水都得往后排。这组描述父母在养育角色里报告的疲惫和消耗出现频度。分数越高，相关体验在本次答卷里报告得越多。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一段最吃力的时段，看看需要哪种具体替手、准备或休息。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "contrast_previous_self",
+        "scoreLabel": "与过去的养育状态相比（0–36）",
+        "headline": "想起从前的自己时，也看看现在的条件",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "当你感觉处理相似事情的耐心和从前不一样，孩子的年龄、自己的工作和身边支持可能都在变。这组记录本次报告在养育状态上感到与从前不同的频度。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "各记一件以前和现在的相似事情，再看看时间、精力和家庭安排有什么变化。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "fed_up",
+        "scoreLabel": "对养育感到难以承受（0–30）",
+        "headline": "把厌倦的具体时段说出来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一个任务接一个任务时，原本能享受的互动也可能变得难以承受。这组记录你本次自述在养育中感到厌倦、挫败或难享乐趣的频度。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一个容易堆积压力的例子，写下能否简化一项要求或请人承担一个具体环节。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional_distancing",
+        "scoreLabel": "日常亲近感受到影响（0–18）",
+        "headline": "照顾都做了，还能留下一点相处时间吗",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "即使把该做的照顾任务安排好，也可能觉得交流或亲近变难。这组记录本次报告对孩子的情感投入和亲近受到影响的频度。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "若有余力，可以试一个双方都舒适的片刻，比如一同看窗外或共享一段闲聊，并保留休息和求助的空间。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "parental_burnout",
+        "scoreLabel": "养育消耗合计（0–138）",
+        "headline": "从四种体验中找一个最需要说清的地方",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "总分汇合父母本次报告的四类养育体验，分数越高，表示相关体验自述出现得更频繁。四组题数不同，单看绝对分数大小难以直接比较对应体验。把它和当前照护安排、经济或健康负担及身边支持一起读，更有助于沟通。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选出一个想和同住家人、信任的亲友或适当专业人员讨论的具体处境。可以把困难说成时间、任务量或资源上的实际需求。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "采用原 C 的 23 题与 0–6 频率键，按 9／6／5／3 分四组并保留整体合计。报告限于当事父母对自己的描述。",
+      "现用独立中文为工作译稿，成人父母研究并以至少一名子女仍同住为原部署范围。",
+      "Roskam、Brianda 和 Mikolajczak（2018），Parental Burnout Assessment 原始项目表，https://doi.org/10.3389/fpsyg.2018.00758 ，CC BY 4.0 https://creativecommons.org/licenses/by/4.0/ 。平台工作译稿及报告为独立改编。"
+    ],
+    "disclaimer": "供现有父母成人研究使用。",
+    "artworkKey": "pba23_2018_zh_cn/1.0.1/1.3.0-pilot"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
