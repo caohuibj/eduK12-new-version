@@ -1,0 +1,100 @@
+{
+  "toolKey": "ipip_responsive_joy10_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "感受到他人的喜悦｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对 IPIP 官方逐题与正反向键、冻结中文工作译稿和原 P 的 score-only 解释。当前证据适用于成人试用描述。"
+      }
+    },
+    "primaryScoreKeys": [
+      "ipip_responsive_joy10"
+    ],
+    "scoreOrder": [
+      "ipip_responsive_joy10"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "ipip_responsive_joy10",
+        "scoreLabel": "共感愉悦合计分（10–50）",
+        "headline": "当别人开心时，留意自己怎样加入",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有人庆祝一件小进步时，你可能也被感染，或者只是安静为对方高兴。这十题关注别人笑、庆祝或心情好时，你是否容易跟着有积极感受。合计范围 10–50，数值越大，表示更认同容易受到他人喜悦感染的描述。派对喜好、疲惫程度和自己的心情都会影响反应。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次别人分享好消息的时刻，区分对方的喜悦和你当下实际感受到的变化。"
+          },
+          {
+            "category": "strategy",
+            "text": "如果想参与，可以给一句具体祝贺、问问对方最开心的一刻，或用你舒服的方式陪他庆祝。"
+          },
+          {
+            "category": "support",
+            "text": "如果自己那天正难过，可以真诚回应后给自己留空间，不必逼迫自己跟上现场的热情。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "本报告使用项目中文工作译稿，面向其现有成人自评研究及自我回顾范围。当前证据支持对本次作答做描述。",
+      "原题和计分可按 IPIP 官方公有领域声明使用。由于本译稿尚无适配常模，报告仅显示实得分。",
+      "各结果按相应题组完整作答后计算，漏答保留为缺失。请结合近期情境和具体经历理解。"
+    ],
+    "disclaimer": "适用于成人试用研究及自我回顾。诊断、人员筛选、排名与个体高风险决定需要相应的专门方法。",
+    "artworkKey": "ipip_responsive_joy10_zh_cn_research/1.0.0/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
