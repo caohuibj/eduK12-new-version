@@ -17,6 +17,7 @@ import {
 import { artifactReference, type GovernedArtifact } from '../survey/governed-tool.model'
 import { reconcileGitGovernedArtifact } from '../survey/governed-tool.service'
 import { publishedCognitiveConfigMeasurement } from '../measurement-content/cognitive'
+import { gitReleaseManifestFields, gitReleaseSelectionFields, resolveGitReleaseStates } from '../measurement-content/git-release-manifest'
 import { assetReference, prepareRelease } from '../measurement-content/release'
 import { getContentRelease, publishContentRelease } from '../measurement-content/repository'
 import { reportTemplateSchema, validateReportTemplateBindings } from '../measurement-content/report-template'
@@ -45,16 +46,14 @@ const dataCeiling:ScaleDataCeilingV1 = {
 }
 const toolKey = z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)
 const version = z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/)
-const product = z.enum(['TRAINING', 'SURVEY', 'SCHOOL', 'TEACHER'])
 const profile = z.enum(['experience', 'standard', 'research'])
 const prose = z.string().trim().min(1).max(4000)
 const selectorSchema = z.object({
-  version, parameterVersion: version, reportVersion: version, profile,
-  allowedEntries: z.array(product).min(1).max(4).refine(entries => new Set(entries).size === entries.length),
-  state: z.enum(['ONLINE', 'WITHDRAWN']), replaces: version.optional(),
+  ...gitReleaseSelectionFields,
+  parameterVersion: version, reportVersion: version, profile,
 }).strict()
 const manifestSchema = z.object({
-  schemaVersion: z.literal(1), toolKey,
+  ...gitReleaseManifestFields, toolKey,
   releases: z.array(selectorSchema).min(1).max(100),
 }).strict()
 const parameterSchema = z.object({
@@ -110,33 +109,21 @@ function hasManifest(root:string,key:string){
   return Boolean(manifest)
 }
 
-function assertLineage(selectors: Array<z.infer<typeof selectorSchema>>) {
-  const seen = new Set<string>()
-  for (const selector of selectors) {
-    if (seen.has(selector.version) || selector.replaces && !seen.has(selector.replaces))
-      throw Error('Cognitive releases must append a unique version and reference only earlier versions: ' + selector.version)
-    seen.add(selector.version)
-  }
-  // Replacement is a lifecycle assertion, not an instruction to delete a
-  // previous release or its receipts. Rollback reselects the earlier version.
-  const selected = new Set(selectors.filter(item => item.state === 'ONLINE').map(item => item.version))
-  if (selectors.some(item => selected.has(item.version) && item.replaces && selected.has(item.replaces)))
-    throw Error('Cognitive replacements require the replaced version to be WITHDRAWN')
-}
-
 function loadCognitiveGitTool(root: string, rawKey: string) {
   const key = toolKey.parse(rawKey)
   if (key === 'fake') throw Error('Framework test identities cannot be published')
   const manifest = manifestSchema.parse(jsonUnder(root, key, 'releases.json'))
   if (manifest.toolKey !== key) throw Error('Cognitive manifest toolKey differs from its path')
-  assertLineage(manifest.releases)
+  const states = resolveGitReleaseStates(manifest.releases, {errorPrefix:'COGNITIVE_GIT'})
   const fixtures = new Set<string>()
   return manifest.releases.map(selection => {
+    const {releaseKey} = selection
+    const state = states.get(releaseKey)!
     const parameter = parameterSchema.parse(jsonUnder(root, key, 'parameters', selection.parameterVersion + '.json'))
     const report = reportSchema.parse(jsonUnder(root, key, 'reports', selection.reportVersion + '.json'))
     if (parameter.toolKey !== key || report.toolKey !== key
       || parameter.version !== selection.parameterVersion || report.version !== selection.reportVersion
-      || report.parameterVersion !== parameter.version) throw Error('Cognitive release axes do not match: ' + selection.version)
+      || report.parameterVersion !== parameter.version) throw Error('Cognitive release axes do not match: ' + selection.releaseKey)
 
     const entry = getCognitiveRegistryEntry(key, parameter.engineVersion, parameter.scoringVersion)
     if (!entry || !entry.profiles[selection.profile]) throw Error('Cognitive engine/scorer/profile is not installed: ' + key)
@@ -164,7 +151,7 @@ function loadCognitiveGitTool(root: string, rawKey: string) {
       throw Error('Custom Cognitive images and reference bands currently require Survey rendering')
     const readiness = evaluateCognitiveProductReadiness(definition, config)
     if (!readiness.ready) throw Error('Cognitive product readiness failed: ' + readiness.blockers.map(issue => issue.message).join(', '))
-    const runtimeIdentity = {testType:key,configVersion:selection.version,
+    const runtimeIdentity = {testType:key,configVersion:selection.releaseKey,
       engineVersion:parameter.engineVersion,scoringVersion:parameter.scoringVersion,config}
     const measurement = prepareRelease(publishedCognitiveConfigMeasurement(runtimeIdentity))
     if (measurement.layer !== 'MEASUREMENT') throw Error('Cognitive native measurement projection invalid')
@@ -193,7 +180,7 @@ function loadCognitiveGitTool(root: string, rawKey: string) {
       const rendered=renderDeclaredReport(report.template,exampleMetrics,[],resolveAudienceDisclosure(effectiveDisclosure,audience))
       canonicalHash(rendered)
     }
-    return {key,selection,parameter,report,config,runtimeIdentity,measurement,effectiveDisclosure,references:references?.definition,metricKeys}
+    return {key,selection,state,parameter,report,config,runtimeIdentity,measurement,effectiveDisclosure,references:references?.definition,metricKeys}
   })
 }
 
@@ -209,9 +196,11 @@ export function checkCognitiveGitRelease(root: string, rawKey: string) {
     })
   }
   const candidates=loadCognitiveGitTool(root,key)
-  return candidates.map(({selection,measurement,parameter,report})=>({
-    version:selection.version,state:selection.state,engineVersion:parameter.engineVersion,
-    scoringVersion:parameter.scoringVersion,parameterVersion:parameter.version,reportVersion:report.version,
+  return candidates.map(({selection,state,measurement,parameter,report})=>({
+    releaseKey:selection.releaseKey,version:selection.releaseKey,state:selection.state,effectiveState:state,
+    allowedEntries:selection.allowedEntries,...(selection.replaces?{replaces:selection.replaces}:{}),
+    engineVersion:parameter.engineVersion,scoringVersion:parameter.scoringVersion,
+    parameterVersion:parameter.version,reportVersion:report.version,
     measurementHash:measurement.contentHash,
   }))
 }
@@ -225,13 +214,15 @@ function manifests(root: string) {
 type Candidate=ReturnType<typeof loadCognitiveGitTool>[number]
 
 async function syncCandidate(tx:Prisma.TransactionClient,actorId:string,gitCommitSha:string,candidate:Candidate){
-  const {key,selection,parameter,report,config,runtimeIdentity,measurement,effectiveDisclosure,references,metricKeys}=candidate
-  const selector={testType:key,configVersion:selection.version}
+  const {key,selection,state,parameter,report,config,runtimeIdentity,measurement,effectiveDisclosure,references,metricKeys}=candidate
+  const result = {toolKey:key,releaseKey:selection.releaseKey,version:selection.releaseKey}
+  if (state==='HOLD') return {...result,action:'HOLD'}
+  const selector={testType:key,configVersion:selection.releaseKey}
   const intentHash=canonicalHash({source:'SYSTEM_GIT_RELEASE',runtimeIdentity,parameter,report,profile:selection.profile,
     ...(selection.replaces?{replaces:selection.replaces}:{})})
   let stored=await tx.cognitiveTestConfig.findUnique({where:{testType_configVersion:selector}})
-  const online=selection.state==='ONLINE'
-  if(!stored&&!online)return {toolKey:key,version:selection.version,action:'ABSENT'}
+  const online=state==='ONLINE'
+  if(!stored&&!online)return {...result,action:'ABSENT'}
   if(stored){
     const prior=await tx.assessmentManagementEvent.findFirst({where:{
       actorId,resourceId:stored.id,action:'COGNITIVE_GIT_CONFIG_PUBLISHED',
@@ -239,9 +230,9 @@ async function syncCandidate(tx:Prisma.TransactionClient,actorId:string,gitCommi
     if((prior?.metadata as {intentHash?:string}|null)?.intentHash!==intentHash
       ||canonicalHash(stored.config)!==canonicalHash(config)||stored.engineVersion!==parameter.engineVersion
       ||stored.scoringVersion!==parameter.scoringVersion||stored.name!==report.name||stored.instruction!==(report.instruction??null)) {
-      throw Error('Existing Cognitive configuration is independently managed or has changed: '+key+'/'+selection.version)
+      throw Error('Existing Cognitive configuration is independently managed or has changed: '+key+'/'+selection.releaseKey)
     }
-    if(stored.status==='RETIRED'||stored.accessPolicy!=='GRANT')return {toolKey:key,version:selection.version,action:'MANUAL_HOLD'}
+    if(stored.status==='RETIRED'||stored.accessPolicy!=='GRANT')return {...result,action:'MANUAL_HOLD'}
   }
   const created=!stored
   if(!stored){
@@ -286,14 +277,14 @@ async function syncCandidate(tx:Prisma.TransactionClient,actorId:string,gitCommi
   const approved=online
     ? await approveGitCognitiveProfile(tx,actorId,stored.id,selection.profile,selection.allowedEntries,gitCommitSha)
     : await stopGitCognitiveProfileAdmission(tx,actorId,stored.id,selection.profile,gitCommitSha)
-  if(approved.action==='MANUAL_HOLD')return {toolKey:key,version:selection.version,action:approved.action}
+  if(approved.action==='MANUAL_HOLD')return {...result,action:approved.action}
   if(selection.allowedEntries.includes('SURVEY')||approved.hadSurvey){
     assertSurveyCognitiveProfileExecutable(approved.artifact)
     const frozen=compileSurveyCognitiveProfile(approved.artifact,source)
     const display=surveyCognitiveProfileDraftSchema.parse({schemaVersion:2,templateKey:frozen.templateKey,artifactHash:frozen.artifactHash})
     const artifact:GovernedArtifact={
-      schemaVersion:1,family:'COGNITIVE',toolKey:'cognitive:'+key,version:selection.version,title:report.name,
-      unit:{ref:{kind:'COGNITIVE',sourceId:stored.id,sourceVersion:selection.version},title:report.name,
+      schemaVersion:1,family:'COGNITIVE',toolKey:'cognitive:'+key,version:selection.releaseKey,title:report.name,
+      unit:{ref:{kind:'COGNITIVE',sourceId:stored.id,sourceVersion:selection.releaseKey},title:report.name,
         displayDefinition:display,compiledDefinition:frozen,definitionDigest:frozen.artifactHash,
         scoringDigest:frozen.measurementDigest,adapterVersion:'survey-catalog-v1',
         ...(report.instruction?{instruction:report.instruction}:{}),
@@ -307,7 +298,7 @@ async function syncCandidate(tx:Prisma.TransactionClient,actorId:string,gitCommi
       gitCommitSha,allowedProducts:['SURVEY'],online:online&&selection.allowedEntries.includes('SURVEY'),measurement:pointer,
     })
   }
-  return {toolKey:key,version:selection.version,action:created?'PUBLISHED':approved.action}
+  return {...result,action:created?'PUBLISHED':approved.action}
 }
 
 export async function syncCognitiveGitReleases(root:string,tx:Prisma.TransactionClient,actorId:string,gitCommitSha:string) {

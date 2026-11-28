@@ -6,7 +6,7 @@ import { assetReference } from '../measurement-content/release'
 import { assessmentAssetIdSchema } from '../assessment-media/assessment-asset-identity'
 import { reportTemplateSchema, validateReportTemplateBindings } from '../measurement-content/report-template'
 import { validateReferenceSetDefinition } from '../assessment-reference/reference'
-import { activeScaleDeclarations } from '../scale/declarative/replacement'
+import { gitReleaseManifestFields, gitReleaseSelectionFields, resolveGitReleaseStates } from '../measurement-content/git-release-manifest'
 import { compileEffectiveDisclosure } from '../scale/policy/disclosure'
 import { scaleDataCeilingSchema, scaleReportVisibilitySchema } from '../scale/policy/schema'
 import { situationDefinitionV2Schema } from './situation-branching'
@@ -21,7 +21,6 @@ import { assertSurveyNativeSituationalDefinition } from '../survey/situational-n
 const toolKeySchema = sourceIdentitySchema.shape.instrumentKey.max(100)
 const versionSchema = sourceIdentitySchema.shape.instrumentVersion.max(40)
 const releaseKeySchema = z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)
-const entrySchema = z.enum(['TRAINING', 'SCHOOL', 'TEACHER', 'SURVEY'])
 const axes = { scoring: true, report: true, referencePolicy: true } as const
 const runtimeScoring = situationDefinitionSchema.shape.scoring
 const modelIdentity = runtimeScoring.shape.model.unwrap().pick({ modelKey: true, modelVersion: true }).strict()
@@ -57,16 +56,15 @@ export const sjtGitReportSchema = z.object({
 }).strict()
 
 export const sjtReleaseSelectionSchema = z.object({
+  ...gitReleaseSelectionFields,
   releaseKey: releaseKeySchema,
   contentVersion: versionSchema,
   parameterVersion: versionSchema,
   reportVersion: versionSchema,
-  state: z.enum(['ONLINE', 'WITHDRAWN']),
-  allowedEntries: z.array(entrySchema).min(1).max(4).refine(entries => new Set(entries).size === entries.length),
   replaces: releaseKeySchema.optional(),
 }).strict()
 export const sjtGitReleasesSchema = z.object({
-  schemaVersion: z.literal(1),
+  ...gitReleaseManifestFields,
   toolKey: toolKeySchema,
   releases: z.array(sjtReleaseSelectionSchema).max(200),
 }).strict()
@@ -176,11 +174,7 @@ export function readSjtGitReleasePlan(root: string, key: string) {
   if (!fileStat(manifestPath)) return null
   const manifest = sjtGitReleasesSchema.parse(json(toolRoot, ['releases.json']))
   if (manifest.toolKey !== toolKey) throw new Error('SJT_GIT_MANIFEST_IDENTITY_MISMATCH')
-  const keys = new Set(manifest.releases.map(release => release.releaseKey))
-  if (manifest.releases.some(release => release.replaces !== undefined && !keys.has(release.replaces))) {
-    throw new Error('SJT_GIT_REPLACEMENT_NOT_FOUND')
-  }
-  const online = new Set(activeScaleDeclarations(manifest.releases).map(release => release.releaseKey))
+  const states = resolveGitReleaseStates(manifest.releases, { errorPrefix: 'SJT_GIT' })
   const declarations = manifest.releases.map(release => prepareSjtReleaseAxes(toolKey, release, {
     content: json(toolRoot, [release.contentVersion, 'content.json']),
     parameters: json(toolRoot, ['parameters', release.parameterVersion + '.json']),
@@ -188,7 +182,7 @@ export function readSjtGitReleasePlan(root: string, key: string) {
   }))
   const combinations = new Set(declarations.map(item => canonicalHash(item.axes)))
   if (combinations.size !== declarations.length) throw new Error('SJT_GIT_DUPLICATE_COMBINATION')
-  return { toolKey, declarations: declarations.map(item => ({ ...item, online: online.has(item.release.releaseKey) })) }
+  return { toolKey, declarations: declarations.map(item => ({ ...item, effectiveState: states.get(item.release.releaseKey)! })) }
 }
 
 /** CI-compatible structural and scientific check. Actual StoredAsset existence is
@@ -197,11 +191,11 @@ export function checkSjtGitRelease(root: string, key: string) {
   const toolKey = toolKeySchema.parse(key)
   const plan = readSjtGitReleasePlan(root, toolKey)
   if (plan) {
-    for (const item of plan.declarations.filter(item => item.online)) assertSjtSurveyPublicationSupported(item)
+    for (const item of plan.declarations.filter(item => item.effectiveState === 'ONLINE')) assertSjtSurveyPublicationSupported(item)
     return {
       toolKey,
-      releases: plan.declarations.map(({ release, axes, online, assetRefs }) => ({
-        releaseKey: release.releaseKey, axes, state: online ? 'ONLINE' : 'WITHDRAWN', assetReferences: assetRefs.length,
+      releases: plan.declarations.map(({ release, axes, effectiveState, assetRefs }) => ({
+        releaseKey: release.releaseKey, axes, state: release.state, effectiveState, assetReferences: assetRefs.length,
       })),
       historical: [],
     }

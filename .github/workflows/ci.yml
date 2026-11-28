@@ -692,6 +692,11 @@ jobs:
       - name: backend prisma generate
         working-directory: server-version/backend
         run: npx prisma generate
+      - name: validate changed Git content declarations in mixed application changes
+        working-directory: server-version/backend
+        env:
+          CONTENT_BASE_SHA: ${{ github.event.before }}
+        run: node ../../.github/scripts/check-git-content-releases.mjs "$CONTENT_BASE_SHA"
       - name: Bundle immutable history (declarations checked once by npm build)
         working-directory: server-version/backend
         env:

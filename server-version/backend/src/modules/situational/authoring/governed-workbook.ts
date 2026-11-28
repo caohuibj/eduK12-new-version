@@ -50,7 +50,7 @@ export function prepareGovernedSjtWorkbook(raw: unknown) {
     report: { schemaVersion: 1, contentVersion: instrumentVersion, parameterVersion: instrumentVersion, version: input.reportVersion,
       report: { ...report, reportVersion: input.reportVersion }, reportVisibility: input.reportVisibility, template: input.reportTemplate },
   })
-  const { artifact, unit } = prepareSjtSurveyPublication({ ...axes, online: true }, 'ADMIN_WORKBOOK')
+  const { artifact, unit } = prepareSjtSurveyPublication({ ...axes, effectiveState: 'ONLINE' }, 'ADMIN_WORKBOOK')
   artifact.unit = {
     ...unit,
     provenance: { ...unit.provenance, sjtWorkbookRelease: { contentHash: axes.axes.content,

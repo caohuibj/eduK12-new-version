@@ -60,7 +60,21 @@ describe.runIf(enabled)('Cognitive Git release lifecycle',()=>{
         audiences:{respondent:{numericScores:true,rawAnswers:false}},
       })
 
-      fixture.releases[0].state='WITHDRAWN'
+      fixture.releases[0].state='HOLD'
+      fixture.releases[0].allowedEntries=['TEACHER']
+      fixture.releases[1].state='HOLD'
+      fixture.write()
+      await expect(sync('d'.repeat(40))).resolves.toEqual([
+        expect.objectContaining({releaseKey:fixture.version('release1'),action:'HOLD'}),
+        expect.objectContaining({releaseKey:fixture.version('release2'),action:'HOLD'}),
+      ])
+      await expect(verifyBundle()).resolves.toBeUndefined()
+      await expect(db!.cognitiveTestConfig.findUnique({where:{testType_configVersion:{
+        testType:'gonogo',configVersion:fixture.version('release2'),
+      }}})).resolves.toBeNull()
+
+      fixture.releases[0].state='ONLINE'
+      fixture.releases[0].allowedEntries=['TRAINING','SURVEY']
       fixture.releases[1].state='ONLINE'
       fixture.write()
       await sync('b'.repeat(40))

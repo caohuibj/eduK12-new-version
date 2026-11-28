@@ -3,20 +3,62 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const moduleRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../src/modules/situational')
+const toolKey = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/
+const versionIdentity = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+const entries = dir => fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
+
+function requireRegularFile(entry, file) {
+  if (entry.isSymbolicLink()) throw new Error('Symlink forbidden: ' + file)
+  if (!entry.isFile()) throw new Error('Expected regular instrument data file: ' + file)
+}
+
+function inspectLegacyDirectory(dir, children = entries(dir)) {
+  for (const entry of children) {
+    const file = path.join(dir, entry.name)
+    if (entry.isDirectory()) {
+      inspectLegacyDirectory(file)
+    } else {
+      requireRegularFile(entry, file)
+      if (/\.(?:[cm]?js|tsx?)$/i.test(entry.name)) throw new Error('Executable content forbidden: ' + file)
+    }
+  }
+}
+
 export function discoverSources(root = path.join(moduleRoot, 'instruments')) {
   if (!fs.existsSync(root)) return []
   if (fs.lstatSync(root).isSymbolicLink()) throw new Error('Instrument root must not be a symlink')
   const result = []
-  const entries = dir => fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
   const seen = new Set()
   for (const key of entries(root)) {
-    if (!key.isDirectory() || !/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(key.name)) throw new Error(`Invalid instrument directory: ${key.name}`)
-    for (const version of entries(path.join(root, key.name))) {
-      if (!version.isDirectory() || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(version.name)) throw new Error(`Invalid instrument version: ${version.name}`)
-      const dir = path.join(root, key.name, version.name)
-      // Reject links anywhere in the owned directory, including assets/test data.
-      const inspect = current => { for (const e of entries(current)) { const p = path.join(current, e.name); if (e.isSymbolicLink()) throw new Error(`Symlink forbidden: ${p}`); if (e.isDirectory()) inspect(p); else if (!e.isFile() || /\.(?:[cm]?js|tsx?)$/i.test(e.name)) throw new Error(`Executable content forbidden: ${p}`) } }
-      inspect(dir)
+    if (!key.isDirectory() || !toolKey.test(key.name)) throw new Error('Invalid instrument directory: ' + key.name)
+    const packageDir = path.join(root, key.name)
+    for (const version of entries(packageDir)) {
+      const dir = path.join(packageDir, version.name)
+      if (version.name === 'releases.json') {
+        requireRegularFile(version, dir)
+        continue
+      }
+      if (version.name === 'parameters' || version.name === 'reports') {
+        if (!version.isDirectory()) throw new Error('Invalid instrument declaration directory: ' + dir)
+        for (const entry of entries(dir)) {
+          const file = path.join(dir, entry.name)
+          requireRegularFile(entry, file)
+          if (!entry.name.endsWith('.json') || !versionIdentity.test(entry.name.slice(0, -5))) {
+            throw new Error('Invalid instrument declaration: ' + file)
+          }
+        }
+        continue
+      }
+      if (!version.isDirectory() || !versionIdentity.test(version.name)) throw new Error('Invalid instrument version: ' + version.name)
+      const children = entries(dir)
+      inspectLegacyDirectory(dir, children)
+      const declarativeContent = children.find(entry => entry.name === 'content.json')
+      if (declarativeContent) {
+        requireRegularFile(declarativeContent, path.join(dir, declarativeContent.name))
+        // The runtime Git publisher owns C/P/R. A version may also carry the
+        // independently frozen files for the legacy instrument registry.
+        if (children.length === 1) continue
+      }
       const read = name => JSON.parse(fs.readFileSync(path.join(dir, name + '.json'), 'utf8'))
       const content = read('instrument'), publication = read('publication'), scientific = read('scientific')
       if (content.identity?.instrumentKey !== key.name || content.identity?.instrumentVersion !== version.name) throw new Error(`Path/identity mismatch: ${dir}`)

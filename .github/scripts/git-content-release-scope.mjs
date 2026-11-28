@@ -18,12 +18,15 @@ export function verifyGitContentHistory(entries, { readBaseFile, readHeadFile } 
     const control = artifact[2] === 'releases.json'
     const added = status === 'A' && oldMode === '000000' && newMode === '100644'
     const updatedControl = control && status === 'M' && oldMode === '100644' && newMode === '100644'
-    if (updatedControl && !scale.test(relative) && readBaseFile && readHeadFile) {
+    if (updatedControl && readBaseFile && readHeadFile) {
       const before = JSON.parse(readBaseFile(file)).releases
       const after = JSON.parse(readHeadFile(file)).releases
       if (!Array.isArray(before) || !Array.isArray(after)) throw new Error('Expected a release list: ' + file)
-      const retained = new Set(after.map(release => release.version ?? release.releaseKey))
-      if (before.some(release => !retained.has(release.version ?? release.releaseKey))) {
+      if ([...before, ...after].some(release => typeof release?.releaseKey !== 'string' || !release.releaseKey)) {
+        throw new Error('Expected a releaseKey for every declaration: ' + file)
+      }
+      const retained = new Set(after.map(release => release.releaseKey))
+      if (before.some(release => !retained.has(release.releaseKey))) {
         throw new Error('Keep existing release identifiers; withdraw via the manifest: ' + file)
       }
     }

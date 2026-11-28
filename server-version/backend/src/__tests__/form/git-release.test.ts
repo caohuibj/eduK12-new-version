@@ -1,15 +1,18 @@
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
-import { checkFormGitRelease } from '../../modules/form/git-release'
+import { checkFormGitRelease, syncFormGitReleases } from '../../modules/form/git-release'
+
+const { publish } = vi.hoisted(() => ({ publish: vi.fn() }))
+vi.mock('../../modules/form/publication', () => ({ publishFormGitRelease: publish }))
 
 const key = 'synthetic_form'
 
-function withRelease(check: (root: string, files: {
+async function withRelease(check: (root: string, files: {
   content: string; report: string; index: string;
-}) => void) {
+}) => void | Promise<void>) {
   const root = mkdtempSync(join(tmpdir(), 'form-git-release-test-'))
   const directory = join(root, key)
   mkdirSync(join(directory, 'reports'), { recursive: true })
@@ -43,22 +46,22 @@ function withRelease(check: (root: string, files: {
     template: { blocks: [{ type: 'TEXT', text: 'Synthetic completion text' }], limitations: [] },
   }
   const index = { schemaVersion: 1, toolKey: key, releases: [{ releaseKey: '1.0.1', contentVersion: '1.0.0',
-    reportVersion: '2.0.0', contentHash, reportHash: canonicalHash(report), state: 'HOLD', allowedProducts: ['SURVEY'] }] }
+    reportVersion: '2.0.0', contentHash, reportHash: canonicalHash(report), state: 'HOLD', allowedEntries: ['SURVEY'] }] }
   try {
     writeFileSync(files.content, JSON.stringify(content))
     writeFileSync(files.report, JSON.stringify(report))
     writeFileSync(files.index, JSON.stringify(index))
-    check(root, files)
+    await check(root, files)
   } finally {
     rmSync(root, { recursive: true, force: true })
   }
 }
 
 describe('Form Git release declaration', () => {
-  it('validates a branching synthetic case and freezes distinct C/R disclosure without enabling the release', () => {
-    withRelease(root => {
+  it('validates a branching synthetic case and freezes distinct C/R disclosure without enabling the release', async () => {
+    await withRelease(root => {
       const { releases: [release] } = checkFormGitRelease(root, key)
-      expect(release.state).toBe('HOLD')
+      expect(release).toMatchObject({ state: 'HOLD', effectiveState: 'HOLD', allowedEntries: ['SURVEY'] })
       expect(release.prepared.provenance).toMatchObject({
         contentVersion: '1.0.0', reportVersion: '2.0.0',
         effectiveDisclosure: { audiences: {
@@ -69,8 +72,64 @@ describe('Form Git release declaration', () => {
     })
   })
 
-  it('rejects changed file hashes and symlinks', () => {
-    withRelease((root, files) => {
+  it('replaces the declared ONLINE predecessor and restores it on explicit rollback', async () => {
+    publish.mockClear()
+    await withRelease(async (root, files) => {
+      const previous = JSON.parse(readFileSync(files.index, 'utf8'))
+      const formerReport = JSON.parse(readFileSync(files.report, 'utf8'))
+      const replacementReport = {
+        ...formerReport,
+        version: '3.0.0',
+        template: { blocks: [{ type: 'TEXT', text: 'New completion version' }], limitations: [] },
+      }
+      const predecessor = { ...previous.releases[0], state: 'ONLINE' }
+      const replacement = {
+        ...predecessor,
+        releaseKey: '1.0.2',
+        reportVersion: '3.0.0',
+        reportHash: canonicalHash(replacementReport),
+        replaces: predecessor.releaseKey,
+      }
+      writeFileSync(join(root, key, 'reports/3.0.0.json'), JSON.stringify(replacementReport))
+      const tx = {} as import('@prisma/client').Prisma.TransactionClient
+      const sha = 'a'.repeat(40)
+      writeFileSync(files.index, JSON.stringify({ ...previous, releases: [predecessor, replacement] }))
+      await syncFormGitReleases(root, tx, 'git-actor', sha)
+      expect(publish.mock.calls.map(([, , release]) => [release.releaseKey, release.state, release.effectiveState])).toEqual([
+        ['1.0.1', 'ONLINE', 'WITHDRAWN'],
+        ['1.0.2', 'ONLINE', 'ONLINE'],
+      ])
+      publish.mockClear()
+      writeFileSync(files.index, JSON.stringify({
+        ...previous, releases: [predecessor, { ...replacement, state: 'WITHDRAWN' }],
+      }))
+      await syncFormGitReleases(root, tx, 'git-actor', sha)
+      expect(publish.mock.calls.map(([, , release]) => [release.releaseKey, release.effectiveState])).toEqual([
+        ['1.0.1', 'ONLINE'],
+        ['1.0.2', 'WITHDRAWN'],
+      ])
+    })
+  })
+
+  it('preserves a standalone HOLD and rejects legacy or unsupported entry fields', async () => {
+    publish.mockClear()
+    await withRelease(async (root, files) => {
+      const tx = {} as import('@prisma/client').Prisma.TransactionClient
+      expect(await syncFormGitReleases(root, tx, 'git-actor', 'a'.repeat(40))).toEqual([])
+      expect(publish).not.toHaveBeenCalled()
+      const index = JSON.parse(readFileSync(files.index, 'utf8'))
+      index.releases[0].allowedEntries = ['TRAINING']
+      writeFileSync(files.index, JSON.stringify(index))
+      expect(() => checkFormGitRelease(root, key)).toThrow()
+      const { allowedEntries: _, ...legacy } = index.releases[0]
+      index.releases = [{ ...legacy, allowedProducts: ['SURVEY'] }]
+      writeFileSync(files.index, JSON.stringify(index))
+      expect(() => checkFormGitRelease(root, key)).toThrow()
+    })
+  })
+
+  it('rejects changed file hashes and symlinks', async () => {
+    await withRelease((root, files) => {
       const previous = readFileSync(files.report, 'utf8')
       const changed = JSON.parse(previous)
       changed.template.blocks[0].text = 'Rewritten version'
@@ -82,8 +141,8 @@ describe('Form Git release declaration', () => {
     })
   })
 
-  it('rejects malformed branch fixtures and an R axis expanding score access even with updated declared hashes', () => {
-    withRelease((root, files) => {
+  it('rejects malformed branch fixtures and an R axis expanding score access even with updated declared hashes', async () => {
+    await withRelease((root, files) => {
       const content = JSON.parse(readFileSync(files.content, 'utf8'))
       const report = JSON.parse(readFileSync(files.report, 'utf8'))
       const index = JSON.parse(readFileSync(files.index, 'utf8'))

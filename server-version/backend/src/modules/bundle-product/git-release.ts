@@ -8,6 +8,7 @@ import { verifyPackageFixtures } from '../assessment-bundle/onboarding/fixtures'
 import { loadPackage } from '../assessment-bundle/onboarding/loader'
 import { publicDeclarationDependencies } from '../assessment-bundle/onboarding/public-check'
 import { BUNDLE_KEY, EXACT_VERSION, HEX_HASH } from '../assessment-bundle/schema'
+import { gitReleaseManifestFields, gitReleaseSelectionFields, resolveGitReleaseStates } from '../measurement-content/git-release-manifest'
 import { BundleDefinitionProvider } from './definition-provider'
 import { applyGitBundleRelease, assertApprovedBundleClaims, gitBundleReviewSchema, lockBundleRelease, type GitBundleAction } from './package-release'
 
@@ -15,11 +16,14 @@ const keySchema = z.string().regex(BUNDLE_KEY).max(100)
 const versionSchema = z.string().regex(EXACT_VERSION).max(64)
 const hashSchema = z.string().regex(HEX_HASH)
 const releaseManifest = z.object({
-  schemaVersion: z.literal(1),
+  ...gitReleaseManifestFields,
+  toolKey: keySchema,
   releases: z.array(z.object({
-    version: versionSchema,
+    ...gitReleaseSelectionFields,
+    releaseKey: versionSchema,
+    state: z.enum(['ONLINE', 'HOLD', 'WITHDRAWN', 'RETIRED']),
+    allowedEntries: z.tuple([z.literal('SURVEY')]),
     contentHash: hashSchema,
-    status: z.enum(['ONLINE', 'HOLD', 'RETIRED']),
     review: gitBundleReviewSchema.optional(),
     replaces: versionSchema.optional(),
   }).strict()).max(100),
@@ -27,13 +31,18 @@ const releaseManifest = z.object({
 type Release = z.infer<typeof releaseManifest>['releases'][number]
 export type BundleGitCheck = {
   key: string
-  versions: Array<{ version: string; contentHash: string; fixtureCount: number; status: 'UNLISTED' | Release['status'] }>
+  versions: Array<{
+    releaseKey: string
+    contentHash: string
+    fixtureCount: number
+    state: 'UNLISTED' | Release['state']
+    effectiveState: 'UNLISTED' | Release['state']
+    allowedEntries?: Release['allowedEntries']
+  }>
 }
-export type BundleGitSyncResult = {
+export type BundleGitSyncResult = Pick<Release, 'releaseKey' | 'contentHash' | 'state' | 'allowedEntries'> & {
   key: string
-  version: string
-  contentHash: string
-  status: Release['status']
+  effectiveState: Release['state']
   action: GitBundleAction
   releaseId?: string
 }
@@ -42,37 +51,48 @@ function entries(directory: string) {
   if (!fs.lstatSync(directory).isDirectory()) throw new Error('BUNDLE_GIT_DIRECTORY_REQUIRED:' + directory)
   return fs.readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))
 }
-function manifestFor(directory: string) {
+function manifestFor(directory: string, key: string) {
   const manifestPath = path.join(directory, 'releases.json')
   const info = fs.lstatSync(manifestPath, { throwIfNoEntry: false })
   if (!info) return []
   if (!info.isFile() || info.size > PACKAGE_LIMITS.bytes) throw new Error('BUNDLE_GIT_MANIFEST_REJECTED:' + directory)
-  const { releases } = releaseManifest.parse(JSON.parse(fs.readFileSync(manifestPath, 'utf8')))
-  if (new Set(releases.map(release => release.version)).size !== releases.length) {
-    throw new Error('BUNDLE_GIT_DUPLICATE_VERSION:' + directory)
-  }
+  const { releases, toolKey } = releaseManifest.parse(JSON.parse(fs.readFileSync(manifestPath, 'utf8')))
+  if (toolKey !== key) throw new Error('BUNDLE_GIT_TOOL_KEY_MISMATCH:' + key)
+  const states = resolveGitReleaseStates(releases, { errorPrefix: 'BUNDLE_GIT' })
   for (const release of releases) {
-    if (release.status === 'ONLINE' && release.review?.contentHash !== release.contentHash) {
-      throw new Error('BUNDLE_GIT_REVIEW_HASH_REQUIRED:' + release.version)
-    }
-    if (release.replaces && release.status === 'ONLINE' && (release.replaces === release.version ||
-      !releases.some(prior => prior.version === release.replaces && prior.status === 'HOLD'))) {
-      throw new Error('BUNDLE_GIT_REPLACEMENT_MUST_HOLD_PRIOR:' + release.version)
+    if (release.state === 'ONLINE' && release.review?.contentHash !== release.contentHash) {
+      throw new Error('BUNDLE_GIT_REVIEW_HASH_REQUIRED:' + release.releaseKey)
     }
   }
-  return releases
+  // An explicit withdrawal also has to respect predecessor ownership when
+  // it is part of a replacement, even though its effective state is identical.
+  const byKey = new Map(releases.map(release => [release.releaseKey, release]))
+  const predecessors = new Set<string>()
+  for (const release of releases) {
+    if (states.get(release.releaseKey) !== 'ONLINE') continue
+    let predecessor = release.replaces
+    while (predecessor && !predecessors.has(predecessor)) {
+      predecessors.add(predecessor)
+      predecessor = byKey.get(predecessor)?.replaces
+    }
+  }
+  return releases.map(release => ({
+    ...release,
+    effectiveState: states.get(release.releaseKey)!,
+    isPredecessor: predecessors.has(release.releaseKey),
+  }))
 }
 function readBundle(root: string, key: string, checkedOnly: boolean) {
   keySchema.parse(key)
   const directory = path.join(root, key)
   const children = entries(directory)
-  const releases = manifestFor(directory)
+  const releases = manifestFor(directory, key)
   const packages = new Map<string, { content: DeclarativePackage; fixtureCount: number; contentHash: string }>()
   for (const child of children) {
     if (child.name === 'releases.json') continue
     if (!child.isDirectory()) throw new Error('BUNDLE_GIT_VERSION_DIRECTORY_REQUIRED:' + child.name)
     const version = versionSchema.parse(child.name)
-    const declaration = releases.find(item => item.version === version)
+    const declaration = releases.find(item => item.releaseKey === version)
     if (!checkedOnly && !declaration) continue
     const content = loadPackage(path.join(directory, version))
     if (content.manifest.definition.bundleKey !== key || content.manifest.definition.bundleVersion !== version) {
@@ -85,10 +105,10 @@ function readBundle(root: string, key: string, checkedOnly: boolean) {
     // Known, publicly listed private-source draft stubs can be checked without
     // installing private test material. The exception never applies to ONLINE.
     const dependencies = publicDeclarationDependencies(content)
-    if (dependencies.blockers.length || declaration?.status === 'ONLINE' && dependencies.unavailablePrivateSources.length) {
+    if (dependencies.blockers.length || declaration?.state === 'ONLINE' && dependencies.unavailablePrivateSources.length) {
       throw new Error([...dependencies.blockers, ...dependencies.unavailablePrivateSources].join('; '))
     }
-    if (declaration?.status === 'ONLINE') {
+    if (declaration?.state === 'ONLINE') {
       assertApprovedBundleClaims(content, declaration.review!.claims)
       const provider = new BundleDefinitionProvider([packageEntry(content)])
       const blockers = provider.publicationBlockers(key, version).filter(item => item !== 'BUNDLE_NOT_PUBLISHED')
@@ -97,7 +117,7 @@ function readBundle(root: string, key: string, checkedOnly: boolean) {
     packages.set(version, { content, contentHash, fixtureCount: verifyPackageFixtures(content).length })
   }
   for (const release of releases) {
-    if (!packages.has(release.version)) throw new Error('BUNDLE_GIT_UNKNOWN_VERSION:' + key + '@' + release.version)
+    if (!packages.has(release.releaseKey)) throw new Error('BUNDLE_GIT_UNKNOWN_VERSION:' + key + '@' + release.releaseKey)
   }
   if (checkedOnly && packages.size === 0) throw new Error('BUNDLE_GIT_NO_VERSION:' + key)
   return { releases, packages }
@@ -105,10 +125,15 @@ function readBundle(root: string, key: string, checkedOnly: boolean) {
 export function checkBundleGitRelease(root: string, key: string): BundleGitCheck {
   if (!fs.lstatSync(root).isDirectory()) throw new Error('BUNDLE_GIT_DIRECTORY_REQUIRED:' + root)
   const { releases, packages } = readBundle(root, key, true)
-  return { key, versions: [...packages].map(([version, pack]) => ({
-    version, contentHash: pack.contentHash, fixtureCount: pack.fixtureCount,
-    status: releases.find(item => item.version === version)?.status ?? 'UNLISTED',
-  })) }
+  return { key, versions: [...packages].map(([releaseKey, pack]) => {
+    const release = releases.find(item => item.releaseKey === releaseKey)
+    return {
+      releaseKey, contentHash: pack.contentHash, fixtureCount: pack.fixtureCount,
+      state: release?.state ?? 'UNLISTED',
+      effectiveState: release?.effectiveState ?? 'UNLISTED',
+      ...(release ? { allowedEntries: release.allowedEntries } : {}),
+    }
+  }) }
 }
 
 /** Consume repository declarations in the caller's single deployment transaction.
@@ -124,21 +149,26 @@ export async function syncBundleGitReleases(
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('bundle-git-release-sync'))`
   const results: BundleGitSyncResult[] = []
   for (const { key, releases, packages } of tools) {
-    for (const { version } of [...releases].sort((a, b) => a.version.localeCompare(b.version))) {
-      await lockBundleRelease(tx, key, version)
+    for (const { releaseKey } of [...releases].sort((a, b) => a.releaseKey.localeCompare(b.releaseKey))) {
+      await lockBundleRelease(tx, key, releaseKey)
     }
-    const replaced = new Set(releases.filter(item => item.status === 'ONLINE').flatMap(item => item.replaces ? [item.replaces] : []))
-    // Stop the previous version before publication in this transaction. A later
-    // failure rolls back both operations together.
-    for (const release of [...releases].sort((a, b) => Number(a.status === 'ONLINE') - Number(b.status === 'ONLINE'))) {
-      const { version, contentHash, status, review, replaces } = release
-      const outcome = await applyGitBundleRelease(tx, {
-        actorId, gitCommitSha, pack: packages.get(version)!.content, contentHash, status, review, replaces,
-      })
-      if (replaced.has(version) && (outcome.action === 'MANUAL_HOLD' || outcome.action === 'MANUAL_OVERRIDE')) {
-        throw new Error('BUNDLE_GIT_REPLACEMENT_PREDECESSOR_CHANGED:' + key + '@' + version)
+    // Withdrawal and publication share one transaction, including any publisher
+    // validation that can reject the entire replacement.
+    for (const release of [...releases].sort((a, b) => Number(a.effectiveState === 'ONLINE') - Number(b.effectiveState === 'ONLINE'))) {
+      const { releaseKey, contentHash, allowedEntries, effectiveState, state, review, replaces } = release
+      const selection = { key, releaseKey, contentHash, allowedEntries, state, effectiveState }
+      if (effectiveState === 'HOLD') {
+        results.push({ ...selection, action: 'UNCHANGED' })
+        continue
       }
-      results.push({ key, version, contentHash, status, ...outcome })
+      const outcome = await applyGitBundleRelease(tx, {
+        actorId, gitCommitSha, pack: packages.get(releaseKey)!.content, contentHash, state, effectiveState, allowedEntries, review, replaces,
+      })
+      const operatorPaused = outcome.action === 'MANUAL_HOLD' || outcome.action === 'MANUAL_OVERRIDE'
+      if (effectiveState === 'WITHDRAWN' && release.isPredecessor && operatorPaused) {
+        throw new Error('BUNDLE_GIT_REPLACEMENT_PREDECESSOR_CHANGED:' + key + '@' + releaseKey)
+      }
+      results.push({ ...selection, ...outcome })
     }
   }
   return results

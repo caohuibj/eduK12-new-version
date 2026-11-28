@@ -66,6 +66,17 @@ suite('Git policy uses the existing exact scale publication lifecycle',()=>{
     expect(await sync('a',[first])).toEqual([{...a,action:'UNCHANGED'}])
     expect((await standardReleaseRow(prisma,a.releaseId)).latest_trial).toBe(older.latest_trial)
 
+    await expect(sync('d',[
+      {...first,state:'HOLD',allowedEntries:['TRAINING']},
+      {...second,state:'HOLD'},
+    ])).resolves.toEqual([])
+    expect(await standardReleaseRow(prisma,a.releaseId)).toMatchObject({
+      state:'ONLINE',version:older.version,latest_trial:older.latest_trial,
+    })
+    expect(await readApprovedToolEntryProducts(prisma,{resourceKey:'standard-release:'+a.releaseId,fingerprint:older.combination_hash}))
+      .toMatchObject({approvedProducts:['SURVEY']})
+    expect(await prisma.$queryRaw`SELECT id FROM survey_standard_releases WHERE combination_hash=${second.triplet.combinationHash}`).toEqual([])
+
     const broken={...second,triplet:{...second.triplet,blockers:['synthetic P/R binding conflict']}}
     await expect(sync('b',[first,broken])).rejects.toThrow('synthetic P/R binding conflict')
     expect((await standardReleaseRow(prisma,a.releaseId)).state).toBe('ONLINE')

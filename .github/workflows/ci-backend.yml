@@ -127,6 +127,11 @@ jobs:
         run: node --test ../../.github/scripts/cognitive-content.test.mjs ../../.github/scripts/content-workflows.test.mjs
       - name: prisma generate
         run: npx prisma generate
+      - name: validate changed Git content declarations in mixed application changes
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        env:
+          CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: node ../../.github/scripts/check-git-content-releases.mjs "$CONTENT_BASE_SHA"
       # Compile before seeding, upgrade rehearsal and long-running data gates.
       # One actual backend build; later jobs consume this exact verified artifact.
       - name: build (tsc) — fail fast on source/type errors
@@ -178,19 +183,6 @@ jobs:
           const base=process.env.BUNDLE_CONTENT_BASE_SHA || (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch'
             ? execFileSync('git',['merge-base','HEAD','origin/main'],{encoding:'utf8'}).trim() : '');
           verifyHistory(base);
-          JS
-      - name: validate changed Git content declarations in mixed application changes
-        if: github.event_name == 'pull_request' && inputs.focus != 'form-intake'
-        env:
-          CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          node --input-type=module <<'JS'
-          import {gitContentReleaseSelector} from '../../.github/scripts/git-content-release-scope.mjs';
-          import {execFileSync} from 'node:child_process';
-          const base = process.env.CONTENT_BASE_SHA;
-          const files=execFileSync('git',['diff','--name-only','-z',base,'HEAD'],{encoding:'utf8'}).split('\0');
-          const selectors=[...new Set(files.map(gitContentReleaseSelector).filter(Boolean))];
-          if(selectors.length)execFileSync('npm',['run','content:check','--',...selectors],{stdio:'inherit'});
           JS
       - name: native Form strict input, real HTTP authority and PostgreSQL save/readback
         if: inputs.focus == 'form-intake'

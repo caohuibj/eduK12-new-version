@@ -1,54 +1,15 @@
 import { randomUUID } from 'node:crypto'
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { checkSjtGitRelease, readSjtGitReleasePlan } from '../../modules/situational/git-release'
-import legacy from '../../modules/situational/instruments/sjt-assertiveness-golden/1.0.0/instrument.json'
+import { c, p, r, entry, contentVersion, ceiling, visibility, writeSjtDeclaration } from './git-release.fixture'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { prepareGovernedSjtWorkbook, governedSjtWorkbookMeasurementInput } from '../../modules/situational/authoring/governed-workbook'
 
 let root: string | undefined
 let toolKey = 'sample-sjt'
-const contentVersion = '1.0.0'
-const entry = {
-  releaseKey: 'first',
-  contentVersion,
-  parameterVersion: '1.0.0',
-  reportVersion: '1.0.0',
-  state: 'ONLINE',
-  allowedEntries: ['SURVEY'],
-}
-const ceiling = {
-  schemaVersion: 1, policyVersion: '1.0.0', unknownAudience: 'DENY',
-  audiences: { researcher: { rawAnswers: true, itemScores: true, methods: true, resultQualityDetails: true } },
-}
-const visibility = {
-  schemaVersion: 1, policyVersion: '1.0.0', unknownAudience: 'DENY',
-  audiences: { researcher: {
-    numericScores: true, references: false, scoreDerivedLabels: false, individualInterpretations: false,
-    educationalContent: false, artwork: false,
-  } },
-}
-const { scoring, report, referencePolicy: _reference, ...definition } = legacy.definition
-const { scoringVersion, ...weights } = scoring
-const c = {
-  schemaVersion: 1,
-  identity: { instrumentKey: toolKey, instrumentVersion: contentVersion },
-  definition: { ...definition, license: { ...definition.license, redistribution: 'allowed' } },
-  scorer: { scoringVersion },
-  dataCeiling: ceiling,
-}
-const p = {
-  schemaVersion: 1, contentVersion, version: '1.0.0', scoring: weights,
-  goldenCases: legacy.goldenCases, scientific: { schemaVersion: 1, scientificMaturity: 'PILOT', governanceRevision: 1 },
-}
-const r = {
-  schemaVersion: 1, contentVersion, parameterVersion: '1.0.0', version: '1.0.0',
-  report: { ...report, reportVersion: '1.0.0' }, reportVisibility: visibility,
-  template: { title: 'Research report' },
-}
-
 function write(path: string, value: unknown) {
   writeFileSync(join(root!, toolKey, path), JSON.stringify(value))
 }
@@ -58,11 +19,7 @@ function manifest(...releases: typeof entry[]) {
 function sample(key = 'sample-sjt') {
   toolKey = key
   root = mkdtempSync(join(tmpdir(), 'sjt-git-release-'))
-  for (const path of [contentVersion, 'parameters', 'reports']) mkdirSync(join(root, toolKey, path), { recursive: true })
-  write(contentVersion + '/content.json', { ...c, identity: { ...c.identity, instrumentKey: toolKey } })
-  write('parameters/1.0.0.json', p)
-  write('reports/1.0.0.json', r)
-  manifest(entry)
+  writeSjtDeclaration(root, toolKey)
 }
 afterEach(() => {
   if (root) rmSync(root, { force: true, recursive: true })
@@ -87,8 +44,8 @@ describe('SJT declarative content releases', () => {
     const second = { ...entry, releaseKey: 'second', reportVersion: '1.0.1', replaces: 'first' }
     manifest(entry, second)
     const [first, latest] = readSjtGitReleasePlan(root!, toolKey)!.declarations
-    expect(first.online).toBe(false)
-    expect(latest.online).toBe(true)
+    expect(first.effectiveState).toBe('WITHDRAWN')
+    expect(latest.effectiveState).toBe('ONLINE')
     expect(first.axes.content).toEqual(latest.axes.content)
     expect(first.axes.parameters).toEqual(latest.axes.parameters)
     expect(first.axes.report).not.toEqual(latest.axes.report)
@@ -99,7 +56,7 @@ describe('SJT declarative content releases', () => {
     expect(canonicalHash(first.pkg.definition.scoring)).toEqual(canonicalHash(latest.pkg.definition.scoring))
     manifest(entry, { ...second, state: 'WITHDRAWN' })
     const rollback = checkSjtGitRelease(root!, toolKey)
-    expect(rollback.releases.map(release => release.state)).toEqual(['ONLINE', 'WITHDRAWN'])
+    expect(rollback.releases.map(release => release.effectiveState)).toEqual(['ONLINE', 'WITHDRAWN'])
   })
 
   it('rejects version drift, a scorer change under an existing C and an incorrect exact golden value', () => {

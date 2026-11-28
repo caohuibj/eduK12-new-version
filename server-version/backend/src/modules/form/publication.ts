@@ -59,12 +59,13 @@ export async function publishFormGitRelease(tx: Prisma.TransactionClient, actorI
   const artifact = buildGovernedFormRelease(actorId, {
     ...release, requestId: '00000000-0000-4000-8000-000000000001',
   })
-  if (release.state === 'ONLINE') {
+  const online = release.effectiveState === 'ONLINE'
+  if (online) {
     await lockFormReleaseAxes(tx, release.content.toolKey)
     await assertFormReleaseAxesUnchanged(tx, artifact)
   }
   const result = await reconcileGitGovernedArtifact(tx, actorId, artifact, {
-    gitCommitSha, allowedProducts: release.allowedProducts, online: release.state === 'ONLINE',
+    gitCommitSha, allowedProducts: release.allowedEntries, online,
   })
   return { toolKey: release.content.toolKey, releaseKey: release.releaseKey, ...result }
 }

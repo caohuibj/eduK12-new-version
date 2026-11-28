@@ -4,28 +4,31 @@ import type { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import {
+  gitReleaseManifestFields, gitReleaseSelectionFields, resolveGitReleaseStates,
+} from '../measurement-content/git-release-manifest'
+import {
   formGitContentSchema, formReleaseToolKey, formReleaseVersion, formTemplateReportSchema, prepareFormRelease,
   verifyFormRepresentativeCase,
 } from './release'
 
 const hash = z.string().regex(/^[a-f0-9]{64}$/)
 const selection = z.object({
+  ...gitReleaseSelectionFields,
   releaseKey: formReleaseVersion,
+  replaces: formReleaseVersion.optional(),
   contentVersion: formReleaseVersion,
   reportVersion: formReleaseVersion,
   contentHash: hash,
   reportHash: hash,
-  state: z.enum(['ONLINE', 'HOLD', 'WITHDRAWN']),
   // Native Form completion projection is implemented for Survey. Preserve
   // legacy non-report Training Form support outside this release adapter.
-  allowedProducts: z.tuple([z.literal('SURVEY')]),
+  allowedEntries: z.tuple([z.literal('SURVEY')]),
 }).strict()
 const releaseIndex = z.object({
-  schemaVersion: z.literal(1),
+  ...gitReleaseManifestFields,
   toolKey: formReleaseToolKey,
   releases: z.array(selection).min(1).max(100),
-}).strict().refine(index => new Set(index.releases.map(release => release.releaseKey)).size === index.releases.length,
-  'Form release keys must be unique')
+}).strict()
 
 function checkedDirectory(path: string) {
   if (!lstatSync(path).isDirectory()) throw new Error('FORM_RELEASE_DIRECTORY_REQUIRED: ' + path)
@@ -43,6 +46,7 @@ export function checkFormGitRelease(root: string, key: string) {
   const directory = checkedDirectory(join(realpathSync(root), toolKey))
   const index = releaseIndex.parse(readJson(join(directory, 'releases.json')))
   if (index.toolKey !== toolKey) throw new Error('FORM_RELEASE_TOOL_IDENTITY_MISMATCH: ' + toolKey)
+  const effectiveStates = resolveGitReleaseStates(index.releases, { errorPrefix: 'FORM_RELEASE' })
   const reportDirectory = checkedDirectory(join(directory, 'reports'))
   const contentDescriptors = new Map<string, string>()
   return {
@@ -62,7 +66,9 @@ export function checkFormGitRelease(root: string, key: string) {
       if (priorVersion && priorVersion !== content.version) throw new Error('FORM_RELEASE_DUPLICATE_CONTENT_VERSION: ' + entry.releaseKey)
       contentDescriptors.set(descriptor, content.version)
       verifyFormRepresentativeCase(prepared.definition, representativeCase)
-      return { ...entry, content, report, prepared }
+      const effectiveState = effectiveStates.get(entry.releaseKey)
+      if (!effectiveState || effectiveState === 'RETIRED') throw new Error('FORM_RELEASE_INVALID_STATE: ' + entry.releaseKey)
+      return { ...entry, effectiveState, content, report, prepared }
     }),
   }
 }
@@ -71,7 +77,7 @@ export async function syncFormGitReleases(root: string, tx: Prisma.TransactionCl
   const keys = readdirSync(realpathSync(root), { withFileTypes: true })
     .filter(entry => entry.isDirectory() || entry.isSymbolicLink())
     .map(entry => formReleaseToolKey.parse(entry.name)).sort()
-  const selected = keys.flatMap(key => checkFormGitRelease(root, key).releases)
+  const selected = keys.flatMap(key => checkFormGitRelease(root, key).releases).filter(release => release.effectiveState !== 'HOLD')
   if (!selected.length) return []
   const { publishFormGitRelease } = await import('./publication')
   const changes = []

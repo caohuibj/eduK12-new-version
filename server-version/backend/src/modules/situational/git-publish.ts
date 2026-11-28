@@ -21,12 +21,13 @@ async function publishSurveyRelease(tx: Prisma.TransactionClient, item: SjtGitDe
   assertAssessmentOperationallyActive({ family: 'SITUATIONAL', key: pkg.key, version: pkg.instrumentVersion })
   const references = governedMediaRefs(unit).map(ref => assessmentAssetIdentitySchema.parse(ref))
   if (references.length) {
+    const assetIds = [...new Set(references.map(ref => ref.assetId))]
     const rows = await tx.storedAsset.findMany({
-      where: { id: { in: references.map(ref => ref.assetId) }, deletedAt: null,
+      where: { id: { in: assetIds }, deletedAt: null,
         OR: [{ accessScope: 'PUBLIC' }, { accessScope: 'PRIVATE', ownerId: actorId }] },
       select: { id: true },
     })
-    if (rows.length !== references.length) throw new Error('SJT_GIT_ASSET_RIGHTS_REQUIRED')
+    if (rows.length !== assetIds.length) throw new Error('SJT_GIT_ASSET_RIGHTS_REQUIRED')
     await assertAssessmentAssetReferencesReady(references, tx)
   }
   const measurement = await publishContentRelease(tx, sjtStandardMeasurementInput(unit, {
@@ -75,7 +76,7 @@ export async function syncSjtGitReleases(root: string, tx: Prisma.TransactionCli
   })
   await assertGitScalePublisher(tx, actorId)
   if (!/^[a-f0-9]{40}$/.test(gitCommitSha)) throw new Error('SJT_GIT_COMMIT_REQUIRED')
-  for (const item of plans.filter(item => item.online)) prepareSjtSurveyPublication(item)
+  for (const item of plans.filter(item => item.effectiveState === 'ONLINE')) prepareSjtSurveyPublication(item)
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('sjt-git-release-sync'))`
   const rows = await tx.$queryRaw<GovernedRow[]>`SELECT * FROM survey_governed_tools
     WHERE family='SJT' AND submitted_by=${actorId} AND approved_by=${actorId}
@@ -87,10 +88,10 @@ export async function syncSjtGitReleases(root: string, tx: Prisma.TransactionCli
     if (item && canonicalHash(binding.axes) !== canonicalHash(item.axes)) throw new Error('SJT_GIT_RELEASE_IMMUTABLE')
   }
   const applied = []
-  for (const item of plans.filter(item => item.online)) applied.push(await publishSurveyRelease(tx, item, actorId, gitCommitSha))
+  for (const item of plans.filter(item => item.effectiveState === 'ONLINE')) applied.push(await publishSurveyRelease(tx, item, actorId, gitCommitSha))
   for (const row of rows) {
     const item = desired.get(row.tool_key.slice('SJT:git:'.length) + ':' + row.tool_version)
-    if (item?.online || row.state !== 'ONLINE') continue
+    if (item?.effectiveState === 'ONLINE' || item?.effectiveState === 'HOLD' || row.state !== 'ONLINE') continue
     applied.push(await reconcileGitGovernedArtifact(tx, actorId, row.snapshot, {
       online: false, allowedProducts: ['SURVEY'], gitCommitSha,
     }))

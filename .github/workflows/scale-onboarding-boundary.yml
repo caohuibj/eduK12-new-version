@@ -164,21 +164,35 @@ jobs:
       - name: Scale declaration schemas, registries and reference/report compatibility
         if: inputs.scale
         run: npm run scale:onboarding:check && npm run scale:instruments:check && npm run scale:qualification:check
-      - name: Cognitive cross-tree declaration dependencies
+      - name: Resolve changed Cognitive task declarations
+        id: cognitive-declarations
         if: inputs.cognitive
-        working-directory: server-version/frontend
-        run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Cognitive declaration boundary and selected task fixtures
-        if: inputs.cognitive
-        working-directory: .
         env:
           CI_BASE_SHA: ${{ inputs.base }}
         run: |
+          node --input-type=module <<'JS'
+          import { appendFileSync } from 'node:fs';
+          import { changedFiles, domainFor } from '../../.github/scripts/content-scope.mjs';
+          import { gitContentReleaseSelector } from '../../.github/scripts/git-content-release-scope.mjs';
+          const tasks = [...new Set(changedFiles(process.env.CI_BASE_SHA)
+            .filter(file => domainFor(file) === 'cognitive' && !gitContentReleaseSelector(file))
+            .map(file => file.split('/')[6]))].sort();
+          appendFileSync(process.env.GITHUB_OUTPUT, 'tasks=' + tasks.join(',') + '\n');
+          JS
+      - name: Cognitive cross-tree declaration dependencies
+        if: steps.cognitive-declarations.outputs.tasks != ''
+        working-directory: server-version/frontend
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Cognitive declaration boundary and selected task fixtures
+        if: steps.cognitive-declarations.outputs.tasks != ''
+        working-directory: .
+        env:
+          CI_BASE_SHA: ${{ inputs.base }}
+          COGNITIVE_TASKS: ${{ steps.cognitive-declarations.outputs.tasks }}
+        run: |
           node .github/scripts/cognitive-content.mjs
-          tasks=$(git diff --name-only "$CI_BASE_SHA" HEAD -- server-version/backend/src/modules/cognitive/tasks/ | cut -d/ -f7 | sort -u | paste -sd, -)
-          test -n "$tasks"
           cd server-version/backend
-          npm run cognitive:onboarding-check -- --tasks "$tasks" --json
+          npm run cognitive:onboarding-check -- --tasks "$COGNITIVE_TASKS" --json
       - name: SJT declaration schemas, references and golden scoring fixtures
         if: inputs.situational
         run: npm run situational:contracts
@@ -197,12 +211,12 @@ jobs:
           import fs from 'node:fs';
           import {execFileSync} from 'node:child_process';
           import {verifyHistory} from './scripts/bundle-content-check.ts';
-          import {gitContentReleaseSelector} from '../../.github/scripts/git-content-release-scope.mjs';
+          import {gitContentReleaseSelector,isCognitiveRuntimePath} from '../../.github/scripts/git-content-release-scope.mjs';
           const base=process.env.BUNDLE_CONTENT_BASE_SHA;
           const files=execFileSync('git',['diff','--name-only','-z',base,'HEAD'],{encoding:'utf8'}).split('\0').filter(Boolean);
           const root='src/modules/assessment-bundle/packages';
           const units=files.map(f=>f.match(/src\/modules\/(?:scale|situational)\/instruments\/([^/]+)\/([^/]+)\//)).filter(Boolean).map(m=>m[1]+'/'+m[2]);
-          const cognitive=files.some(f=>f.includes('/modules/cognitive/tasks/'));
+          const cognitive=files.some(isCognitiveRuntimePath);
           const releaseSelectors=[...new Set(files.map(gitContentReleaseSelector).filter(Boolean))];
           const releasedKeys=new Set(releaseSelectors.filter(selector=>selector.startsWith('bundle:')).map(selector=>selector.slice('bundle:'.length)));
           const selected=[];

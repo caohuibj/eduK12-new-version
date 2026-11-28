@@ -37,10 +37,15 @@ test('only the exact Cognitive Git P/R files enter the declaration lane', () => 
 })
 
 test('published manifest identities stay present when a deployment is withdrawn', () => {
-  const change = entry(bundle + 'releases.json', 'M', '100644', '100644')
-  const readBaseFile = () => '{"releases":[{"version":"1.0.0","status":"ONLINE"}]}'
-  verifyGitContentHistory([change], { readBaseFile, readHeadFile: () => '{"releases":[{"version":"1.0.0","status":"HOLD"}]}' })
-  assert.throws(() => verifyGitContentHistory([change], { readBaseFile, readHeadFile: () => '{"releases":[]}' }), /Keep existing/)
+  for (const root of [scale, bundle]) {
+    const change = entry(root + 'releases.json', 'M', '100644', '100644')
+    const readBaseFile = () => '{"releases":[{"releaseKey":"1.0.0","state":"ONLINE"}]}'
+    verifyGitContentHistory([change], { readBaseFile, readHeadFile: () => '{"releases":[{"releaseKey":"1.0.0","state":"HOLD"}]}' })
+    assert.throws(() => verifyGitContentHistory([change], { readBaseFile, readHeadFile: () => '{"releases":[]}' }), /Keep existing/)
+    assert.throws(() => verifyGitContentHistory([change], {
+      readBaseFile, readHeadFile: () => '{"releases":[{"version":"1.0.0","status":"HOLD"}]}',
+    }), /releaseKey/)
+  }
 })
 
 test('SJT declaration-only releases do not select arbitrary stimulus or renderer paths', () => {

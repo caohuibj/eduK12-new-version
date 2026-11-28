@@ -30,6 +30,29 @@ describe('declarative Cognitive publication', () => {
     } finally {rmSync(fixture.root,{recursive:true,force:true})}
   })
 
+  it('checks the common release keys and reports effective replacement and rollback states', () => {
+    const fixture=cognitiveDeclarationFixture()
+    const effective=()=>checkCognitiveGitRelease(fixture.root,fixture.key)
+    try {
+      fixture.releases[1].state='ONLINE'
+      fixture.write()
+      expect(effective()).toEqual([
+        expect.objectContaining({releaseKey:fixture.version('release1'),state:'ONLINE',effectiveState:'WITHDRAWN'}),
+        expect.objectContaining({releaseKey:fixture.version('release2'),state:'ONLINE',effectiveState:'ONLINE',
+          replaces:fixture.version('release1'),allowedEntries:['TRAINING','SURVEY']}),
+      ])
+      fixture.releases[1].state='WITHDRAWN'
+      fixture.write()
+      expect(effective()).toEqual([
+        expect.objectContaining({releaseKey:fixture.version('release1'),effectiveState:'ONLINE'}),
+        expect.objectContaining({releaseKey:fixture.version('release2'),effectiveState:'WITHDRAWN'}),
+      ])
+      fixture.releases[0].state='HOLD'
+      fixture.write()
+      expect(effective()[0]).toMatchObject({releaseKey:fixture.version('release1'),effectiveState:'HOLD'})
+    } finally {rmSync(fixture.root,{recursive:true,force:true})}
+  })
+
   it('reports a registered Gonogo implementation when no Git release has been selected', () => {
     const actual=resolve(__dirname,'../../modules/cognitive/tasks')
     expect(checkCognitiveGitRelease(actual,'gonogo')).toEqual([

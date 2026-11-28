@@ -163,24 +163,26 @@ export async function changePackageStatus(db: PrismaClient, actorId: string, key
   })
 }
 
-export type GitBundleAction = 'PUBLISHED' | 'RESTORED' | 'UNCHANGED' | 'HELD' | 'RETIRED' | 'ABSENT' | 'MANUAL' | 'MANUAL_HOLD' | 'MANUAL_OVERRIDE'
+export type GitBundleAction = 'PUBLISHED' | 'RESTORED' | 'UNCHANGED' | 'WITHDRAWN' | 'RETIRED' | 'ABSENT' | 'MANUAL' | 'MANUAL_HOLD' | 'MANUAL_OVERRIDE'
 type GitBundleReceipt = { rowStatus: string; rowUpdatedAt: string; contentHash: string }
 export async function applyGitBundleRelease(tx: Prisma.TransactionClient, input: {
   actorId: string
   gitCommitSha: string
   pack: Package
   contentHash: string
-  status: 'ONLINE' | 'HOLD' | 'RETIRED'
+  state: 'ONLINE' | 'HOLD' | 'WITHDRAWN' | 'RETIRED'
+  effectiveState: 'ONLINE' | 'WITHDRAWN' | 'RETIRED'
+  allowedEntries: ['SURVEY']
   review?: GitBundleReview
   replaces?: string
 }): Promise<{ action: GitBundleAction; releaseId?: string }> {
-  const { actorId, gitCommitSha, pack, contentHash, status, replaces } = input
+  const { actorId, gitCommitSha, pack, contentHash, state, effectiveState, allowedEntries, replaces } = input
   const { bundleKey, bundleVersion } = pack.manifest.definition
   if (!/^[a-f0-9]{40}$/.test(gitCommitSha) || !await isProvisionedGitScalePublisher(tx, actorId)) {
     throw new Error('BUNDLE_GIT_AUTHORITY_REQUIRED')
   }
   if (hashDeclarativePackage(pack) !== contentHash) throw new Error('BUNDLE_CONTENT_HASH_MISMATCH')
-  const review = status === 'ONLINE' ? gitBundleReviewSchema.parse(input.review) : undefined
+  const review = effectiveState === 'ONLINE' ? gitBundleReviewSchema.parse(input.review) : undefined
   if (review) {
     if (review.contentHash !== contentHash) throw new Error('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
     assertApprovedBundleClaims(pack, review.claims)
@@ -190,10 +192,10 @@ export async function applyGitBundleRelease(tx: Prisma.TransactionClient, input:
   if (prior && (prior.contentHash !== contentHash || hashDeclarativePackage(prior.content) !== contentHash)) {
     throw new Error('BUNDLE_VERSION_IMMUTABLE')
   }
-  if (!prior && status !== 'ONLINE') return { action: 'ABSENT' }
+  if (!prior && effectiveState !== 'ONLINE') return { action: 'ABSENT' }
 
   if (prior && prior.installedBy !== actorId) {
-    if (status === 'ONLINE' && prior.status === 'PUBLISHED') {
+    if (effectiveState === 'ONLINE' && prior.status === 'PUBLISHED') {
       await validatePackageAdmission(tx, pack, prior)
       const { assertGitBundleDependencies } = await import('./git-release-dependencies')
       await assertGitBundleDependencies(tx, pack)
@@ -221,7 +223,7 @@ export async function applyGitBundleRelease(tx: Prisma.TransactionClient, input:
   }
 
   let row: BundlePackageRelease, action: GitBundleAction
-  if (status === 'ONLINE') {
+  if (effectiveState === 'ONLINE') {
     if (prior?.status === 'PUBLISHED') {
       await validatePackageAdmission(tx, pack, prior)
       const { assertGitBundleDependencies } = await import('./git-release-dependencies')
@@ -233,14 +235,16 @@ export async function applyGitBundleRelease(tx: Prisma.TransactionClient, input:
     action = prior ? 'RESTORED' : 'PUBLISHED'
   } else {
     if (!prior) return { action: 'ABSENT' }
-    if (prior.status === status) return { action: 'UNCHANGED', releaseId: prior.id }
-    row = await updateReleaseStatus(tx, prior, status)
-    action = status === 'HOLD' ? 'HELD' : 'RETIRED'
+    const nativeStatus = effectiveState === 'WITHDRAWN' ? 'HOLD' : 'RETIRED'
+    if (prior.status === nativeStatus || prior.status === 'RETIRED') return { action: 'UNCHANGED', releaseId: prior.id }
+    row = await updateReleaseStatus(tx, prior, nativeStatus)
+    action = effectiveState
   }
   await tx.surveyEvent.create({ data: {
     id: randomUUID(), actorUserId: actorId, action: 'GIT_BUNDLE_RELEASE_SYNCED',
     metadata: {
       source: 'SYSTEM_GIT_RELEASE', gitCommitSha, bundleKey, bundleVersion, contentHash,
+      toolKey: bundleKey, releaseKey: bundleVersion, state, effectiveState, allowedEntries,
       releaseId: row.id, rowStatus: row.status, rowUpdatedAt: row.updatedAt.toISOString(), action,
       ...(replaces ? { replaces } : {}),
     },

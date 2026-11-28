@@ -1,8 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {gitContentReleaseSelector} from './git-content-release-scope.mjs';
+import {gitContentReleaseSelector,isCognitiveRuntimePath} from './git-content-release-scope.mjs';
 import {runInNewContext} from 'node:vm';
+import {checkChangedGitContentReleases} from './check-git-content-releases.mjs';
+import {domainFor} from './content-scope.mjs';
 import {regressionGroups} from './backend-regression-selection.mjs';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
@@ -99,7 +101,7 @@ test('content declarations keep pure schema/fixture/reference checks without dat
   assert.throws(()=>run({},()=>{throw Error('No fallback outside manual dispatch');}),/BUNDLE_BASE_SHA_REQUIRED/);
   const boundary=job(content,'boundary');
   assert.doesNotMatch(boundary,/services:|postgres:|redis:|db:migrate|prisma generate|tsc --noEmit|src\/__tests__|--verify-reviews --base.*\n.*--no-file-parallelism/);
-  assert.match(boundary,/--tasks "\$tasks"/);
+  assert.match(boundary,/--tasks "\$COGNITIVE_TASKS"/);
   assert.match(boundary,/publication.json/);
   assert.doesNotMatch(ci,/\n  pull_request_review:/);
 });
@@ -553,7 +555,7 @@ test('content source selection checks its reverse reference and leaves unrelated
  const manifests={affected:{definition:{slots:[{unitType:'SCALE',instrumentKey:'changed',instrumentVersion:'1.0.0'}]}},privateDraft:{definition:{status:'DRAFT',slots:[{unitType:'SCALE',instrumentKey:'PRIVATE_CHEXI',instrumentVersion:'1.0.0'}]}}};
  const calls=[],base='a'.repeat(40);let report;
  runInNewContext(command,{
-  gitContentReleaseSelector,
+  gitContentReleaseSelector,isCognitiveRuntimePath,
   fs:{readdirSync:p=>p===root?Object.keys(manifests):['1.0.0'],readFileSync:p=>JSON.stringify(manifests[p.split('/').at(-3)]),writeFileSync:(_,text)=>{report=JSON.parse(text)}},
   execFileSync:(exe,args)=>{if(exe==='git')return 'server-version/backend/src/modules/scale/instruments/changed/1.0.0/source.json\0';calls.push(args)},
   verifyHistory:()=>{throw Error('Unchanged Bundle history is unrelated')},process:{env:{BUNDLE_CONTENT_BASE_SHA:base,BUNDLE_CONTENT_EVIDENCE:'fixture'},execPath:'node'},Buffer,
@@ -638,3 +640,49 @@ test('authenticated regression reuse executes only with a current-HEAD verifier 
   assert.ok(failedChecks({...notReused,'backend-regression':{result:'failure'}},false).includes('backend-regression'));
 });
 
+
+test('Cognitive JSON declarations do not install frontend or run legacy onboarding fixtures', () => {
+  const boundary=job(source('scale-onboarding-boundary'),'boundary');
+  const plan=boundary.match(/node --input-type=module <<'JS'\n([\s\S]*?)\n\s+JS/)[1].replace(/^\s*import[^\n]*\n/gm,'');
+  const task = 'server-version/backend/src/modules/cognitive/tasks/gonogo/';
+  const declarations = ['parameters/1.0.0.json', 'reports/1.0.0.json', 'releases.json'].map(file => task + file);
+  const evaluate=files=>{
+    let output;
+    runInNewContext(plan,{process:{env:{CI_BASE_SHA:'a'.repeat(40)}},changedFiles:()=>files,
+      domainFor,gitContentReleaseSelector,appendFileSync:(_file,text)=>{output=text;}});
+    return output;
+  };
+  assert.equal(evaluate(declarations),'tasks=\n');
+  assert.equal(evaluate([...declarations,task+'seeds.ts']),'tasks=gonogo\n');
+  assert.match(boundary,/Cognitive cross-tree declaration dependencies\n\s+if: steps\.cognitive-declarations\.outputs\.tasks != ''/);
+  assert.match(boundary,/Cognitive declaration boundary and selected task fixtures\n\s+if: steps\.cognitive-declarations\.outputs\.tasks != ''/);
+  assert.match(boundary,/files\.some\(isCognitiveRuntimePath\)/);
+  assert.match(boundary,/execFileSync\('npm',\['run','content:check','--',\.\.\.releaseSelectors\]/);
+});
+
+test('mixed push and Form intake validate matching Git declarations against the exact event base', () => {
+  const backend=job(source('ci-backend'),'backend');
+  const validate=backend.match(/      - name: validate changed Git content declarations[^\n]*\n([\s\S]*?)(?=\n      - name:)/)[1];
+  assert.match(validate,/if: github\.event_name == 'pull_request' \|\| github\.event_name == 'push'/);
+  assert.doesNotMatch(validate,/inputs\.focus/);
+  assert.match(validate,/github\.event\.pull_request\.base\.sha \|\| github\.event\.before/);
+  assert.match(validate,/node \.\.\/\.\.\/\.github\/scripts\/check-git-content-releases\.mjs "\$CONTENT_BASE_SHA"/);
+  const push=job(source('ci'),'post-merge-smoke');
+  assert.match(push,/CONTENT_BASE_SHA: \$\{\{ github\.event\.before \}\}\s+run: node \.\.\/\.\.\/\.github\/scripts\/check-git-content-releases\.mjs "\$CONTENT_BASE_SHA"/);
+
+  const base='a'.repeat(40), modules='server-version/backend/src/modules/';
+  const files=['form/templates/demographics_v1/1.0.0.json','form/templates/demographics_v1/releases.json',
+    'survey/governed-tool.service.ts','cognitive/tasks/gonogo/reports/1.0.0.json'].map(file=>modules+file);
+  const commands=[];
+  const execute=(command,args)=>{
+    commands.push([command,args]);
+    return command==='git'?files.join('\0')+'\0':'';
+  };
+  const selectors=checkChangedGitContentReleases(base,execute);
+  assert.deepEqual(selectors,['cognitive:gonogo','form:demographics_v1']);
+  assert.deepEqual(commands,[
+    ['git',['diff','--no-ext-diff','--no-textconv','--no-renames','--name-only','-z',base,'HEAD','--']],
+    ['npm',['run','content:check','--',...selectors]],
+  ]);
+  for(const invalid of [undefined,'main','0'.repeat(40)])assert.throws(()=>checkChangedGitContentReleases(invalid,()=>assert.fail()),/exact Git content base/);
+});

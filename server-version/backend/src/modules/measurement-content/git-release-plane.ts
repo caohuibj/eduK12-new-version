@@ -38,9 +38,11 @@ export async function checkContentRelease(repoRoot: string, selector: string) {
   requireDirectory(join(root, toolKey))
   if (family === 'scale') {
     const { checkDeclaredScaleReleases } = await import('../scale/declarative/check')
+    const { scaleDeclarationStates } = await import('../scale/declarative/replacement')
     const releases = checkDeclaredScaleReleases(root, { repoRoot, toolKeys: [toolKey] })
+    const states = scaleDeclarationStates(releases)
     return { family, toolKey, releases: releases.map(({ releaseKey, state, triplet }) => ({
-      releaseKey, state, combinationHash: triplet.combinationHash, contentHash: triplet.parts.CONTENT.hash,
+      releaseKey, state, effectiveState: states.get(releaseKey), combinationHash: triplet.combinationHash, contentHash: triplet.parts.CONTENT.hash,
     })) }
   }
   if (family === 'cognitive') {
@@ -55,8 +57,8 @@ export async function checkContentRelease(repoRoot: string, selector: string) {
   if (family === 'form') {
     const { checkFormGitRelease } = await import('../form/git-release')
     const { releases } = checkFormGitRelease(root, toolKey)
-    return { family, toolKey, releases: releases.map(({ releaseKey, contentVersion, reportVersion, contentHash, reportHash, state }) => ({
-      releaseKey, contentVersion, reportVersion, contentHash, reportHash, state,
+    return { family, toolKey, releases: releases.map(({ releaseKey, contentVersion, reportVersion, contentHash, reportHash, state, effectiveState }) => ({
+      releaseKey, contentVersion, reportVersion, contentHash, reportHash, state, effectiveState,
     })) }
   }
   const { checkBundleGitRelease } = await import('../bundle-product/git-release')

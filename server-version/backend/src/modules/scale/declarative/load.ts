@@ -2,6 +2,7 @@ import {lstatSync, readFileSync, readdirSync} from 'node:fs'
 import {join} from 'node:path'
 import {z} from 'zod'
 import {canonicalHash} from '../../assessment-runtime/canonical'
+import {gitReleaseManifestFields, gitReleaseSelectionFields} from '../../measurement-content/git-release-manifest'
 import {assetReference} from '../../measurement-content/release'
 import {reportTemplateSchema} from '../../measurement-content/report-template'
 import {composeTriplet, registeredParts, sourceParts, type Axis, type Part, type Triplet} from '../../survey/standard-triplet.model'
@@ -16,8 +17,6 @@ const toolKeySchema = z.string().max(120).regex(/^[a-z][a-z0-9_]*$/)
 const contentVersionSchema = z.string().regex(/^\d+\.\d+\.\d+$/)
 const versionSchema = z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/)
 const assetVersionSchema = versionSchema.refine(value => value !== 'default', 'default is reserved for the original source')
-const entriesSchema = z.array(z.enum(['TRAINING', 'SURVEY', 'SCHOOL', 'TEACHER'])).min(1).max(4)
-  .refine(entries => new Set(entries).size === entries.length, 'Duplicate entry')
 const parameterSchema = z.object({
   toolKey: toolKeySchema, contentVersion: contentVersionSchema, scoringVersion: z.string().min(1).max(120),
   version: assetVersionSchema, ...parameterPayloadSchema.shape,
@@ -29,13 +28,16 @@ const reportSchema = z.object({
   assetRefs: z.array(assetReference).max(100).optional(),
 }).strict()
 const releaseSchema = z.object({
+  ...gitReleaseSelectionFields,
   releaseKey: assetVersionSchema, contentVersion: contentVersionSchema, parameterVersion: versionSchema, reportVersion: versionSchema,
   contentHash: z.string().regex(/^[0-9a-f]{64}$/),
-  allowedEntries: entriesSchema, state: z.enum(['ONLINE', 'WITHDRAWN']),
   replaces: z.union([versionSchema, z.string().regex(/^\d+\.\d+\.\d+\/default$/)]).optional(),
   reviewNote: z.string().trim().min(1).max(2000).optional(),
 }).strict()
 const manifestSchema = z.object({
+  ...gitReleaseManifestFields,
+  // Accept Scale controls from before the shared envelope.
+  schemaVersion: gitReleaseManifestFields.schemaVersion.optional(),
   toolKey: toolKeySchema,
   readiness: z.enum(['READY', 'NEEDS_TRANSLATION', 'NEEDS_LICENSE']).optional(),
   releases: z.array(releaseSchema),

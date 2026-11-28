@@ -18,9 +18,9 @@ export function cognitiveDeclarationFixture(versionPrefix='fictional'){
     name:'Synthetic report',instruction:'Synthetic instructions',introduction:'Synthetic plain language guidance.',
     practicalTips:['Use the same testing conditions.'],disclaimer:'Synthetic score is not a diagnosis.',
     reportVisibility:approvedVisibility,template:{title:'Synthetic report',blocks:[{type:'METRIC',metricKey:'hitRate',display:'RAW'}]}}
-  const releases=[{version:version('release1'),parameterVersion:parameter.version,reportVersion:report.version,
+  const releases=[{releaseKey:version('release1'),parameterVersion:parameter.version,reportVersion:report.version,
     profile:'standard',allowedEntries:['TRAINING','SURVEY'],state:'ONLINE'},
-    {version:version('release2'),parameterVersion:parameter.version,reportVersion:version('r2'),
+    {releaseKey:version('release2'),parameterVersion:parameter.version,reportVersion:version('r2'),
       profile:'standard',allowedEntries:['TRAINING','SURVEY'],state:'WITHDRAWN',replaces:version('release1')}]
   const set=(path:string,value:unknown)=>writeFileSync(join(dir,path),JSON.stringify(value))
   set('parameters/'+parameter.version+'.json',parameter)

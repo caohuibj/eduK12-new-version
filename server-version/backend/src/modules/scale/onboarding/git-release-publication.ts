@@ -12,13 +12,13 @@ import {
   assertGitScalePublisher, publishScaleRelease, type GitScalePublication, type StandardRelease,
 } from '../../survey/standard-triplet.service'
 import {ensureStandardNativeScale} from './standard-release-native'
-import {activeScaleDeclarations} from '../declarative/replacement'
+import {scaleDeclarationStates} from '../declarative/replacement'
 
 export type GitScaleRelease = {
   releaseKey: string
   triplet: Triplet
   allowedEntries: unknown
-  state: 'ONLINE' | 'WITHDRAWN'
+  state: 'ONLINE' | 'HOLD' | 'WITHDRAWN'
   replaces?: string
   reviewNote?: string
 }
@@ -52,7 +52,7 @@ async function readSyncReceipts(tx:Prisma.TransactionClient,actorId:string,toolK
   return new Map(rows.map(({metadata})=>[metadata.releaseId,metadata]))
 }
 
-async function syncTool(tx:Prisma.TransactionClient,input:{actorId:string;gitCommitSha:string},toolKey:string,releases:readonly GitScaleRelease[],desired:readonly GitScaleRelease[]):Promise<SyncResult[]>{
+async function syncTool(tx:Prisma.TransactionClient,input:{actorId:string;gitCommitSha:string},toolKey:string,releases:readonly GitScaleRelease[],states:ReturnType<typeof scaleDeclarationStates>):Promise<SyncResult[]>{
   const {actorId,gitCommitSha}=input
   // The shared publisher takes this lock before any release row lock. Taking the
   // same locks in order also serializes concurrent admin publication of a match.
@@ -66,7 +66,10 @@ async function syncTool(tx:Prisma.TransactionClient,input:{actorId:string;gitCom
   const owned=rows.filter(row=>gitOrigin(row))
   if(owned.some(row=>row.approved_by!==actorId))conflict('DEPLOYMENT_IDENTITY_CHANGED:'+toolKey)
   const receipts=await readSyncReceipts(tx,actorId,toolKey)
-  const desiredHashes=new Set(desired.map(release=>release.triplet.combinationHash))
+  const retainedHashes=new Set(releases.filter(release=>{
+    const state=states.get(release.releaseKey)
+    return state==='ONLINE'||state==='HOLD'
+  }).map(release=>release.triplet.combinationHash))
   const changes:SyncResult[]=[]
   const record=async(releaseKey:string,releaseId:string,releaseVersion:number,state:GitSyncReceipt['state'],allowedEntries:Products,
     action:SyncResult['action'],extra={})=>{
@@ -74,7 +77,7 @@ async function syncTool(tx:Prisma.TransactionClient,input:{actorId:string;gitCom
       metadata:{toolKey,releaseKey,releaseId,releaseVersion,state,allowedEntries,source:'SYSTEM_GIT_RELEASE',gitCommitSha,action,...extra}}})
     changes.push({toolKey,releaseKey,releaseId,action})
   }
-  for(const release of desired){
+  for(const release of releases.filter(release=>states.get(release.releaseKey)==='ONLINE')){
     const {releaseKey,triplet,replaces,reviewNote}=release
     const allowedEntries=exactStandardCombinationEntryProducts(release.allowedEntries)
     const prior=rows.find(row=>row.combination_hash===triplet.combinationHash)
@@ -120,7 +123,7 @@ async function syncTool(tx:Prisma.TransactionClient,input:{actorId:string;gitCom
     await tx.$executeRaw`UPDATE survey_standard_releases SET state='ONLINE',version=version+1,updated_at=clock_timestamp() WHERE id=${prior.id}`
     await record(releaseKey,prior.id,prior.version+1,'ONLINE',allowedEntries,prior.state==='WITHDRAWN'?'RESTORED':'SCOPE_CHANGED')
   }
-  for(const row of owned.filter(row=>row.state==='ONLINE'&&!desiredHashes.has(row.combination_hash))){
+  for(const row of owned.filter(row=>row.state==='ONLINE'&&!retainedHashes.has(row.combination_hash))){
     await tx.$executeRaw`UPDATE survey_standard_releases SET state='WITHDRAWN',version=version+1,updated_at=clock_timestamp() WHERE id=${row.id}`
     await record(gitOrigin(row)!.releaseKey,row.id,row.version+1,'WITHDRAWN',receipts.get(row.id)?.allowedEntries??[],'WITHDRAWN',{preserveHistory:true})
   }
@@ -145,9 +148,9 @@ export async function syncGitScaleReleasesInTransaction(tx:Prisma.TransactionCli
     tool.push(release)
     byTool.set(key,tool)
   }
-  const desired=new Map([...byTool].map(([key,releases])=>{
+  const states=new Map([...byTool].map(([key,releases])=>{
     if(new Set(releases.map(item=>item.triplet.combinationHash)).size!==releases.length)conflict('DUPLICATE_COMBINATION:'+key)
-    return [key,activeScaleDeclarations(releases)]
+    return [key,scaleDeclarationStates(releases)]
   }))
   await assertGitScalePublisher(tx,input.actorId)
   // A release commit represents a single desired state. Keep discovery under
@@ -157,6 +160,6 @@ export async function syncGitScaleReleasesInTransaction(tx:Prisma.TransactionCli
     WHERE state='ONLINE' AND (reference->'approvals') @> ${gitMarker}::jsonb`
   const results:SyncResult[]=[]
   const toolKeys=[...new Set([...byTool.keys(),...previous.map(row=>row.tool_key)])].sort()
-  for(const toolKey of toolKeys)results.push(...await syncTool(tx,input,toolKey,byTool.get(toolKey)??[],desired.get(toolKey)??[]))
+  for(const toolKey of toolKeys)results.push(...await syncTool(tx,input,toolKey,byTool.get(toolKey)??[],states.get(toolKey)??new Map()))
   return results
 }

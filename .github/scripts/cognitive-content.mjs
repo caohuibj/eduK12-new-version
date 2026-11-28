@@ -2,6 +2,11 @@ import fs from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import ts from '../../server-version/backend/node_modules/typescript/lib/typescript.js';
 import { changedFiles, domainFor } from './content-scope.mjs';
+import { gitContentReleaseSelector } from './git-content-release-scope.mjs';
+
+export function cognitiveDataModulePaths(files) {
+  return files.filter(file => domainFor(file) === 'cognitive' && !gitContentReleaseSelector(file));
+}
 
 // Existing task content is declaration-only. Executable changes belong in the
 // engine/package surface and must take the full route.
@@ -34,7 +39,7 @@ export function isDataModule(text) {
   });
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const files = changedFiles(process.env.CI_BASE_SHA).filter(file => domainFor(file) === 'cognitive' && fs.existsSync(file));
+  const files = cognitiveDataModulePaths(changedFiles(process.env.CI_BASE_SHA)).filter(file => fs.existsSync(file));
   for (const file of files) {
     if (fs.lstatSync(file).isSymbolicLink() || !isDataModule(fs.readFileSync(file, 'utf8'))) throw new Error(`Not declaration-only Cognitive content: ${file}`);
   }
