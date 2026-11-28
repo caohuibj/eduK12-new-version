@@ -10,6 +10,18 @@ import { instrumentSourceSchema } from '../../modules/situational/onboarding/sch
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { prepareGovernedSjtWorkbook, governedSjtWorkbookMeasurementInput } from '../../modules/situational/authoring/governed-workbook'
 
+function requireIsolatedSjtGitReleaseDatabase() {
+  const url = new URL(process.env.DATABASE_URL!)
+  const localFixture = url.hostname === '127.0.0.1' && url.port === '55488'
+  const hostedFixture = process.env.CI === 'true' && process.env.GITHUB_ACTIONS === 'true'
+    && process.env.RUNNER_ENVIRONMENT === 'github-hosted'
+    && /^[a-f0-9]{64}$/.test(process.env.CI_POSTGRES_SERVICE_ID ?? '')
+    && url.href === 'postgresql://ptool:ptool123@localhost:5432/eduk12_sjt_git_test?schema=public'
+  if (url.pathname !== '/eduk12_sjt_git_test' || (!localFixture && !hostedFixture)) {
+    throw new Error('A disposable SJT Git release database is required')
+  }
+}
+
 let root: string | undefined
 let toolKey = 'sample-sjt'
 function write(path: string, value: unknown) {
@@ -149,10 +161,7 @@ describe('SJT declarative content releases', () => {
 
 
 it.skipIf(process.env.SJT_GIT_RELEASE_ISOLATED !== '1')('publishes and rolls back report-only revisions through actual governed transactions', async () => {
-  const url = new URL(process.env.DATABASE_URL!)
-  if (url.hostname !== '127.0.0.1' || url.port !== '55488' || url.pathname !== '/eduk12_sjt_git_test') {
-    throw new Error('A disposable SJT Git release database is required')
-  }
+  requireIsolatedSjtGitReleaseDatabase()
   sample('sample-sjt-' + randomUUID().slice(0, 8))
   const { prisma } = await import('../../config/database')
   const { ensureGitScalePublisher } = await import('../../modules/scale/onboarding/git-release-actor')
@@ -245,10 +254,7 @@ it('prepares a validated workbook without widening entry or recipient access', (
 })
 
 it.skipIf(process.env.SJT_GIT_RELEASE_ISOLATED !== '1')('uses existing MFA approval and trial for a workbook and its report-only revision', async () => {
-  const url = new URL(process.env.DATABASE_URL!)
-  if (url.hostname !== '127.0.0.1' || url.port !== '55488' || url.pathname !== '/eduk12_sjt_git_test') {
-    throw new Error('A disposable SJT Git release database is required')
-  }
+  requireIsolatedSjtGitReleaseDatabase()
   const { prisma } = await import('../../config/database')
   const { approveGovernedTool, governedRow, previewGovernedWorkbookSjt, submitGovernedWorkbookSjt } =
     await import('../../modules/survey/governed-tool.service')

@@ -138,7 +138,7 @@ jobs:
           NODE
       - name: clear reports from previous regression jobs
         # Self-hosted /tmp persists between jobs; never upload old-focus evidence.
-        run: rm -f /tmp/eduk12-backend-vitest-fixtures.json /tmp/eduk12-backend-vitest-${{ matrix.group }}.json /tmp/eduk12-backend-inventory-${{ matrix.group }}.json /tmp/eduk12-backend-vitest.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-teacher-runtime-vitest.json /tmp/eduk12-cognitive-install-vitest.json /tmp/eduk12-cognitive-admin-intake-vitest.json /tmp/eduk12-library-http-vitest.json /tmp/eduk12-component-import-vitest.json /tmp/eduk12-parent-vitest.json /tmp/eduk12-r5-vitest.json /tmp/eduk12-hosted-ci-env.txt /tmp/eduk12-teacher-self-group.json /tmp/eduk12-library-self-group.json /tmp/eduk12-teacher-private-group.json /tmp/eduk12-school-private-source.json /tmp/eduk12-school-composition-delta.json /tmp/eduk12-school-native-source.json /tmp/eduk12-school-native-reports.json /tmp/eduk12-education-marker.json /tmp/eduk12-education-feedback-policy.json /tmp/eduk12-education-standard-marker.json /tmp/eduk12-education-license-selection.json /tmp/eduk12-education-publication.json /tmp/eduk12-group-native.json /tmp/eduk12-evc-lifecycle.json /tmp/eduk12-evc-restore.json /tmp/eduk12-legacy-education-setup.json /tmp/eduk12-license-batch.json /tmp/eduk12-license-handoff.json /tmp/eduk12-entry-offboarding.json
+        run: rm -f /tmp/eduk12-backend-vitest-fixtures.json /tmp/eduk12-backend-vitest-${{ matrix.group }}.json /tmp/eduk12-backend-inventory-${{ matrix.group }}.json /tmp/eduk12-backend-vitest.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-teacher-runtime-vitest.json /tmp/eduk12-cognitive-install-vitest.json /tmp/eduk12-cognitive-admin-intake-vitest.json /tmp/eduk12-library-http-vitest.json /tmp/eduk12-component-import-vitest.json /tmp/eduk12-parent-vitest.json /tmp/eduk12-r5-vitest.json /tmp/eduk12-hosted-ci-env.txt /tmp/eduk12-teacher-self-group.json /tmp/eduk12-library-self-group.json /tmp/eduk12-teacher-private-group.json /tmp/eduk12-school-private-source.json /tmp/eduk12-school-composition-delta.json /tmp/eduk12-school-native-source.json /tmp/eduk12-school-native-reports.json /tmp/eduk12-education-marker.json /tmp/eduk12-education-feedback-policy.json /tmp/eduk12-education-standard-marker.json /tmp/eduk12-education-license-selection.json /tmp/eduk12-education-publication.json /tmp/eduk12-group-native.json /tmp/eduk12-evc-lifecycle.json /tmp/eduk12-evc-restore.json /tmp/eduk12-legacy-education-setup.json /tmp/eduk12-license-batch.json /tmp/eduk12-license-handoff.json /tmp/eduk12-entry-offboarding.json /tmp/eduk12-content-git-vitest.json /tmp/eduk12-cognitive-git-vitest.json /tmp/eduk12-sjt-git-vitest.json /tmp/eduk12-bundle-git-vitest.json
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
@@ -205,6 +205,9 @@ jobs:
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool cognitive_admin_intake_ci_test
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool library_http_ci_test
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool component_import_ci_test
+          for database in content_git_ci_test eduk12_cognitive_git_test eduk12_sjt_git_test bundle_git_ci_test; do
+            docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool "$database"
+          done
           for variant in marker feedback_policy standard_marker license_selection publication; do
             docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool "education_${variant}_ci_test"
           done
@@ -355,6 +358,11 @@ jobs:
           --exclude=src/__tests__/scale/component-publication.postgres.integration.test.ts
           --exclude=src/__tests__/scale/git-standard-release.postgres.integration.test.ts
           --exclude=src/__tests__/scale/component-management.http.integration.test.ts
+          --exclude=src/__tests__/measurement-content/content-release-plane.postgres.integration.test.ts
+          --exclude=src/__tests__/cognitive/git-release.postgres.integration.test.ts
+          --exclude=src/__tests__/cognitive/admin-report-release.postgres.integration.test.ts
+          --exclude=src/__tests__/situational/git-release.test.ts
+          --exclude=src/__tests__/bundle-onboarding/git-release.postgres.integration.test.ts
           --exclude=src/__tests__/integration/teacherSelfGroupScale.postgres.integration.test.ts
           --exclude=src/__tests__/integration/librarySelfGroupScale.postgres.integration.test.ts
           --exclude=src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts
@@ -463,6 +471,31 @@ jobs:
         run: |
           npm test -- src/__tests__/scale/component-publication.postgres.integration.test.ts src/__tests__/scale/component-management.http.integration.test.ts src/__tests__/scale/git-standard-release.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-component-import-vitest.json
           node scripts/assert-release-test-report.mjs /tmp/eduk12-component-import-vitest.json src/__tests__/scale/component-publication.postgres.integration.test.ts src/__tests__/scale/component-management.http.integration.test.ts src/__tests__/scale/git-standard-release.postgres.integration.test.ts
+      - name: Git content release lifecycles on empty isolated PostgreSQL databases
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.empty-fixtures.outcome == 'success'
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          CONTENT_GIT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/content_git_ci_test?schema=public
+          COGNITIVE_GIT_RELEASE_TEST_DB_URL: postgresql://ptool:ptool123@localhost:5432/eduk12_cognitive_git_test?schema=public
+          SJT_GIT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/eduk12_sjt_git_test?schema=public
+          BUNDLE_GIT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/bundle_git_ci_test?schema=public
+        run: |
+          run_release_suite() {
+            local report="$1"
+            shift
+            npm test -- "$@" --no-file-parallelism --reporter=default --reporter=json --outputFile="$report"
+            node scripts/assert-release-test-report.mjs "$report" "$@"
+          }
+          DATABASE_URL="$CONTENT_GIT_TEST_DATABASE_URL" run_release_suite /tmp/eduk12-content-git-vitest.json \
+            src/__tests__/measurement-content/content-release-plane.postgres.integration.test.ts
+          DATABASE_URL="$COGNITIVE_GIT_RELEASE_TEST_DB_URL" COGNITIVE_GIT_RELEASE_ISOLATED_TEST=1 \
+            run_release_suite /tmp/eduk12-cognitive-git-vitest.json \
+            src/__tests__/cognitive/git-release.postgres.integration.test.ts \
+            src/__tests__/cognitive/admin-report-release.postgres.integration.test.ts
+          DATABASE_URL="$SJT_GIT_TEST_DATABASE_URL" SJT_GIT_RELEASE_ISOLATED=1 \
+            run_release_suite /tmp/eduk12-sjt-git-vitest.json src/__tests__/situational/git-release.test.ts
+          DATABASE_URL="$BUNDLE_GIT_TEST_DATABASE_URL" run_release_suite /tmp/eduk12-bundle-git-vitest.json \
+            src/__tests__/bundle-onboarding/git-release.postgres.integration.test.ts
       - name: real legacy education publication for the current compatibility consumer
         id: legacy-feedback
         if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.empty-fixtures.outcome == 'success' && steps.historical-fixtures.outcome == 'success'
@@ -542,6 +575,10 @@ jobs:
         if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures'
         run: >-
           node "$GITHUB_WORKSPACE/.github/scripts/backend-regression-reports.mjs" /tmp/eduk12-backend-vitest-fixtures.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-teacher-runtime-vitest.json /tmp/eduk12-cognitive-install-vitest.json /tmp/eduk12-cognitive-admin-intake-vitest.json /tmp/eduk12-library-http-vitest.json /tmp/eduk12-component-import-vitest.json
+          /tmp/eduk12-content-git-vitest.json
+          /tmp/eduk12-cognitive-git-vitest.json
+          /tmp/eduk12-sjt-git-vitest.json
+          /tmp/eduk12-bundle-git-vitest.json
           /tmp/eduk12-teacher-self-group.json
           /tmp/eduk12-library-self-group.json
           /tmp/eduk12-teacher-private-group.json
@@ -590,6 +627,10 @@ jobs:
             /tmp/eduk12-cognitive-admin-intake-vitest.json
             /tmp/eduk12-library-http-vitest.json
             /tmp/eduk12-component-import-vitest.json
+            /tmp/eduk12-content-git-vitest.json
+            /tmp/eduk12-cognitive-git-vitest.json
+            /tmp/eduk12-sjt-git-vitest.json
+            /tmp/eduk12-bundle-git-vitest.json
             /tmp/eduk12-teacher-self-group.json
             /tmp/eduk12-library-self-group.json
             /tmp/eduk12-teacher-private-group.json
@@ -690,6 +731,11 @@ jobs:
           src/__tests__/survey/library-management.http.integration.test.ts
           src/__tests__/scale/component-publication.postgres.integration.test.ts
           src/__tests__/scale/git-standard-release.postgres.integration.test.ts
+          src/__tests__/measurement-content/content-release-plane.postgres.integration.test.ts
+          src/__tests__/cognitive/git-release.postgres.integration.test.ts
+          src/__tests__/cognitive/admin-report-release.postgres.integration.test.ts
+          src/__tests__/situational/git-release.test.ts
+          src/__tests__/bundle-onboarding/git-release.postgres.integration.test.ts
           src/__tests__/scale/component-management.http.integration.test.ts
           src/__tests__/survey/governed-native.postgres.integration.test.ts
           src/__tests__/survey/standard-catalog-fingerprint.postgres.integration.test.ts
