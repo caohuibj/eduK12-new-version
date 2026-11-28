@@ -1,0 +1,97 @@
+{
+  "toolKey": "ofs10_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0",
+  "title": "面向未来｜先给想做的事留一扇门",
+  "report": {
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 原件与内容核对",
+        "reviewedAt": "2026-11-28T01:29:32.298Z",
+        "basis": "核对 Botella 等（2018）英文附表及西班牙语原表，十项、原五档、中点和第6项反向保持一致；保留憧憬、计划、应对、接受未来不确定的原意。所用论文与同作者附表为 CC BY 4.0。现行 P 无分档，论文西班牙样本的分组阈值不迁移。独立中文工作译稿。"
+      }
+    },
+    "reportVersion": "1.3.0",
+    "primaryScoreKeys": [
+      "openness_to_future"
+    ],
+    "scoreOrder": [
+      "openness_to_future"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "openness_to_future",
+        "headline": "先给想做的事留一扇门",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "你想参加一项活动，日程和精力还没定下来。可以先问清下次时间，给那天留一点余地。愿望未必需要立刻兑现，先给它留个能回来查看的位置，也是一种面对未来的办法。\n\n十题把期待、计划、应对困难的信心，以及能否接受生活会有好有坏，放在同一个总分里。得分范围 10–50，分高表示这次回答更接近愿意面对未来的描述。这个数无法替你决定该追哪个目标；它邀请你回头看，自己目前还愿意对哪件事保持一点好奇，或需要哪些实际支持。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一个愿意保留的「也许」：再联系一位朋友、试一次喜欢的活动，或者给日程留点空档。记下它对你为什么重要。"
+          },
+          {
+            "category": "strategy",
+            "text": "写下一步能做的准备和一个备选安排。比如先问对方哪天方便，再约定时间不合适就下周再谈。"
+          },
+          {
+            "category": "support",
+            "text": "如果目前最需要的是处理压力或休息，就先照顾这件事。可以找人一起分担一项实事，再决定有没有余力看下一步。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "中文工作版本仍在研究完善，没有可用的中文等级或排名；本次回答不能预言未来。十题需答完整才计算，漏答不是0分。"
+    ],
+    "disclaimer": "供成年人研究和日常反思使用，不用于诊断、选拔或排名。中文为独立研究工作稿。",
+    "artworkKey": "ofs10_zh_cn_research/1.0.0/1.3.0"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
