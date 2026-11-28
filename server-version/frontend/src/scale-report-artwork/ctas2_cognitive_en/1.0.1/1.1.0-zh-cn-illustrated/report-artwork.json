@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "ctas2_cognitive_en/1.0.1/1.1.0-zh-cn-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位成年学生在考桌前停一停，目光回到手边的答题纸。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

@@ -1,0 +1,139 @@
+{
+  "toolKey": "jcq_en",
+  "contentVersion": "1.0.0",
+  "version": "1.1.0-zh-cn-illustrated",
+  "parameterVersion": "default",
+  "title": "工作可以从一个小调整开始",
+  "report": {
+    "reportVersion": "1.1.0-zh-cn-illustrated",
+    "primaryScoreKeys": [
+      "task_crafting",
+      "cognitive_crafting",
+      "relational_crafting",
+      "total_job_crafting"
+    ],
+    "scoreOrder": [
+      "task_crafting",
+      "cognitive_crafting",
+      "relational_crafting",
+      "total_job_crafting"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "task_crafting",
+        "scoreLabel": "任务调整｜1–6 均分",
+        "headline": "让做事的顺序更适合手头的任务",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "在允许调整的范围内，换一个步骤、安排一段专注时间，或把交接说清楚，都可能让一件事更好完成。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "选一个反复被打断的环节。和受影响的人约定一种简单的调整，下次看看它是否减少了来回确认。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "cognitive_crafting",
+        "scoreLabel": "看待工作的方式｜1–6 均分",
+        "headline": "找到这件事服务的那个具体人",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "重复的工作有时会让人看不见它的作用。想一想，你手里这一步给谁省了时间、帮谁做了判断，或让哪件事更容易继续。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "找一件常觉得没意思的工作。写下一句具体的影响，再决定哪里值得投入，哪里需要和团队商量。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "relational_crafting",
+        "scoreLabel": "工作关系调整｜1–6 均分",
+        "headline": "给需要一起做的事留一次交流",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "把合作变得顺一点，可以从更早确认分工开始。知道遇到问题找谁，也能给彼此少留一场临时救火。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "找一位最近经常需要协作的人。用十分钟对一下交接内容，定下下次最早何时互相提醒。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "total_job_crafting",
+        "scoreLabel": "工作重塑总体｜1–6 均分",
+        "headline": "先挑一个值得尝试的小调整",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "工作重塑记录的是平时会怎样调整做事方式、理解工作和组织合作。不同岗位留出的空间不同，频率也会随工作阶段变化。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "从三个方面任选一个当地实际允许的小动作。一周后回想变化带来的是省力、顺畅，还是多了一项要照看的事，再决定是否继续。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "每题原频次 1–6 分。三个维度各 5 题，维度答全后求均分。15 题齐答时提供总体均分。分数越高，表示相应做法较常出现。此版本以原分回顾，没有人群等级。",
+      "题本仍使用 15 题六档英语原版，中文为原创反馈。频率不等同于调整效果，岗位权限和协作约定应纳入解释。中文六档回译题本及数字分发许可仍待材料。"
+    ],
+    "disclaimer": "供成年工作人群非商业研究和个人回顾使用。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "jcq_en/1.0.0/1.1.0-zh-cn-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-zh-cn-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

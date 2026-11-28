@@ -1,0 +1,89 @@
+{
+  "toolKey": "ctas2_cognitive_en",
+  "contentVersion": "1.0.1",
+  "version": "1.1.0-zh-cn-illustrated",
+  "parameterVersion": "default",
+  "title": "考试时卡住了，先找一个能下笔的地方",
+  "report": {
+    "reportVersion": "1.1.0-zh-cn-illustrated",
+    "primaryScoreKeys": [
+      "cognitive_test_anxiety"
+    ],
+    "scoreOrder": [
+      "cognitive_test_anxiety"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "cognitive_test_anxiety",
+        "scoreLabel": "认知考试焦虑｜24–96 原始总分",
+        "headline": "考试时卡住了，先找一个能下笔的地方",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有时明明学过，脑子却一直在想时间够不够、答错会怎样。担心会占住一部分注意力，眼前的题就更难读进去。这份结果帮你回想什么时刻最容易被这些念头打断，也给下一次练习留一个可以试的小动作。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次卡住的经历。什么时候最明显，是刚拿到卷子、遇到陌生题，还是看到时间走得很快？记下当时最影响你的一件事。"
+          },
+          {
+            "category": "strategy",
+            "text": "先在熟悉的练习里试一次。遇到卡住时，给自己几秒钟，划出正在问什么，然后写下确定能做的一步。需要跳过时留个记号，做完能做的再回来。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "24 项按原版四档计 1–4 分，答全后相加，原分范围 24–96。分数越高，表示这次报告的考试担忧和思绪干扰越多。结果采用描述性原分。",
+      "题本使用 Cassady 的英语第二版，中文是本项目原创报告。结果并行反映考试情境和学习经历，不能用来评定能力或决定分班。中文题本译制和数字分发仍待确认。"
+    ],
+    "disclaimer": "供大学生及成年学习者在非商业研究和自我回顾中使用。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "ctas2_cognitive_en/1.0.1/1.1.0-zh-cn-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-zh-cn-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "toolKey": "copsoq3_job_satisfaction_en",
+  "contentVersion": "1.0.0",
+  "version": "1.1.0-zh-cn-illustrated",
+  "parameterVersion": "default",
+  "title": "工作满意度｜把想留下的和想改变的分开",
+  "report": {
+    "reportVersion": "1.1.0-zh-cn-illustrated",
+    "primaryScoreKeys": [
+      "job_satisfaction"
+    ],
+    "scoreOrder": [
+      "job_satisfaction"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "job_satisfaction",
+        "headline": "把想留下的和想改变的分开",
+        "scoreLabel": "工作满意度｜0–100 原始均分",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "说起工作，你可能既想留住一些东西，也有一两件事已经想改很久。把两种感受放在一张纸上，常常比追问自己到底满不满意更容易看出方向。这次结果记录你对工作整体、发展机会和报酬的看法。哪一部分最影响你的日常，要回到具体经历里看。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "在纸上写两行。第一行写一件下周还想留住的事，第二行写一件想改善的事。尽量写到具体场景，例如保留一段能专心做事的时间，或和同事商量清楚哪项任务优先。"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一件自己能先动手的小事，给它一个时间。如果要靠他人或制度一起改变，先记下发生过的一次具体情况，再找一个合适的人谈谈。"
+          },
+          {
+            "category": "environment",
+            "text": "隔一段时间想再回看时，记下这期间实际发生的一件变化，例如分工、时间安排或沟通方式。把变化和结果放在一起看，有助于决定下一步值得花力气的地方。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份反馈对应 COPSOQ III 国际中版的英文工作满意度题本。此报告为项目原创中文解读。",
+      "完整三题的原始分在 0–100 范围内等权取均值。分数越高，表示这次自报的满意程度越高。结果以实际分数呈现，参考地区常模或风险分档暂无依据。",
+      "工作条件、个人需要和近期经历都会影响感受。个体结果用于回顾和沟通，人员考核与录用应使用独立的工作评价依据。"
+    ],
+    "disclaimer": "供成年工作人群在非商业研究和个人回顾中使用。本页记录个人作答感受。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "copsoq3_job_satisfaction_en/1.0.0/1.1.0-zh-cn-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-zh-cn-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}
