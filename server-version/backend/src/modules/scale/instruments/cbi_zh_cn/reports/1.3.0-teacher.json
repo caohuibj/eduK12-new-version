@@ -1,0 +1,138 @@
+{
+  "toolKey": "cbi_zh_cn",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-teacher",
+  "title": "哥本哈根倦怠量表（中文试用报告）",
+  "report": {
+    "reportVersion": "1.3.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "primaryScoreKeys": [
+      "personal_burnout",
+      "work_related_burnout",
+      "client_related_burnout"
+    ],
+    "scoreOrder": [
+      "personal_burnout",
+      "work_related_burnout",
+      "client_related_burnout"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "personal_burnout",
+        "scoreLabel": "整体疲惫（个人分）",
+        "headline": "看看什么时候最想停下来歇一歇",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有时工作告一段落，回家后只是准备一顿饭、收拾几样东西，也觉得很费力；有时早上还没开始忙，身体或情绪已经有些撑不住。整体疲惫分取六题的 0–100 均分，分数越高，表示你本次自述的疲惫出现得更常。这部分把工作内外的体验都包括在内。",
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一个最累的日常片段，只记当时做了什么、感觉如何、后来什么时候缓过来。也可以回想一次类似却轻松一些的经历。"
+          },
+          {
+            "category": "environment",
+            "text": "从接下来一天的安排里选一件可以延后或请人分担的事，把省下来的时间留给一段不被下一件任务打断的休息。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "work_related_burnout",
+        "scoreLabel": "工作相关疲惫",
+        "headline": "把疲惫放回具体的工作安排里",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "连续上课、开会和处理临时来件的一天结束后，可能很难再做需要专注的事；一想到明天还这样排满，也会觉得累。工作相关疲惫取七题的 0–100 均分，分数越高，表示你在答题时更常或更强地感到与工作有关的疲惫。分数记录你对工作体验的看法。",
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看最近一个工作日，标出一项最费力的安排。想想累主要出现在任务集中时、反复切换时，还是缺少时间或人手时。"
+          },
+          {
+            "category": "support",
+            "text": "如果需要协作，选一个具体的协调请求和负责安排的人谈一谈，比如错开两项截止时间，或给需要专注的任务留出完整时段。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "client_related_burnout",
+        "scoreLabel": "服务互动相关疲惫",
+        "headline": "留意服务互动结束后的感受",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "连续答疑、照料或协助别人之后，有时会想先安静一下才能开始下一项工作。这一部分取六题的 0–100 均分，分数越高，表示你在答题时更常或更强地感到与服务互动有关的疲惫。学校里的服务对象可以是学生，其他工作也可按实际面对的人理解。分数反映你的感受，服务对象无须为此承担评价。",
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想近期同一类服务对象的一次互动，记下具体发生了什么、互动持续了多久，以及结束后你还需要承担哪些事务。"
+          },
+          {
+            "category": "support",
+            "text": "如果互动常常连着发生，可以和同事商量事先分工、交接或轮流回应。给自己留一个短过渡，也让需要的服务保持连续。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "整体疲惫至少答 3 道，工作相关至少答 4 道，服务互动至少答 3 道，才能显示对应分数。达到最低题数但有漏答时，用已答题计平均；漏答不当作零分。",
+      "三项分开阅读。没有对应服务互动经历时，该部分不适用。",
+      "题本是依据英文原版独立翻译的简体中文工作稿，仍待人工译审和本地验证。分数没有本地常模、百分位或等级，请结合答题时的实际情况阅读。",
+      "量表来源与使用署名：Borritz M et al. Burnout among employees in human service work: design and baseline findings of the PUMA study. Scandinavian Journal of Public Health. 2006;34:49–58。工具发展文献：Kristensen TS 等（2005），https://doi.org/10.1080/02678370500297720。"
+    ],
+    "disclaimer": "供成人教师和相关工作者回顾本次自述体验。请勿将结果用于诊断、录用、绩效考核或学校排名。",
+    "artworkKey": "cbi_zh_cn/1.0.1/1.3.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

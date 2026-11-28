@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "cbi_zh_cn/1.0.1/1.3.0-teacher",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一名成人结束服务工作后经过前台和办公桌，在窗边停下来。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
