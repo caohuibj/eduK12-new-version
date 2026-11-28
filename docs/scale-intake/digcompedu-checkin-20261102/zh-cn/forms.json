@@ -1,0 +1,700 @@
+{
+  "source": "https://doi.org/10.7717/peerj.18456/supp-1",
+  "license": "原作 © 2024 Ersoy 等。论文《Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects》，PeerJ 12:e18456，https://doi.org/10.7717/peerj.18456。原 DigCompEdu 框架：Redecker（2017），Punie 编，欧盟委员会联合研究中心，https://doi.org/10.2760/159770。附件按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）使用。本项目改动为简体中文工作翻译及配套图文说明，沿用英语数字化版本的字段和施测安排。",
+  "forms": [
+    {
+      "key": "digcompedu_checkin_peerj2023_pre_positioning_zh_cn",
+      "name": "DigCompEdu Check-In｜填写前自我定位｜高等教育教师自评｜简体中文工作译本",
+      "version": "1.0.0",
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:zh-cn",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "form:pre_positioning"
+      ],
+      "sourceQuestions": [
+        2
+      ],
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "pre_positioning",
+            "title": "填写前自我定位",
+            "description": "这是一道自愿填写的自我定位题。请按当下对自己教学实践的判断选一个类别。\n\n原作 © 2024 Ersoy 等。论文《Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects》，PeerJ 12:e18456，https://doi.org/10.7717/peerj.18456。原 DigCompEdu 框架：Redecker（2017），Punie 编，欧盟委员会联合研究中心，https://doi.org/10.2760/159770。附件按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）使用。本项目改动为简体中文工作翻译及配套图文说明，沿用英语数字化版本的字段和施测安排。",
+            "questions": [
+              {
+                "itemKey": "dce_context_2",
+                "type": "SINGLE",
+                "prompt": "目前，你如何评估自己在高等教育或继续教育教学中的数字能力？",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "A1. 初学者"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "A2. 探索者"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "B1. 整合者"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "B2. 专家"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "C1. 引领者"
+                  },
+                  {
+                    "optionKey": "o6",
+                    "label": "C2. 开拓者"
+                  }
+                ],
+                "rows": []
+              }
+            ]
+          }
+        ]
+      },
+      "counterpartKey": "digcompedu_checkin_peerj2023_pre_positioning_en",
+      "contentLocale": "zh-CN",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "attribution": "原作 © 2024 Ersoy 等。论文《Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects》，PeerJ 12:e18456，https://doi.org/10.7717/peerj.18456。原 DigCompEdu 框架：Redecker（2017），Punie 编，欧盟委员会联合研究中心，https://doi.org/10.2760/159770。附件按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）使用。本项目改动为简体中文工作翻译及配套图文说明，沿用英语数字化版本的字段和施测安排。"
+    },
+    {
+      "key": "digcompedu_checkin_peerj2023_context_zh_cn",
+      "name": "DigCompEdu Check-In｜背景与数字教学条件｜高等教育教师自评｜简体中文工作译本",
+      "version": "1.0.0",
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:zh-cn",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "form:context"
+      ],
+      "sourceQuestions": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "context",
+            "title": "背景与数字教学条件",
+            "description": "请按你愿意分享的情况填写。个人背景和工作条件用于理解教学语境。请勿填写可识别学生身份的信息。\n\n原作 © 2024 Ersoy 等。论文《Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects》，PeerJ 12:e18456，https://doi.org/10.7717/peerj.18456。原 DigCompEdu 框架：Redecker（2017），Punie 编，欧盟委员会联合研究中心，https://doi.org/10.2760/159770。附件按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）使用。本项目改动为简体中文工作翻译及配套图文说明，沿用英语数字化版本的字段和施测安排。",
+            "questions": [
+              {
+                "itemKey": "dce_context_25",
+                "type": "SINGLE",
+                "prompt": "你的学术职称是？",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "正教授（博士）"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "副教授（博士）"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "助理教授（博士）"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "研究助理"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "讲师"
+                  }
+                ],
+                "rows": []
+              },
+              {
+                "itemKey": "dce_context_26",
+                "type": "SINGLE",
+                "prompt": "你的性别是？",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "女"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "男"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "不愿透露"
+                  }
+                ],
+                "rows": []
+              },
+              {
+                "itemKey": "dce_context_27",
+                "type": "NUMBER",
+                "prompt": "你的年龄是多少？",
+                "required": false,
+                "options": [],
+                "rows": [],
+                "min": 0
+              },
+              {
+                "itemKey": "dce_context_28",
+                "type": "NUMBER",
+                "prompt": "你在高等教育中从事教学已有多少年？",
+                "required": false,
+                "options": [],
+                "rows": [],
+                "min": 0
+              },
+              {
+                "itemKey": "dce_context_29",
+                "type": "MULTIPLE",
+                "prompt": "你在哪些学科领域任教？可多选。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "护理学"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "营养学与膳食学"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "物理治疗与康复"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "听力学"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "医疗卫生管理"
+                  },
+                  {
+                    "optionKey": "o6",
+                    "label": "社会工作"
+                  },
+                  {
+                    "optionKey": "o7",
+                    "label": "运动与体育科学"
+                  },
+                  {
+                    "optionKey": "o8",
+                    "label": "作业治疗"
+                  },
+                  {
+                    "optionKey": "o9",
+                    "label": "其他，请填写"
+                  }
+                ],
+                "rows": [],
+                "otherOptionKey": "o9",
+                "otherMaxLength": 300
+              },
+              {
+                "itemKey": "dce_context_30",
+                "type": "MULTIPLE",
+                "prompt": "你主要教授哪些学生？可多选。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "本科生"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "硕士研究生"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "博士研究生"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "全日制成人学生"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "非全日制成人学生"
+                  },
+                  {
+                    "optionKey": "o6",
+                    "label": "其他，请填写"
+                  }
+                ],
+                "rows": [],
+                "otherOptionKey": "o6",
+                "otherMaxLength": 300
+              },
+              {
+                "itemKey": "dce_context_31",
+                "type": "NUMBER",
+                "prompt": "你在教学中使用数字技术已有多少年？请填写年数，从未使用填 0。这里的数字技术指手机、电脑、互联网、软件等信息通信技术，可用于以电子方式创建、查看、分发、修改、存储、检索、传输和接收数字信息。",
+                "required": false,
+                "options": [],
+                "rows": [],
+                "min": 0
+              },
+              {
+                "itemKey": "dce_context_32",
+                "type": "MULTIPLE",
+                "prompt": "你或你的学生在教学和学习中用过哪些数字工具？可多选。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "演示文稿"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "电子海报、思维导图、计划工具"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "观看视频或收听音频"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "在线测验或投票，例如 Kahoot、Mentimeter"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "博客或维基平台"
+                  },
+                  {
+                    "optionKey": "o6",
+                    "label": "制作视频或音频"
+                  },
+                  {
+                    "optionKey": "o7",
+                    "label": "在线或虚拟学习环境，例如 Moodle"
+                  },
+                  {
+                    "optionKey": "o8",
+                    "label": "在线沟通工具，例如 Zoom、Teams、Skype、Google Meet"
+                  },
+                  {
+                    "optionKey": "o9",
+                    "label": "我还没有在课堂上使用过任何数字工具"
+                  },
+                  {
+                    "optionKey": "o10",
+                    "label": "其他，请填写"
+                  }
+                ],
+                "rows": [],
+                "otherOptionKey": "o10",
+                "otherMaxLength": 300
+              },
+              {
+                "itemKey": "dce_context_33",
+                "type": "MULTIPLE",
+                "prompt": "你的大学提供哪些教学或学习用数字技术？可多选。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "学习管理系统或虚拟学习环境，例如 Moodle 或 Blackboard"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "学生选课与成绩管理系统，例如课程名单、成绩、考勤"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "异步沟通工具，例如电子邮件、短信、即时消息"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "同步沟通工具，例如 Zoom、Teams、Skype"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "在线或电子化测量与评估系统"
+                  },
+                  {
+                    "optionKey": "o6",
+                    "label": "其他，请填写"
+                  }
+                ],
+                "rows": [],
+                "otherOptionKey": "o6",
+                "otherMaxLength": 300
+              },
+              {
+                "itemKey": "dce_context_34",
+                "type": "MULTIPLE",
+                "prompt": "你是否可以使用下列面向教学或学习的先进技术或学科专用数字技术？可多选。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "增强现实或虚拟现实工具或环境"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "模拟工具"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "用于特定任务的软件或应用，例如高级计算、数据分析"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "学校购买的特定在线资料库或数据库访问权限"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "其他，请填写"
+                  }
+                ],
+                "rows": [],
+                "otherOptionKey": "o5",
+                "otherMaxLength": 300
+              },
+              {
+                "itemKey": "dce_context_35",
+                "type": "MULTIPLE",
+                "prompt": "你有在线教学经验吗？可多选。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "有，我只在新冠疫情期间开过全在线课程"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "有，我在新冠疫情之前开过全在线课程"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "有，我只在新冠疫情期间开过部分在线课程（混合式课程）"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "有，我在新冠疫情之前开过部分在线课程（混合式课程）"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "没有，我从未开过在线课程"
+                  },
+                  {
+                    "optionKey": "o6",
+                    "label": "其他，请填写"
+                  }
+                ],
+                "rows": [],
+                "otherOptionKey": "o6",
+                "otherMaxLength": 300
+              },
+              {
+                "itemKey": "dce_context_36",
+                "type": "MULTIPLE",
+                "prompt": "你有参加或报名在线课程或证书项目的经历吗？可多选。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "有，我参加或报名过全在线课程或证书项目"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "有，我参加或报名过部分在线的课程或证书项目（混合式）"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "没有，我没有这类学习经历"
+                  }
+                ],
+                "rows": []
+              },
+              {
+                "itemKey": "dce_context_37",
+                "type": "MATRIX",
+                "prompt": "下列说法与你本人及你在工作以外使用数字技术的情况相符吗？每行只选一项。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "非常不同意"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "不同意"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "既不同意也不反对"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "同意"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "非常同意"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "r1",
+                    "label": "我觉得电脑和其他技术设备容易使用。"
+                  },
+                  {
+                    "rowKey": "r2",
+                    "label": "我经常使用互联网，并且用得很熟练。"
+                  },
+                  {
+                    "rowKey": "r3",
+                    "label": "我愿意了解新的应用、程序和资源，并且对它们感到好奇。"
+                  },
+                  {
+                    "rowKey": "r4",
+                    "label": "我加入了多个社交网络。"
+                  }
+                ]
+              },
+              {
+                "itemKey": "dce_context_38",
+                "type": "MATRIX",
+                "prompt": "你的工作环境在多大程度上符合下列情况？每行只选一项。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "非常不同意"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "不同意"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "既不同意也不反对"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "同意"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "非常同意"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "r1",
+                    "label": "所在院系投入资源更新和改进技术基础设施。"
+                  },
+                  {
+                    "rowKey": "r2",
+                    "label": "所在院系提供必要的技术支持。"
+                  },
+                  {
+                    "rowKey": "r3",
+                    "label": "学生可以使用数字设备。"
+                  },
+                  {
+                    "rowKey": "r4",
+                    "label": "所在院系的网络连接稳定且速度快。"
+                  },
+                  {
+                    "rowKey": "r5",
+                    "label": "所在院系支持我发展数字能力，例如提供持续专业发展活动。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "counterpartKey": "digcompedu_checkin_peerj2023_context_en",
+      "contentLocale": "zh-CN",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "attribution": "原作 © 2024 Ersoy 等。论文《Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects》，PeerJ 12:e18456，https://doi.org/10.7717/peerj.18456。原 DigCompEdu 框架：Redecker（2017），Punie 编，欧盟委员会联合研究中心，https://doi.org/10.2760/159770。附件按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）使用。本项目改动为简体中文工作翻译及配套图文说明，沿用英语数字化版本的字段和施测安排。"
+    },
+    {
+      "key": "digcompedu_checkin_peerj2023_post_positioning_zh_cn",
+      "name": "DigCompEdu Check-In｜填写后自我定位｜高等教育教师自评｜简体中文工作译本",
+      "version": "1.0.0",
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:zh-cn",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "form:post_positioning"
+      ],
+      "sourceQuestions": [
+        39
+      ],
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "post_positioning",
+            "title": "填写后自我定位",
+            "description": "这是一道自愿填写的自我定位题。请按当下对自己教学实践的判断选一个类别。\n\n原作 © 2024 Ersoy 等。论文《Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects》，PeerJ 12:e18456，https://doi.org/10.7717/peerj.18456。原 DigCompEdu 框架：Redecker（2017），Punie 编，欧盟委员会联合研究中心，https://doi.org/10.2760/159770。附件按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）使用。本项目改动为简体中文工作翻译及配套图文说明，沿用英语数字化版本的字段和施测安排。",
+            "questions": [
+              {
+                "itemKey": "dce_context_39",
+                "type": "SINGLE",
+                "prompt": "填写问卷之后，你现在如何评估自己在高等教育或继续教育教学中的数字能力？请从 A1 到 C2 选择一个等级，A1 为最低，C2 为最高。",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "A1. 初学者"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "A2. 探索者"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "B1. 整合者"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "B2. 专家"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "C1. 引领者"
+                  },
+                  {
+                    "optionKey": "o6",
+                    "label": "C2. 开拓者"
+                  }
+                ],
+                "rows": []
+              }
+            ]
+          }
+        ]
+      },
+      "counterpartKey": "digcompedu_checkin_peerj2023_post_positioning_en",
+      "contentLocale": "zh-CN",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "attribution": "原作 © 2024 Ersoy 等。论文《Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects》，PeerJ 12:e18456，https://doi.org/10.7717/peerj.18456。原 DigCompEdu 框架：Redecker（2017），Punie 编，欧盟委员会联合研究中心，https://doi.org/10.2760/159770。附件按 CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）使用。本项目改动为简体中文工作翻译及配套图文说明，沿用英语数字化版本的字段和施测安排。"
+    }
+  ],
+  "adaptations": [
+    "All background and positioning questions are optional (source required flags removed).",
+    "Source question1 email collection omitted; use existing platform identity controls.",
+    "Question33 editorial parenthesis about seeking partner LMS names omitted.",
+    "Question34/35 Turkish Other label Diğer normalised to English Other.",
+    "Mechanical PDF missing-letter/line-wrap repairs in question33 and36; no response scores.",
+    "Non-negative number entry is a project data-entry guard, not an author-specified score rule.",
+    "Pre/post positioning labels punctuated consistently. No A1–C2 calculated classification or matrix score."
+  ],
+  "englishReferenceSha256": "6b9b42827f1d4e4ade6bf514f4a8a443535cde561ef9c3b5188410346461160c",
+  "contentLocale": "zh-CN",
+  "correspondence": [
+    {
+      "english": "digcompedu_checkin_peerj2023_pre_positioning_en",
+      "chinese": "digcompedu_checkin_peerj2023_pre_positioning_zh_cn",
+      "sourceQuestions": [
+        2
+      ]
+    },
+    {
+      "english": "digcompedu_checkin_peerj2023_context_en",
+      "chinese": "digcompedu_checkin_peerj2023_context_zh_cn",
+      "sourceQuestions": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ]
+    },
+    {
+      "english": "digcompedu_checkin_peerj2023_post_positioning_en",
+      "chinese": "digcompedu_checkin_peerj2023_post_positioning_zh_cn",
+      "sourceQuestions": [
+        39
+      ]
+    }
+  ],
+  "ordinaryCombinationPlan": {
+    "kind": "ordinary_questionnaire_plan",
+    "sourceOrder": [
+      "pre_positioning",
+      "digcompedu_checkin_peerj2023_professional_engagement_en",
+      "digcompedu_checkin_peerj2023_digital_resources_en",
+      "digcompedu_checkin_peerj2023_teaching_learning_en",
+      "digcompedu_checkin_peerj2023_assessment_en",
+      "digcompedu_checkin_peerj2023_empowering_learners_en",
+      "digcompedu_checkin_peerj2023_facilitating_digital_competence_en",
+      "context",
+      "post_positioning"
+    ],
+    "order": [
+      "digcompedu_checkin_peerj2023_pre_positioning_zh_cn",
+      "digcompedu_checkin_peerj2023_professional_engagement_zh_cn",
+      "digcompedu_checkin_peerj2023_digital_resources_zh_cn",
+      "digcompedu_checkin_peerj2023_teaching_learning_zh_cn",
+      "digcompedu_checkin_peerj2023_assessment_zh_cn",
+      "digcompedu_checkin_peerj2023_empowering_learners_zh_cn",
+      "digcompedu_checkin_peerj2023_facilitating_digital_competence_zh_cn",
+      "digcompedu_checkin_peerj2023_context_zh_cn",
+      "digcompedu_checkin_peerj2023_post_positioning_zh_cn"
+    ],
+    "aggregateScore": null
+  }
+}
