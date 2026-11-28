@@ -1,0 +1,263 @@
+{
+  "toolKey": "srlo44_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-pilot",
+  "title": "看清一门在线课程里的学习做法｜大学课程研究试用",
+  "report": {
+    "reportVersion": "1.3.0-pilot",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 来源、计分和内容复核",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "以原论文与更正页核对同一门课指导、44 题、十维、原方向及 1–7 均分，与现有 C 和 P 配置对应。"
+      }
+    },
+    "primaryScoreKeys": [
+      "online_academic_self_efficacy",
+      "online_intrinsic_motivation",
+      "online_extrinsic_motivation",
+      "online_negative_achievement_emotion",
+      "planning_time_management",
+      "metacognition",
+      "study_environment",
+      "online_effort_regulation",
+      "online_social_support",
+      "online_task_strategies"
+    ],
+    "scoreOrder": [
+      "online_academic_self_efficacy",
+      "online_intrinsic_motivation",
+      "online_extrinsic_motivation",
+      "online_negative_achievement_emotion",
+      "planning_time_management",
+      "metacognition",
+      "study_environment",
+      "online_effort_regulation",
+      "online_social_support",
+      "online_task_strategies"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "online_academic_self_efficacy",
+        "scoreLabel": "课程信心（1–7 均分）",
+        "headline": "哪一类课程任务让你有把握",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "第一次打开作业页面时，你可能有把握找到要求，也可能在决定如何起步时犹豫。这里描述你报告能理解、完成和坚持学习这门课程的信心。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找一项准备开始的作业，先写下完成它的三个具体动作，再留意其中哪一步需要范例或解释。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "online_intrinsic_motivation",
+        "scoreLabel": "课程内容兴趣（1–7 均分）",
+        "headline": "哪一小段让你想多学一点",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "当某个例子有意思时，有人会愿意看完延伸资料，或者在讨论区继续追问。这个均分对应你对这门课程内容本身的兴趣和学习感受。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一个想展开的问题，再找一小段材料看看这份兴趣是否能带来可行的下一步。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "online_extrinsic_motivation",
+        "scoreLabel": "成绩与期待的推动（1–7 均分）",
+        "headline": "哪些外部事情让你更愿意投入",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "成绩目标、别人的期待等条件会推动学习。这个均分反映你在这门课程里对这些动力的自述认可。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想想一个外部要求如何影响具体安排，例如是否促成明确的学习时段，也是否带来额外压力。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "online_negative_achievement_emotion",
+        "scoreLabel": "学习时的难受与压力（1–7 均分）",
+        "headline": "把压力放回发生的课程情境",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "临近提交时，消息、任务或进度叠在一起，可能让人对学习感到担忧或烦难。此组数值越高，表示你本次更认同有关负面学习感受的描述。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一件具体的学习经历，看看哪些任务要求、时间限制或交流问题与自己的感受一起出现。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "planning_time_management",
+        "scoreLabel": "计划和时间安排（1–7 均分）",
+        "headline": "计划能不能接到实际一周里",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "事前把任务拆成几件，并留意自己什么时候能做，这是这一维关注的习惯。分数描述在这门课里你自述使用相关做法的程度。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "用下一次提交日期排出一个短时段，先做一件能当场看见进展的事。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "metacognition",
+        "scoreLabel": "检查与调整做法（1–7 均分）",
+        "headline": "学过之后，怎样知道自己真的懂了",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "完成一段视频学习后，用自己的话讲给同学听，也许会发现一个环节还没想清楚。这组均分反映本次自述的检查和调整做法。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一小段材料关掉页面后复述一次，再回到原文核实那个遗漏的地方。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "study_environment",
+        "scoreLabel": "实际学习环境（1–7 均分）",
+        "headline": "把环境里能安排的部分找出来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有时安静的地方、有网络的时间或合适的座椅，都会影响你能否顺利学习。这个均分描述你报告的环境安排做法。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选在接下来最常用的一处环境，找一个能减少中断的调整，同时记下需要别人提供的资源。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "online_effort_regulation",
+        "scoreLabel": "遇到干扰时的投入（1–7 均分）",
+        "headline": "分心以后从哪一步接回来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "如果中途有人找你帮忙，保留一句提醒有时更容易回来继续。该均分记录这门课中自述保持努力和处理干扰的情况。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "下次暂停前，把正在进行的动作写成一句能接续的话。回来后再看这句话是否真的帮到你。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "online_social_support",
+        "scoreLabel": "在线学习支持（1–7 均分）",
+        "headline": "一个具体的问题更容易得到回应",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "转到网络课堂后，学习交流可能从举手变成提问帖或同伴群。这组描述你本次在课中获取、寻求和使用支持的做法。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一个你想讨论的问题，带上自己的初步尝试，找一个合适的同学或教师交流。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "online_task_strategies",
+        "scoreLabel": "处理与联系课程内容（1–7 均分）",
+        "headline": "把新内容接上已经知道的事",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "把新概念写进一个已有例子里，有时可以检查自己是否真的能用。这组均分描述你在这门课中理解、组织与联系内容的自述。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一个课程概念，找一个自己熟悉的案例，试着用它解释一处具体现象。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "沿用同一门大学在线或混合课程作答、完整题组均分和十维并列结果。课程资源和个人处境可帮助解释这次回答。",
+      "独立中文工作译稿。P 提供十个 1–7 描述分，没有样本等级。",
+      "Broadbent、Panadero、Lodge 和 Fuller-Tyszkiewicz，SRL-O 更正后 Table 8，https://doi.org/10.1007/s11409-022-09319-6 ，更正 https://doi.org/10.1007/s11409-022-09323-w ，CC BY 4.0 https://creativecommons.org/licenses/by/4.0/ 。平台中文题本和报告为独立改编。"
+    ],
+    "disclaimer": "用于 18 岁及以上大学在线或混合课程的学习研究和具体回顾。",
+    "artworkKey": "srlo44_zh_cn_research/1.0.0/1.3.0-pilot"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
