@@ -1,0 +1,323 @@
+{
+  "requestId": "ae740000-62bf-5657-899d-42d4b0c90106",
+  "toolKey": "dmee_class_t_structuring_teacher_self_zh_cn",
+  "version": "1.0.0",
+  "title": "DMEE-Class-T｜结构组织｜教师自评｜简体中文工作稿",
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "dmee_class_t_structuring_teacher_self_zh_cn",
+        "title": "DMEE-Class-T｜结构组织｜教师自评｜简体中文工作稿",
+        "description": "请根据平常的教学实践，选择与实际情况最贴近的频率，不适用或无法判断时可留空。原发表版未指定固定回顾期。本表供教师自我反思，采用无分频率记录。请勿填写学生姓名等可识别信息。 该部分是从完整卷按原研究最终题组划分提取的描述性记录。",
+        "questions": [
+          {
+            "itemKey": "dmee_en_item_09",
+            "type": "LIKERT",
+            "prompt": "在一节课或一项活动开始时，我会简要回顾上一节课或上一次活动的内容。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_10",
+            "type": "LIKERT",
+            "prompt": "我会说明给学生安排的不同活动之间有什么联系。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_11",
+            "type": "LIKERT",
+            "prompt": "我会引导学生关注这节课或这项活动的重点。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_12",
+            "type": "LIKERT",
+            "prompt": "在一节课或一项活动结束时，我会总结已经学过或练习过的内容。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_13",
+            "type": "LIKERT",
+            "prompt": "学生会把当前的课程或活动与先前的课程或活动联系起来。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_14",
+            "type": "LIKERT",
+            "prompt": "学生能够重新讲清上一节课或上一次活动进行了什么。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_15",
+            "type": "LIKERT",
+            "prompt": "在一节课或一项活动结束时，学生会总结他们已经学过或练习过的内容。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          }
+        ]
+      }
+    ]
+  },
+  "statement": "根据 Claude Dierendonck（2023）研究补充表 S1 法语原文与作者英译逐项转译为简体中文，并保留补充表 S5 最终题组对应。CC BY 4.0，保留署名和改动声明。七档原频率选项保持顺序，均无分值。项目中文工作稿供非商业教育反思。",
+  "classificationTags": [
+    "population:teacher",
+    "language_validation:content_zh-CN",
+    "language_validation:maturity_pilot",
+    "use:reflection"
+  ],
+  "reference": {
+    "author": "Claude Dierendonck",
+    "originalArticle": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2023.1281431/full",
+    "supplement": "https://doi.org/10.3389/feduc.2023.1281431.s001",
+    "originalItemNumbers": [
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "retainedForm55": false,
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "sourceLocale": "fr",
+    "authorTranslationLocale": "en",
+    "contentLocale": "zh-CN",
+    "tags": [
+      "family:dmee-class-t",
+      "role:teacher_self",
+      "stage:basic_school",
+      "lang:zh-CN",
+      "version:2023",
+      "use:reflection",
+      "status:pilot",
+      "carrier:form",
+      "source:fr_author_en",
+      "license:cc-by-4.0"
+    ],
+    "changes": "55 retained statements translated to Simplified Chinese against original French and author English, with platform Chinese response guidance. Item sequence, seven ordered frequency categories, option IDs, absence of required answers and absence of scores are preserved. For the eight subsets, membership is copied from the existing final grouping and retained in source order.",
+    "versionScope": "Working Chinese translation for non-commercial educational self-reflection. Descriptive use. No claim of validated Chinese scores, independent subscale administration, norms or author endorsement.",
+    "sourceDefinition": {
+      "key": "dmee_class_t_structuring_teacher_self_en",
+      "version": "1.0.0",
+      "sha256": "8e128f56db6c39fbf6bf0e1c882c61d744b913537233c2bda7aca802b1db4f3e"
+    }
+  }
+}

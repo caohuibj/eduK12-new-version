@@ -1,0 +1,2147 @@
+{
+  "requestId": "83c65a67-b022-5404-a40d-9a62f806c04a",
+  "toolKey": "dmee_class_t_retained55_teacher_self_zh_cn",
+  "version": "1.0.0",
+  "title": "DMEE-Class-T｜完整55题｜教师自评｜简体中文工作稿",
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "dmee_class_t_retained55_teacher_self_zh_cn",
+        "title": "DMEE-Class-T｜完整55题｜教师自评｜简体中文工作稿",
+        "description": "请根据平常的教学实践，选择与实际情况最贴近的频率，不适用或无法判断时可留空。原发表版未指定固定回顾期。本表供教师自我反思，采用无分频率记录。请勿填写学生姓名等可识别信息。",
+        "questions": [
+          {
+            "itemKey": "dmee_en_item_01",
+            "type": "LIKERT",
+            "prompt": "在一节课或一项活动开始时，我会向学生明确说明学习目标。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_02",
+            "type": "LIKERT",
+            "prompt": "在课堂或活动中，我会解释所安排的每项任务有什么用。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_03",
+            "type": "LIKERT",
+            "prompt": "我会确认学生是否真正理解我所安排的课程或活动的含义和价值。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_04",
+            "type": "LIKERT",
+            "prompt": "我会询问学生，他们认为为什么要安排这些课程或活动。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_05",
+            "type": "LIKERT",
+            "prompt": "学生知道当前这节课或这项活动的目的或目标。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_06",
+            "type": "LIKERT",
+            "prompt": "学生知道自己为什么在做某一项活动。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_07",
+            "type": "LIKERT",
+            "prompt": "学生明白自己为什么正在完成某一项具体任务。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_08",
+            "type": "LIKERT",
+            "prompt": "我会为学习遇到困难的学生调整目标和要求。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_09",
+            "type": "LIKERT",
+            "prompt": "在一节课或一项活动开始时，我会简要回顾上一节课或上一次活动的内容。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_10",
+            "type": "LIKERT",
+            "prompt": "我会说明给学生安排的不同活动之间有什么联系。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_11",
+            "type": "LIKERT",
+            "prompt": "我会引导学生关注这节课或这项活动的重点。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_12",
+            "type": "LIKERT",
+            "prompt": "在一节课或一项活动结束时，我会总结已经学过或练习过的内容。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_13",
+            "type": "LIKERT",
+            "prompt": "学生会把当前的课程或活动与先前的课程或活动联系起来。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_14",
+            "type": "LIKERT",
+            "prompt": "学生能够重新讲清上一节课或上一次活动进行了什么。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_15",
+            "type": "LIKERT",
+            "prompt": "在一节课或一项活动结束时，学生会总结他们已经学过或练习过的内容。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_16",
+            "type": "LIKERT",
+            "prompt": "我会根据学生的能力调整任务量。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_17",
+            "type": "LIKERT",
+            "prompt": "我会根据学生的能力安排不同的任务。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_18",
+            "type": "LIKERT",
+            "prompt": "我会用口头方式向全班提问。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_19",
+            "type": "LIKERT",
+            "prompt": "我会用口头方式向特定学生单独提问。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_20",
+            "type": "LIKERT",
+            "prompt": "我会以书面形式提出问题。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_21",
+            "type": "LIKERT",
+            "prompt": "我会提出开放式问题，要求学生给出有理由或较充分的回答。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_22",
+            "type": "LIKERT",
+            "prompt": "学生能理解我提出的问题。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_23",
+            "type": "LIKERT",
+            "prompt": "学生能正确回答我单独向他们提出的问题。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_24",
+            "type": "LIKERT",
+            "prompt": "当我向全班提出问题时，学生愿意回答。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_25",
+            "type": "LIKERT",
+            "prompt": "我会向学生讲解策略和步骤，再要求他们实际运用。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_26",
+            "type": "LIKERT",
+            "prompt": "当学生做练习遇到特定困难时，我会向他们示范应该使用的正确策略或步骤。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_27",
+            "type": "LIKERT",
+            "prompt": "为完成练习或解决情境中的问题，我会要求学生使用我示范过的策略和步骤。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_28",
+            "type": "LIKERT",
+            "prompt": "面对练习或问题情境，学生会提出自己的解题策略或步骤。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_29",
+            "type": "LIKERT",
+            "prompt": "面对练习或问题情境，学生会正确运用我示范过的策略和步骤。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_30",
+            "type": "LIKERT",
+            "prompt": "学生能够比较轻松地理解我讲解的策略和步骤。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_31",
+            "type": "LIKERT",
+            "prompt": "我会布置书面的应用练习，请学生独立完成。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_32",
+            "type": "LIKERT",
+            "prompt": "我会布置书面的应用练习，请学生两人一组完成。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_33",
+            "type": "LIKERT",
+            "prompt": "我会布置书面的应用练习，请学生分组完成。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_34",
+            "type": "LIKERT",
+            "prompt": "我会口头布置应用练习，让学生运用刚刚学到的内容。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_35",
+            "type": "LIKERT",
+            "prompt": "我布置的应用练习有明确的针对性，聚焦某项技能或某一类任务。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_36",
+            "type": "LIKERT",
+            "prompt": "我布置的应用练习需要综合运用多项技能。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_37",
+            "type": "LIKERT",
+            "prompt": "我布置的练习会在课堂上集体订正，或由我在校内时段或放学后批改。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_38",
+            "type": "LIKERT",
+            "prompt": "我会根据学生的能力调整任务的复杂程度，例如评价一篇文章、概括内容或识别主要主题。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_39",
+            "type": "LIKERT",
+            "prompt": "我会确保每位学生都能参与这节课或这项活动。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_40",
+            "type": "LIKERT",
+            "prompt": "我会给学生积极的反馈。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_41",
+            "type": "LIKERT",
+            "prompt": "课堂学习的气氛平静而安定。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_42",
+            "type": "LIKERT",
+            "prompt": "我鼓励学生在有不懂的内容时主动告诉我。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_43",
+            "type": "LIKERT",
+            "prompt": "我会选择不同材料来匹配学生的能力水平，例如给熟练程度较低或较高的学生选用符合其需要的书籍。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_44",
+            "type": "LIKERT",
+            "prompt": "我会给基础相对薄弱的学生提供额外帮助和工具，例如含有关键信息的视觉提示材料。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_45",
+            "type": "LIKERT",
+            "prompt": "我的评估确实能帮助学生改进接下来的学习。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_46",
+            "type": "LIKERT",
+            "prompt": "我会分析学生在评估中最常犯的错误，准确判断全班或部分学生首先需要练习什么。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_47",
+            "type": "LIKERT",
+            "prompt": "学生在课堂上完成一项具体任务时，我会观察他们，并直接就他们的表现给出反馈。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_48",
+            "type": "LIKERT",
+            "prompt": "每次评估后，我会向学生反馈哪些内容已经掌握得好，哪些方面还需要继续努力。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_49",
+            "type": "LIKERT",
+            "prompt": "每次评估后，我会为遇到困难的学生补充讲解。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_50",
+            "type": "LIKERT",
+            "prompt": "每次评估后，我会为遇到困难的学生设计改进活动，安排具体的纠正步骤。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_51",
+            "type": "LIKERT",
+            "prompt": "我会按照每位学生的学习水平调整评估，例如提出不同的问题或调整我对作答的要求。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_52",
+            "type": "LIKERT",
+            "prompt": "我会评估基础相对薄弱的学生取得了哪些进步。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_53",
+            "type": "LIKERT",
+            "prompt": "我会分析有关学生学业进步的数据。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_54",
+            "type": "LIKERT",
+            "prompt": "我会评估自己的教学做法是否有效，例如持续查看学生的学习成果和取得的进步。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "dmee_en_item_55",
+            "type": "LIKERT",
+            "prompt": "我会根据收集到的学生能力数据，决定教学中需要作哪些调整。",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "frequency_1",
+                "label": "从不"
+              },
+              {
+                "optionKey": "frequency_2",
+                "label": "很少"
+              },
+              {
+                "optionKey": "frequency_3",
+                "label": "有时"
+              },
+              {
+                "optionKey": "frequency_4",
+                "label": "定期"
+              },
+              {
+                "optionKey": "frequency_5",
+                "label": "经常"
+              },
+              {
+                "optionKey": "frequency_6",
+                "label": "非常经常"
+              },
+              {
+                "optionKey": "frequency_7",
+                "label": "一贯如此"
+              }
+            ],
+            "rows": []
+          }
+        ]
+      }
+    ]
+  },
+  "statement": "根据 Claude Dierendonck（2023）研究补充表 S1 法语原文与作者英译逐项转译为简体中文，并保留补充表 S5 最终题组对应。CC BY 4.0，保留署名和改动声明。七档原频率选项保持顺序，均无分值。项目中文工作稿供非商业教育反思。",
+  "classificationTags": [
+    "population:teacher",
+    "language_validation:content_zh-CN",
+    "language_validation:maturity_pilot",
+    "use:reflection"
+  ],
+  "reference": {
+    "author": "Claude Dierendonck",
+    "originalArticle": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2023.1281431/full",
+    "supplement": "https://doi.org/10.3389/feduc.2023.1281431.s001",
+    "originalItemNumbers": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55
+    ],
+    "retainedForm55": true,
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "sourceLocale": "fr",
+    "authorTranslationLocale": "en",
+    "contentLocale": "zh-CN",
+    "tags": [
+      "family:dmee-class-t",
+      "role:teacher_self",
+      "stage:basic_school",
+      "lang:zh-CN",
+      "version:2023",
+      "use:reflection",
+      "status:pilot",
+      "carrier:form",
+      "source:fr_author_en",
+      "license:cc-by-4.0"
+    ],
+    "changes": "55 retained statements translated to Simplified Chinese against original French and author English, with platform Chinese response guidance. Item sequence, seven ordered frequency categories, option IDs, absence of required answers and absence of scores are preserved. For the eight subsets, membership is copied from the existing final grouping and retained in source order.",
+    "versionScope": "Working Chinese translation for non-commercial educational self-reflection. Descriptive use. No claim of validated Chinese scores, independent subscale administration, norms or author endorsement.",
+    "sourceDefinition": {
+      "key": "dmee_class_t_retained55_teacher_self_en",
+      "version": "1.0.0",
+      "sha256": "05822605b166d2bbced4054f82a0cd8c7d062f30e31208406c32861071c40749"
+    }
+  }
+}
