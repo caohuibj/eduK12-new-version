@@ -1,0 +1,101 @@
+{
+  "toolKey": "res9_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0",
+  "title": "计划变了，可以找一个小支点（试用）",
+  "report": {
+    "reportVersion": "1.3.0",
+    "primaryScoreKeys": [
+      "resilience_total"
+    ],
+    "scoreOrder": [
+      "resilience_total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "resilience_total",
+        "headline": "计划变了，可以找一个小支点",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "好好的出门计划，半路碰上自行车漏气。你可能先把车推到安全的地方，找一个能借工具的人，再决定改道还是继续。问卷里说的应对困难，往往就体现在这些小决定里。回想一次类似的经历时，也可以看看有什么条件帮你走到了下一步。\n\n九道题把你对自己平时怎么面对困难的看法汇成一个合计。分数越高，表示你这次更认同题里的应对描述。生活支持、健康和手头资源都会影响实际经历。这份试用报告留给你一个简单的回顾问题。事情变化时，什么帮你多走了一步？",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一个最近的困难，分别写下一件自己实际做过的事、一项当时得到的支持，以及一个仍未解决的需要。用具体经历理解回答，不用让一次经历代表永久的自己。"
+          },
+          {
+            "category": "strategy",
+            "text": "从仍未解决的需要里选一个负担较小的下一步，例如把任务再拆小、预留恢复时间，或先处理最影响日常的一件事。判断它是否有帮助，要看实际生活变化，不看分数是否上升。"
+          },
+          {
+            "category": "support",
+            "text": "如果压力持续影响睡眠、工作、学习或人际生活，可以把具体困难和需要告诉可信赖的人，或寻求合适的专业支持。是否求助不需要等总分达到某个界线。"
+          }
+        ],
+        "scoreLabel": "面对困难时的自我评价合计（0–36）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "中文研究样本为484名中国成人的便利样本，女性、年轻、高教育和汉族参与者较多；它不是全国常模，也不能直接外推到中小学生、临床筛查或所有成人情境。",
+      "九条中文题干逐字来自Qing等（2022）Table 2；本平台指导语和五档中文响应标签是依据已发表英文施测页制作的工作译稿，并非论文公开的逐字中文版。此报告同样由平台新增，尚待人工译审，原作者未审定或背书本平台呈现。",
+      "本版本只解释一个0–36总分，不设分档、常模、百分位、子量表或诊断切点。九题必须答完整才计算；真实0分与漏答未计算不同。",
+      "题干来源与许可：Qing, Y., Bakker, A., van der Meer, C. A. I., te Brake, H., & Olff, M. (2022). Assessing psychological resilience: translation and validation of the Chinese version of the resilience evaluation scale (RES). European Journal of Psychotraumatology, 13(2), 2133358. https://doi.org/10.1080/20008066.2022.2133358 。© 2022 The Author(s)，按CC BY-NC 4.0许可（https://creativecommons.org/licenses/by-nc/4.0/）仅限非商业使用；需保留署名、许可链接并注明改动。仓库MIT许可证不覆盖量表题文。"
+    ],
+    "disclaimer": "供成人中文非商业研究与自我了解。分数反映本次回答，若担心持续压力对生活的影响，可以请合适的专业人员进一步了解。题干按 CC BY-NC 4.0 保留署名。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted source, rights and editorial review; not human expert or psychometric approval",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对Qing等（2022）Table 2及许可声明、van der Meer等（2018）附录完整英文响应锚点、res9_zh_cn C1.0.0/P none和现有许可元数据。本次只新增绑定原C/P的非商业、无阈值R审稿件；不声称中文工作译稿经作者验证，不改变题本、计分、适用人群、许可、披露、注册状态或真实部署状态。"
+      }
+    },
+    "artworkKey": "res9_zh_cn/1.0.0/1.3.0"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
