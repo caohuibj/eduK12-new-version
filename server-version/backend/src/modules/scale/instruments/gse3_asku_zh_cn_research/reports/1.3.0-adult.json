@@ -1,0 +1,101 @@
+{
+  "toolKey": "gse3_asku_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "把陌生任务变成下一步｜成人试用版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex source, rights and editorial review; not human translation or psychometric approval",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "依据ZIS官方GSE-3英文题本、当前中文工作译稿C1.0.0及default P复核三题、五档锚点、完整作答均值和使用权边界。本次只新增score-only成人审稿R；不改变C/P，不引入常模、参考、分档或能力判断。"
+      }
+    },
+    "primaryScoreKeys": [
+      "general_self_efficacy"
+    ],
+    "scoreOrder": [
+      "general_self_efficacy"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "general_self_efficacy",
+        "scoreLabel": "一般自我效能均分（1–5，试用）",
+        "headline": "有把握，不等于什么都要独自解决",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "想象一个日常场景：家里的无线路由器突然需要重新设置，页面上却出现一排陌生选项。有人会先保存旧配置、查说明，再请客服确认一个关键步骤；有人会先觉得自己处理不了。使用清单、说明书或别人的经验，并不会把自己的能力清零——能辨认问题、组织信息、尝试和核对，本来就是解决任务的一部分。\n\n这三题记录的是你通常在困难、复杂任务面前，对自己能否找到办法的看法。三题都答完后取1–5的平均值；数值越大，表示这次整体更认同“我能应对”的描述。它没有观察你的实际表现，也不能从分数推断你会不会某项技能、能否独立完成某件事。\n\n比起追问“我到底行不行”，更有用的是回到最近一个真实任务：哪些部分已经会，哪里还不清楚，什么资源能帮忙，以及下一步可以小到什么程度。信心会随经验、任务难度、身体状态和支持条件变化；这份结果只提供一次回顾入口。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一件最近完成或正在处理的陌生任务，分别写下“我已经知道的”“我后来查到的”和“仍需要确认的”。把工具和他人的帮助也记进去。"
+          },
+          {
+            "category": "strategy",
+            "text": "给任务设一个十五分钟内能开始的步骤，例如保存现状、列出两个问题、读完一页说明或完成一次小测试。做完后再决定下一步，不要求一开始就看懂全部。"
+          },
+          {
+            "category": "support",
+            "text": "需要协助时，把请求说具体：说明卡在哪一步、已经试过什么、希望对方帮你确认哪一点。具体求助是解决问题的策略，不是能力不足的证明。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "当前C是依据ZIS官方英文题本制作的中文工作译稿，尚未完成人工专家译审、认知访谈或中文目标人群心理测量验证；不得称为官方或已验证中文版。",
+      "三题采用完整作答后的等权均值，范围1–5，无反向题。default P不含常模、百分位、cut-off或参考分档，本报告也不新增这些内容。",
+      "分数描述一般性的任务信心，不是实际能力、智力、独立程度、成绩、工作表现或未来成功的测量。",
+      "仅限符合许可条件的非商业使用。来源：Doll, E. S., Nießen, D., Schmidt, I., Rammstedt, B., & Lechner, C. M. (2021). The General Self-Efficacy Short Scale–3 (GSE-3): An English-language adaptation. ZIS. https://doi.org/10.6102/zis294 。中文工作译稿及平台报告属于改编，按CC BY-NC-SA 4.0提供：https://creativecommons.org/licenses/by-nc-sa/4.0/；须保留署名、许可链接、同许可和改动说明，原作者未背书本平台。"
+    ],
+    "disclaimer": "成人非商业研究试用版，仅供描述性自我回顾；不用于诊断、能力鉴定、选拔、排名或商业服务。中文工作译稿尚待人工译审，报告不提供高低分界。",
+    "artworkKey": "gse3_asku_zh_cn_research/1.0.0/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "gse3_asku_zh_cn_research/1.0.0/1.3.0-adult",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一名成人翻看工作笔记，和同事把一个陌生任务拆成手头能试的第一步。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
