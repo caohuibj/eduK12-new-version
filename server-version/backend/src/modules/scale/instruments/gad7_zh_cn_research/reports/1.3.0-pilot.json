@@ -1,0 +1,92 @@
+{
+  "toolKey": "gad7_zh_cn_research",
+  "contentVersion": "1.1.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-pilot",
+  "title": "回顾过去两周的紧张与担忧｜成人研究试用",
+  "report": {
+    "reportVersion": "1.3.0-pilot",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 来源、计分和内容复核",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对作者 2006 GAD-7、NCBI 英文问卷，确定过去两周、0–3、七题同向合计。当前版本的独立中文译词与其他发表译本分别记录。"
+      }
+    },
+    "primaryScoreKeys": [
+      "gad7_total"
+    ],
+    "scoreOrder": [
+      "gad7_total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "gad7_total",
+        "scoreLabel": "紧张与担忧频次合计（0–21）",
+        "headline": "近期哪些状况出现得更常",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这份记录汇总你对过去两周中紧张、担忧、放松困难及相关体验的回答。各题的频次按 0–3 编码，7 题完整回答后得到 0–21 的合计。数值较高表示合并起来看，本次报告受到相关情况困扰的频次较多。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "可以从感受比较鲜明的一个时段入手，记下发生在什么地方、当时正做什么，以及这个记录覆盖哪几天。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "当前中文为项目独立工作译稿，保留成人研究。报告描述本次过去两周的原始合计。",
+      "一道题出现频繁与多道题各出现几天可能得到相似合计。具体经历还需结合时间和情境理解。",
+      "Spitzer、Kroenke、Williams 和 Löwe（2006），GAD-7，https://doi.org/10.1001/archinte.166.10.1092 。开发获得 Pfizer Inc. 教育资助，开发者允许量表复制、翻译、展示与分发。报告与中文工作译稿为平台独立改编。"
+    ],
+    "disclaimer": "供成人研究试用及描述性回顾，诊断需要独立专业评估。",
+    "artworkKey": "gad7_zh_cn_research/1.1.0/1.3.0-pilot"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

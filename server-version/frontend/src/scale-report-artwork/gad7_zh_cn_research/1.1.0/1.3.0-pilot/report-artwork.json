@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "gad7_zh_cn_research/1.1.0/1.3.0-pilot",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位成人在候车窗边停下来回顾当时的经历。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
