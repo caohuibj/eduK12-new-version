@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "l1_zh_cn_research/1.0.0/1.3.0-pilot",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位成人走在傍晚的街道上，回望身旁的树影、住家和路人。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
