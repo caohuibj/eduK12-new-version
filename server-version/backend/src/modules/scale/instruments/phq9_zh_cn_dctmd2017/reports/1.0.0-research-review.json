@@ -1,0 +1,84 @@
+{
+  "toolKey": "phq9_zh_cn_dctmd2017",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.0.0-research-review",
+  "title": "研究记录与专业复核",
+  "report": {
+    "reportVersion": "1.0.0-research-review",
+    "primaryScoreKeys": [
+      "phq9_total"
+    ],
+    "scoreOrder": [
+      "phq9_total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "phq9_total",
+        "headline": "回顾近两周的记录",
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "summary": "九道题记录近两周出现过哪些感受、出现得多频繁。生活功能补充题进一步了解这些感受对工作、家务或与人相处的影响。负责专业人员可把结果和当事人的日常经历放在一起理解。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "在有人提供专业支持的场合，可以从最近最影响日常生活的一件变化谈起。这能帮助双方具体了解当前需要的支持。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "九道症状题分别按 0–3 计分，完整作答时直接相加，范围为 0–27。答满六题、未答满九题时，按已答题均分推算九题总分并标为估算。少于六题时不计算。最后的功能困难题单独保留。",
+      "DC/TMD 评分手册中的 5、10、15、20 为专业参考点。本研究候审核心为连续分，无本地常模或自动个人分档。",
+      "研究项目应在采用本问卷前安排专业人员独立查看第 9 题并按当地流程跟进。单个题目或总分不足以判断风险程度。"
+    ],
+    "disclaimer": "供有专业支持的研究后台审阅。页面无实时人员值守。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-research-review",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}
