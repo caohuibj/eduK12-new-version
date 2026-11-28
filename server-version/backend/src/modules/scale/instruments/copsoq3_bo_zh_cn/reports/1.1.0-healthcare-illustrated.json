@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_bo_zh_cn",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-healthcare-illustrated",
+  "parameterVersion": "default",
+  "title": "累过一班，也可以看看累了多久",
+  "report": {
+    "reportVersion": "1.1.0-healthcare-illustrated",
+    "primaryScoreKeys": [
+      "dimension"
+    ],
+    "scoreOrder": [
+      "dimension"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "dimension",
+        "headline": "累过一班，也可以看看累了多久",
+        "scoreLabel": "职业倦怠（0–100 原量尺均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一场忙碌后的疲惫，和一连几周都很难恢复，值得用不同方式照顾。这里描述过去四周身体、情绪和整体的疲惫体验。休息机会、任务负担和生活处境都可能影响你的回答。先为最近的消耗留出观察空间。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回顾一周里最消耗的一段和最能恢复的一段，分别记一个发生条件。找一个容易落实的改变，如把短休条件写进交班或安排替岗。若持续疲惫已影响睡眠或日常，建议向你信任的专业人员寻求支持。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "共 4 题。完整作答后对各项 0–100 分等权求均分。分数越高，表示过去四周疲惫、身体耗竭和情绪耗竭出现频率越高。",
+      "研究证据来自中国医疗人员样本的整套问卷。暂无独立施测常模或风险阈值。",
+      "请结合最近四周的实际生活理解结果。单次自评不足以确定原因或作出临床诊断。"
+    ],
+    "disclaimer": "供成年医疗人员非商业研究和个人回顾。现阶段显示描述性原分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "copsoq3_bo_zh_cn/1.1.0/1.1.0-healthcare-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-healthcare-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

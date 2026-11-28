@@ -1,0 +1,1041 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ets16_en",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "教学投入量表（ETS，英文原版 16 题）",
+      "abbreviation": "ETS16-EN",
+      "instrumentFamily": "Engaged Teachers Scale original 16 items and four factors"
+    },
+    "construct": {
+      "primaryDomain": "ENGAGEMENT",
+      "secondaryDomains": [],
+      "constructDefinition": "从认知、情感、师生互动和同事互动四方面描述在职教师的教学投入。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "ets16_en",
+        "domain:teacher_workplace",
+        "construct:engagement",
+        "population:adult_teacher",
+        "response:self",
+        "locale:en",
+        "use:noncommercial_research"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "面向能读懂英文的成年在职教师。维持英文原题，本报告不采用中国本地常模。"
+    },
+    "administration": {
+      "itemCount": 16,
+      "estimatedMinutes": 6,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "教学经历。英文原表未设置固定回忆期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "2013 表2的16个原英文条目按原编号呈现。",
+        "显示 2018 原作者确认的 0–6 七档频次。四方面独立计算完整作答的描述性均分。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "成年在职教师的非商业教学投入研究。项目描述性均分用于个人回顾。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "https://www.frontlinelearningresearch.org/index.php/journal/article/view/44",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "2013 表2的 16 个原英文条目不改字句，依原编号排序。2018 原作者复核正文与附录核对原七档频次。英文题本和原创双语反馈分别留痕。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-en-research",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-descriptive-no-raw-feedback",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-credited-noncommercial-adult",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "The source publisher identifies the article as CC BY-NC-ND. This English transcription retains the 16 Table 2 items and their numeric order unchanged. The 2018 original-author cross-check corroborates wording, order, and the original seven-point frequency response labels. The Chinese report is a separate original commentary. Credited non-commercial research only. The scale authors do not endorse this implementation.",
+      "https://www.frontlinelearningresearch.org/index.php/journal/article/view/44",
+      "https://eprints.whiterose.ac.uk/id/eprint/129461/"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "en",
+    "version": "1.1.0",
+    "text": "Think about your experience teaching. For each statement, choose how often it describes what you do or feel.\n\nEngaged Teachers Scale. Robert M. Klassen, Sündüs Yerdelen, and Tracy L. Durksen (2013). English Table 2 item text reproduced for non-commercial research under the publisher’s CC BY-NC-ND terms. Source: https://doi.org/10.14786/flr.v1i2.44",
+    "source": "https://www.frontlinelearningresearch.org/index.php/journal/article/view/44"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "teacher_self_report",
+      "source": {
+        "title": "Engaged Teachers Scale (ETS), original English 16-item version, Table 2",
+        "citation": "Klassen, R. M., Yerdelen, S., & Durksen, T. L. (2013). Measuring Teacher Engagement: Development of the Engaged Teachers Scale (ETS). Frontline Learning Research, 1(2), 33–52. https://doi.org/10.14786/flr.v1i2.44",
+        "url": "https://www.frontlinelearningresearch.org/index.php/journal/article/view/44",
+        "publicationYear": 2013
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "The source publisher identifies the article as CC BY-NC-ND. This English transcription retains the 16 Table 2 items and their numeric order unchanged. The 2018 original-author cross-check corroborates wording, order, and the original seven-point frequency response labels. The Chinese report is a separate original commentary. Credited non-commercial research only. The scale authors do not endorse this implementation. https://www.frontlinelearningresearch.org/index.php/journal/article/view/44"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ets16_en",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "frequency_0_6",
+          "options": [
+            {
+              "value": "option_0",
+              "label": "Never",
+              "score": 0
+            },
+            {
+              "value": "option_1",
+              "label": "Rarely",
+              "score": 1
+            },
+            {
+              "value": "option_2",
+              "label": "On occasion",
+              "score": 2
+            },
+            {
+              "value": "option_3",
+              "label": "Sometimes",
+              "score": 3
+            },
+            {
+              "value": "option_4",
+              "label": "Often",
+              "score": 4
+            },
+            {
+              "value": "option_5",
+              "label": "Frequently",
+              "score": 5
+            },
+            {
+              "value": "option_6",
+              "label": "Always",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "ETS01",
+          "content": "At school, I connect well with my colleagues",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS02",
+          "content": "I am excited about teaching",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS03",
+          "content": "In class, I show warmth to my students",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS04",
+          "content": "I try my hardest to perform well while teaching",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS05",
+          "content": "I feel happy while teaching",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS06",
+          "content": "In class, I am aware of my students’ feelings",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS07",
+          "content": "At school, I am committed to helping my colleagues",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS08",
+          "content": "While teaching, I really “throw” myself into my work",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS09",
+          "content": "At school, I value the relationships I build with my colleagues",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS10",
+          "content": "I love teaching",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS11",
+          "content": "While teaching I pay a lot of attention to my work",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS12",
+          "content": "At school, I care about the problems of my colleagues",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS13",
+          "content": "I find teaching fun",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS14",
+          "content": "In class, I care about the problems of my students",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS15",
+          "content": "While teaching, I work with intensity",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ETS16",
+          "content": "In class, I am empathetic towards my students",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "frequency_0_6",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "cognitive_engagement",
+            "type": "dimension",
+            "label": "专注投入 · Cognitive engagement",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "aggregation": "mean",
+              "items": [
+                {
+                  "itemCode": "ETS04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ETS08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ETS11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ETS15",
+                  "weight": 1
+                }
+              ]
+            }
+          },
+          {
+            "key": "emotional_engagement",
+            "type": "dimension",
+            "label": "情感投入 · Emotional engagement",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "aggregation": "mean",
+              "items": [
+                {
+                  "itemCode": "ETS02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ETS05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ETS10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ETS13",
+                  "weight": 1
+                }
+              ]
+            }
+          },
+          {
+            "key": "student_engagement",
+            "type": "dimension",
+            "label": "与学生互动 · Engagement with students",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "aggregation": "mean",
+              "items": [
+                {
+                  "itemCode": "ETS03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ETS06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ETS14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ETS16",
+                  "weight": 1
+                }
+              ]
+            }
+          },
+          {
+            "key": "colleague_engagement",
+            "type": "dimension",
+            "label": "与同事互动 · Engagement with colleagues",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "aggregation": "mean",
+              "items": [
+                {
+                  "itemCode": "ETS01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ETS07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ETS09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ETS12",
+                  "weight": 1
+                }
+              ]
+            }
+          }
+        ],
+        "itemRules": [
+          {
+            "itemCode": "ETS01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ETS16",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ]
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "cognitive_engagement",
+          "emotional_engagement",
+          "student_engagement",
+          "colleague_engagement"
+        ],
+        "scoreOrder": [
+          "cognitive_engagement",
+          "emotional_engagement",
+          "student_engagement",
+          "colleague_engagement"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "cognitive_engagement",
+            "headline": "课堂上哪些时刻最容易集中注意？",
+            "scoreLabel": "专注投入 · Cognitive engagement · 0–6 平均分",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这组回答记录教学时专注和投入精力的频次。把回答放回一节你记得清楚的课，看看当时是怎样保住思路的。\n\nWhich parts of teaching most often hold your attention? Think of a recent lesson and take note of what let you stay focused.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "挑一个经常被打断的环节，先挪走一个干扰源，试一节课。\n\nProtect one part of the next lesson from a recurring distraction."
+              }
+            ]
+          },
+          {
+            "scoreKey": "emotional_engagement",
+            "headline": "哪一刻让你觉得这堂课值得？",
+            "scoreLabel": "情感投入 · Emotional engagement · 0–6 平均分",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "教学的兴趣和愉快感有时来自小小的实际进展，比如学生终于看懂一个点。回想近期最让你想继续做好的一刻。\n\nInterest and enjoyment in teaching can show up in small moments of progress. Recall one recent moment that made you want to keep going.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "记下这一刻发生的条件，下周让它再有一次出现的机会。\n\nNote what made that moment possible and make space for it once next week."
+              }
+            ]
+          },
+          {
+            "scoreKey": "student_engagement",
+            "headline": "哪一次你听到了学生真正想说的？",
+            "scoreLabel": "与学生互动 · Engagement with students · 0–6 平均分",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这组回答来自你留意学生感受、与学生保持联系的体验。留意一个真实的交谈片段，给自己时间听完对方的话。\n\nThese responses describe the energy you give to connecting with students and noticing what they are experiencing.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "课后选一个开放问题，听完一个学生的回答，再复述自己听到的重点。\n\nAsk an open question after class, listen, and reflect the main point back."
+              }
+            ]
+          },
+          {
+            "scoreKey": "colleague_engagement",
+            "headline": "谁曾帮你一起把一件小事做好？",
+            "scoreLabel": "与同事互动 · Engagement with colleagues · 0–6 平均分",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一起备一节课、借一份材料或互相接手一件事务，都是教研关系中的投入。可以先让这一类合作有一点固定时间。\n\nSharing materials or planning together are everyday ways to invest in relationships with colleagues.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "约出十分钟，互相带一个真实的课堂片段来讨论。\n\nFind ten minutes to exchange one concrete classroom observation with a colleague."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "四方面都按完整作答的四个题取 0–6 均分，这是本项目的描述性计分口径。用原分回顾自己的教学情境，不合成总分，不设置常模或切点。",
+          "Each dimension is the mean of its four answered items on the original 0–6 scale. The four descriptive means have no composite, norm or cutoff in this report."
+        ],
+        "disclaimer": "教学投入会随课堂与学校条件变化。仅用于成年人非商业教学研究和个人回顾。Please use the scores for non-commercial research and personal reflection.",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "en"
+        }
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "ETS01",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS02",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS03",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS04",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS05",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS06",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS07",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS08",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS09",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS10",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS11",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS12",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS13",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS14",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS15",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS16",
+            "responseValue": "option_0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_engagement": 0,
+            "emotional_engagement": 0,
+            "student_engagement": 0,
+            "colleague_engagement": 0
+          },
+          "totalScoreKeys": [
+            "cognitive_engagement",
+            "emotional_engagement",
+            "student_engagement",
+            "colleague_engagement"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "ETS01",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS02",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS03",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS04",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS05",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS06",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS07",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS08",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS09",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS10",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS11",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS12",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS13",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS14",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS15",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS16",
+            "responseValue": "option_3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_engagement": 3,
+            "emotional_engagement": 3,
+            "student_engagement": 3,
+            "colleague_engagement": 3
+          },
+          "totalScoreKeys": [
+            "cognitive_engagement",
+            "emotional_engagement",
+            "student_engagement",
+            "colleague_engagement"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "ETS01",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS02",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS03",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS04",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS05",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS06",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS07",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS08",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS09",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS10",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS11",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS12",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS13",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS14",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS15",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS16",
+            "responseValue": "option_6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_engagement": 6,
+            "emotional_engagement": 6,
+            "student_engagement": 6,
+            "colleague_engagement": 6
+          },
+          "totalScoreKeys": [
+            "cognitive_engagement",
+            "emotional_engagement",
+            "student_engagement",
+            "colleague_engagement"
+          ]
+        }
+      },
+      {
+        "name": "distinct_four_dimension_means",
+        "answers": [
+          {
+            "itemCode": "ETS01",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "ETS02",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "ETS03",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS04",
+            "responseValue": "option_0"
+          },
+          {
+            "itemCode": "ETS05",
+            "responseValue": "option_2"
+          },
+          {
+            "itemCode": "ETS06",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "ETS07",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS08",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "ETS09",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS10",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ETS11",
+            "responseValue": "option_2"
+          },
+          {
+            "itemCode": "ETS12",
+            "responseValue": "option_6"
+          },
+          {
+            "itemCode": "ETS13",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "ETS14",
+            "responseValue": "option_4"
+          },
+          {
+            "itemCode": "ETS15",
+            "responseValue": "option_2"
+          },
+          {
+            "itemCode": "ETS16",
+            "responseValue": "option_5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "cognitive_engagement": 1.25,
+            "emotional_engagement": 2.5,
+            "student_engagement": 4,
+            "colleague_engagement": 5.75
+          },
+          "totalScoreKeys": [
+            "cognitive_engagement",
+            "emotional_engagement",
+            "student_engagement",
+            "colleague_engagement"
+          ]
+        }
+      }
+    ]
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  }
+}

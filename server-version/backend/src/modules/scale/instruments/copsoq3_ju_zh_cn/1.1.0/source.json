@@ -1,0 +1,484 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "copsoq3_ju_zh_cn",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "COPSOQ III 组织公正（中国医疗人员中文研究分量表）",
+      "abbreviation": "COPSOQ3-JU-S1-ZH",
+      "instrumentFamily": "COPSOQ III 2025 Chinese healthcare study, published Supplemental S1 original full dimension"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructDefinition": "描述成年医疗人员自评的感受到公平分工、公平处理及意见获得回应的程度。",
+      "constructOverlapTags": [
+        "copsoq3_ju_zh_cn",
+        "source:copsoq_iii_china_healthcare_s1_2025",
+        "domain:workplace_psychosocial",
+        "population:adult_healthcare_workers",
+        "response:self",
+        "use:research",
+        "norms:none"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "面向能阅读中文的成年医疗机构工作人员。用于非商业研究和个人回顾。"
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "按原题所问的岗位工作体验，S1 本维度未指定统一回顾期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "按 S1 中文原题顺序、响应选项及计分方向施测。",
+        "完整作答后按原量尺计算单维度等权均分。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "研究证据来自医疗机构人员样本整套问卷。S1 中文原文施测版本的独立验证和当地常模尚缺。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Huang et al. (2025), Healthcare 13(7):825, 10.3390/healthcare13070825, Supplement S1 pp. 9, Chinese response key p. 15. https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "沿用论文作者已发表的中文原文，排版换行合并。平台配套文字和插图位于独立报告组件。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_ju_zh_cn-1.1.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_ju_zh_cn-1.1.0",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      }
+    }
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_ju_zh_cn-1.1.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Huang et al. (2025), Chinese research translation reproduced from publisher Supplement S1 with attribution; MDPI CC BY supplemental policy (https://www.mdpi.com/openaccess). The study describes authorization of the translation/validation by COPSOQ International Network and Li Jian in March 2023; the study's authorization is specific to its validation. Original network questionnaire CC BY-NC-ND 4.0 and guideline §4 research terms apply (https://www.copsoq-network.org/licence-guidelines-and-questionnaire). Unmodified full original study dimension as published in S1. Independent report, no network endorsement. Limited to adult healthcare personnel in non-commercial research, with no distribution of a new national version.",
+      "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf#page=7"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "zh-CN",
+    "version": "1.1.0",
+    "text": "接下来的问题不是关于你自己的工作，而是关于整个工作场所",
+    "source": "S1 PDF 第 8 页原中文信任与公正组指导语。https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "COPSOQ III China healthcare S1 — 组织公正",
+        "citation": "Huang et al. (2025), Healthcare 13(7):825, 10.3390/healthcare13070825, Supplement S1 pp. 9, Chinese response key p. 15. https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+        "url": "https://www.mdpi.com/2227-9032/13/7/825"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "Huang et al. (2025), Chinese research translation reproduced from publisher Supplement S1 with attribution; MDPI CC BY supplemental policy (https://www.mdpi.com/openaccess). The study describes authorization of the translation/validation by COPSOQ International Network and Li Jian in March 2023; the study's authorization is specific to its validation. Original network questionnaire CC BY-NC-ND 4.0 and guideline §4 research terms apply (https://www.copsoq-network.org/licence-guidelines-and-questionnaire). Unmodified full original study dimension as published in S1. Independent report, no network endorsement. Limited to adult healthcare personnel in non-commercial research, with no distribution of a new national version."
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "copsoq3_ju_zh_cn",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "s1_2",
+          "options": [
+            {
+              "value": "option_1",
+              "label": "程度非常大",
+              "score": 100
+            },
+            {
+              "value": "option_2",
+              "label": "程度很大",
+              "score": 75
+            },
+            {
+              "value": "option_3",
+              "label": "有些",
+              "score": 50
+            },
+            {
+              "value": "option_4",
+              "label": "程度很小",
+              "score": 25
+            },
+            {
+              "value": "option_5",
+              "label": "程度非常小",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "JU1",
+          "content": "冲突以公正的方式得以解决吗？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "s1_2",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "JU2",
+          "content": "当劳动者工作做得很好时，他们是否受到赞赏？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "s1_2",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "JU3",
+          "content": "管理层是否认真对待劳动者的所有建议？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "s1_2",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "JU4",
+          "content": "工作的分配是否公平？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "s1_2",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "dimension",
+            "label": "组织公正",
+            "type": "dimension",
+            "description": "感受到公平分工、公平处理及意见获得回应的程度",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "JU1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "JU2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "JU3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "JU4",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ],
+        "itemRules": [
+          {
+            "itemCode": "JU1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "JU2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "JU3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "JU4",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ]
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "dimension"
+        ],
+        "scoreOrder": [
+          "dimension"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "dimension",
+            "headline": "一件事办得公平，过程也看得见",
+            "scoreLabel": "组织公正（0–100 原量尺均分）",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "谁接下临时任务、建议有没有回音、有分歧能够怎么说，这些细节逐渐让人形成对公平的感受。分数描述你对这个工作场所的体验。清楚的理由、可预期的处理步骤和说得上话的机会，比一句「一视同仁」更具体。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一件你认为处理得公平或不公平的事，先记下过程：谁能提出意见，规则是怎么说明的，最后有没有反馈。把观察写成一个关于流程的问题，更容易和团队讨论。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "共 4 题。完整作答后对各项 0–100 分等权求均分。分数越高，表示感受到公平分工、公平处理及意见获得回应的程度越高。",
+          "研究证据来自中国医疗人员样本的整套问卷。暂无独立施测常模或风险阈值。"
+        ],
+        "disclaimer": "供成年医疗人员非商业研究和个人回顾。现阶段显示描述性原分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum descriptor",
+        "answers": [
+          {
+            "itemCode": "JU1",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "JU2",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "JU3",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "JU4",
+            "responseValue": "option_5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dimension": 0.0
+          },
+          "totalScoreKeys": [
+            "dimension"
+          ]
+        }
+      },
+      {
+        "name": "middle descriptor",
+        "answers": [
+          {
+            "itemCode": "JU1",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "JU2",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "JU3",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "JU4",
+            "responseValue": "option_3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dimension": 50.0
+          },
+          "totalScoreKeys": [
+            "dimension"
+          ]
+        }
+      },
+      {
+        "name": "maximum descriptor",
+        "answers": [
+          {
+            "itemCode": "JU1",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "JU2",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "JU3",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "JU4",
+            "responseValue": "option_1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dimension": 100.0
+          },
+          "totalScoreKeys": [
+            "dimension"
+          ]
+        }
+      },
+      {
+        "name": "mixed descriptors",
+        "answers": [
+          {
+            "itemCode": "JU1",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "JU2",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "JU3",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "JU4",
+            "responseValue": "option_5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dimension": 25.0
+          },
+          "totalScoreKeys": [
+            "dimension"
+          ]
+        }
+      }
+    ]
+  }
+}

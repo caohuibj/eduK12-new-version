@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_st_zh_cn",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-healthcare-illustrated",
+  "parameterVersion": "default",
+  "title": "班下了，紧绷感也可以慢慢放下来",
+  "report": {
+    "reportVersion": "1.1.0-healthcare-illustrated",
+    "primaryScoreKeys": [
+      "dimension"
+    ],
+    "scoreOrder": [
+      "dimension"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "dimension",
+        "headline": "班下了，紧绷感也可以慢慢放下来",
+        "scoreLabel": "压力（0–100 原量尺均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有时工作结束了，肩膀和注意力却还停在紧急状态。这里回看过去四周的难放松、易烦躁和紧张。分数告诉你这些感受出现得有多频繁。留意一段真正能够松口气的时间，也是在照看自己。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找一个平时最紧绷的时段，再找一个比较能放松的时段，比较环境或任务有什么不同。试试给交班后的前几分钟留出缓冲。若问题持续并影响生活，可考虑与专业人员讨论。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "共 3 题。完整作答后对各项 0–100 分等权求均分。分数越高，表示过去四周难放松、易怒和紧张出现频率越高。",
+      "研究证据来自中国医疗人员样本的整套问卷。暂无独立施测常模或风险阈值。",
+      "请结合最近四周的实际生活理解结果。单次自评不足以确定原因或作出临床诊断。"
+    ],
+    "disclaimer": "供成年医疗人员非商业研究和个人回顾。现阶段显示描述性原分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "copsoq3_st_zh_cn/1.1.0/1.1.0-healthcare-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-healthcare-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

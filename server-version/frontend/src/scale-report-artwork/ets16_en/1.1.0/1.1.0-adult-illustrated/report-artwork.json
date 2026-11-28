@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "ets16_en/1.1.0/1.1.0-adult-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "教师围桌交流，有人分享想法，有人翻开材料，也有人专注倾听。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

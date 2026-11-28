@@ -1,0 +1,85 @@
+{
+  "toolKey": "copsoq3_qw_zh_cn",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-healthcare-illustrated",
+  "parameterVersion": "default",
+  "title": "想把工作做好，也得有做好的条件",
+  "report": {
+    "reportVersion": "1.1.0-healthcare-illustrated",
+    "primaryScoreKeys": [
+      "dimension"
+    ],
+    "scoreOrder": [
+      "dimension"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "dimension",
+        "headline": "想把工作做好，也得有做好的条件",
+        "scoreLabel": "工作质量（0–100 原量尺均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "觉得「做得到」和回头看「做得满意」，共同构成这份工作质量体验。分数取自你对岗位条件和完成质量的感受。顺手的工具、清楚的交接、足够的复核时间，常常会决定一件工作能不能按心里的标准收尾。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找一件最近让你满意的工作，想想哪项条件帮了忙。再找一个容易返工的环节，用一句话写清楚「做到什么算完成」，下一班也能用同一标准交接。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "共 2 题。完整作答后对各项 0–100 分等权求均分。分数越高，表示在岗位条件下能完成满意质量且对实际完成质量满意的程度越高。",
+      "研究证据来自中国医疗人员样本的整套问卷。暂无独立施测常模或风险阈值。"
+    ],
+    "disclaimer": "供成年医疗人员非商业研究和个人回顾。现阶段显示描述性原分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "copsoq3_qw_zh_cn/1.1.0/1.1.0-healthcare-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-healthcare-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

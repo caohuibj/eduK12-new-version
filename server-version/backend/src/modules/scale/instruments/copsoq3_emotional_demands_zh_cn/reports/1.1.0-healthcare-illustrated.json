@@ -1,0 +1,85 @@
+{
+  "toolKey": "copsoq3_emotional_demands_zh_cn",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-healthcare-illustrated",
+  "parameterVersion": "default",
+  "title": "照顾别人的感受，也是一份工作",
+  "report": {
+    "reportVersion": "1.1.0-healthcare-illustrated",
+    "primaryScoreKeys": [
+      "dimension"
+    ],
+    "scoreOrder": [
+      "dimension"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "dimension",
+        "headline": "照顾别人的感受，也是一份工作",
+        "scoreLabel": "情感要求（0–100 原量尺均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有些当班任务写在流程里，有些藏在对话中：听完担心，回应失落，把一次为难的沟通讲清楚。本分数记录这些情绪情境在你的工作中出现得多频繁、要求有多大。一个人投入的耐心，未必能从完成了几项任务看出来。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想哪一种沟通最常让你带着心事离开。如果方便，在合规和保护隐私的前提下，找同事或督导简短复盘一次，聊一个难点，再决定有没有一处团队分工可以减轻负担。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "共 3 题。完整作答后对各项 0–100 分等权求均分。分数越高，表示工作中面对情绪困扰或他人问题的程度越高。",
+      "研究证据来自中国医疗人员样本的整套问卷。暂无独立施测常模或风险阈值。"
+    ],
+    "disclaimer": "供成年医疗人员非商业研究和个人回顾。现阶段显示描述性原分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "copsoq3_emotional_demands_zh_cn/1.1.0/1.1.0-healthcare-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-healthcare-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

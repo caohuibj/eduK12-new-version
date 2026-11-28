@@ -1,0 +1,85 @@
+{
+  "toolKey": "copsoq3_ju_zh_cn",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-healthcare-illustrated",
+  "parameterVersion": "default",
+  "title": "一件事办得公平，过程也看得见",
+  "report": {
+    "reportVersion": "1.1.0-healthcare-illustrated",
+    "primaryScoreKeys": [
+      "dimension"
+    ],
+    "scoreOrder": [
+      "dimension"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "dimension",
+        "headline": "一件事办得公平，过程也看得见",
+        "scoreLabel": "组织公正（0–100 原量尺均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "谁接下临时任务、建议有没有回音、有分歧能够怎么说，这些细节逐渐让人形成对公平的感受。分数描述你对这个工作场所的体验。清楚的理由、可预期的处理步骤和说得上话的机会，比一句「一视同仁」更具体。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一件你认为处理得公平或不公平的事，先记下过程：谁能提出意见，规则是怎么说明的，最后有没有反馈。把观察写成一个关于流程的问题，更容易和团队讨论。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "共 4 题。完整作答后对各项 0–100 分等权求均分。分数越高，表示感受到公平分工、公平处理及意见获得回应的程度越高。",
+      "研究证据来自中国医疗人员样本的整套问卷。暂无独立施测常模或风险阈值。"
+    ],
+    "disclaimer": "供成年医疗人员非商业研究和个人回顾。现阶段显示描述性原分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "copsoq3_ju_zh_cn/1.1.0/1.1.0-healthcare-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-healthcare-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

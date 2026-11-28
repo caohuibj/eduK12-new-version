@@ -1,0 +1,139 @@
+{
+  "toolKey": "ets16_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "教学的投入，有四种样子 · Four ways we engage in teaching",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "cognitive_engagement",
+      "emotional_engagement",
+      "student_engagement",
+      "colleague_engagement"
+    ],
+    "scoreOrder": [
+      "cognitive_engagement",
+      "emotional_engagement",
+      "student_engagement",
+      "colleague_engagement"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "cognitive_engagement",
+        "headline": "课堂上哪些时刻最容易集中注意？",
+        "scoreLabel": "专注投入 · Cognitive engagement · 0–6 平均分",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这组回答记录教学时专注和投入精力的频次。把回答放回一节你记得清楚的课，看看当时是怎样保住思路的。\n\nWhich parts of teaching most often hold your attention? Think of a recent lesson and take note of what let you stay focused.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一个经常被打断的环节，先挪走一个干扰源，试一节课。\n\nProtect one part of the next lesson from a recurring distraction."
+          }
+        ]
+      },
+      {
+        "scoreKey": "emotional_engagement",
+        "headline": "哪一刻让你觉得这堂课值得？",
+        "scoreLabel": "情感投入 · Emotional engagement · 0–6 平均分",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "教学的兴趣和愉快感有时来自小小的实际进展，比如学生终于看懂一个点。回想近期最让你想继续做好的一刻。\n\nInterest and enjoyment in teaching can show up in small moments of progress. Recall one recent moment that made you want to keep going.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "记下这一刻发生的条件，下周让它再有一次出现的机会。\n\nNote what made that moment possible and make space for it once next week."
+          }
+        ]
+      },
+      {
+        "scoreKey": "student_engagement",
+        "headline": "哪一次你听到了学生真正想说的？",
+        "scoreLabel": "与学生互动 · Engagement with students · 0–6 平均分",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这组回答来自你留意学生感受、与学生保持联系的体验。留意一个真实的交谈片段，给自己时间听完对方的话。\n\nThese responses describe the energy you give to connecting with students and noticing what they are experiencing.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "课后选一个开放问题，听完一个学生的回答，再复述自己听到的重点。\n\nAsk an open question after class, listen, and reflect the main point back."
+          }
+        ]
+      },
+      {
+        "scoreKey": "colleague_engagement",
+        "headline": "谁曾帮你一起把一件小事做好？",
+        "scoreLabel": "与同事互动 · Engagement with colleagues · 0–6 平均分",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一起备一节课、借一份材料或互相接手一件事务，都是教研关系中的投入。可以先让这一类合作有一点固定时间。\n\nSharing materials or planning together are everyday ways to invest in relationships with colleagues.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "约出十分钟，互相带一个真实的课堂片段来讨论。\n\nFind ten minutes to exchange one concrete classroom observation with a colleague."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "四方面都按完整作答的四个题取 0–6 均分，这是本项目的描述性计分口径。用原分回顾自己的教学情境，不合成总分，不设置常模或切点。",
+      "Each dimension is the mean of its four answered items on the original 0–6 scale. The four descriptive means have no composite, norm or cutoff in this report."
+    ],
+    "disclaimer": "教学投入会随课堂与学校条件变化。仅用于成年人非商业教学研究和个人回顾。Please use the scores for non-commercial research and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en"
+    },
+    "artworkKey": "ets16_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

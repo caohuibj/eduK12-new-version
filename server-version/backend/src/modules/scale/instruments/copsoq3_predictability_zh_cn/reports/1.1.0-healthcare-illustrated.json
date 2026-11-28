@@ -1,0 +1,85 @@
+{
+  "toolKey": "copsoq3_predictability_zh_cn",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-healthcare-illustrated",
+  "parameterVersion": "default",
+  "title": "消息早到一步，准备就多一步",
+  "report": {
+    "reportVersion": "1.1.0-healthcare-illustrated",
+    "primaryScoreKeys": [
+      "dimension"
+    ],
+    "scoreOrder": [
+      "dimension"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "dimension",
+        "headline": "消息早到一步，准备就多一步",
+        "scoreLabel": "可预期性（0–100 原量尺均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "排班、动线或流程有了变化，提前知道和到点才知道，会带来很不一样的一天。这里看的是重要消息来得是否及时、做事所需的信息是否找得到。分数较高，表示你通常更容易为工作作准备。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一次临时变更，写下三点：什么时候知道、当时最需要哪条信息、谁最适合更新它。若团队经常为同一类变化手忙脚乱，可以试一个固定通知渠道和一次交班时的复述。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "共 2 题。完整作答后对各项 0–100 分等权求均分。分数越高，表示工作变化及所需信息能提前获得的程度越高。",
+      "研究证据来自中国医疗人员样本的整套问卷。暂无独立施测常模或风险阈值。"
+    ],
+    "disclaimer": "供成年医疗人员非商业研究和个人回顾。现阶段显示描述性原分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "copsoq3_predictability_zh_cn/1.1.0/1.1.0-healthcare-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-healthcare-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

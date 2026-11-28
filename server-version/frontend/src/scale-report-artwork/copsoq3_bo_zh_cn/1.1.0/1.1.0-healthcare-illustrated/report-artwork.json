@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "copsoq3_bo_zh_cn/1.1.0/1.1.0-healthcare-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "医护结束繁忙班次后，在休息区给自己留一点空当。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

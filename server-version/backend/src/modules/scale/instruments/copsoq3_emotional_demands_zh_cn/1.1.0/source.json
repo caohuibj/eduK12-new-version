@@ -1,0 +1,479 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "copsoq3_emotional_demands_zh_cn",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "COPSOQ III 情感要求（中国医疗人员中文研究分量表）",
+      "abbreviation": "COPSOQ3-ED-S1-ZH",
+      "instrumentFamily": "COPSOQ III 2025 Chinese healthcare study, published Supplemental S1 original full dimension"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructDefinition": "描述成年医疗人员自评的工作中面对情绪困扰或他人问题的程度。",
+      "constructOverlapTags": [
+        "copsoq3_emotional_demands_zh_cn",
+        "source:copsoq_iii_china_healthcare_s1_2025",
+        "domain:workplace_psychosocial",
+        "population:adult_healthcare_workers",
+        "response:self",
+        "use:research",
+        "norms:none"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "面向能阅读中文的成年医疗机构工作人员。用于非商业研究和个人回顾。"
+    },
+    "administration": {
+      "itemCount": 3,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "按原题所问的岗位工作体验，S1 本维度未指定统一回顾期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "按 S1 中文原题顺序、响应选项及计分方向施测。",
+        "完整作答后按原量尺计算单维度等权均分。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "研究证据来自医疗机构人员样本整套问卷。S1 中文原文施测版本的独立验证和当地常模尚缺。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Huang et al. (2025), Healthcare 13(7):825, 10.3390/healthcare13070825, Supplement S1 pp. 1–2, Chinese response key p. 15. https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "沿用论文作者已发表的中文原文，排版换行合并。平台配套文字和插图位于独立报告组件。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_emotional_demands_zh_cn-1.1.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_emotional_demands_zh_cn-1.1.0",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      }
+    }
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_emotional_demands_zh_cn-1.1.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Huang et al. (2025), Chinese research translation reproduced from publisher Supplement S1 with attribution; MDPI CC BY supplemental policy (https://www.mdpi.com/openaccess). The study describes authorization of the translation/validation by COPSOQ International Network and Li Jian in March 2023; the study's authorization is specific to its validation. Original network questionnaire CC BY-NC-ND 4.0 and guideline §4 research terms apply (https://www.copsoq-network.org/licence-guidelines-and-questionnaire). Unmodified full original study dimension as published in S1. Independent report, no network endorsement. Limited to adult healthcare personnel in non-commercial research, with no distribution of a new national version.",
+      "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf#page=7"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "zh-CN",
+    "version": "1.1.0",
+    "text": "请按自己的工作体验，选择最符合实际的答案。",
+    "source": "平台施测通用操作提示。"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "COPSOQ III China healthcare S1 — 情感要求",
+        "citation": "Huang et al. (2025), Healthcare 13(7):825, 10.3390/healthcare13070825, Supplement S1 pp. 1–2, Chinese response key p. 15. https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+        "url": "https://www.mdpi.com/2227-9032/13/7/825"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "Huang et al. (2025), Chinese research translation reproduced from publisher Supplement S1 with attribution; MDPI CC BY supplemental policy (https://www.mdpi.com/openaccess). The study describes authorization of the translation/validation by COPSOQ International Network and Li Jian in March 2023; the study's authorization is specific to its validation. Original network questionnaire CC BY-NC-ND 4.0 and guideline §4 research terms apply (https://www.copsoq-network.org/licence-guidelines-and-questionnaire). Unmodified full original study dimension as published in S1. Independent report, no network endorsement. Limited to adult healthcare personnel in non-commercial research, with no distribution of a new national version."
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "copsoq3_emotional_demands_zh_cn",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "s1_1",
+          "options": [
+            {
+              "value": "option_1",
+              "label": "总是",
+              "score": 100
+            },
+            {
+              "value": "option_2",
+              "label": "经常",
+              "score": 75
+            },
+            {
+              "value": "option_3",
+              "label": "有时",
+              "score": 50
+            },
+            {
+              "value": "option_4",
+              "label": "很少",
+              "score": 25
+            },
+            {
+              "value": "option_5",
+              "label": "从不/几乎没有",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "s1_2",
+          "options": [
+            {
+              "value": "option_1",
+              "label": "程度非常大",
+              "score": 100
+            },
+            {
+              "value": "option_2",
+              "label": "程度很大",
+              "score": 75
+            },
+            {
+              "value": "option_3",
+              "label": "有些",
+              "score": 50
+            },
+            {
+              "value": "option_4",
+              "label": "程度很小",
+              "score": 25
+            },
+            {
+              "value": "option_5",
+              "label": "程度非常小",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "ED1",
+          "content": "您的工作使您处于情绪困扰的情境吗？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "s1_1",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EDX2",
+          "content": "作为您工作的一部分，您不得不处理他人的个人问题吗？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "s1_1",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ED3",
+          "content": "您的工作是情感要求型的吗？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "s1_2",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "dimension",
+            "label": "情感要求",
+            "type": "dimension",
+            "description": "工作中面对情绪困扰或他人问题的程度",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ED1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EDX2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ED3",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ],
+        "itemRules": [
+          {
+            "itemCode": "ED1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EDX2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ED3",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ]
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "dimension"
+        ],
+        "scoreOrder": [
+          "dimension"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "dimension",
+            "headline": "照顾别人的感受，也是一份工作",
+            "scoreLabel": "情感要求（0–100 原量尺均分）",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "有些当班任务写在流程里，有些藏在对话中：听完担心，回应失落，把一次为难的沟通讲清楚。本分数记录这些情绪情境在你的工作中出现得多频繁、要求有多大。一个人投入的耐心，未必能从完成了几项任务看出来。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想哪一种沟通最常让你带着心事离开。如果方便，在合规和保护隐私的前提下，找同事或督导简短复盘一次，聊一个难点，再决定有没有一处团队分工可以减轻负担。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "共 3 题。完整作答后对各项 0–100 分等权求均分。分数越高，表示工作中面对情绪困扰或他人问题的程度越高。",
+          "研究证据来自中国医疗人员样本的整套问卷。暂无独立施测常模或风险阈值。"
+        ],
+        "disclaimer": "供成年医疗人员非商业研究和个人回顾。现阶段显示描述性原分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum descriptor",
+        "answers": [
+          {
+            "itemCode": "ED1",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "EDX2",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "ED3",
+            "responseValue": "option_5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dimension": 0.0
+          },
+          "totalScoreKeys": [
+            "dimension"
+          ]
+        }
+      },
+      {
+        "name": "middle descriptor",
+        "answers": [
+          {
+            "itemCode": "ED1",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "EDX2",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "ED3",
+            "responseValue": "option_3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dimension": 50.0
+          },
+          "totalScoreKeys": [
+            "dimension"
+          ]
+        }
+      },
+      {
+        "name": "maximum descriptor",
+        "answers": [
+          {
+            "itemCode": "ED1",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "EDX2",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "ED3",
+            "responseValue": "option_1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dimension": 100.0
+          },
+          "totalScoreKeys": [
+            "dimension"
+          ]
+        }
+      },
+      {
+        "name": "mixed descriptors",
+        "answers": [
+          {
+            "itemCode": "ED1",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "EDX2",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "ED3",
+            "responseValue": "option_5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dimension": 33.333333333333336
+          },
+          "totalScoreKeys": [
+            "dimension"
+          ]
+        }
+      }
+    ]
+  }
+}

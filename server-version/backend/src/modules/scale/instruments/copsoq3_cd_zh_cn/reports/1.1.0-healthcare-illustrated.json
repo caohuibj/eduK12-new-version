@@ -1,0 +1,85 @@
+{
+  "toolKey": "copsoq3_cd_zh_cn",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-healthcare-illustrated",
+  "parameterVersion": "default",
+  "title": "有些班次，最忙的是脑子",
+  "report": {
+    "reportVersion": "1.1.0-healthcare-illustrated",
+    "primaryScoreKeys": [
+      "dimension"
+    ],
+    "scoreOrder": [
+      "dimension"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "dimension",
+        "headline": "有些班次，最忙的是脑子",
+        "scoreLabel": "认知要求（0–100 原量尺均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "同一时间听消息、记细节、变通做法，还得为一个棘手决定留出判断空间。这几件事都会用到注意力。分数记录岗位向大脑提出多少要求。尤其忙时，一份好用的记录或同事的一次复核，可以把判断留给真正需要判断的事。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一个常被打断的环节，先写下「做到哪里、下一步是什么」。复杂决定前，问一句「有没有一条信息值得再核对？」这两步都能减少回到任务时的重新摸索。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "共 4 题。完整作答后对各项 0–100 分等权求均分。分数越高，表示工作对注意、记忆、想办法和做决定的要求越高。",
+      "研究证据来自中国医疗人员样本的整套问卷。暂无独立施测常模或风险阈值。"
+    ],
+    "disclaimer": "供成年医疗人员非商业研究和个人回顾。现阶段显示描述性原分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "copsoq3_cd_zh_cn/1.1.0/1.1.0-healthcare-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-healthcare-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

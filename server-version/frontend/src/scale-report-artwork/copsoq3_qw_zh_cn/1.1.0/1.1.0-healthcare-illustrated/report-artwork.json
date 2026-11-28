@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "copsoq3_qw_zh_cn/1.1.0/1.1.0-healthcare-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "两位医护一起核对准备情况，确保下一步顺利。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

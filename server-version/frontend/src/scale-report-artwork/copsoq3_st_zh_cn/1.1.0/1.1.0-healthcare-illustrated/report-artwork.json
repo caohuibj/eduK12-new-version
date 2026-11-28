@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "copsoq3_st_zh_cn/1.1.0/1.1.0-healthcare-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位医护在窗边休息，让结束工作后的身体慢慢放松。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

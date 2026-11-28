@@ -1,0 +1,414 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "copsoq3_qw_zh_cn",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "COPSOQ III 工作质量（中国医疗人员中文研究分量表）",
+      "abbreviation": "COPSOQ3-QW-S1-ZH",
+      "instrumentFamily": "COPSOQ III 2025 Chinese healthcare study, published Supplemental S1 original full dimension"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructDefinition": "描述成年医疗人员自评的在岗位条件下能完成满意质量且对实际完成质量满意的程度。",
+      "constructOverlapTags": [
+        "copsoq3_qw_zh_cn",
+        "source:copsoq_iii_china_healthcare_s1_2025",
+        "domain:workplace_psychosocial",
+        "population:adult_healthcare_workers",
+        "response:self",
+        "use:research",
+        "norms:none"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "面向能阅读中文的成年医疗机构工作人员。用于非商业研究和个人回顾。"
+    },
+    "administration": {
+      "itemCount": 2,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "按原题所问的岗位工作体验，S1 本维度未指定统一回顾期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "按 S1 中文原题顺序、响应选项及计分方向施测。",
+        "完整作答后按原量尺计算单维度等权均分。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "研究证据来自医疗机构人员样本整套问卷。S1 中文原文施测版本的独立验证和当地常模尚缺。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Huang et al. (2025), Healthcare 13(7):825, 10.3390/healthcare13070825, Supplement S1 pp. 7, Chinese response key p. 15. https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "沿用论文作者已发表的中文原文，排版换行合并。平台配套文字和插图位于独立报告组件。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_qw_zh_cn-1.1.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_qw_zh_cn-1.1.0",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      }
+    }
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_qw_zh_cn-1.1.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Huang et al. (2025), Chinese research translation reproduced from publisher Supplement S1 with attribution; MDPI CC BY supplemental policy (https://www.mdpi.com/openaccess). The study describes authorization of the translation/validation by COPSOQ International Network and Li Jian in March 2023; the study's authorization is specific to its validation. Original network questionnaire CC BY-NC-ND 4.0 and guideline §4 research terms apply (https://www.copsoq-network.org/licence-guidelines-and-questionnaire). Unmodified full original study dimension as published in S1. Independent report, no network endorsement. Limited to adult healthcare personnel in non-commercial research, with no distribution of a new national version.",
+      "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf#page=7"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "zh-CN",
+    "version": "1.1.0",
+    "text": "请按自己的工作体验，选择最符合实际的答案。",
+    "source": "平台施测通用操作提示。"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "COPSOQ III China healthcare S1 — 工作质量",
+        "citation": "Huang et al. (2025), Healthcare 13(7):825, 10.3390/healthcare13070825, Supplement S1 pp. 7, Chinese response key p. 15. https://mdpi-res.com/d_attachment/healthcare/healthcare-13-00825/article_deploy/healthcare-13-00825-s001.zip",
+        "url": "https://www.mdpi.com/2227-9032/13/7/825"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "Huang et al. (2025), Chinese research translation reproduced from publisher Supplement S1 with attribution; MDPI CC BY supplemental policy (https://www.mdpi.com/openaccess). The study describes authorization of the translation/validation by COPSOQ International Network and Li Jian in March 2023; the study's authorization is specific to its validation. Original network questionnaire CC BY-NC-ND 4.0 and guideline §4 research terms apply (https://www.copsoq-network.org/licence-guidelines-and-questionnaire). Unmodified full original study dimension as published in S1. Independent report, no network endorsement. Limited to adult healthcare personnel in non-commercial research, with no distribution of a new national version."
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "copsoq3_qw_zh_cn",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "s1_2",
+          "options": [
+            {
+              "value": "option_1",
+              "label": "程度非常大",
+              "score": 100
+            },
+            {
+              "value": "option_2",
+              "label": "程度很大",
+              "score": 75
+            },
+            {
+              "value": "option_3",
+              "label": "有些",
+              "score": 50
+            },
+            {
+              "value": "option_4",
+              "label": "程度很小",
+              "score": 25
+            },
+            {
+              "value": "option_5",
+              "label": "程度非常小",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "QW1",
+          "content": "您发现在多大程度上可能以令人满意的质量完成您的工作任务？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "s1_2",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "QW2",
+          "content": "在您的工作场所，您对所完成工作的质量满意吗?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "s1_2",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "dimension",
+            "label": "工作质量",
+            "type": "dimension",
+            "description": "在岗位条件下能完成满意质量且对实际完成质量满意的程度",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "QW1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "QW2",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ],
+        "itemRules": [
+          {
+            "itemCode": "QW1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "QW2",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ]
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "dimension"
+        ],
+        "scoreOrder": [
+          "dimension"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "dimension",
+            "headline": "想把工作做好，也得有做好的条件",
+            "scoreLabel": "工作质量（0–100 原量尺均分）",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "觉得「做得到」和回头看「做得满意」，共同构成这份工作质量体验。分数取自你对岗位条件和完成质量的感受。顺手的工具、清楚的交接、足够的复核时间，常常会决定一件工作能不能按心里的标准收尾。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "找一件最近让你满意的工作，想想哪项条件帮了忙。再找一个容易返工的环节，用一句话写清楚「做到什么算完成」，下一班也能用同一标准交接。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "共 2 题。完整作答后对各项 0–100 分等权求均分。分数越高，表示在岗位条件下能完成满意质量且对实际完成质量满意的程度越高。",
+          "研究证据来自中国医疗人员样本的整套问卷。暂无独立施测常模或风险阈值。"
+        ],
+        "disclaimer": "供成年医疗人员非商业研究和个人回顾。现阶段显示描述性原分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum descriptor",
+        "answers": [
+          {
+            "itemCode": "QW1",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "QW2",
+            "responseValue": "option_5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dimension": 0.0
+          },
+          "totalScoreKeys": [
+            "dimension"
+          ]
+        }
+      },
+      {
+        "name": "middle descriptor",
+        "answers": [
+          {
+            "itemCode": "QW1",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "QW2",
+            "responseValue": "option_3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dimension": 50.0
+          },
+          "totalScoreKeys": [
+            "dimension"
+          ]
+        }
+      },
+      {
+        "name": "maximum descriptor",
+        "answers": [
+          {
+            "itemCode": "QW1",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "QW2",
+            "responseValue": "option_1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dimension": 100.0
+          },
+          "totalScoreKeys": [
+            "dimension"
+          ]
+        }
+      },
+      {
+        "name": "mixed descriptors",
+        "answers": [
+          {
+            "itemCode": "QW1",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "QW2",
+            "responseValue": "option_5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "dimension": 50.0
+          },
+          "totalScoreKeys": [
+            "dimension"
+          ]
+        }
+      }
+    ]
+  }
+}

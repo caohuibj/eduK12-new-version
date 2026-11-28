@@ -1,0 +1,85 @@
+{
+  "toolKey": "copsoq3_work_pace_zh_cn",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-healthcare-illustrated",
+  "parameterVersion": "default",
+  "title": "忙碌会过去，持续赶路值得留意",
+  "report": {
+    "reportVersion": "1.1.0-healthcare-illustrated",
+    "primaryScoreKeys": [
+      "dimension"
+    ],
+    "scoreOrder": [
+      "dimension"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "dimension",
+        "headline": "忙碌会过去，持续赶路值得留意",
+        "scoreLabel": "工作节奏（0–100 原量尺均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "交班前最后十分钟，和整班都在赶时间，是两种体验。这里的分数描述工作本身要求你多快、又要把这个速度维持多久。节奏越紧，当天能留给复核、交接或休息的空当就可能越少。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一个典型班次回想：最快的一段从哪件事开始，又在哪里慢了下来？如果那段速度经常持续到下一班，试着和团队约定谁先接收中断、哪些事项能稍后处理。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "共 3 题。完整作答后对各项 0–100 分等权求均分。分数越高，表示工作需要维持高节奏的程度越高。",
+      "研究证据来自中国医疗人员样本的整套问卷。暂无独立施测常模或风险阈值。"
+    ],
+    "disclaimer": "供成年医疗人员非商业研究和个人回顾。现阶段显示描述性原分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "copsoq3_work_pace_zh_cn/1.1.0/1.1.0-healthcare-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-healthcare-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}
