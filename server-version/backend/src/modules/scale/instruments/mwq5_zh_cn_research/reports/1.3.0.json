@@ -1,0 +1,97 @@
+{
+  "toolKey": "mwq5_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0",
+  "title": "日常走神｜给注意力留一个回来点",
+  "report": {
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 原件与内容核对",
+        "reviewedAt": "2026-11-28T01:29:32.296Z",
+        "basis": "逐项对照 Mrazek 等（2013）Study 1 Methods 五条原题和六级频率锚点。第 5 条按正文的 lectures or presentations 与作者原件，保留听课或报告情境。现有适用范围仅成人，均分 1–6、无测量时间窗。英文 CC BY 3.0，独立中文工作译稿。"
+      }
+    },
+    "reportVersion": "1.3.0",
+    "primaryScoreKeys": [
+      "mind_wandering"
+    ],
+    "scoreOrder": [
+      "mind_wandering"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "mind_wandering",
+        "headline": "给注意力留一个回来点",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "眼睛滑到一段话的末尾，才发现刚刚一直在想晚饭。你把书签挪回来，给自己一句提醒：「这一段在解释什么？」发现已经走远、知道回来接哪一步，是可以练习的两件事。\n\n这五题回想平时读东西、听讲或做事时，注意力离开手头任务的频率。六档回答取平均，范围 1–6，分高表示这次自报发生得更频繁。把它当作一个观察起点就好：做简单重复的事、听陌生材料、心里挂着其他事，都可能让一天里的专注体验不同。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一次方便回顾的走神，写下当时正在做什么，自己是怎样发现的。先观察一个场景，记不全也没关系。"
+          },
+          {
+            "category": "strategy",
+            "text": "在下一段阅读或工作开始时，先写一句本段要完成的小事。走神时在原处留个标记，回来就知道从哪里接上。"
+          },
+          {
+            "category": "environment",
+            "text": "如果同一场景经常卡住，先只改动一个条件，比如静音十分钟、把任务拆小，或找对方确认要求。过一两次再看看哪个做法更容易继续。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "本独立中文成人工作稿尚未验证，无等级或排名；走神自述不是ADHD筛查、能力或意志力评价。"
+    ],
+    "disclaimer": "MWQ：Mrazek 等（2013），CC BY 3.0（https://creativecommons.org/licenses/by/3.0/）。本中文翻译与反馈为独立改编，非作者背书；仅供成人研究与非诊断自我了解。",
+    "artworkKey": "mwq5_zh_cn_research/1.0.1/1.3.0"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
