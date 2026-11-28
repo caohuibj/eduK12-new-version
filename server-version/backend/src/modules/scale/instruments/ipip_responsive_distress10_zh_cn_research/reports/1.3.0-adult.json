@@ -1,0 +1,100 @@
+{
+  "toolKey": "ipip_responsive_distress10_zh_cn_research",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "面对他人痛苦时的情绪反应｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对 IPIP 官方逐题与正反向键、冻结中文工作译稿和原 P 的 score-only 解释。当前证据适用于成人试用描述。"
+      }
+    },
+    "primaryScoreKeys": [
+      "ipip_responsive_distress10"
+    ],
+    "scoreOrder": [
+      "ipip_responsive_distress10"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "ipip_responsive_distress10",
+        "scoreLabel": "面对他人痛苦的反应合计分（10–50）",
+        "headline": "被他人的难过触动，也可以照顾自己的节奏",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "看到别人遇到不顺，你可能一下子跟着难过，也可能保持平静再想能做什么。这十题也涵盖看到悲伤情节和紧张情境时的自述反应。加总范围 10–50，数值越大，回答越倾向于报告受这些情境触动。感受到多强、愿不愿帮忙、能提供什么帮助，是几件不同的事。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一次触动你的片段，分别记录对方发生了什么、你的感受有多明显，以及现实中能做的一件事。"
+          },
+          {
+            "category": "strategy",
+            "text": "先确认对方是否愿意被关心，再提供一个具体而安全的小帮助，也给自己留一点缓冲。"
+          },
+          {
+            "category": "support",
+            "text": "如果类似消息不断消耗精力，可以暂时离开细节，和可信任的人谈谈你能承担和暂时放下的事。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "本报告使用项目中文工作译稿，面向其现有成人自评研究及自我回顾范围。当前证据支持对本次作答做描述。",
+      "原题和计分可按 IPIP 官方公有领域声明使用。由于本译稿尚无适配常模，报告仅显示实得分。",
+      "各结果按相应题组完整作答后计算，漏答保留为缺失。请结合近期情境和具体经历理解。"
+    ],
+    "disclaimer": "适用于成人试用研究及自我回顾。诊断、人员筛选、排名与个体高风险决定需要相应的专门方法。",
+    "artworkKey": "ipip_responsive_distress10_zh_cn_research/1.0.1/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
