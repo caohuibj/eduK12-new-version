@@ -1,0 +1,1087 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "dass21_zh_cn_nhc2022",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "抑郁焦虑压力量表 DASS-21｜2022 简体中文临床参考",
+      "abbreviation": "DASS21",
+      "instrumentFamily": "《磨牙症诊疗指南（2022 年版）》附件 1：抑郁焦虑压力量表"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "三组各七题自评，分别描述过去一周的抑郁、焦虑、压力相关体验。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "中文",
+        "成人自评",
+        "非商业",
+        "研究",
+        "非诊断",
+        "DASS-21",
+        "数字施测受限",
+        "专业解读"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "本版逐题对照国家卫生健康委指南附件；采用既有项目限制的成人非商业研究或受专业人员组织的群体。该附件的诊疗语境不能外推到学校或未成年人。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 21,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "过去一周",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "题序和选项编码沿用所标中文源版本。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "本版逐题对照国家卫生健康委指南附件；采用既有项目限制的成人非商业研究或受专业人员组织的群体。该附件的诊疗语境不能外推到学校或未成年人。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "https://www.nhc.gov.cn/cms-search/downFiles/f178a44828d74b13ad7ae434257bb216.pdf",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "录入已公开的精确简体中文题本及官方计分口径。项目未自主改写题项或选项。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "dass21_zh_cn_nhc2022-adult",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "dass21_zh_cn_nhc2022-raw",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "dass21_zh_cn_nhc2022-use",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedDeploymentModes": [
+      "QUESTIONNAIRE"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "原 DASS 题本为公有领域。电子施测按原作者 FAQ 9、21 限预先定义的参与者群，分数交项目专业人员；本简体版本在管理员区待用途审核。",
+      "本版逐题对照国家卫生健康委指南附件；采用既有项目限制的成人非商业研究或受专业人员组织的群体。该附件的诊疗语境不能外推到学校或未成年人。",
+      "原题、选项、分值已齐。入口投放前确定封闭队列、获授权专业读者与实际使用流程。"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请阅读以下各项，然后根据过去一周之内符合您的实际情况，选择对应的分值。回答没有对错，请不要在任何一项上花太多时间。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "https://www.nhc.gov.cn/cms-search/downFiles/f178a44828d74b13ad7ae434257bb216.pdf"
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "dass21_zh_cn_nhc2022-base-report",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false,
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false,
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false,
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false,
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false
+      }
+    }
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "definition": {
+      "schemaVersion": 2,
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "dass21_zh_cn_nhc2022",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      },
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "《磨牙症诊疗指南（2022 年版）》附件 1：抑郁焦虑压力量表",
+        "citation": "Lovibond & Lovibond (1995); 国家卫生健康委《磨牙症诊疗指南（2022 年版）》附件 1，第 8–9 页。1901c5cb7bc06d95c3bae9ecbcb204d40a307fbe5ba5e9c454caf3b735556fd2",
+        "url": "https://www.nhc.gov.cn/cms-search/downFiles/f178a44828d74b13ad7ae434257bb216.pdf",
+        "publicationYear": 2022
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "原 DASS 题本为公有领域。电子施测按原作者 FAQ 9、21 限预先定义的参与者群，分数交项目专业人员；本简体版本在管理员区待用途审核。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "original_response",
+          "options": [
+            {
+              "value": "0",
+              "label": "根本不符合我的情况",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "在某种程度上或是某些时候与我的实际情况相符",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "在很大程度上或是大部分情况下与我的实际情况相符",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "与我的实际情况非常相符",
+              "score": 3
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "DASS21_01",
+          "content": "我觉得很难让自己安静下来。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_02",
+          "content": "我感到口干。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_03",
+          "content": "我似乎不能积极乐观起来。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_04",
+          "content": "我感到过呼吸困难（例如：在没有体力透支的情况下感到呼吸急促，喘不过气来）。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_05",
+          "content": "我感到很难主动去开始工作。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_06",
+          "content": "我对于所处的环境（情况）易反应过度。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_07",
+          "content": "我曾有发抖的感觉（例如：手颤）。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_08",
+          "content": "我觉得我在耗费很多精神。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_09",
+          "content": "我会担心一些可能让自己恐慌或出丑的场合或情景。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_10",
+          "content": "我感到我没什么可期待的。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_11",
+          "content": "我发现我变得容易激动。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_12",
+          "content": "我感到很难放松自己。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_13",
+          "content": "我感到伤心和郁闷。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_14",
+          "content": "阻碍我正在进行工作的事我会无法容忍。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_15",
+          "content": "我感到惶恐不安。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_16",
+          "content": "我对任何事都提不起兴趣。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_17",
+          "content": "我觉得自己不怎么配做人。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 16,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_18",
+          "content": "我感到我极容易因为小事而发火。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 17,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_19",
+          "content": "即使没有体力活动我也感觉到心跳（如：有心跳加速或心律不正常的感觉）。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 18,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_20",
+          "content": "我无缘无故地感到害怕。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 19,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DASS21_21",
+          "content": "我感到生活毫无意义。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 20,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "DASS21_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DASS21_21",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "depression",
+            "type": "dimension",
+            "label": "抑郁相关体验分",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DASS21_03",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_05",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_10",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_13",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_16",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_17",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_21",
+                  "weight": 2
+                }
+              ],
+              "aggregation": "weighted_sum"
+            }
+          },
+          {
+            "key": "anxiety",
+            "type": "dimension",
+            "label": "焦虑相关体验分",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DASS21_02",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_04",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_07",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_09",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_15",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_19",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_20",
+                  "weight": 2
+                }
+              ],
+              "aggregation": "weighted_sum"
+            }
+          },
+          {
+            "key": "stress",
+            "type": "dimension",
+            "label": "压力相关体验分",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DASS21_01",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_06",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_08",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_11",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_12",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_14",
+                  "weight": 2
+                },
+                {
+                  "itemCode": "DASS21_18",
+                  "weight": 2
+                }
+              ],
+              "aggregation": "weighted_sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "none-v1",
+        "primaryScoreKeys": [
+          "depression",
+          "anxiety",
+          "stress"
+        ],
+        "scoreOrder": [
+          "depression",
+          "anxiety",
+          "stress"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "depression",
+            "headline": "抑郁相关体验分",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "本配置不提供文字报告。",
+            "bands": [],
+            "guidance": []
+          },
+          {
+            "scoreKey": "anxiety",
+            "headline": "焦虑相关体验分",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "本配置不提供文字报告。",
+            "bands": [],
+            "guidance": []
+          },
+          {
+            "scoreKey": "stress",
+            "headline": "压力相关体验分",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "本配置不提供文字报告。",
+            "bands": [],
+            "guidance": []
+          }
+        ],
+        "limitations": [
+          "按量表作者所述，数字施测限预先定义的群体，分数交负责研究者或专业人员。受测者端不提供自动个体反馈。",
+          "三项各按七题原分之和乘 2，范围 0–42。不把三项加为总分。此报告不输出本地常模或自动严重程度分档。",
+          "量表回顾过去一周。专业人员结合访谈、健康和日常功能资料解释，不能由单份问卷确定病因。"
+        ],
+        "disclaimer": "供专业回顾与非商业研究使用。这是单次自报记录，不能代替诊断或临床处置。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "references": [],
+    "goldenCases": [
+      {
+        "name": "first anchor",
+        "answers": [
+          {
+            "itemCode": "DASS21_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_10",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_11",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_12",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_13",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_14",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_15",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_16",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_17",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_18",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_19",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_20",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DASS21_21",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "depression": 0,
+            "anxiety": 0,
+            "stress": 0
+          },
+          "totalScoreKeys": [
+            "depression",
+            "anxiety",
+            "stress"
+          ]
+        }
+      },
+      {
+        "name": "middle anchor",
+        "answers": [
+          {
+            "itemCode": "DASS21_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DASS21_21",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "depression": 14,
+            "anxiety": 14,
+            "stress": 14
+          },
+          "totalScoreKeys": [
+            "depression",
+            "anxiety",
+            "stress"
+          ]
+        }
+      },
+      {
+        "name": "last anchor",
+        "answers": [
+          {
+            "itemCode": "DASS21_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DASS21_21",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "depression": 42,
+            "anxiety": 42,
+            "stress": 42
+          },
+          "totalScoreKeys": [
+            "depression",
+            "anxiety",
+            "stress"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "dass21_zh_cn_nhc2022/1.0.0/1.1.0-professional-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位成年人安静地坐在窗边，窗下的七张图记录了这一周的不同体验。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

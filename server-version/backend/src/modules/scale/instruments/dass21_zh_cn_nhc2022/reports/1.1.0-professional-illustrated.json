@@ -1,0 +1,134 @@
+{
+  "toolKey": "dass21_zh_cn_nhc2022",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-professional-illustrated",
+  "title": "过去一周的三条线索｜专业回顾",
+  "report": {
+    "reportVersion": "1.1.0-professional-illustrated",
+    "primaryScoreKeys": [
+      "depression",
+      "anxiety",
+      "stress"
+    ],
+    "scoreOrder": [
+      "depression",
+      "anxiety",
+      "stress"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "depression",
+        "headline": "从原本在意的一件事谈起",
+        "scoreLabel": "抑郁相关体验（0–42）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录过去一周与情绪低落、兴趣减少、难以启动以及对未来期待相关的体验。工作节奏、睡眠、身体状况和近期变化，都能帮助专业人员理解当事人所处的环境。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "如需进一步回顾，可以请当事人选一件平时在意、最近做起来感觉不同的事，具体说明何时开始变化、对日常有哪些影响。"
+          },
+          {
+            "category": "strategy",
+            "text": "在适用的专业流程中记录时间和功能线索，再由负责人员判断是否需要进一步了解和转介。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "anxiety",
+        "headline": "把紧张时的身体感受和场合放在一起",
+        "scoreLabel": "焦虑相关体验（0–42）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组涉及主观的恐惧和紧张，以及部分身体警觉反应。比如某个场合的慌张感可能伴随心跳或呼吸变化。谈起它发生的时间、环境及身体状况，有助于专业判断。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "请当事人描述一次愿意谈的经历，包括它发生在哪里、持续多久，以及是否打断平常活动。"
+          },
+          {
+            "category": "strategy",
+            "text": "身体感觉可能有不同来源。需要时结合医疗信息、生活背景和专业评估，不凭问卷推断原因。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "stress",
+        "headline": "什么时候人最难松下来",
+        "scoreLabel": "紧张与压力体验（0–42）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这里的压力维度主要记录难以放松、紧绷或容易烦躁的体验。它不能单独说明工作量、人际压力或生活安排的客观强度。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "如安排访谈，可一起找出一天中最难缓下来的时段，并了解当时的任务、睡眠与可用支持。"
+          },
+          {
+            "category": "strategy",
+            "text": "在同一作答口径下记录变化。用于跟踪时，应说明可能改变周内体验的重要事件和测量间隔。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "按量表作者所述，数字施测限预先定义的群体，分数交负责研究者或专业人员。受测者端不提供自动个体反馈。",
+      "三项各按七题原分之和乘 2，范围 0–42。不把三项加为总分。此报告不输出本地常模或自动严重程度分档。",
+      "量表回顾过去一周。专业人员结合访谈、健康和日常功能资料解释，不能由单份问卷确定病因。"
+    ],
+    "disclaimer": "供专业回顾与非商业研究使用。这是单次自报记录，不能代替诊断或临床处置。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "dass21_zh_cn_nhc2022/1.0.0/1.1.0-professional-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-professional-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": true
+      }
+    }
+  }
+}
