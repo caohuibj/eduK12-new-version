@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_cs_zh_cn",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-healthcare-s1-illustrated",
+  "parameterVersion": "default",
+  "title": "一时想不清，可以先给思考留一点空间",
+  "report": {
+    "reportVersion": "1.1.0-healthcare-s1-illustrated",
+    "primaryScoreKeys": [
+      "dimension"
+    ],
+    "scoreOrder": [
+      "dimension"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "dimension",
+        "headline": "一时想不清，可以先给思考留一点空间",
+        "scoreLabel": "认知压力（0–100 原量尺均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这份结果回看过去四周里想清楚一件事、做决定和记住细节有多费力。很多停顿发生在信息不断涌入的时候。把下一步写下来、给复杂问题留一段安静时间，能让你更容易看到困难出现的具体场景。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次感觉思绪打结的片段，记下当时的任务、打断与休息情况。选一个能先调小的干扰试一班。若这些体验持续并影响日常生活，可以向信任的专业人员咨询。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "共 3 题。完整作答后对各项 0–100 分等权求均分。分数越高，表示过去四周里感到难以清晰思考、做决定或记住事情的频率越高。",
+      "仅描述公开 S1 保留题所涵盖的体验。暂无独立施测常模或风险阈值。",
+      "请结合最近四周的实际生活理解结果。单次自评不足以确定原因或作出临床诊断。"
+    ],
+    "disclaimer": "供成年医疗人员非商业研究和个人回顾。现阶段显示描述性原分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "copsoq3_cs_zh_cn/1.1.0/1.1.0-healthcare-s1-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-healthcare-s1-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

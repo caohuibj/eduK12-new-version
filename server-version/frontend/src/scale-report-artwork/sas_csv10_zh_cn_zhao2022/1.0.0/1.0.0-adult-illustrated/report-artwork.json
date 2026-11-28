@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "sas_csv10_zh_cn_zhao2022/1.0.0/1.0.0-adult-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "大学生在桌前读书，手机放在手边以外。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

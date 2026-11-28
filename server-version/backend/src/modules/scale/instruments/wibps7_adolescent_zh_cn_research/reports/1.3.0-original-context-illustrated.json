@@ -1,0 +1,94 @@
+{
+  "toolKey": "wibps7_adolescent_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "version": "1.3.0-original-context-illustrated",
+  "parameterVersion": "default",
+  "title": "上床之后，给今天留一个收尾",
+  "report": {
+    "reportVersion": "1.3.0-original-context-illustrated",
+    "primaryScoreKeys": [
+      "while_in_bed_procrastination"
+    ],
+    "scoreOrder": [
+      "while_in_bed_procrastination"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "while_in_bed_procrastination",
+        "headline": "上床之后，给今天留一个收尾",
+        "scoreLabel": "入睡前活动频率（7–35 原分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "上床后的一段音乐、一条消息或一局游戏，有时刚好帮一天收个尾，有时又比打算的多了一会儿。这个分数整理你对七种活动的平时回忆。可以先想一个普通晚上，看哪一段你愿意保留，哪一段想早点结束。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想起一次还记得清楚的晚上：上床后做了什么，原来打算什么时候停，后来停在了哪里？这一次只观察经过，给事情留点具体细节。"
+          },
+          {
+            "category": "strategy",
+            "text": "如果有一件事确实想早点收尾，给它留个续点。可以把没看完的视频存下来，或和同伴约好明天再聊。先试一件，下一晚再看看是否合适。"
+          },
+          {
+            "category": "support",
+            "text": "有时晚上本来就被功课、家庭安排或联系需要挤得很满。若想腾出休息时间，也可以找信任的人商量，看看哪件事能提前或有人一起分担。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "七题答齐后以1–5原分相加，得到7–35的原分。回答反映平时活动频率，不能从分数换算入睡时间、判断失眠或确定活动与睡眠之间的因果关系。",
+      "仅供能理解且日常接触所列活动语境的15–20岁参与者进行探索性回顾。该工作译版保留YouTube、电视、视频电话、指定设备和原点心示例。活动接触机会明显不同的群体不作比较。",
+      "原研究为葡萄牙样本的探索性研究。简体中文工作译本仍待本地验证。采用描述性原分，暂无适用的常模或风险切点。"
+    ],
+    "disclaimer": "供15–20岁参与者回顾上床后、入睡前的活动。请结合实际可接触的活动和自己的时间安排理解结果。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "wibps7_adolescent_zh_cn_research/1.0.0/1.3.0-original-context-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-original-context-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

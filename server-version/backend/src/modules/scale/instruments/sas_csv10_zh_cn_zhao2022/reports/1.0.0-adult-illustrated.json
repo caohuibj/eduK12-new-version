@@ -1,0 +1,140 @@
+{
+  "toolKey": "sas_csv10_zh_cn_zhao2022",
+  "contentVersion": "1.0.0",
+  "version": "1.0.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "把手机使用的节奏放回自己手里",
+  "report": {
+    "reportVersion": "1.0.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "phone_use_difficulties",
+      "negative_effect",
+      "withdrawal",
+      "tolerance"
+    ],
+    "scoreOrder": [
+      "phone_use_difficulties",
+      "negative_effect",
+      "withdrawal",
+      "tolerance"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "phone_use_difficulties",
+        "headline": "先看手机在哪些时候打乱了你的安排",
+        "scoreLabel": "手机使用相关困扰（10–60 原分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "手机常常是学习、找资料和联系同伴的工具。这个分数汇总你提到的三类经历：日常活动受到影响、暂时不用手机时的感受，以及使用超出预期。可以先回想一个想把使用节奏调回来的场景。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "下次想专注做一件事时，先把手机放到伸手够不到的位置。结束后记一句：刚才少了什么打扰？"
+          }
+        ]
+      },
+      {
+        "scoreKey": "negative_effect",
+        "headline": "哪件原本要做的事被打断了？",
+        "scoreLabel": "日常活动受到影响（3–18 原分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组回答涉及原计划、专注和身体不适。手机承担许多用途，打断来自哪里，需要结合当时做的事理解。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一件经常被打断的事，先关掉与它无关的一类通知。若握着手机容易累，也可以中途放下，换个姿势休息。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "withdrawal",
+        "headline": "暂时不看手机时，留意自己的感受",
+        "scoreLabel": "暂时不用手机时的感受（3–18 原分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组记录手机不在手边或没有使用时的挂念和不安。忙于联系同伴、等待消息，或习惯随手查看，都可能影响当下感受。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一个不急着等消息的时段，把手机放远十分钟，留意自己什么时候想拿回来、当时在等什么。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "tolerance",
+        "headline": "给‘再看一下’设个结束点",
+        "scoreLabel": "使用是否超过原计划（4–24 原分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一组描述使用时间超出计划、反复检查消息，以及你或身边的人留意到的使用变化。回想哪次最难结束，看看当时什么事还没做完。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "打开手机前先定一件明确的事，例如回复一条消息。做完离开应用，再跟原先的计划对照一次。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "10题全答后的总分是10–60。三个方面的原分范围为3–18、3–18和4–24。题数不同，原分不适合直接横向比较。",
+      "公开研究来自山东两所高校。报告保留原分，未使用全国常模、分档或自动标签。",
+      "分数供本人理解本次回答。单次自述无法确定使用行为背后的原因。"
+    ],
+    "disclaimer": "供18–24岁成年大学生非商业研究和个人回顾。分数不能作为临床诊断、选拔、处分或排名依据。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "sas_csv10_zh_cn_zhao2022/1.0.0/1.0.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

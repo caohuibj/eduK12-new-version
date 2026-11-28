@@ -1,0 +1,85 @@
+{
+  "toolKey": "copsoq3_he_zh_cn",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-healthcare-s1-illustrated",
+  "parameterVersion": "default",
+  "title": "保持专业，有时也意味着把情绪先放一放",
+  "report": {
+    "reportVersion": "1.1.0-healthcare-s1-illustrated",
+    "primaryScoreKeys": [
+      "dimension"
+    ],
+    "scoreOrder": [
+      "dimension"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "dimension",
+        "headline": "保持专业，有时也意味着把情绪先放一放",
+        "scoreLabel": "隐藏情绪要求（0–100 原量尺均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "遇到令人不快的情况，仍要公平回应、保持友善，或把自己的情绪暂时藏起来，这些都要花力气。分数描述工作对情绪表达提出的要求，一次回答无法区分这些要求来自哪类场景。让团队讨论具体处境，比评价谁更能忍更容易找到调整办法。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一个总需要稳住表情的工作时刻。回看哪些话难说出口、事后有没有合适的复盘机会。需要时，可以和团队约定当班互相接手，以及保护隐私的讨论方式。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "共 3 题。完整作答后对各项 0–100 分等权求均分。分数越高，表示工作中管理情绪表达以及保持友善、公平待人所承受的要求越高。",
+      "仅描述公开 S1 保留题所涵盖的体验。暂无独立施测常模或风险阈值。"
+    ],
+    "disclaimer": "供成年医疗人员非商业研究和个人回顾。现阶段显示描述性原分。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    },
+    "artworkKey": "copsoq3_he_zh_cn/1.1.0/1.1.0-healthcare-s1-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-healthcare-s1-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}
