@@ -90,3 +90,20 @@ it('applies the optional transaction timeout from the ops environment', async ()
     rmSync(root, { recursive: true, force: true })
   }
 }, 60_000)
+
+it.each([
+  './src/modules/cognitive/session.service.ts',
+  './src/workers/exportBatchChild.ts',
+])('initializes %s in a fresh Node process', (entry) => {
+  execFileSync(process.execPath, ['--import', 'tsx', '-e', 'require(process.argv[1]); process.exit(0)', entry], {
+    cwd: resolve(__dirname, '../../..'),
+    env: {
+      ...process.env,
+      NODE_ENV: 'test',
+      DATABASE_URL: 'postgresql://fixture:fixture@127.0.0.1:1/eduk12_import_test',
+      DATABASE_URL_RUNTIME: '',
+      REDIS_URL: 'redis://127.0.0.1:1',
+    },
+    timeout: 25_000,
+  })
+}, 30_000)

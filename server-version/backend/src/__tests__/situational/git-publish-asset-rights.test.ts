@@ -26,7 +26,7 @@ vi.mock('../../modules/situational/standard-release.artifact', () => ({
 }))
 vi.mock('../../modules/survey/governed-tool.media', () => ({ governedMediaRefs: references }))
 vi.mock('../../modules/measurement-content/repository', () => ({ publishContentRelease }))
-vi.mock('../../modules/survey/standard-triplet.service', () => ({ assertGitScalePublisher: vi.fn() }))
+vi.mock('../../modules/scale/onboarding/git-release-actor', () => ({ assertGitScalePublisher: vi.fn() }))
 vi.mock('../../modules/survey/governed-tool.service', () => ({ reconcileGitGovernedArtifact }))
 
 const actor = 'system-actor'

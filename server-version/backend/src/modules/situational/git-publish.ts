@@ -8,7 +8,7 @@ import { DECLARATIVE_REPORT_GENERATOR } from '../measurement-content/report-rend
 import { clone, type GovernedRow } from '../survey/governed-tool.model'
 import { governedMediaRefs } from '../survey/governed-tool.media'
 import { reconcileGitGovernedArtifact } from '../survey/governed-tool.service'
-import { assertGitScalePublisher } from '../survey/standard-triplet.service'
+import { assertGitScalePublisher } from '../scale/onboarding/git-release-actor'
 import { readSjtGitReleasePlan, type SjtGitDeclaration } from './git-release'
 import { sjtGitFrozenBindingSchema } from './git-release.binding'
 import { prepareSjtSurveyPublication, sjtStandardMeasurementInput } from './standard-release.artifact'

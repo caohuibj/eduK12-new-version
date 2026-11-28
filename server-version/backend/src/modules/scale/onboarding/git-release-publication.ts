@@ -9,8 +9,9 @@ import {
 import {getContentRelease} from '../../measurement-content/repository'
 import type {Triplet} from '../../survey/standard-triplet.model'
 import {
-  assertGitScalePublisher, publishScaleRelease, type GitScalePublication, type StandardRelease,
+  publishScaleRelease, type GitScalePublication, type StandardRelease,
 } from '../../survey/standard-triplet.service'
+import {assertGitScalePublisher} from './git-release-actor'
 import {ensureStandardNativeScale} from './standard-release-native'
 import {scaleDeclarationStates} from '../declarative/replacement'
 

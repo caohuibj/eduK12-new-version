@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { assertGitScalePublisher } from '../survey/standard-triplet.service'
+import { assertGitScalePublisher } from '../scale/onboarding/git-release-actor'
 import {
   approveGitCognitiveProfile,
   stopGitCognitiveProfileAdmission,

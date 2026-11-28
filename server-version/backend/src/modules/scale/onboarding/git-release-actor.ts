@@ -14,6 +14,13 @@ export async function isProvisionedGitScalePublisher(db: Pick<Prisma.Transaction
   return rows.length === 1
 }
 
+/** Shared Git release authorization, without loading the publication services. */
+export async function assertGitScalePublisher(db: Pick<Prisma.TransactionClient, '$queryRaw'>, actor: string) {
+  if (await isProvisionedGitScalePublisher(db, actor)) return
+  const { AdminPermissionError } = await import('../../admin-permissions/service')
+  throw new AdminPermissionError(403, 'Git 量表发布需要 SYSTEM_GIT_RELEASE 部署身份')
+}
+
 export function ensureGitScalePublisher(db: Pick<PrismaClient, '$transaction'>): Promise<string> {
   return db.$transaction(async tx => {
     // Both the reserved username and ID must be free, or already identify this exact actor.

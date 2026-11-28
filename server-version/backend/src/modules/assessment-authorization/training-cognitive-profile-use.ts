@@ -1,6 +1,7 @@
 import {catalogDiscoveryRecords,discoveryPageSql,discoveryJoin} from '../survey/catalog-discovery'
 import {catalogDiscoveryQueryFields,catalogTagFacets,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import {readApprovedCognitiveProfileArtifact} from './cognitive-profile-approved-source'
+import {hasTrainingCognitiveProfileHistory,TRAINING_COGNITIVE_USE_ACTION} from './training-cognitive-profile-history'
 import {Prisma} from '@prisma/client'
 import {randomUUID} from 'node:crypto'
 import {z} from 'zod'
@@ -18,7 +19,7 @@ import {selectedConfigurationBindingSchema,readSelectedConfigurationBinding,seal
 import {selectedConfigurationPointer,selectedConfigurationPointerSchema} from './standard-configuration-binding'
 const id=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/),revision=z.number().int().positive()
 const profile=z.enum(['experience','standard','research'])
-export const TRAINING_COGNITIVE_USE_ACTION='TRAINING_COGNITIVE_PROFILE_USE_GRANTED'
+export { TRAINING_COGNITIVE_USE_ACTION } from './training-cognitive-profile-history'
 export const TRAINING_COGNITIVE_REVOKE_ACTION='TRAINING_COGNITIVE_PROFILE_USE_REVOKED'
 export const TRAINING_COGNITIVE_USE_SCOPE='cognitive-profile-configurations'
 const replaces=z.object({grantId:id,expectedVersion:revision,reason:z.string().trim().min(1).max(500)}).strict()
@@ -187,11 +188,6 @@ export function readTrainingCognitiveTaskBinding(courseSnapshot:unknown):Trainin
  const raw=courseSnapshot&&typeof courseSnapshot==='object'&&!Array.isArray(courseSnapshot)
   ?(courseSnapshot as Record<string,unknown>).selectedCognitiveProfile:undefined
  return raw===undefined?null:trainingCognitiveTaskBindingSchema.parse(raw)
-}
-export async function hasTrainingCognitiveProfileHistory(tx:Pick<Tx,'$queryRaw'>,userId:string,configId:string){
- const rows=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM assessment_management_events
-  WHERE action=${TRAINING_COGNITIVE_USE_ACTION} AND resource_id=${configId} AND metadata->>'userId'=${userId} LIMIT 1`
- return rows.length>0
 }
 type DirectoryHeader={authorizationMode:'PRECISE';available:boolean;unavailableReason:string|null;fixedProfile:z.infer<typeof profile>|null;
  configurationName:string|null;selectedBinding:z.infer<typeof selectedConfigurationPointerSchema>|null}
