@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "bscs_zh_cn/1.0.0/1.2.0",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生在书桌上把手机放远，翻开作业册准备开始一个具体小步骤。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

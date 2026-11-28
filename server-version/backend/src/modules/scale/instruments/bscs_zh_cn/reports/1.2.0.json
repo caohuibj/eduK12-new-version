@@ -1,0 +1,80 @@
+{
+  "toolKey": "bscs_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0",
+  "title": "自我控制｜给自己一个容易开始的环境",
+  "report": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "self_control"
+    ],
+    "scoreOrder": [
+      "self_control"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "self_control",
+        "scoreLabel": "自我控制描述性均分（1–5）",
+        "headline": "给自己一个容易开始的环境",
+        "summary": "你本来要做二十分钟作业，手机亮了一下，回过神已经换了三件事。自我控制的一部分是让自己的行动接近原先打算做的事。有时把干扰放远、让第一步看得见，比反复提醒自己更管用。\n\n这 13 题把平时处理分心、冲动和目标的自我描述放在一起，取原题约定的平均分。分数越高，表示你这次更常把有利于坚持目标的做法描述为自己的习惯。可以结合一件具体任务回想，哪些安排让自己更容易照着计划走？",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一个近期要做的短任务，先写下自己准备从哪里开始，再把最容易边做边看的东西移出手边。结束后记一件有帮助的安排，下次保留它。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "目前沿用项目已有中文措辞与五级作答。这里呈现的是单一试用均分，阅读时结合实际情境。",
+      "题本与计分取自唐尼等 2004 年简式量表及本项目已有题本与授权登记。报告文案和插画由平台制作。"
+    ],
+    "disclaimer": "本报告用于研究试用和本次作答的描述性回顾。",
+    "artworkKey": "bscs_zh_cn/1.0.0/1.2.0"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
