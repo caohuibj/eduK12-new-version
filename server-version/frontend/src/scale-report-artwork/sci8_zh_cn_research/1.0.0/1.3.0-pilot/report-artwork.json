@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "sci8_zh_cn_research/1.0.0/1.3.0-pilot",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "安静卧室和白天窗边的读书角相邻，呈现夜晚与白天的不同感受。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

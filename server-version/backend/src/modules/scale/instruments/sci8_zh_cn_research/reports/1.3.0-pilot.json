@@ -1,0 +1,92 @@
+{
+  "toolKey": "sci8_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-pilot",
+  "title": "把近来的睡眠情况说具体｜成人非商业研究试用",
+  "report": {
+    "reportVersion": "1.3.0-pilot",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 来源、计分和内容复核",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对原 SCI 八道题的逐题选项与方向。保留成人非商业、工作译本和描述性合计，按现 P 不使用临床分界。"
+      }
+    },
+    "primaryScoreKeys": [
+      "sleep_condition"
+    ],
+    "scoreOrder": [
+      "sleep_condition"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "sleep_condition",
+        "scoreLabel": "自述睡眠状况（0–32）",
+        "headline": "回顾通常一晚和白天的感受",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这 8 道题记录过去一个月典型晚上的睡眠、白天受影响的程度，以及问题已持续多久。每题按原规则取 0–4 后求和，整体数值越大，表示本次报告的入睡或夜醒困难、睡眠带来的困扰等相对少，睡眠状况整体自评更好。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看过去一个月的一般情况，记录一个具体片段，例如入睡、夜醒或第二天精力。如果感受持续影响每天安排，可以把这些信息带去专业交流。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "现行 P 给出 0–32 的自述合计，仅限成人非商业描述性研究。原作者论文的临床筛查用途及参考范围独立记录。",
+      "题目的时间要求不同。前七题的报告窗口为过去一个月，第八题回应问题持续时间。",
+      "Espie、Kyle、Hames、Gardani、Fleming 和 Cape（2014），Sleep Condition Indicator，https://doi.org/10.1136/bmjopen-2013-004183 。SCI 版权归 Sleepio Limited，现 C 的题本权利记录为 CC BY-NC 4.0 https://creativecommons.org/licenses/by-nc/4.0/ 。中文工作译稿与报告由平台改编。"
+    ],
+    "disclaimer": "供成人非商业研究试用，描述睡眠自述，诊疗需专业评估。",
+    "artworkKey": "sci8_zh_cn_research/1.0.0/1.3.0-pilot"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-pilot",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
