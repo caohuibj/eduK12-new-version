@@ -1,0 +1,359 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "copsoq3_it_en",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "COPSOQ III Illegitimate Tasks（国际英文单项指标）",
+      "abbreviation": "COPSOQ3-IT",
+      "instrumentFamily": "COPSOQ III International English Annex 1, original item indicators"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "自评工作中遇到看来没有必要完成的任务的程度。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "copsoq3_it_en",
+        "domain:workplace_psychosocial",
+        "population:adult",
+        "response:self",
+        "use:research",
+        "source:copsoq_iii_annex_1",
+        "norms:none"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "用于能够理解英文原表的成年工作人群，限非商业研究。中文为独立原创报告。"
+    },
+    "administration": {
+      "itemCount": 1,
+      "estimatedMinutes": 1,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "当前工作情况，附录无单独回顾期",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留附录原题号和英文题文。",
+        "每题独立编码，只显示该题的回答结果。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "保留附录中的原指标及其原选项。不提供附录以外的合成分、风险分界或本地常模。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "COPSOQ III Annex 1 original English, PDF pp. 12, 20; https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "保留英文题本，中文为独立原创反馈，并同时提供英文说明。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_it_en-1.1.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_it_en-1.1.0",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_it_en-1.1.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Original unmodified COPSOQ International Network Annex 1 item wording and scored response anchors. The Network publishes CC BY-NC-ND 4.0 and linked use guidelines. Use here is limited to non-commercial research with adult workers. Feedback is independently authored, with no endorsement. https://www.copsoq-network.org/licence-guidelines-and-questionnaire"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "en",
+    "version": "1.1.0",
+    "text": "This item is from the COPSOQ III Annex 1 Illegitimate Tasks indicator.",
+    "source": "Platform orientation only. Annex 1 does not specify a separate IT instruction. https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "copsoq3_it_en",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      },
+      "source": {
+        "title": "COPSOQ III Annex 1 — Illegitimate Tasks",
+        "citation": "COPSOQ International Network. COPSOQ III: Guidelines and questionnaire. Annex 1, PDF pp. 12, 20, Network-linked 2021 version.",
+        "url": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "Original unmodified COPSOQ International Network Annex 1 item wording and scored response anchors. The Network publishes CC BY-NC-ND 4.0 and linked use guidelines. Use here is limited to non-commercial research with adult workers. Feedback is independently authored, with no endorsement. https://www.copsoq-network.org/licence-guidelines-and-questionnaire"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "copsoq_iii_extent_type_2",
+          "options": [
+            {
+              "value": "100",
+              "label": "To a very large extent",
+              "score": 100
+            },
+            {
+              "value": "75",
+              "label": "To a large extent",
+              "score": 75
+            },
+            {
+              "value": "50",
+              "label": "Somewhat",
+              "score": 50
+            },
+            {
+              "value": "25",
+              "label": "To a small extent",
+              "score": 25
+            },
+            {
+              "value": "0",
+              "label": "To a very small extent",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "IT1",
+          "content": "Do you sometimes have to do things which seem to be unnecessary?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "copsoq_iii_extent_type_2",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "IT1",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "perceived_unnecessary_work",
+            "type": "dimension",
+            "label": "Perceived unnecessary tasks",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IT1",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "perceived_unnecessary_work"
+        ],
+        "scoreOrder": [
+          "perceived_unnecessary_work"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "perceived_unnecessary_work",
+            "headline": "Perceived unnecessary tasks",
+            "scoreLabel": "Perceived unnecessary tasks (0–100)",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "This item describes how strongly you report being given work that seems unnecessary. Review the task's purpose and context before drawing conclusions.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Pick one task that felt repetitive, check its purpose, and ask a colleague whether the same result could be achieved in fewer steps."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "只报告 IT1 单项分数。保留 Annex 1 的五档有序回答及 0、25、50、75、100 编码，不计算多题总分或分档。",
+          "IT1 is one ordinal response mapped to 0–100 using Annex response category 2. No multi-item total or normative bands are reported."
+        ],
+        "disclaimer": "用于成年工作人群的非商业研究与自我回顾。For non-commercial research with adult workers and personal reflection.",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "en"
+        }
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "IT1",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "perceived_unnecessary_work": 0
+          },
+          "totalScoreKeys": [
+            "perceived_unnecessary_work"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "IT1",
+            "responseValue": "50"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "perceived_unnecessary_work": 50
+          },
+          "totalScoreKeys": [
+            "perceived_unnecessary_work"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "IT1",
+            "responseValue": "100"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "perceived_unnecessary_work": 100
+          },
+          "totalScoreKeys": [
+            "perceived_unnecessary_work"
+          ]
+        }
+      }
+    ]
+  }
+}

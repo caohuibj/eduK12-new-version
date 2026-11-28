@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_wf_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "工作结束之后，生活还有多少可以留给自己？",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "work_life_conflict"
+    ],
+    "scoreOrder": [
+      "work_life_conflict"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "work_life_conflict",
+        "headline": "工作结束之后，生活还有多少可以留给自己？",
+        "scoreLabel": "工作与私人生活冲突（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "时间被占用、下班后精力不足，或原有的私人计划不得不改，都是工作影响生活的具体方式。分数描述本次体验。\n\nWork can affect private life through time, energy or changes to family and personal plans.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次因为工作改变的私人安排，记下触发它的是哪次联络、排班或交付。和相关人商量一个可以明确的边界。\n\nRecall one disrupted plan and the specific trigger. Discuss a practical contact, scheduling or exception boundary."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 5 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示工作更常挤占私人生活的时间或精力。",
+      "本次分数用于描述作答。国际中版或其他国家版的研究不能作为此组合的当地常模。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_wf_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

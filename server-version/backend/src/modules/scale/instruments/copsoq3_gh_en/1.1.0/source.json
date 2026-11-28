@@ -1,0 +1,515 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "copsoq3_gh_en",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "COPSOQ III Self Rated Health（国际英文单项指标）",
+      "abbreviation": "COPSOQ3-GH",
+      "instrumentFamily": "COPSOQ III International English Annex 1, original item indicators"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "通过总体健康五级评价及当下健康数值评价，分别描述受访者当前整体健康感受。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "copsoq3_gh_en",
+        "domain:workplace_psychosocial",
+        "population:adult",
+        "response:self",
+        "use:research",
+        "source:copsoq_iii_annex_1",
+        "norms:none"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "用于能够理解英文原表的成年工作人群，限非商业研究。中文为独立原创报告。"
+    },
+    "administration": {
+      "itemCount": 2,
+      "estimatedMinutes": 1,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "健康组引导回顾过去四周，GH1 问总体健康，GH2 问当下健康",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留附录原题号和英文题文。",
+        "每题独立编码，只显示该题的回答结果。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "保留附录中的原指标及其原选项。不提供附录以外的合成分、风险分界或本地常模。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "COPSOQ III Annex 1 original English, PDF pp. 17, 20; https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "保留英文题本，中文为独立原创反馈，并同时提供英文说明。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_gh_en-1.1.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_gh_en-1.1.0",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_gh_en-1.1.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Original unmodified COPSOQ International Network Annex 1 item wording and scored response anchors. The Network publishes CC BY-NC-ND 4.0 and linked use guidelines. Use here is limited to non-commercial research with adult workers. Feedback is independently authored, with no endorsement. https://www.copsoq-network.org/licence-guidelines-and-questionnaire"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "en",
+    "version": "1.1.0",
+    "text": "The following questions are about your own health and well-being. Please do not try to distinguish between symptoms that are caused by work and symptoms that are due to other causes. The task is to describe how you are in general.\n\nThe questions are about your health and well-being during the last four weeks:",
+    "source": "Original English Annex 1 (Intro Health, p. 17). https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "copsoq3_gh_en",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      },
+      "source": {
+        "title": "COPSOQ III Annex 1 — Self Rated Health",
+        "citation": "COPSOQ International Network. COPSOQ III: Guidelines and questionnaire. Annex 1, PDF pp. 17, 20, Network-linked 2021 version.",
+        "url": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "Original unmodified COPSOQ International Network Annex 1 item wording and scored response anchors. The Network publishes CC BY-NC-ND 4.0 and linked use guidelines. Use here is limited to non-commercial research with adult workers. Feedback is independently authored, with no endorsement. https://www.copsoq-network.org/licence-guidelines-and-questionnaire"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "copsoq_iii_health_category_type_7",
+          "options": [
+            {
+              "value": "100",
+              "label": "Excellent",
+              "score": 100
+            },
+            {
+              "value": "75",
+              "label": "Very good",
+              "score": 75
+            },
+            {
+              "value": "50",
+              "label": "Good",
+              "score": 50
+            },
+            {
+              "value": "25",
+              "label": "Fair",
+              "score": 25
+            },
+            {
+              "value": "0",
+              "label": "Poor",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "copsoq_iii_health_numeric_type_8",
+          "options": [
+            {
+              "value": "0",
+              "label": "0",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "1",
+              "score": 10
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 20
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 30
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 40
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 50
+            },
+            {
+              "value": "6",
+              "label": "6",
+              "score": 60
+            },
+            {
+              "value": "7",
+              "label": "7",
+              "score": 70
+            },
+            {
+              "value": "8",
+              "label": "8",
+              "score": 80
+            },
+            {
+              "value": "9",
+              "label": "9",
+              "score": 90
+            },
+            {
+              "value": "10",
+              "label": "10",
+              "score": 100
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "GH1",
+          "content": "In general, would you say your health is:",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "copsoq_iii_health_category_type_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "GH2",
+          "content": "If you evaluate the best conceivable state of health at 10 points and the worst at 0 points: how many points do you then give your present state of health?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "copsoq_iii_health_numeric_type_8",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "GH1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "GH2",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "general_health_rating",
+            "type": "dimension",
+            "label": "General health rating",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "GH1",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "present_health_rating",
+            "type": "dimension",
+            "label": "Present health rating",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "GH2",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "general_health_rating",
+          "present_health_rating"
+        ],
+        "scoreOrder": [
+          "general_health_rating",
+          "present_health_rating"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "general_health_rating",
+            "headline": "General health rating",
+            "scoreLabel": "General health rating (0–100)",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "This item converts your five-choice general health rating to 0, 25, 50, 75 or 100. A higher result indicates a more favorable self-rating.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Consider whether recent changes in sleep, work or daily activity help explain your overall rating."
+              }
+            ]
+          },
+          {
+            "scoreKey": "present_health_rating",
+            "headline": "Present health rating",
+            "scoreLabel": "Present health rating (0–100)",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "Your original 0–10 present-health choice is multiplied by 10, as specified in the Annex. Keep this answer separate from your general health rating.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "If tracking change, record the context each time. If symptoms persist or interfere with daily life, consider discussing the changes and timing with a health professional."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "GH1 与 GH2 分开呈现。GH1 使用附录第 7 种选项。GH2 保留 0–10 原始选项并乘 10 显示。两项均为 0–100 的单项指标，不计算合成分或风险分档。",
+          "GH1 category 7 and GH2 category 8 are separate response formats and separate results. There is no composite or diagnostic score."
+        ],
+        "disclaimer": "用于成年工作人群的非商业研究与自我回顾。For non-commercial research with adult workers and personal reflection.",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "en"
+        }
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "GH1",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "GH2",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "general_health_rating": 0,
+            "present_health_rating": 0
+          },
+          "totalScoreKeys": [
+            "general_health_rating",
+            "present_health_rating"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "GH1",
+            "responseValue": "50"
+          },
+          {
+            "itemCode": "GH2",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "general_health_rating": 50,
+            "present_health_rating": 50
+          },
+          "totalScoreKeys": [
+            "general_health_rating",
+            "present_health_rating"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "GH1",
+            "responseValue": "100"
+          },
+          {
+            "itemCode": "GH2",
+            "responseValue": "10"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "general_health_rating": 100,
+            "present_health_rating": 100
+          },
+          "totalScoreKeys": [
+            "general_health_rating",
+            "present_health_rating"
+          ]
+        }
+      },
+      {
+        "name": "different_levels",
+        "answers": [
+          {
+            "itemCode": "GH1",
+            "responseValue": "25"
+          },
+          {
+            "itemCode": "GH2",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "general_health_rating": 25,
+            "present_health_rating": 70
+          },
+          "totalScoreKeys": [
+            "general_health_rating",
+            "present_health_rating"
+          ]
+        }
+      }
+    ]
+  }
+}

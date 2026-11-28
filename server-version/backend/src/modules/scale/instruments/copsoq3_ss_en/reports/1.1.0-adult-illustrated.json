@@ -1,0 +1,87 @@
+{
+  "toolKey": "copsoq3_ss_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "领导支持（有直属主管的成年工作者）",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "social_support_from_supervisor"
+    ],
+    "scoreOrder": [
+      "social_support_from_supervisor"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "social_support_from_supervisor",
+        "headline": "需要帮忙时，知道第一句话找谁说（有直属主管的成年工作者）",
+        "scoreLabel": "领导支持（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "当工作遇到问题时，能否请直属主管听一听、提供帮助或一起谈谈工作做得怎样，会影响你解决困难的方式。\n\nThis result describes how often an immediate supervisor listens, provides help or gives feedback about how the work is being carried out.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找一个经常卡住的场景，提前说清什么时候需要反馈、希望得到哪种帮助、什么时间回应最合适。\n\nPick a common sticking point and agree when to ask, what kind of support would help and when to check in."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 3 项构成。各题按原版计分转换到 0–100，完整作答后等权求均分。分数越高，表示更常感到直接上级愿意听、帮得上忙或提供与工作有关的反馈。",
+      "只纳入事先确认属于有直属主管的成年工作者的非商业研究样本。附录第 20 页将无相应关系作为可选缺失项。本分量表适用于已确认的人群，保留五个原版有分选项。有题未答时，本维度留空。",
+      "本次分数用于描述作答。未套用当地常模、等级或筛选界值。",
+      "Use only in a preselected non-commercial research sample of adult workers with an immediate supervisor. Annex 1 footnote † permits adding 'I do not have a supervisor' as a missing response if needed. This edition is restricted to the confirmed cohort, with five original scored responses. An incomplete scale has no score."
+    ],
+    "disclaimer": "适用于有直属主管的成年工作者，供非商业研究和自我回顾。 This descriptive score is for non-commercial research and personal reflection with adult workers with an immediate supervisor.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_ss_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

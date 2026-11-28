@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_sl_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "睡不安稳时，先看看困难出现在哪一段",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "sleeping_troubles"
+    ],
+    "scoreOrder": [
+      "sleeping_troubles"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "sleeping_troubles",
+        "headline": "睡不安稳时，先看看困难出现在哪一段",
+        "scoreLabel": "睡眠困扰（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "过去四周，入睡、睡稳，或者醒来后再睡着，可能有不同的困难。把变化按实际发生的时间记下，更容易讲清。\n\nThe items describe difficulty falling asleep, staying asleep and returning to sleep over the past four weeks.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "连续几天记一下你在哪一段睡得不稳，以及第二天受到什么影响。如果持续困扰或明显影响日常，可以带着记录咨询专业人员。\n\nKeep a brief note of when difficulties occur and how the next day is affected. Seek qualified advice if they persist or disrupt daily life."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 4 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示过去四周更经常遇到入睡、睡稳或再入睡的困难。",
+      "本分数描述过去四周的自我报告体验。严重程度、原因及专业判断需要其他信息。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_sl_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

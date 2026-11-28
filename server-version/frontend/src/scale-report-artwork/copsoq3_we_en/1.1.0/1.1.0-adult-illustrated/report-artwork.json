@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "copsoq3_we_en/1.1.0/1.1.0-adult-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位成年人专注于手边的制作，桌上是还在完成的作品。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

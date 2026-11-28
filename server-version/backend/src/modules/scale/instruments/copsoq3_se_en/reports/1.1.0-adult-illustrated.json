@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_se_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "把“我能不能”变成“我可以先试什么”",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "self_efficacy"
+    ],
+    "scoreOrder": [
+      "self_efficacy"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "self_efficacy",
+        "headline": "把“我能不能”变成“我可以先试什么”",
+        "scoreLabel": "一般自我效能（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "遇到难题时，能想到不同办法、调整计划，或相信自己可以逐步处理意外，都与本分量表有关。分数描述你对自己做法的看法。\n\nThis scale describes how strongly people feel able to solve problems, adapt plans and deal with surprises.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一件正在犹豫的事，拆出一项成本小、能得到反馈的尝试。记下有什么办法管用，遇到类似事情时可以重用。\n\nChoose a low-cost first step that gives useful feedback. Keep a note of what helped so you can use it next time."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 6 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示更相信自己能解决问题、调整办法并应对意外。",
+      "本次分数用于描述作答。国际中版或其他国家版的研究不能作为此组合的当地常模。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_se_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

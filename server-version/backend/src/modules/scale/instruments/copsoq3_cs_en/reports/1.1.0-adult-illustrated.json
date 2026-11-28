@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_cs_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "头绪打结时，把最重要的一件事放到眼前",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "cognitive_stress"
+    ],
+    "scoreOrder": [
+      "cognitive_stress"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "cognitive_stress",
+        "headline": "头绪打结时，把最重要的一件事放到眼前",
+        "scoreLabel": "认知压力体验（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "过去四周，集中注意、理清思路、做决定或记住细节，可能有某一环更费力。这个分量表描述自我观察到的体验。\n\nThe items describe reported difficulties concentrating, thinking clearly, deciding or remembering over the past four weeks.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把一项复杂任务分成几步，先把第一步和需要记住的事写下来，减少同时处理的内容。若变化持续并影响日常，可咨询专业人员。\n\nWrite down the first step of a complex task to reduce how much must be held in mind. Seek qualified advice if difficulties persist and disrupt daily life."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 4 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示过去四周更常感到难集中、思路不清、难做决定或记不住。",
+      "本分数描述过去四周的自我报告体验。严重程度、原因及专业判断需要其他信息。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_cs_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

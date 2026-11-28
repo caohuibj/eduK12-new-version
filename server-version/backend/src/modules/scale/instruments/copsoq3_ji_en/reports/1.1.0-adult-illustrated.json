@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_ji_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "有些担心来自事实，有些来自还没有答案",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "job_insecurity"
+    ],
+    "scoreOrder": [
+      "job_insecurity"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "job_insecurity",
+        "headline": "有些担心来自事实，有些来自还没有答案",
+        "scoreLabel": "工作不安全感（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "担心失业、担心变化影响岗位，和担心难以找到下一份工作，都可能让人觉得不踏实。报告只描述这些担心的程度。\n\nConcerns about unemployment, technological change and finding another job can all contribute to feeling insecure.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把已经确认的变化、还需要查证的信息，以及现在能做的准备分别记下来。先找一个可靠渠道核对一条信息。\n\nSeparate confirmed changes, questions to verify and things you can prepare. Check one question with a reliable source."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 3 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示对失业、岗位被替代或重新就业的担心更多。",
+      "本次分数用于描述作答。国际中版或其他国家版的研究不能作为此组合的当地常模。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_ji_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "toolKey": "copsoq3_sc_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "同事支持（有工作同事的成年工作者）",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "social_support_from_colleagues"
+    ],
+    "scoreOrder": [
+      "social_support_from_colleagues"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "social_support_from_colleagues",
+        "headline": "互相帮得上忙，往往从知道怎么开口开始（有工作同事的成年工作者）",
+        "scoreLabel": "同事支持（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "同事支持可能是一起解一个难题、听你说清遇到的困难，也可能是把有用的反馈及时告诉你。这组题记录这些事情发生得有多频繁。\n\nThis result describes how often colleagues offer practical help, listen or talk through how the work is going.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把一次求助说得更具体，例如请同事用十分钟一起看一份材料。也可以约好繁忙时由谁接手，怎样回传进展。\n\nMake one request easy to answer. For example, ask a colleague to review one document with you for ten minutes, or clarify how busy handovers should work."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 3 项构成。各题按原版计分转换到 0–100，完整作答后等权求均分。分数越高，表示更常感到同事愿意协助、倾听或交流工作做法。",
+      "只纳入事先确认属于有工作同事的成年工作者的非商业研究样本。附录第 20 页将无相应关系作为可选缺失项。本分量表适用于已确认的人群，保留五个原版有分选项。有题未答时，本维度留空。",
+      "本次分数用于描述作答。未套用当地常模、等级或筛选界值。",
+      "Use only in a preselected non-commercial research sample of adult workers with colleagues. Annex 1 footnote ‡ permits adding 'I do not have colleagues' as a missing response if needed. This edition is restricted to the confirmed cohort, with five original scored responses. An incomplete scale has no score."
+    ],
+    "disclaimer": "适用于有工作同事的成年工作者，供非商业研究和自我回顾。 This descriptive score is for non-commercial research and personal reflection with adult workers with colleagues.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_sc_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_ju_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "公平常常体现在理由能不能说得清楚",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "organizational_justice"
+    ],
+    "scoreOrder": [
+      "organizational_justice"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "organizational_justice",
+        "headline": "公平常常体现在理由能不能说得清楚",
+        "scoreLabel": "组织公正（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这个分量表关注单位如何处理冲突、分配工作，以及对好的工作和员工意见作什么回应。请从单位整体来理解。\n\nThis whole-workplace result describes perceived fair conflict handling, recognition, serious consideration of suggestions and distribution of work.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一个经常出现的分工决定，询问标准能否被大家看见、理由能否说清、意见能否进入讨论。先把其中一项做得更明确。\n\nTake one recurring allocation decision and clarify its standard, explanation or way to raise a concern."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 4 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示更常感到工作分配、冲突处理和人员意见对待得公允。",
+      "本次分数用于描述作答。国际中版或其他国家版的研究不能作为此组合的当地常模。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_ju_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "copsoq3_ju_en/1.1.0/1.1.0-adult-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "大家围坐在一张桌边，按相同顺序查看和讨论工作卡片。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

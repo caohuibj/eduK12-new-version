@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_qd_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "忙与忙之间，有没有喘口气的空档？",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "quantitative_demands"
+    ],
+    "scoreOrder": [
+      "quantitative_demands"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "quantitative_demands",
+        "headline": "忙与忙之间，有没有喘口气的空档？",
+        "scoreLabel": "定量要求（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "同样多的任务，如果集中在同一天，就更容易出现来不及和往后拖。这个分量表关注的是任务堆积、可用时间和延误经历。\n\nTasks that would fit across a week can still pile up on one afternoon. This dimension describes reported workload peaks, time pressure and backlogs.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看最近一次任务积压，把任务、期限和当时能用的时间放在一张表里。协商优先级时，先指出哪两项碰在了一起。\n\nMap the tasks and their due times for a recent bottleneck. Use the example to agree which two deadlines need to move or which task needs support."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 4 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示工作量的堆积、期限紧张和积压感越常出现。",
+      "本次分数用于描述作答。国际中版或其他国家版的研究不能作为此组合的当地常模。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_qd_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

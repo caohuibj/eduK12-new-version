@@ -1,0 +1,103 @@
+{
+  "toolKey": "copsoq3_gh_en",
+  "contentVersion": "1.1.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-adult-illustrated",
+  "title": "同一份健康感受，用两种方式分别记录 / Two ways to check in with your health",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "general_health_rating",
+      "present_health_rating"
+    ],
+    "scoreOrder": [
+      "general_health_rating",
+      "present_health_rating"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "general_health_rating",
+        "headline": "怎样概括整体健康感受？",
+        "scoreLabel": "总体健康自评（五档编码）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这项回答来自你对整体健康的五档评价。系统按附录换算为 0、25、50、75 或 100，越高表示自评越好。这里记录的是你的总体感受，无法辨认具体病因。\n\nThis item converts your five-choice general health rating to 0, 25, 50, 75 or 100. A higher result indicates a more favorable self-rating.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看最近的睡眠、工作与日常活动，想想哪些变化对当前的整体感受影响最大。\n\nConsider whether recent changes in sleep, work or daily activity help explain your overall rating."
+          }
+        ]
+      },
+      {
+        "scoreKey": "present_health_rating",
+        "headline": "用一个数字定位此刻的感受",
+        "scoreLabel": "当下健康自评（0–10 换算）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "你在原题的 0–10 量尺上选择一个数字，按附录乘以 10 后呈现。它与五档总体健康评价各自保留，即使两项结果不同，也可以回看两道问题关注的角度。\n\nYour original 0–10 present-health choice is multiplied by 10, as specified in the Annex. Keep this answer separate from your general health rating.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "如果打算跟踪变化，可以在相似情境下再次记录。若不适持续或影响日常，考虑向医疗专业人员说明变化和发生的时间。\n\nIf tracking change, record the context each time. If symptoms persist or interfere with daily life, consider discussing the changes and timing with a health professional."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "GH1 与 GH2 分开呈现。GH1 使用附录第 7 种选项。GH2 保留 0–10 原始选项并乘 10 显示。两项均为 0–100 的单项指标，不计算合成分或风险分档。",
+      "GH1 category 7 and GH2 category 8 are separate response formats and separate results. There is no composite or diagnostic score."
+    ],
+    "disclaimer": "用于成年工作人群的非商业研究与自我回顾。For non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_gh_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

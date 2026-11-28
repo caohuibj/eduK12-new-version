@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_bo_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "把最近耗尽精力的时段找出来",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "burnout"
+    ],
+    "scoreOrder": [
+      "burnout"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "burnout",
+        "headline": "把最近耗尽精力的时段找出来",
+        "scoreLabel": "近四周耗竭感（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "过去四周，有时是身体累，有时是情绪上没有余力，也可能只觉得整体疲惫。这个分量表记录体验出现的频率。\n\nThe items describe feeling worn out, physically exhausted, emotionally exhausted or tired in the past four weeks.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "记下两个最容易觉得耗尽的时段，看看之前有哪些负担、之后有没有恢复机会。持续或明显影响日常时，可以寻求专业支持。\n\nRecord when exhaustion tends to appear and what chance there is to recover. Seek qualified support if it persists or significantly disrupts daily living."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 4 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示过去四周的疲惫、身体或情绪耗竭更频繁。",
+      "本分数描述过去四周的自我报告体验。严重程度、原因及专业判断需要其他信息。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_bo_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

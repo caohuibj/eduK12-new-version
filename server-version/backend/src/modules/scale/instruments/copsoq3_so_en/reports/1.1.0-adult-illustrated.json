@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_so_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "身体的变化，值得按实际出现的样子记下来",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "somatic_stress"
+    ],
+    "scoreOrder": [
+      "somatic_stress"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "somatic_stress",
+        "headline": "身体的变化，值得按实际出现的样子记下来",
+        "scoreLabel": "躯体压力相关感受（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "过去四周的身体感觉值得按出现时间、持续多久和对生活的影响来记录。这些感受可能有多种原因。\n\nThis scale describes reported bodily experiences over the past four weeks. Such experiences may have several causes.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "如果不适反复、加重或影响日常，把记录带给医疗专业人员。问卷分数只概括你报告的频率。\n\nFor persistent, worsening or disruptive discomfort, bring a short record of timing and impact to a health professional."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 4 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示过去四周的身体不适和肌肉紧张更常见。",
+      "本分数描述过去四周的自我报告体验。严重程度、原因及专业判断需要其他信息。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_so_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

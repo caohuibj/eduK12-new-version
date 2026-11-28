@@ -1,0 +1,85 @@
+{
+  "toolKey": "copsoq3_it_en",
+  "contentVersion": "1.1.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-adult-illustrated",
+  "title": "工作流程里，哪一步可以商量？ / Discuss one step in your work process",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "perceived_unnecessary_work"
+    ],
+    "scoreOrder": [
+      "perceived_unnecessary_work"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "perceived_unnecessary_work",
+        "headline": "留意一次看来多做了一遍的任务",
+        "scoreLabel": "不合理任务感受（0–100 分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这道题记录你对工作中某些安排是否有必要的感受。越接近 100，表示你越认同自己遇到了看来没有必要做的事。它描述的是你的经验，不能代替对任务用途的核实。\n\nThis item describes how strongly you report being given work that seems unnecessary. Review the task's purpose and context before drawing conclusions.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一件你觉得重复的事，确认它在流程里起什么作用。如果同一个目标能用更少的步骤完成，跟相关同事讨论一种可以先试的小调整。\n\nPick one task that felt repetitive, check its purpose, and ask a colleague whether the same result could be achieved in fewer steps."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "只报告 IT1 单项分数。保留 Annex 1 的五档有序回答及 0、25、50、75、100 编码，不计算多题总分或分档。",
+      "IT1 is one ordinal response mapped to 0–100 using Annex response category 2. No multi-item total or normative bands are reported."
+    ],
+    "disclaimer": "用于成年工作人群的非商业研究与自我回顾。For non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_it_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

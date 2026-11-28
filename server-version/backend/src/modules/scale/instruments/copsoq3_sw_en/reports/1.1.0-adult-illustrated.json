@@ -1,0 +1,87 @@
+{
+  "toolKey": "copsoq3_sw_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "工作共同体感（有工作同事的成年工作者）",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "sense_of_community_at_work"
+    ],
+    "scoreOrder": [
+      "sense_of_community_at_work"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "sense_of_community_at_work",
+        "headline": "有一件事，大家真的在一起做（有工作同事的成年工作者）",
+        "scoreLabel": "工作共同体感（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一起上班未必就有团队感。这组题关注彼此相处的氛围、协作是否顺畅，以及你是否觉得自己是这个团队的一员。\n\nThis result describes the atmosphere among colleagues, how cooperation feels and whether people feel part of a workplace community.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次大家配合顺利的工作，看看它靠的是共享信息、相互补位还是目标清楚。选一件能在下一次合作中重复的小事。\n\nChoose a recent example of effective collaboration. Identify one small practice to repeat, such as sharing information earlier or clarifying who can step in."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 3 项构成。各题按原版计分转换到 0–100，完整作答后等权求均分。分数越高，表示更常感到与同事相处融洽、协作顺利并融入团队。",
+      "只纳入事先确认属于有工作同事的成年工作者的非商业研究样本。附录第 20 页将无相应关系作为可选缺失项。本分量表适用于已确认的人群，保留五个原版有分选项。有题未答时，本维度留空。",
+      "本次分数用于描述作答。未套用当地常模、等级或筛选界值。",
+      "Use only in a preselected non-commercial research sample of adult workers with colleagues. Annex 1 footnote ‡ permits adding 'I do not have colleagues' as a missing response if needed. This edition is restricted to the confirmed cohort, with five original scored responses. An incomplete scale has no score."
+    ],
+    "disclaimer": "适用于有工作同事的成年工作者，供非商业研究和自我回顾。 This descriptive score is for non-commercial research and personal reflection with adult workers with colleagues.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_sw_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

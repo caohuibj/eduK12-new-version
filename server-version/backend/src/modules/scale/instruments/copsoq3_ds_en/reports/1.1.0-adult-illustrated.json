@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_ds_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "如果最近不太能感到兴致，可以先从一件小事说起",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "depressive_symptoms"
+    ],
+    "scoreOrder": [
+      "depressive_symptoms"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "depressive_symptoms",
+        "headline": "如果最近不太能感到兴致，可以先从一件小事说起",
+        "scoreLabel": "过去四周低落相关体验（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "过去四周，如果一件平常愿意做的事变得难以提起兴趣，或心情、自信出现变化，可以先把这件事具体说出来。这个分数是对近期体验的自评。\n\nThis result describes self-reported sadness, guilt, diminished interest and lower confidence over the past four weeks. Clinical interpretation requires other information.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "记下一件近期变得困难的活动，找一位你信任的人交流。低落或兴趣下降持续、明显影响生活时，可以寻求专业支持。\n\nName one recent change and consider discussing it with someone you trust. Seek qualified support if low mood or lost interest persists or disrupts daily life."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 4 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示过去四周低落、失去兴趣、自信减弱或内疚的体验更常见。",
+      "本分数描述过去四周的自我报告体验。严重程度、原因及专业判断需要其他信息。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_ds_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

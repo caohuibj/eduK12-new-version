@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_emotional_demands_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "需要接住别人的情绪，也需要让自己有地方放下",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "emotional_demands"
+    ],
+    "scoreOrder": [
+      "emotional_demands"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "emotional_demands",
+        "headline": "需要接住别人的情绪，也需要让自己有地方放下",
+        "scoreLabel": "情绪要求（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有些工作场景需要面对别人的困难，也让人带着情绪继续完成后面的事。此分量表记录这类情境的强度和出现程度。\n\nSome work involves responding to other people's difficulties or handling emotionally demanding interactions.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想一场真正耗神的交流。在守住对方隐私的前提下，安排一次简短交接或复盘，让支持有具体的时间和人。\n\nChoose one taxing interaction, then plan a brief handover or debrief that respects the person's privacy."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 3 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示情绪要求较强的场面或接触他人难处的机会更多。",
+      "本次分数用于描述作答。国际中版或其他国家版的研究不能作为此组合的当地常模。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_emotional_demands_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_in_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "收到任务以后，自己还能决定多少？",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "influence_at_work"
+    ],
+    "scoreOrder": [
+      "influence_at_work"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "influence_at_work",
+        "headline": "收到任务以后，自己还能决定多少？",
+        "scoreLabel": "工作影响力（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "接到同一个目标，有人可以商量做法、速度和分工，也有人只能按已有安排执行。这个分量表描述能参与这些决定的程度。\n\nWorkers may have different degrees of say in their assignments, colleagues, pace and methods.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把一项近期任务拆成目标、时限、分工和做法。找出其中一个可以讨论的决定，与相关人核对你能在哪一步参与。\n\nBreak one task into goal, deadline, partners and method. Clarify one decision you can influence."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 6 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示能参与工作安排、做法或节奏选择的机会更多。",
+      "本次分数用于描述作答。国际中版或其他国家版的研究不能作为此组合的当地常模。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_in_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

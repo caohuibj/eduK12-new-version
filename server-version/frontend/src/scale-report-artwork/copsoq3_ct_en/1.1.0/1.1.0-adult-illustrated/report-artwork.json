@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "copsoq3_ct_en/1.1.0/1.1.0-adult-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "桌上的工作卡之间留出一个空档，旁边放着一只杯子。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

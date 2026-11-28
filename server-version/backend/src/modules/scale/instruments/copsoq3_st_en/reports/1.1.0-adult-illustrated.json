@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_st_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "紧绷感什么时候开始，什么时候能松下来？",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "stress"
+    ],
+    "scoreOrder": [
+      "stress"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "stress",
+        "headline": "紧绷感什么时候开始，什么时候能松下来？",
+        "scoreLabel": "压力体验（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "过去四周，有些紧张表现为难放松，有些表现为易烦躁或持续紧绷。单看分数看不出这些体验的原因。\n\nThis scale describes difficulty relaxing, irritability and tension over the past four weeks. The score cannot identify the cause.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一个明显紧绷的时段，记下前后情境和能让你转入休息的具体安排。困扰持续时，可寻求适合你的专业支持。\n\nNote what comes before and after one tense period. Choose a concrete transition into rest, and seek qualified support if difficulties persist."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 3 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示过去四周难放松、易烦躁或紧绷的感觉更常见。",
+      "本分数描述过去四周的自我报告体验。严重程度、原因及专业判断需要其他信息。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_st_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

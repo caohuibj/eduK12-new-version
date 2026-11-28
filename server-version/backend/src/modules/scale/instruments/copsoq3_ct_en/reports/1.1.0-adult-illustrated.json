@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_ct_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "有些时间，能不能自己做一点主？",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "control_over_working_time"
+    ],
+    "scoreOrder": [
+      "control_over_working_time"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "control_over_working_time",
+        "headline": "有些时间，能不能自己做一点主？",
+        "scoreLabel": "工作时间自主（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "决定何时休息、能否临时离开、什么时候请假，以及加班多不多，都会影响人对工作时间的掌控感。\n\nScheduling a break, arranging time away and working overtime all shape how much control workers have over their time.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一次难安排的休息、请假或临时事务，看看交接、审批和人手中是哪一环卡住了，先和相关人谈这一环。\n\nChoose one recent scheduling difficulty. See whether coverage, the handover or the approval process can be discussed first."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 5 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示更能自主安排休息、短时离岗或休假，同时被迫加班较少。",
+      "本次分数用于描述作答。国际中版或其他国家版的研究不能作为此组合的当地常模。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_ct_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

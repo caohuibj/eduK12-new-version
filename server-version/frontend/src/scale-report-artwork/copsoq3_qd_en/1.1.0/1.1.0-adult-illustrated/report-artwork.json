@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "copsoq3_qd_en/1.1.0/1.1.0-adult-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一只手重新排列日历上的任务卡，给排得太满的工作留出空间。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

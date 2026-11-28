@@ -1,0 +1,555 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "copsoq3_in_en",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "COPSOQ III Influence at Work（国际英文分量表）",
+      "abbreviation": "COPSOQ3-IN",
+      "instrumentFamily": "COPSOQ III international English Annex 1, full original dimension"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "能参与工作安排、做法或节奏选择的机会更多。国际英文附录完整维度，面向成人非商业研究。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "copsoq3_in_en",
+        "domain:workplace_psychosocial",
+        "population:adult",
+        "response:self",
+        "use:research",
+        "source:copsoq_iii_annex_1",
+        "norms:none"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "适用于能读懂英文的成年工作人群。作为非商业研究的自评资料，配有独立中英文反馈。"
+    },
+    "administration": {
+      "itemCount": 6,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "依原题所问的工作或自我感受。本维度无统一具体回顾期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留英文原题、题号、原序、响应锚点和计分方向。",
+        "平台按完整答卷计算本维度 0–100 原量尺均分。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "English item set and scores follow the Annex. Research applicability is exploratory for this exact standalone administration. Studies of a separately administered national form or international Middle subset do not establish benchmarks for this Annex dimension."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "COPSOQ International Network, Annex 1, original English, PDF pp. 10. https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "保留国际附录英文原题。报告为独立中英文反馈。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_in_en-1.1.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_in_en-1.1.0",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_in_en-1.1.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Original English item text and response categories for a complete COPSOQ III Annex 1 dimension. Source: COPSOQ International Network. The Network lists CC BY-NC-ND 4.0 and linked questionnaire guidelines. This implementation is limited to non-commercial adult research. The original questionnaire terms continue to apply. Independent feedback does not imply Network endorsement and this dimension alone is not organizational risk assessment.",
+      "https://www.copsoq-network.org/licence-guidelines-and-questionnaire"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "en",
+    "version": "1.1.0",
+    "text": "Please select the response that best matches your work experience for each item.",
+    "source": "Platform completion guidance. The Annex does not provide a separate instruction for this dimension. https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "COPSOQ III Annex 1 — Influence at Work",
+        "citation": "COPSOQ International Network. COPSOQ III: Guidelines and questionnaire, Annex 1, 18 August 2021. PDF pp. 10; response options pp. 19–20. Full original Annex 1 IN dimension; 6 items; response option types 1.",
+        "url": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "Original English item text and response categories for a complete COPSOQ III Annex 1 dimension. Source: COPSOQ International Network. The Network lists CC BY-NC-ND 4.0 and linked questionnaire guidelines. This implementation is limited to non-commercial adult research. The original questionnaire terms continue to apply. Independent feedback does not imply Network endorsement and this dimension alone is not organizational risk assessment. https://www.copsoq-network.org/licence-guidelines-and-questionnaire"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "copsoq3_in_en",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "copsoq_iii_response_type_1",
+          "options": [
+            {
+              "value": "option_1",
+              "label": "Always",
+              "score": 100
+            },
+            {
+              "value": "option_2",
+              "label": "Often",
+              "score": 75
+            },
+            {
+              "value": "option_3",
+              "label": "Sometimes",
+              "score": 50
+            },
+            {
+              "value": "option_4",
+              "label": "Seldom",
+              "score": 25
+            },
+            {
+              "value": "option_5",
+              "label": "Never/hardly ever",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "INX1",
+          "content": "Do you have a large degree of influence on the decisions concerning your work?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "copsoq_iii_response_type_1",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IN2",
+          "content": "Do you have a say in choosing who you work with?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "copsoq_iii_response_type_1",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IN3",
+          "content": "Can you influence the amount of work assigned to you?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "copsoq_iii_response_type_1",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IN4",
+          "content": "Do you have any influence on what you do at work?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "copsoq_iii_response_type_1",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IN5",
+          "content": "Can you influence how quickly you work?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "copsoq_iii_response_type_1",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IN6",
+          "content": "Do you have any influence on HOW you do your work?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "copsoq_iii_response_type_1",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "influence_at_work",
+            "label": "Influence at Work",
+            "type": "dimension",
+            "description": "能参与工作安排、做法或节奏选择的机会更多",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "INX1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IN2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IN3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IN4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IN5",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IN6",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ],
+        "itemRules": [
+          {
+            "itemCode": "INX1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IN2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IN3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IN4",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IN5",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IN6",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ]
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "influence_at_work"
+        ],
+        "scoreOrder": [
+          "influence_at_work"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "influence_at_work",
+            "headline": "Which decisions can you actually shape?",
+            "scoreLabel": "Influence at Work (0–100 mean)",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "Workers may have different degrees of say in their assignments, colleagues, pace and methods.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Break one task into goal, deadline, partners and method. Clarify one decision you can influence."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本分量表由 6 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示能参与工作安排、做法或节奏选择的机会更多。",
+          "本次分数用于描述作答。国际中版或其他国家版的研究不能作为此组合的当地常模。",
+          "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+        ],
+        "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "en"
+        }
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "INX1",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "IN2",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "IN3",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "IN4",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "IN5",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "IN6",
+            "responseValue": "option_5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "influence_at_work": 0.0
+          },
+          "totalScoreKeys": [
+            "influence_at_work"
+          ]
+        }
+      },
+      {
+        "name": "midpoint response positions",
+        "answers": [
+          {
+            "itemCode": "INX1",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "IN2",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "IN3",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "IN4",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "IN5",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "IN6",
+            "responseValue": "option_3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "influence_at_work": 50.0
+          },
+          "totalScoreKeys": [
+            "influence_at_work"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "INX1",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "IN2",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "IN3",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "IN4",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "IN5",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "IN6",
+            "responseValue": "option_1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "influence_at_work": 100.0
+          },
+          "totalScoreKeys": [
+            "influence_at_work"
+          ]
+        }
+      },
+      {
+        "name": "mixed responses use item-specific direction",
+        "answers": [
+          {
+            "itemCode": "INX1",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "IN2",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "IN3",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "IN4",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "IN5",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "IN6",
+            "responseValue": "option_5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "influence_at_work": 16.666666666666668
+          },
+          "totalScoreKeys": [
+            "influence_at_work"
+          ]
+        }
+      }
+    ]
+  }
+}

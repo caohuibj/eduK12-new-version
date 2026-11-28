@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_va_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "工作里有多少变化，什么时候又需要稳定？",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "variation_of_work"
+    ],
+    "scoreOrder": [
+      "variation_of_work"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "variation_of_work",
+        "headline": "工作里有多少变化，什么时候又需要稳定？",
+        "scoreLabel": "工作多样性（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "工作可能在不同任务之间切换，也可能长时间重复同一步骤。此分量表描述变化多少。熟悉的步骤也可能帮助质量稳定。\n\nThis result describes how varied the work feels and how much it repeats. Routine can still help keep quality stable.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一项可以小幅轮换的重复工作，试试改变角度、分工或顺序。先保留对质量最有帮助的固定动作。\n\nPick one repeatable task with room for a modest rotation, while keeping a step that is important for quality."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 2 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示工作内容更丰富、重复性较少。",
+      "本次分数用于描述作答。国际中版或其他国家版的研究不能作为此组合的当地常模。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_va_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

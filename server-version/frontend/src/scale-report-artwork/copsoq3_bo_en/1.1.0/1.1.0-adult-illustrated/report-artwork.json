@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "copsoq3_bo_en/1.1.0/1.1.0-adult-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位工作者关掉任务灯，靠在椅背上喝水休息。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

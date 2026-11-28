@@ -1,0 +1,515 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "copsoq3_he_en",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "COPSOQ III Demands for Hiding Emotions（国际英文分量表）",
+      "abbreviation": "COPSOQ3-HE",
+      "instrumentFamily": "COPSOQ III international English Annex 1, full original dimension"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "工作更常要求调节可表现的情绪、态度或意见。国际英文附录完整维度，面向成人非商业研究。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "copsoq3_he_en",
+        "domain:workplace_psychosocial",
+        "population:adult",
+        "response:self",
+        "use:research",
+        "source:copsoq_iii_annex_1",
+        "norms:none"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "适用于能读懂英文的成年工作人群。作为非商业研究的自评资料，配有独立中英文反馈。"
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "依原题所问的工作或自我感受。本维度无统一具体回顾期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留英文原题、题号、原序、响应锚点和计分方向。",
+        "平台按完整答卷计算本维度 0–100 原量尺均分。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "English item set and scores follow the Annex. Research applicability is exploratory for this exact standalone administration. Studies of a separately administered national form or international Middle subset do not establish benchmarks for this Annex dimension."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "COPSOQ International Network, Annex 1, original English, PDF pp. 10. https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "保留国际附录英文原题。报告为独立中英文反馈。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_he_en-1.1.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_he_en-1.1.0",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "copsoq3_he_en-1.1.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Original English item text and response categories for a complete COPSOQ III Annex 1 dimension. Source: COPSOQ International Network. The Network lists CC BY-NC-ND 4.0 and linked questionnaire guidelines. This implementation is limited to non-commercial adult research. The original questionnaire terms continue to apply. Independent feedback does not imply Network endorsement and this dimension alone is not organizational risk assessment.",
+      "https://www.copsoq-network.org/licence-guidelines-and-questionnaire"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "en",
+    "version": "1.1.0",
+    "text": "Please select the response that best matches your work experience for each item.",
+    "source": "Platform completion guidance. The Annex does not provide a separate instruction for this dimension. https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "COPSOQ III Annex 1 — Demands for Hiding Emotions",
+        "citation": "COPSOQ International Network. COPSOQ III: Guidelines and questionnaire, Annex 1, 18 August 2021. PDF pp. 10; response options pp. 19–20. Full original Annex 1 HE dimension; 4 items; response option types 1, 2. Annex PDF p. 10 truncates HE3 after 'towards'; its complete wording is documented by Burr et al. (2019) Table 5 (https://www.copsoq-network.org/assets/Uploads/The-Third-Version-of-the-Copenhagen-Psychosocial-Questionnaire.pdf) and the Swedish validation supplement (https://www.copsoq-network.org/assets/Uploads/Supplementary-Material-COPSOQ-III-incl-reference.pdf).",
+        "url": "https://www.copsoq-network.org/assets/Uploads/COPSOQ-network-guidelines-for-the-use-of-COPSOQ-III-290618sig.pdf"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "Original English item text and response categories for a complete COPSOQ III Annex 1 dimension. Source: COPSOQ International Network. The Network lists CC BY-NC-ND 4.0 and linked questionnaire guidelines. This implementation is limited to non-commercial adult research. The original questionnaire terms continue to apply. Independent feedback does not imply Network endorsement and this dimension alone is not organizational risk assessment. https://www.copsoq-network.org/licence-guidelines-and-questionnaire"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "copsoq3_he_en",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "copsoq_iii_response_type_1",
+          "options": [
+            {
+              "value": "option_1",
+              "label": "Always",
+              "score": 100
+            },
+            {
+              "value": "option_2",
+              "label": "Often",
+              "score": 75
+            },
+            {
+              "value": "option_3",
+              "label": "Sometimes",
+              "score": 50
+            },
+            {
+              "value": "option_4",
+              "label": "Seldom",
+              "score": 25
+            },
+            {
+              "value": "option_5",
+              "label": "Never/hardly ever",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "copsoq_iii_response_type_2",
+          "options": [
+            {
+              "value": "option_1",
+              "label": "To a very large extent",
+              "score": 100
+            },
+            {
+              "value": "option_2",
+              "label": "To a large extent",
+              "score": 75
+            },
+            {
+              "value": "option_3",
+              "label": "Somewhat",
+              "score": 50
+            },
+            {
+              "value": "option_4",
+              "label": "To a small extent",
+              "score": 25
+            },
+            {
+              "value": "option_5",
+              "label": "To a very small extent",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "HE1",
+          "content": "Are you required to treat everyone equally, even if you do not feel like it?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "copsoq_iii_response_type_1",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HE2",
+          "content": "Does your work require that you hide your feelings?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "copsoq_iii_response_type_2",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HE3",
+          "content": "Are you required to be kind and open towards everyone – regardless of how they behave towards you?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "copsoq_iii_response_type_2",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HE4",
+          "content": "Does your work require that you do not state your opinion?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "copsoq_iii_response_type_1",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "demands_for_hiding_emotions",
+            "label": "Demands for Hiding Emotions",
+            "type": "dimension",
+            "description": "工作更常要求调节可表现的情绪、态度或意见",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "HE1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HE2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HE3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HE4",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ],
+        "itemRules": [
+          {
+            "itemCode": "HE1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HE2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HE3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HE4",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ]
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "demands_for_hiding_emotions"
+        ],
+        "scoreOrder": [
+          "demands_for_hiding_emotions"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "demands_for_hiding_emotions",
+            "headline": "Where is it possible to speak honestly?",
+            "scoreLabel": "Demands for Hiding Emotions (0–100 mean)",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "Professional interactions can call for holding back a feeling or opinion, or staying open and considerate regardless of the other person's approach.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Identify one situation where private feedback would work. Prepare a short, specific statement you can use."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本分量表由 4 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示工作更常要求调节可表现的情绪、态度或意见。",
+          "本次分数用于描述作答。国际中版或其他国家版的研究不能作为此组合的当地常模。",
+          "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+        ],
+        "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "en"
+        }
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "HE1",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "HE2",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "HE3",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "HE4",
+            "responseValue": "option_5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "demands_for_hiding_emotions": 0.0
+          },
+          "totalScoreKeys": [
+            "demands_for_hiding_emotions"
+          ]
+        }
+      },
+      {
+        "name": "midpoint response positions",
+        "answers": [
+          {
+            "itemCode": "HE1",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "HE2",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "HE3",
+            "responseValue": "option_3"
+          },
+          {
+            "itemCode": "HE4",
+            "responseValue": "option_3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "demands_for_hiding_emotions": 50.0
+          },
+          "totalScoreKeys": [
+            "demands_for_hiding_emotions"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "HE1",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "HE2",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "HE3",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "HE4",
+            "responseValue": "option_1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "demands_for_hiding_emotions": 100.0
+          },
+          "totalScoreKeys": [
+            "demands_for_hiding_emotions"
+          ]
+        }
+      },
+      {
+        "name": "mixed responses use item-specific direction",
+        "answers": [
+          {
+            "itemCode": "HE1",
+            "responseValue": "option_1"
+          },
+          {
+            "itemCode": "HE2",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "HE3",
+            "responseValue": "option_5"
+          },
+          {
+            "itemCode": "HE4",
+            "responseValue": "option_5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "demands_for_hiding_emotions": 25.0
+          },
+          "totalScoreKeys": [
+            "demands_for_hiding_emotions"
+          ]
+        }
+      }
+    ]
+  }
+}

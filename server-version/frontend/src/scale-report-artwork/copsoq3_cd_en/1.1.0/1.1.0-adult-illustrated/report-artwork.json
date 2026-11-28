@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "copsoq3_cd_en/1.1.0/1.1.0-adult-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位技术员把桌上的零件分放在几个托盘里，只留眼前的一件。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

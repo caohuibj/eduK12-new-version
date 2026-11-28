@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_work_pace_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "一阵忙，和一整天都得快跑，是两回事",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "work_pace"
+    ],
+    "scoreOrder": [
+      "work_pace"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "work_pace",
+        "headline": "一阵忙，和一整天都得快跑，是两回事",
+        "scoreLabel": "工作节奏（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "短时加快和一整天不得不维持快节奏，是两种不同的工作体验。这个分量表关注速度要求，以及高节奏要维持多久。\n\nA brief rush and a whole shift at high speed are different experiences. The items ask how often fast work is needed and whether the pace has to be maintained.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一个普通工作日，记下必须提速的时段和可以放缓的环节。先挑一处，看看预先分工或交接是否能缓解。\n\nMap one ordinary day. Find one period that can slow down if a handover or division of work is planned earlier."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 3 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示需要快速工作或持续保持快节奏的情形更多。",
+      "本次分数用于描述作答。国际中版或其他国家版的研究不能作为此组合的当地常模。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_work_pace_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

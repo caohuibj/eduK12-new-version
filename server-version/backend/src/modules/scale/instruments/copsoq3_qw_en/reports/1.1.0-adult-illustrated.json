@@ -1,0 +1,86 @@
+{
+  "toolKey": "copsoq3_qw_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "做成和做好，中间需要哪些条件？",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "quality_of_work"
+    ],
+    "scoreOrder": [
+      "quality_of_work"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "quality_of_work",
+        "headline": "做成和做好，中间需要哪些条件？",
+        "scoreLabel": "工作质量（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "想把事做好，既需要有时间和资源，也需要看到最后做出的质量。这个分量表把做得好的条件和对实际质量的感受放在一起。\n\nThis dimension brings together the conditions for doing work to a satisfactory standard and how the achieved quality is perceived.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想一项你很在意质量的工作，确定最常卡住的是时间、资料还是人手。从一个具体环节提出改进。\n\nChoose one task where quality matters. Identify whether time, information or staffing is the first obstacle to address."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 2 项构成。各题按原版计分方向转换到 0–100，完整作答后等权求均分。分数越高，表示更有条件把工作做到满意的质量，也更满意所在单位的实际质量。",
+      "本次分数用于描述作答。国际中版或其他国家版的研究不能作为此组合的当地常模。",
+      "Only completed responses receive an original-scale mean. No local norms or cut-offs are applied."
+    ],
+    "disclaimer": "供成年工作人群非商业研究和自我回顾。此分量表给出描述性原分。 This descriptive result is for non-commercial research with adult workers and personal reflection.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_qw_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

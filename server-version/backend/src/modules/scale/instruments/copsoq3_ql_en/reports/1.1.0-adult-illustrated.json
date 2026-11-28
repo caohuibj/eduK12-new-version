@@ -1,0 +1,87 @@
+{
+  "toolKey": "copsoq3_ql_en",
+  "contentVersion": "1.1.0",
+  "version": "1.1.0-adult-illustrated",
+  "parameterVersion": "default",
+  "title": "领导质量（有直属主管的成年工作者）",
+  "report": {
+    "reportVersion": "1.1.0-adult-illustrated",
+    "primaryScoreKeys": [
+      "quality_of_leadership"
+    ],
+    "scoreOrder": [
+      "quality_of_leadership"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "quality_of_leadership",
+        "headline": "在工作中，哪些具体管理做法帮得上忙？（有直属主管的成年工作者）",
+        "scoreLabel": "领导质量（0–100 分均分）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这组题请你回想直属主管的一些具体做法，例如工作如何规划，遇到分歧怎样处理，发展机会如何安排，对工作满意度有多重视。\n\nThink about how your immediate supervisor plans work, addresses conflicts, supports development and prioritizes job satisfaction.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想一次近期的排程或冲突。先写下哪一个做法让事情变得容易，再选一处希望改进的安排，用具体例子说明。\n\nChoose a recent scheduling or disagreement example. Name one behavior that helped and one concrete practice to improve."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本分量表由 4 项构成。各题按原版计分转换到 0–100，完整作答后等权求均分。分数越高，表示对直接上级的工作规划、发展支持和处理冲突评价更积极。",
+      "只纳入事先确认属于有直属主管的成年工作者的非商业研究样本。附录第 20 页将无相应关系作为可选缺失项。本分量表适用于已确认的人群，保留五个原版有分选项。有题未答时，本维度留空。",
+      "本次分数用于描述作答。未套用当地常模、等级或筛选界值。",
+      "Use only in a preselected non-commercial research sample of adult workers with an immediate supervisor. Annex 1 footnote † permits adding 'I do not have a supervisor' as a missing response if needed. This edition is restricted to the confirmed cohort, with five original scored responses. An incomplete scale has no score."
+    ],
+    "disclaimer": "适用于有直属主管的成年工作者，供非商业研究和自我回顾。 This descriptive score is for non-commercial research and personal reflection with adult workers with an immediate supervisor.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en"
+    },
+    "artworkKey": "copsoq3_ql_en/1.1.0/1.1.0-adult-illustrated"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-adult-illustrated",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    }
+  }
+}

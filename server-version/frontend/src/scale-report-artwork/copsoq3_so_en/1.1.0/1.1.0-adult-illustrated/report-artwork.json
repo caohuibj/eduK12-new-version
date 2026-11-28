@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "copsoq3_so_en/1.1.0/1.1.0-adult-illustrated",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位成年人放下手边的工具，轻轻活动肩膀。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}
