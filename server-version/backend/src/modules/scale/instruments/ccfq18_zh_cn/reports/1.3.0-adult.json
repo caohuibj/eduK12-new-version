@@ -1,0 +1,127 @@
+{
+  "toolKey": "ccfq18_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.3.0-adult",
+  "title": "压力中的情绪与应对选择｜成人试用描述版",
+  "report": {
+    "reportVersion": "1.3.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "对照 Gabrys 等论文 Table 1 的括号施测顺序、18 句、共同压力引导、6 条反向和两个九题均分。"
+      }
+    },
+    "primaryScoreKeys": [
+      "cognitive_control_over_emotion",
+      "appraisal_and_coping_flexibility"
+    ],
+    "scoreOrder": [
+      "cognitive_control_over_emotion",
+      "appraisal_and_coping_flexibility"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "cognitive_control_over_emotion",
+        "scoreLabel": "情绪相关认知调节均分（1–7）",
+        "headline": "情绪拉走注意力时，先说清眼前要做什么",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一维汇总九道题，关注压力下冒出来的想法和情绪会不会挤占注意力，以及你觉得能否把注意力暂时放回手头事务。按同一方向取 1–7 分均值；较大值表示更认可这种调节空间。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次注意力被压力带跑的时刻，记下当时发生了什么和手头原本要做的事。"
+          },
+          {
+            "category": "strategy",
+            "text": "在可以暂停的场合，先把担忧记下来，然后给手上的事情选一个一分钟内能完成的动作。"
+          },
+          {
+            "category": "support",
+            "text": "如果被同一个念头反复打断，可以请可信的人一起整理问题，帮助把眼前能处理的一项拎出来。"
+          }
+        ],
+        "provisional": true
+      },
+      {
+        "scoreKey": "appraisal_and_coping_flexibility",
+        "scoreLabel": "看法与应对选择均分（1–7）",
+        "headline": "给同一个情况多留两种理解",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一维关注面对压力时换角度、权衡选择和想出不止一种回应。九题取 1–7 分均值，较大值表示你更认同有这些选择。紧迫程度和能掌控的资源会影响实际的做法。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把一次压力事件分别写成事实和你当时的解释，再试着补一个也说得通的解释。"
+          },
+          {
+            "category": "strategy",
+            "text": "想出两个可行的回应，选择更容易撤回的一步作为小尝试，留意后续变化。"
+          },
+          {
+            "category": "support",
+            "text": "问熟悉情境的人还有什么信息遗漏，尤其区分能改变与需要接受的限制。"
+          }
+        ],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "两维各自呈现。原研究的英文证据与本次中文工作译稿的使用范围分开。",
+      "采用已登记中文工作译稿及原计分。数值用于理解本次自陈，当前版本以描述分呈现。",
+      "各分数按原来的完整作答规则计算，漏答保留为缺失。"
+    ],
+    "disclaimer": "适用于既有成人试用研究与自我回顾。临床诊断及其他高风险决定需要相应的专门方法。",
+    "artworkKey": "ccfq18_zh_cn/1.0.0/1.3.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

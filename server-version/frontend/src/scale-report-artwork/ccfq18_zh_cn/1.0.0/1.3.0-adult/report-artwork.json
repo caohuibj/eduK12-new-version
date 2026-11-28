@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "ccfq18_zh_cn/1.0.0/1.3.0-adult",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "成年人在工作台停顿，手边几张空白卡片代表不同选择。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
