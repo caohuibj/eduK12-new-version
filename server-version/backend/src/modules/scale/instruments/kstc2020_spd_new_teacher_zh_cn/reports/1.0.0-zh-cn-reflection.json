@@ -1,0 +1,88 @@
+{
+  "toolKey": "kstc2020_spd_new_teacher_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.0.0-zh-cn-reflection",
+  "title": "自我反思｜简中试用",
+  "report": {
+    "reportVersion": "1.0.0-zh-cn-reflection",
+    "primaryScoreKeys": [
+      "spd_new"
+    ],
+    "scoreOrder": [
+      "spd_new"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "spd_new",
+        "headline": "把一个课堂问题带进合作",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这组问题聚焦教师社群、课堂研究和校内外协作。参与的机会与时间、资源和团队安排有关。将最近的教学问题说清楚，往往比先做一个完整研究项目更容易迈出第一步。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "有什么科学课堂问题，找一位同事、家长或社区伙伴共同观察，会比独自思考多一个角度？"
+          },
+          {
+            "category": "strategy",
+            "text": "选一份学生作品或一段简短课堂记录，与同事在一次例会里一起看。先约定想弄清的一件事，再比较各自的观察。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "试用中文译本依据 Kang 等（2020）公开的附录 B 英文题文。原研究针对韩国 210 名小学、初中和高中教师，尚待本地译审与适用性验证。",
+      "采用本项目的单维度等权平均。1 表示很少，5 表示总是。中间档位保持数字，原论文只公布两个端点文字。答完本组全部题目后才计算，缺答不补分。",
+      "不同维度的平均分各自保留。结果供本人回顾教学实践，缺少用于教师比较或专业发展水平分级的本地依据。"
+    ],
+    "disclaimer": "本结果为试用版的自评记录，供科学教师自愿反思或研究。课程、资源和开展机会都会影响作答；教师绩效、职称评定和学生学习成效需要独立证据。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    }
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.0.0-zh-cn-reflection",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": false
+      }
+    }
+  }
+}

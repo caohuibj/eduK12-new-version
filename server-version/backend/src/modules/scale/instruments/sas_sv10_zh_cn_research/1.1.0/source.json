@@ -1,0 +1,790 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "sas_sv10_zh_cn_research",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "智能手机使用体验问卷（SAS-SV，八年级中文情境试用版）",
+      "abbreviation": "SAS-SV10",
+      "instrumentFamily": "Smartphone Addiction Scale – Short Version,2013 English Appendix S1"
+    },
+    "construct": {
+      "primaryDomain": "BEHAVIORAL_DIFFICULTIES",
+      "secondaryDomains": [
+        "SELF_REGULATION"
+      ],
+      "constructDefinition": "智能手机使用对学习、日常计划、身体感受和关系的自报影响；10题简版仅总分，不借用33题版六因素。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "数字使用",
+        "智能手机",
+        "行为习惯",
+        "青少年原始验证",
+        "自评",
+        "10题",
+        "CC-BY",
+        "中文工作稿",
+        "非诊断",
+        "外部阈值未启用",
+        "domain:digital_behavior",
+        "construct:smartphone_use_difficulties",
+        "population:grade_8_research",
+        "response:self",
+        "response:digital_self",
+        "use:research",
+        "use:not_diagnostic",
+        "license:cc_by",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot",
+        "中文情境试用版",
+        "本地示例",
+        "原始总分"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 8,
+        "maxGrade": 8
+      },
+      "populationNotes": "原研究韩国江原道两校初中二年级540名学生，平均14.5岁；本中文工作稿当前限对应八年级研究，不称中国或成人已验证，平均年龄不是推定年龄范围。 本次情境改编也没有独立心理测量验证。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "原附录无固定回忆时段；按一般实际情况回答",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留2013作者英文附录10题/六级同意锚点；全正向。",
+        "沿用 C1.0.0 的中文工作译稿。第 8 题仅更新社交平台示例，参考 Zou 等（2019）在中国初中研究中公开描述的处理，https://doi.org/10.1186/s12887-019-1699-9。本版本仍是独立译稿。",
+        "其余题干、选项、题序和计分沿用 C1.0.0。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "八年级研究工作译稿，不做自动分层或纪律处分。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.1.0",
+    "translationSource": "沿用 C1.0.0 的中文工作译稿。第 8 题仅更新社交平台示例，参考 Zou 等（2019）在中国初中研究中公开描述的处理，https://doi.org/10.1186/s12887-019-1699-9。本版本仍是独立译稿。",
+    "adaptationMethod": "CULTURAL_ADAPTATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "独立中文情境试用版，尚无本地效度或常模。原研究和现有译稿均不等同于本版本。人工译审和认知访谈待完成。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "sas-sv10-zh-cn-research-1.1.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [
+      "gradeLevel"
+    ],
+    "subject": {
+      "grades": [
+        "8"
+      ]
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "sas-sv10-zh-cn-research-1.1.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "sas-sv10-zh-cn-research-1.1.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "©2013 Kwon et al. Kwon M, Kim D-J, Cho H, Yang S (2013). The Smartphone Addiction Scale: Development and Validation of a Short Version for Adolescents. PLoS ONE 8(12): e83558. https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0083558；CC Attribution（当前链接 https://creativecommons.org/licenses/by/4.0/）。本中文翻译与数字排版/反馈为独立改编，无原作者背书；不声称2013原文印有4.0版本号。",
+      "版权不限制为NC；研究用途/工作译稿状态不等同许可NC条款。实际未成年人数据采集仍须按现有同意与隐私流程。",
+      "沿用 C1.0.0 的中文工作译稿。第 8 题仅更新社交平台示例，参考 Zou 等（2019）在中国初中研究中公开描述的处理，https://doi.org/10.1186/s12887-019-1699-9。本版本仍是独立译稿。",
+      "本交付使用范围为非商业研究试用。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Smartphone Addiction Scale – Short Version — 2013 Appendix S1",
+        "citation": "Kwon M, Kim D-J, Cho H, Yang S (2013). The Smartphone Addiction Scale: Development and Validation of a Short Version for Adolescents. PLoS ONE 8(12): e83558.",
+        "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0083558",
+        "publicationYear": 2013
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "©2013 Kwon et al. Kwon M, Kim D-J, Cho H, Yang S (2013). The Smartphone Addiction Scale: Development and Validation of a Short Version for Adolescents. PLoS ONE 8(12): e83558. https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0083558；CC Attribution（当前链接 https://creativecommons.org/licenses/by/4.0/）。本中文翻译与数字排版/反馈为独立改编，无原作者背书；不声称2013原文印有4.0版本号。 沿用 C1.0.0 的中文工作译稿。第 8 题仅更新社交平台示例，参考 Zou 等（2019）在中国初中研究中公开描述的处理，https://doi.org/10.1186/s12887-019-1699-9。本版本仍是独立译稿。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "sas_sv10_agreement_1_6",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有些不同意",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "有些同意",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "同意",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "非常同意",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "SAS_SV10_01",
+          "content": "因为使用智能手机而耽误原先计划好的事情。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "sas_sv10_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_SV10_02",
+          "content": "因为使用智能手机，在上课、做作业或工作时很难集中注意力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "sas_sv10_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_SV10_03",
+          "content": "使用智能手机时，手腕或后颈会疼痛。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "sas_sv10_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_SV10_04",
+          "content": "我会无法忍受没有智能手机。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "sas_sv10_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_SV10_05",
+          "content": "手里没有拿着智能手机时，我会感到不耐烦、烦躁不安。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "sas_sv10_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_SV10_06",
+          "content": "即使没有在使用智能手机，我也会想着它。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "sas_sv10_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_SV10_07",
+          "content": "即使日常生活已经受到很大影响，我也绝不会放弃使用智能手机。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "sas_sv10_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_SV10_08",
+          "content": "我不停地查看智能手机，以免错过其他人在微信、QQ 或微博上的对话。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "sas_sv10_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_SV10_09",
+          "content": "我使用智能手机的时间比原先打算的更长。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "sas_sv10_agreement_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SAS_SV10_10",
+          "content": "身边的人说我使用智能手机太多了。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "sas_sv10_agreement_1_6",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "SAS_SV10_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_SV10_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_SV10_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_SV10_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_SV10_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_SV10_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_SV10_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_SV10_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_SV10_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SAS_SV10_10",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "phone_use_difficulties",
+            "type": "total",
+            "label": "手机使用带来的困扰",
+            "description": "较高分表示本次自述的手机使用相关困扰更多，不是成瘾诊断、意志力或品德判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SAS_SV10_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_SV10_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_SV10_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_SV10_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_SV10_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_SV10_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_SV10_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_SV10_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_SV10_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SAS_SV10_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.3.0-context-base",
+        "primaryScoreKeys": [
+          "phone_use_difficulties"
+        ],
+        "scoreOrder": [
+          "phone_use_difficulties"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "phone_use_difficulties",
+            "headline": "手机在什么时候打断了你？",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "看消息、找资料、跟朋友聊几句，手机能帮上不少忙。它也可能在你本来想专心的时候，把注意力拉到屏幕上。这份问卷请你回想这类体验。10 题总分为 10–60 分。分数越高，说明你这次越认同与手机使用有关的困扰。真正值得留意的是具体情境：什么时候你想看一下，又是什么让你继续看下去？",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "从最近一次分心想起：你本来在做什么？那时是在等一条重要消息，还是习惯性地解锁了手机？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一个短时段试试，比如做作业的前十分钟。把不着急看的消息留到休息时，再看看这段时间能不能接着做原来的事。"
+              },
+              {
+                "category": "support",
+                "text": "如果使用习惯经常影响休息、学习或相处，可以和信任的人商量一个自己也愿意尝试的调整办法。"
+              }
+            ],
+            "provisional": true,
+            "scoreLabel": "手机使用相关困扰总分（试用）"
+          }
+        ],
+        "limitations": [
+          "本次给出八年级情境试用版的原始总分。尚无本中文版的本地常模或界值。",
+          "只有 10 个有效答案时才计算总分。分数用于了解自报体验，不能用于成瘾诊断、纪律处分或学生排名。"
+        ],
+        "disclaimer": "这份报告帮你观察手机使用如何影响日常生活。中文情境版仍处于试用阶段。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "sas_sv10",
+        "locale": "zh-CN",
+        "localizationVersion": "1.1.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "SAS_SV10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_SV10_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_SV10_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_SV10_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_SV10_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_SV10_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_SV10_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_SV10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_SV10_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_SV10_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phone_use_difficulties": 10
+          },
+          "totalScoreKeys": [
+            "phone_use_difficulties"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "SAS_SV10_01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_SV10_02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_SV10_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_SV10_04",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_SV10_05",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_SV10_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_SV10_07",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_SV10_08",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_SV10_09",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_SV10_10",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phone_use_difficulties": 60
+          },
+          "totalScoreKeys": [
+            "phone_use_difficulties"
+          ]
+        }
+      },
+      {
+        "name": "all-three",
+        "answers": [
+          {
+            "itemCode": "SAS_SV10_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_SV10_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_SV10_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_SV10_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_SV10_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_SV10_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_SV10_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_SV10_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_SV10_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_SV10_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phone_use_difficulties": 30
+          },
+          "totalScoreKeys": [
+            "phone_use_difficulties"
+          ]
+        }
+      },
+      {
+        "name": "original-cutoff-value-only",
+        "answers": [
+          {
+            "itemCode": "SAS_SV10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_SV10_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SAS_SV10_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_SV10_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SAS_SV10_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SAS_SV10_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SAS_SV10_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SAS_SV10_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SAS_SV10_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SAS_SV10_10",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "phone_use_difficulties": 31
+          },
+          "totalScoreKeys": [
+            "phone_use_difficulties"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请按你对以下每句话的同意程度作答。",
+    "language": "zh-CN",
+    "version": "1.0.1",
+    "source": "docs/scale-instruments/research-drafts/sas_sv10/1.0.0/bilingual-content.json#/instructions @ b92c69aefa2472775fa7ee86b9c208366886c908；依据原六级同意度选项对既有项目说明作编辑性澄清，采用audit-sas-sv10-batch3.json所列普通修订；无固定回顾期说明留在研究档案，不新增时窗，非作者原指导语。"
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "sas-sv10-zh-cn-research-1.1.0",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "resultQualityDetails": true
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

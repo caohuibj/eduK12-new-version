@@ -1,0 +1,622 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "kstc2020_stp_engagement_teacher_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "KSTC 科学教师自评｜科学教学｜促进学生参与｜简中试用",
+      "abbreviation": "KSTC-STP_ENGAGEMENT",
+      "instrumentFamily": "Kang et al. 2020 Science Teaching Competence Self-Assessment (54 items / Appendix B)"
+    },
+    "construct": {
+      "primaryDomain": "ENGAGEMENT",
+      "secondaryDomains": [],
+      "constructDefinition": "自报科学教学环节中的促进学生参与有关的做法出现频率，题目中的理解与成效也由本人判断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:kstc2020",
+        "role:teacher_self",
+        "population:teacher",
+        "stage:primary_secondary",
+        "subject:science",
+        "language:zh_cn",
+        "version:2020_appendix_b",
+        "use:research",
+        "license:cc_by_4_0",
+        "construct:stp_engagement",
+        "edition:zh_cn_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "公开原研究为 210 名韩国小学、初中和高中教师。本简中试译供年满 18 岁的在职科学教师候审，尚待独立中文译审及本地适用性验证。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 6,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "平常的科学教学相关实践，原论文未规定固定回忆时间。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "按附录 B 保留所属维度和相对顺序。项目由公开英文译为简体中文，尚待独立审校。",
+        "原文公布五个数字位置及两端锚点：1 很少，5 总是。2–4 保留数字标记。",
+        "原研究在同一份 54 题表中对九维度建模。分维候选可供预览，独立施测的解释依据尚待研究。",
+        "本项目采用维度内完整作答的等权平均，无反向题。任一题缺答或无效时该维不计分。",
+        "预计时间根据题目数估计。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "辅助对公开论文维度的研究及原始反应分析。无本地常模、独立施测验证或诊断界值。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Kang 等（2020）公开发表的附录 B 英文题文，https://doi.org/10.1163/23641177-BJA10012",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "简体中文项目试译，沿用原组题号、相对顺序以及频率端点。韩国原施测文本未用于转译。中文使用等值性待核。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "kstc2020_stp_engagement_teacher_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "kstc2020_stp_engagement_teacher_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": false,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": true
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "kstc2020_stp_engagement_teacher_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "translation",
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Kang, N.-H., Kang, H., Maeng, S., Park, J., & Jeong, E. (2020). Teacher Competency in Competency-Focused Science Teaching in the South Korean Context: Teacher Self-Assessment Instrument Development and Application. Asia-Pacific Science Education, 6(2), 480–513. https://doi.org/10.1163/23641177-BJA10012",
+      "© Kang 等（2020）。原题取自公开出版的英文附录 B，https://brill.com/view/journals/apse/6/2/article-p480_10.pdf。CC BY 4.0，https://creativecommons.org/licenses/by/4.0/。本版本改为简体中文并按原论文维度分装；作答数字、端点和各维题目相对顺序保留。等权平均、缺答政策和反思报告为平台描述性设计。中文独立审校待完成，未声称原作者背书。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "科学教师教学能力自评（附录 B）｜科学教学｜促进学生参与",
+        "citation": "Kang, N.-H., Kang, H., Maeng, S., Park, J., & Jeong, E. (2020). Teacher Competency in Competency-Focused Science Teaching in the South Korean Context: Teacher Self-Assessment Instrument Development and Application. Asia-Pacific Science Education, 6(2), 480–513. https://doi.org/10.1163/23641177-BJA10012",
+        "url": "https://doi.org/10.1163/23641177-BJA10012"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© Kang 等（2020）。原题取自公开出版的英文附录 B，https://brill.com/view/journals/apse/6/2/article-p480_10.pdf。CC BY 4.0，https://creativecommons.org/licenses/by/4.0/。本版本改为简体中文并按原论文维度分装；作答数字、端点和各维题目相对顺序保留。等权平均、缺答政策和反思报告为平台描述性设计。中文独立审校待完成，未声称原作者背书。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "frequency",
+          "options": [
+            {
+              "value": "1",
+              "label": "1 很少",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5 总是",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "STP1.CL1",
+          "content": "我营造让学生在相互尊重和信任中参与的科学学习环境。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "STP1.CL2",
+          "content": "开展科学教学时，我会考虑学生在概念理解、思维水平等认知方面的个体差异。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "STP1.CL3",
+          "content": "开展科学教学时，我会考虑学生在学习动机、兴趣等情感方面的个体差异。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "STP1.CL4",
+          "content": "我鼓励学生自己解释科学概念和知识。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "STP1.CL6",
+          "content": "课堂上发生计划之外的情况时，我会灵活调整教学安排。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "STP1.CL7",
+          "content": "我根据学生的能力和水平讲解科学内容。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "STP1.CL1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "STP1.CL2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "STP1.CL3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "STP1.CL4",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "STP1.CL6",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "STP1.CL7",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "stp_engagement",
+            "type": "dimension",
+            "label": "科学教学｜促进学生参与",
+            "description": "本组全部题目作答后取平均分，保留两位小数，范围为 1–5。得分越高，表示本人报告相应做法越常出现。题干中涉及理解和成效时，结果仍来自本人的判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "STP1.CL1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "STP1.CL2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "STP1.CL3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "STP1.CL4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "STP1.CL6",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "STP1.CL7",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "stp_engagement"
+        ],
+        "scoreOrder": [
+          "stp_engagement"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "stp_engagement",
+            "headline": "让更多学生有机会把想法说出来",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "有效参与需要可理解的任务、愿意试错的空间和被听见的机会。这个结果可以提醒你观察：同样一个科学问题，谁容易加入，谁需要多一点思考时间或其他表达方式。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "上一次班级讨论中，哪些学生很少发言？如果先写下想法再同伴交流，他们会多出什么参与机会？"
+              },
+              {
+                "category": "strategy",
+                "text": "安排一次“先独想、再同伴交流、最后全班分享”。保留写、画或口头说明的选择，比较不同学生在这些环节中提供的证据。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "试用中文译本依据 Kang 等（2020）公开的附录 B 英文题文。原研究针对韩国 210 名小学、初中和高中教师，尚待本地译审与适用性验证。",
+          "采用本项目的单维度等权平均。1 表示很少，5 表示总是。中间档位保持数字，原论文只公布两个端点文字。答完本组全部题目后才计算，缺答不补分。",
+          "不同维度的平均分各自保留。结果供本人回顾教学实践，缺少用于教师比较或专业发展水平分级的本地依据。"
+        ],
+        "disclaimer": "本结果为试用版的自评记录，供科学教师自愿反思或研究。课程、资源和开展机会都会影响作答；教师绩效、职称评定和学生学习成效需要独立证据。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "science",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "rarely",
+        "answers": [
+          {
+            "itemCode": "STP1.CL1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "STP1.CL2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "STP1.CL3",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "STP1.CL4",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "STP1.CL6",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "STP1.CL7",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "stp_engagement": 1
+          },
+          "totalScoreKeys": [
+            "stp_engagement"
+          ]
+        }
+      },
+      {
+        "name": "numeric_middle",
+        "answers": [
+          {
+            "itemCode": "STP1.CL1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "STP1.CL2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "STP1.CL3",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "STP1.CL4",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "STP1.CL6",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "STP1.CL7",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "stp_engagement": 3
+          },
+          "totalScoreKeys": [
+            "stp_engagement"
+          ]
+        }
+      },
+      {
+        "name": "always",
+        "answers": [
+          {
+            "itemCode": "STP1.CL1",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "STP1.CL2",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "STP1.CL3",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "STP1.CL4",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "STP1.CL6",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "STP1.CL7",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "stp_engagement": 5
+          },
+          "totalScoreKeys": [
+            "stp_engagement"
+          ]
+        }
+      },
+      {
+        "name": "missing_one_no_score",
+        "answers": [
+          {
+            "itemCode": "STP1.CL1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "STP1.CL2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "STP1.CL3",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "STP1.CL4",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "STP1.CL6",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "stp_engagement": null
+          },
+          "totalScoreKeys": [
+            "stp_engagement"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "version": "1.0.0",
+    "language": "zh-CN",
+    "source": "根据 Kang 等（2020）方法 3.1 节撰写的简中作答说明。",
+    "text": "请回想自己的科学备课、教学或专业发展经历，按各陈述与平常做法的符合频率选择。1 表示“很少”，5 表示“总是”。原发表材料只提供两个端点的文字，2–4 保留数字标记。涉及理解或成效的陈述，请根据自己的判断作答。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "dataCeiling": {
+    "schemaVersion": 1,
+    "policyVersion": "kstc2020_stp_engagement_teacher_zh_cn-c-1.0.0",
+    "unknownAudience": "DENY",
+    "audiences": {
+      "respondent": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "subject": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      },
+      "teacher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "resultQualityDetails": false
+      },
+      "researcher": {
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "resultQualityDetails": true
+      }
+    }
+  }
+}
