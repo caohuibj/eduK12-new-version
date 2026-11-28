@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "cbi_work_zh_cn/1.0.0/1.2.0-teacher",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "两名同事在桌边重新安排一项耗时工作，给下一项任务留出空间。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

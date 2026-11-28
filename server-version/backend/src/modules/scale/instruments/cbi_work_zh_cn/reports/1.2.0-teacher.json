@@ -1,0 +1,92 @@
+{
+  "toolKey": "cbi_work_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-teacher",
+  "title": "工作相关疲惫（CBI-W 中文试用报告）",
+  "report": {
+    "reportVersion": "1.2.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "primaryScoreKeys": [
+      "work_related_burnout"
+    ],
+    "scoreOrder": [
+      "work_related_burnout"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "work_related_burnout",
+        "scoreLabel": "工作相关疲惫",
+        "headline": "观察哪种工作节奏最耗力",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "下午好几个临时任务接连出现，你一直在改计划；离开工作场所后，连原本想做的事也提不起劲。七题的 0–100 均分描述你自己认为与工作有关的疲惫，分数越高表示本次报告的疲惫出现得更常或感受更强。对照不同安排时的体验，可以帮助你说清哪里需要调整。",
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找一项能说清的工作安排，比如集中答疑、交接反复或一整段时间没有休息。记下在哪个时点开始觉得吃力。"
+          },
+          {
+            "category": "support",
+            "text": "把需要调整的事情说具体，例如集中回一批常见问题、有人分担一段值守，或者先确认当天必须完成的任务。找能协调的人一起决定。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "七题里至少回答四题才计算本项。有关闲暇时是否还有精力陪伴亲友的正向题沿用反向计分。有漏答且达到最低题数时只用已答题，漏答不当作零分。",
+      "本项记录你认为与工作有关的疲惫，单次回答无法判定实际原因。",
+      "题本是依据英文原版独立翻译的简体中文工作稿，仍待人工译审和本地验证。分数没有本地常模、百分位或等级，请结合答题时的实际情况阅读。",
+      "量表来源与使用署名：Borritz M et al. Burnout among employees in human service work: design and baseline findings of the PUMA study. Scandinavian Journal of Public Health. 2006;34:49–58。工具发展文献：Kristensen TS 等（2005），https://doi.org/10.1080/02678370500297720。"
+    ],
+    "disclaimer": "供成人教师和相关工作者回顾本次自述体验。请勿将结果用于诊断、录用、绩效考核或学校排名。",
+    "artworkKey": "cbi_work_zh_cn/1.0.0/1.2.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
